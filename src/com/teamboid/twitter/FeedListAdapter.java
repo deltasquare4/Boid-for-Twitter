@@ -194,13 +194,8 @@ public class FeedListAdapter extends BaseAdapter {
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
 		Status tweet = tweets.get(position);
-		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + tweet.getUser().getScreenName() + "&size=bigger");
 		TextView indicatorTxt = (TextView)toReturn.findViewById(R.id.feedItemRetweetIndicatorTxt);
-		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName); 
-		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
-			userNameTxt.setText(tweet.getUser().getName());
-		} else userNameTxt.setText(tweet.getUser().getScreenName());
+		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
 		if(tweet.isRetweet()) {
 			Spannable rtSpan = new SpannableString("RT by @" + tweet.getUser().getScreenName());
 			rtSpan.setSpan(new NoUnderlineClickableSpan() {
@@ -221,6 +216,11 @@ public class FeedListAdapter extends BaseAdapter {
 			userNameTxt.setLayoutParams(userNameParams);
 			indicatorTxt.setVisibility(View.GONE);
 		}
+		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
+		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + tweet.getUser().getScreenName() + "&size=bigger");
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
+			userNameTxt.setText(tweet.getUser().getName());
+		} else userNameTxt.setText(tweet.getUser().getScreenName());
 		final Status fTweet = tweet;
 		profilePic.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

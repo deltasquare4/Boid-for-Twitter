@@ -40,7 +40,7 @@
     <string name="failed_expand_twitlonger">Something happened while expanding this TwitLonger post!</string>
     <string name="failed_expand_twtmore">Something happened while expanding this Twtmore post!</string>
     <string name="copied_str">Tweet copied to clipboard!</string>
-    <string name="successfully_deleted_status">Successfully deleted your Tweet!</string>
+    <string name="successfully_deleted_status">Your Tweet was deleted!</string>
     <string name="failed_delete_status">Something happened while deleting your Tweet!</string>
     
     <string name="tweets_str">Tweets</string>
