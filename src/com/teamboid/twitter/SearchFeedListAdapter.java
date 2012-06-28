@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
 
 import twitter4j.GeoLocation;
@@ -10,6 +11,7 @@ import twitter4j.Tweet;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -139,10 +142,39 @@ public class SearchFeedListAdapter extends BaseAdapter {
 				((TextView)toReturn.findViewById(R.id.locationIndicTxt)).setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
 			}
 		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
-		final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
+		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 		if(media != null && !media.isEmpty()) {
-			((ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator)).setVisibility(View.VISIBLE);
-		} else ((ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator)).setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
+			final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+			mediaPreview.setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
+			if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
+				progress.setVisibility(View.VISIBLE);
+				ImageManager download = ImageManager.getInstance(mContext);
+				download.get(media, new ImageManager.OnImageReceivedListener() {
+					@Override
+					public void onImageReceived(String source, Bitmap bitmap) {
+						progress.setVisibility(View.GONE);
+						mediaPreview.setVisibility(View.VISIBLE);
+						mediaPreview.setImageBitmap(bitmap);
+					}
+				});
+			} else {
+				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
+				toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
+				mediaPreview.setVisibility(View.GONE);
+				mediaPreview.setImageBitmap(null);
+			}
+		} else {
+			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
+			mediaPreview.setVisibility(View.GONE);
+			mediaPreview.setImageBitmap(null);
+		}
+		
+		
 		return toReturn;
 	}
 }
