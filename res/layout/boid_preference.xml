@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="wrap_content"
+	android:minHeight="?android:attr/listPreferredItemHeight"
+	android:gravity="center_vertical" android:paddingRight="?android:attr/scrollbarSize"
+	android:background="?android:attr/selectableItemBackground">
+	<ImageView android:id="@+android:id/icon"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_gravity="center" />
+	<RelativeLayout android:layout_width="0dp"
+		android:layout_height="wrap_content" android:layout_marginTop="6dip"
+		android:layout_marginBottom="6dip" android:layout_weight="1"
+		android:layout_marginLeft="8dp">
+		<TextView android:id="@+android:id/title"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:singleLine="true" android:textAppearance="?android:attr/textAppearanceMedium"
+			android:ellipsize="marquee" android:layout_alignParentRight="true"
+			android:layout_alignParentLeft="true" android:fadingEdge="horizontal" />
+		<TextView android:id="@+android:id/summary"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_below="@android:id/title" android:layout_alignLeft="@android:id/title"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:textColor="?android:attr/textColorSecondary"
+			android:layout_toLeftOf="@+android:id/widget_frame" android:maxLines="4" />
+		<!-- Preference should place its actual preference widget here. -->
+		<LinearLayout android:id="@+android:id/widget_frame"
+			android:layout_width="wrap_content" android:layout_height="match_parent"
+			android:gravity="center_vertical" android:layout_below="@+android:id/title"
+			android:layout_alignParentRight="true" android:orientation="vertical" />
+	</RelativeLayout>
+</LinearLayout>

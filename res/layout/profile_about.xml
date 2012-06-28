@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:paddingLeft="10dp" android:paddingTop="10dp"
+	android:paddingBottom="10dp">
+	<com.handlerexploit.prime.widgets.RemoteImageView android:id="@+id/userItemProfilePic"
+		android:layout_width="73dp" android:layout_height="73dp"
+		android:layout_marginRight="10dp" android:src="@drawable/silouette" />
+	<TextView android:id="@+id/userItemName" android:textColor="?usernameColor"
+		android:singleLine="true" android:layout_width="wrap_content"
+		android:layout_marginRight="10dp" android:layout_height="wrap_content"
+		android:layout_toRightOf="@+id/userItemProfilePic" android:textStyle="bold"
+		android:textAppearance="?android:attr/textAppearanceLarge" />
+	<TextView android:id="@+id/userItemDescription"
+		android:layout_marginRight="10dp" android:textColor="?tweetColor"
+		android:textColorLink="?linkColor" android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_below="@+id/userItemName" android:layout_toRightOf="@+id/userItemProfilePic" />
+	<ImageView android:id="@+id/userItemVerified"
+		android:scaleType="fitCenter" android:layout_toRightOf="@+id/userItemName"
+		android:visibility="gone" android:layout_width="20dp"
+		android:layout_height="20dp" android:layout_marginTop="3dp"
+		android:layout_marginRight="10dp" android:src="@drawable/verified" />
+	<Button android:id="@+id/followButton" android:state_enabled="false"
+		android:layout_marginRight="10dp" android:layout_marginTop="5dp"
+		android:layout_width="fill_parent" android:layout_toRightOf="@+id/userItemProfilePic"
+		android:layout_below="@+id/userItemDescription" android:layout_height="wrap_content"
+		android:text="@string/follow_str" />
+</RelativeLayout>

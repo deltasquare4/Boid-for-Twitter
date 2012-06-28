@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="themeColor" format="color|reference" />
+	<attr name="usernameColor" format="color|reference" />
+	<attr name="selectedItemColor" format="color|reference" />
+	<attr name="timerColor" format="color|reference" />
+	<attr name="tweetColor" format="color|reference" />
+	<attr name="linkColor" format="color|reference" />
+	<attr name="spinnerDropdownItemColor" format="color|reference" />
+	<attr name="mediaIndicator" format="reference" />
+	<attr name="replyIndicator" format="reference" />
+	<attr name="retweetIndicator" format="reference" />
+	<attr name="timeIndicator" format="reference" />
+	<attr name="cloudIcon" format="reference" />
+	<attr name="followIcon" format="reference" />
+	<attr name="unfollowIcon" format="reference" />
+	<attr name="helpIcon" format="reference" />
+	<attr name="settingsIcon" format="reference" />
+	<attr name="accountSwitchIcon" format="reference" />
+	
+	<attr name="pinIcon" format="reference" />
+	<attr name="newTweetIcon" format="reference" />
+	<attr name="addAccountIcon" format="reference" />
+	<attr name="searchIcon" format="reference" />
+	<attr name="addIcon" format="reference" />
+    <attr name="removeIcon" format="reference" />
+	<attr name="refreshIcon" format="reference" />
+	<attr name="profileIcon" format="reference" />
+	<attr name="newMessageIcon" format="reference" />
+
+	<attr name="mentionIcon" format="reference" />
+	<attr name="editIcon" format="reference" />
+	<attr name="reportIcon" format="reference" />
+	<attr name="sendIcon" format="reference" />
+	<attr name="doneIcon" format="reference" />
+
+	<attr name="replyIcon" format="reference" />
+	<attr name="retweetIcon" format="reference" />
+	<attr name="unretweetIcon" format="reference" />
+	<attr name="favoriteIcon" format="reference" />
+	<attr name="unfavoriteIcon" format="reference" />
+	<attr name="copyIcon" format="reference" />
+	<attr name="shareIcon" format="reference" />
+	<attr name="deleteIcon" format="reference" />
+
+	<attr name="cameraAttachedIcon" format="reference" />
+	<attr name="cameraDetachedIcon" format="reference" />
+	<attr name="galleryAttachedIcon" format="reference" />
+	<attr name="galleryDetachedIcon" format="reference" />
+	<attr name="locationAttachedIcon" format="reference" />
+	<attr name="locationDetachedIcon" format="reference" />
+	<attr name="locationIndicator" format="reference" />
+	<attr name="favoritedIndicator" format="reference" />
+	
+	<attr name="timelineTab" format="reference" />
+	<attr name="mentionsTab" format="reference" />
+	<attr name="messagesTab" format="reference" />
+	<attr name="trendsTab" format="reference" />
+	<attr name="favoritesTab" format="reference" />
+	<attr name="savedSearchTab" format="reference" />
+	<attr name="userListTab" format="reference" />
+	<attr name="nearbyTab" format="reference" />
+	<attr name="mediaTab" format="reference" />
+	<attr name="aboutTab" format="reference" />
+</resources>

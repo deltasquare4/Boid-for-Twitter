@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent">
+	<RelativeLayout android:id="@+id/messageInputFrame"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true">
+		<View android:id="@+id/messageInputDivider" android:layout_width="fill_parent"
+			android:layout_height="1dp" android:background="@color/blue"
+			android:layout_alignParentTop="true" />
+		<EditText android:id="@+id/messageInput" android:hint="@string/what_you_wanna_say"
+			android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
+			android:layout_marginTop="15dp" android:layout_marginBottom="15dp"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:layout_centerInParent="true" android:maxHeight="100dp"
+			android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
+			<requestFocus />
+		</EditText>
+	</RelativeLayout>
+	<RelativeLayout android:id="@+id/messageListFrame"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:layout_above="@+id/messageInputFrame">
+		<ListView android:id="@android:id/list" android:layout_width="fill_parent"
+			android:smoothScrollbar="true" android:transcriptMode="alwaysScroll"
+			android:layout_height="fill_parent" />
+		<TextView android:id="@android:id/empty"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="@string/no_messages" android:layout_centerInParent="true"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+	</RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
+		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/mentionAction" android:title="@string/new_tweet_str"
+		android:icon="?mentionIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/messageAction" android:title="@string/directmessage_str"
+		android:icon="?newMessageIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/pinAction" android:title="@string/pin_column_str"
+		android:icon="?pinIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/reportAction" android:title="@string/report_str"
+		android:showAsAction="ifRoom" android:icon="?reportIcon" />
+</menu>

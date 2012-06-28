@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<ScrollView android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<RelativeLayout android:id="@+id/tweetDisplay"
+			android:paddingLeft="20dp" android:paddingRight="20dp"
+			android:paddingTop="10dp" android:paddingBottom="10dp"
+			android:layout_width="match_parent" android:layout_height="wrap_content">
+			<LinearLayout android:id="@android:id/list"
+				android:orientation="vertical" android:layout_width="fill_parent"
+				android:visibility="gone" android:layout_height="wrap_content" />
+			<View android:id="@+id/tweetConvoDivider" android:layout_width="fill_parent"
+				android:layout_height="1dp" android:background="@color/blue"
+				android:layout_below="@+android:id/list" android:visibility="gone"
+				android:layout_marginTop="10dp" android:layout_marginBottom="10dp" />
+			<com.handlerexploit.prime.widgets.RemoteImageView
+				android:id="@+id/tweetProfilePic" android:layout_marginRight="10dp"
+				android:layout_below="@+id/tweetConvoDivider"
+				android:layout_marginTop="10dp" android:layout_width="73dp"
+				android:layout_height="73dp" android:src="@drawable/silouette" />
+			<LinearLayout android:id="@+id/userNameDisplay"
+				android:orientation="vertical" android:layout_alignTop="@+id/tweetProfilePic"
+				android:layout_toRightOf="@+id/tweetProfilePic"
+				android:layout_width="wrap_content" android:layout_height="73dp">
+				<TextView android:id="@+id/tweetUserName"
+					android:layout_gravity="center_vertical" android:textColor="?usernameColor"
+					android:textStyle="bold" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:singleLine="true"
+					android:textAppearance="?android:attr/textAppearanceLarge" />
+				<TextView android:id="@+id/tweetScreenName"
+					android:layout_weight="1" android:layout_gravity="center_vertical"
+					android:textColor="?tweetColor" android:layout_width="wrap_content"
+					android:layout_height="0dp" android:singleLine="true"
+					android:textAppearance="?android:attr/textAppearanceMedium" />
+			</LinearLayout>
+			<TextView android:id="@+id/tweetContents" android:textColor="?tweetColor"
+				android:layout_marginTop="10dp" android:textColorLink="?linkColor"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_below="@+id/tweetProfilePic" android:linksClickable="true"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+			<TextView android:id="@+id/tweetTimer" android:textColor="@color/dark"
+				android:layout_marginTop="5dp" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:singleLine="true"
+				android:layout_below="@+id/tweetContents" android:layout_alignLeft="@+id/tweetContents"
+				android:textAppearance="?android:attr/textAppearanceSmall" />
+			<RelativeLayout android:id="@+id/tweetMediaFrame"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_below="@+id/tweetTimer" android:visibility="invisible">
+				<ImageView android:id="@+id/tweetMedia" android:scaleType="centerCrop"
+					android:adjustViewBounds="true" android:visibility="gone"
+					android:layout_marginTop="10dp" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" />
+				<ProgressBar android:id="@+id/tweetMediaProgress"
+					android:visibility="gone" android:padding="5dp"
+					android:layout_centerInParent="true" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+			</RelativeLayout>
+			<LinearLayout android:layout_below="@+id/tweetMediaFrame"
+				android:layout_width="fill_parent" android:orientation="vertical"
+				android:layout_height="wrap_content" android:id="@+id/widgets" />
+			<ViewStub android:layout_below="@+id/widgets" android:id="@+id/mapView"
+				android:layout_marginTop="5dp" android:inflatedId="@+id/mapViewImported"
+				android:layout="@layout/map_item" android:layout_height="wrap_content"
+				android:layout_width="fill_parent" />
+		</RelativeLayout>
+	</ScrollView>
+	<ProgressBar android:id="@+id/horizontalProgress"
+		android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
+		android:layout_width="fill_parent" android:visibility="gone"
+		android:layout_height="10dp" android:layout_alignParentBottom="true" />
+</RelativeLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<Preference android:key="clear_search_history"
+		android:summary="@string/clear_searchhistory_desc" android:title="@string/clear_searchhistory_title" />
+	<SwitchPreference android:key="enable_ssl"
+		android:layout="@layout/boid_preference" android:summary="@string/enable_ssl_description"
+		android:title="@string/enable_ssl_title" android:persistent="true" />
+	<SwitchPreference android:key="c2dm"
+		android:layout="@layout/boid_preference" android:summary="@string/enable_push"
+		android:title="@string/push_title" android:persistent="false" />
+</PreferenceScreen>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/convoRelativeLayout" android:layout_width="match_parent"
+	android:layout_height="match_parent" android:padding="5dp">
+	<com.handlerexploit.prime.widgets.RemoteImageView
+		android:id="@+id/dmConvoProfileImg" android:layout_marginRight="10dp"
+		android:layout_width="55dp" android:layout_height="55dp"
+		android:src="@drawable/silouette" />
+	<TextView android:id="@+id/dmConvoScreenNameTxt"
+		android:textColor="?usernameColor" android:textStyle="bold"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:layout_toRightOf="@+id/dmConvoProfileImg"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	<com.handlerexploit.prime.widgets.RemoteImageView
+		android:id="@+id/dmConvoReplyIndicator" android:visibility="gone"
+		android:layout_toRightOf="@+id/dmConvoProfileImg"
+		android:layout_marginRight="5dp" android:layout_width="15dp"
+		android:layout_below="@+id/dmConvoScreenNameTxt"
+		android:layout_height="15dp" android:src="?replyIndicator" />
+	<TextView android:id="@+id/dmConvoMessageTxt"
+		android:textColor="?tweetColor" android:textColorLink="?linkColor"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_toRightOf="@+id/dmConvoReplyIndicator"
+		android:layout_alignTop="@+id/dmConvoReplyIndicator" />
+</RelativeLayout>

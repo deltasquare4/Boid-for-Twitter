@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ignore Lint: We can't do this -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    style="?android:buttonStyle"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    
+    <com.teamboid.twitter.BetterMapView
+        android:id="@+id/miniMap"
+        android:apiKey="0g3YekiGHcxYFwg_f5ut40OKBEd6OC3uqTzoSHw"
+        android:drawingCacheQuality="auto"
+        android:clickable="false"
+        android:layout_width="100dp"
+        android:layout_marginRight="5dp"
+        android:layout_height="100dp" />
+    
+    <TextView
+        android:id="@+id/miniMapDetails"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
