@@ -1,5 +1,8 @@
 package com.teamboid.twitter;
 
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -100,15 +103,13 @@ public class AccountManager extends ListActivity {
 			finish(); //this fixes the issue with the account manager randomly appeared after back is pressed
 		}
 	}
-
+	
 	@Override
-	public void onNewIntent(final Intent intent) {
-		super.onNewIntent(intent);
-		if(intent.getData() != null) {
-			if(intent.getData().getScheme().equals("boid") && intent.getData().getHost().equals("auth")) {
-				setProgressBarIndeterminateVisibility(true);
-				AccountService.verifyAccount(intent.getData().getQueryParameter("oauth_verifier"));
-			}
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == RESULT_OK) {
+			setProgressBarIndeterminateVisibility(true);
+			AccountService.verifyAccount(data.getStringExtra("oauth_verifier"));
 		}
 	}
 
@@ -129,7 +130,7 @@ public class AccountManager extends ListActivity {
 			return true;
 		case R.id.addAccountAction:
 			item.setEnabled(false);
-			AccountService.startAuthorization();
+			startAuth();
 			item.setEnabled(true);
 			return true;
 		default:
@@ -137,6 +138,25 @@ public class AccountManager extends ListActivity {
 		}
 	}
 
+	private void startAuth() {
+		AccountService.pendingClient = new TwitterFactory().getInstance();
+		AccountService.pendingClient.setOAuthConsumer("5LvP1d0cOmkQleJlbKICtg", "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI");
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					final RequestToken requestToken = AccountService.pendingClient.getOAuthRequestToken("boid://auth");
+					startActivityForResult(new Intent(AccountManager.this, LoginHandler.class).putExtra("url", requestToken.getAuthorizationURL()), 600);
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.authorization_error) + "; " + e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
+					});
+				}
+			}
+		}).start();
+	}
+	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

@@ -56,14 +56,7 @@
 		</activity>
 		<activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
 			android:exported="false" android:launchMode="singleTask"
-			android:configChanges="screenSize">
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-				<data android:scheme="boid" android:host="auth" />
-			</intent-filter>
-		</activity>
+			android:configChanges="screenSize" />
 		<service android:name=".AccountService" android:label="@string/account_service_name"
 			android:description="@string/account_service_desc" android:icon="@drawable/launcher_icon" />
 		<activity android:name=".SettingsScreen" android:label="@string/settings_str"
@@ -175,5 +168,8 @@
 				<category android:name="com.teamboid.twitter" />
 			</intent-filter>
 		</receiver>
+		<activity android:name=".LoginHandler" android:theme="@android:style/Theme.Holo.Dialog"
+			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
+			android:windowSoftInputMode="adjustResize"/>
 	</application>
 </manifest>

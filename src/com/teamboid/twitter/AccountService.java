@@ -30,7 +30,7 @@ import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
  */
 public class AccountService extends Service {
 
-	private static Twitter pendingClient;
+	public static Twitter pendingClient;
 	public static Activity activity;
 	private static ArrayList<Account> accounts;
 	public static ArrayList<FeedListAdapter> feedAdapters;
@@ -115,27 +115,6 @@ public class AccountService extends Service {
 	//		mNotificationManager.notify(acc.getUser().getScreenName() + "_" + type.toString(), 1, notification);
 	//		//TODO
 	//	}
-
-	public static void startAuthorization() {
-		pendingClient = new TwitterFactory().getInstance();
-		pendingClient.setOAuthConsumer("5LvP1d0cOmkQleJlbKICtg", "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI");
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					final RequestToken requestToken = pendingClient.getOAuthRequestToken("boid://auth");
-					final Intent viewIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(requestToken.getAuthorizationURL()));
-					// TODO: Use a intent selector, removing Boid.
-					activity.startActivity(viewIntent);
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() { Toast.makeText(activity, activity.getString(R.string.authorization_error) + "; " + e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
-					});
-				}
-			}
-		}).start();
-	}
 	
 	public static ConfigurationBuilder getConfiguration(String token, String secret){
 		return new ConfigurationBuilder()

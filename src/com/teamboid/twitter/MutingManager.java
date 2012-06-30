@@ -59,7 +59,7 @@ public class MutingManager extends ListActivity {
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				Toast.makeText(MutingManager.this, R.string.swipe_to_delete_accounts, Toast.LENGTH_LONG).show();
+				Toast.makeText(MutingManager.this, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
 				return false;
 			}
 		});
