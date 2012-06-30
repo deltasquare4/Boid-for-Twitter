@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -46,7 +45,6 @@ public class PushReceiver extends BroadcastReceiver {
 			}).start();
 			} else if(intent.hasExtra("hm")){
 				new Thread(new Runnable(){
-
 					@Override
 					public void run() {
 						Bundle b = intent.getBundleExtra("hm");
@@ -54,23 +52,15 @@ public class PushReceiver extends BroadcastReceiver {
 							JSONObject status = new JSONObject(b.getString("tweet"));
 							/* note: Twitter4J hack again ;) */
 							twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
-							
-							// TODO: Might want adding to feed adapters :/
-							if(Build.VERSION.SDK_INT >= 11){
-								Api11Methods.ShowNotification(s, PushWorker.this);
-							} else{
-								// TODO: Old Notification
-							}
-						}catch(Exception e){
+							MultiAPIMethods.ShowNotification(s, PushWorker.this);
+						} catch(Exception e) {
 							e.printStackTrace();
 						}
-					}
-				
+					}				
 				}).start();
 			}
 			return Service.START_STICKY;
 		}
-		
 	}
 
 	@Override
