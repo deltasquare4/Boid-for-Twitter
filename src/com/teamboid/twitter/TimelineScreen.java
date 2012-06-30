@@ -70,7 +70,7 @@ public class TimelineScreen extends Activity {
 	private boolean newColumn;
 
 	private SendTweetArrayAdapter sentTweetBinder;
-	
+
 	public class SendTweetUpdater extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
@@ -83,7 +83,7 @@ public class TimelineScreen extends Activity {
 				if(SendTweetService.tweets != null){
 					Log.d("stu", "Send Tweet Updater RECV running...");
 					sentTweetBinder.notifyDataSetInvalidated();
-					
+
 					if(SendTweetService.tweets.size() > 0){
 						findViewById(R.id.progress).setVisibility(View.VISIBLE);
 						findViewById(R.id.progress).setAlpha(1.0f);
@@ -99,14 +99,14 @@ public class TimelineScreen extends Activity {
 							vpa.setListener(new AnimatorListener(){
 								@Override
 								public void onAnimationCancel(Animator arg0) {}
-	
+
 								@Override
 								public void onAnimationEnd(Animator arg0) {
 									findViewById(R.id.progress).setVisibility(View.GONE);
 									findViewById(R.id.progress_handle).setBackgroundColor(getResources().getColor(android.R.color.background_dark));
 									performRefresh();
 								}
-	
+
 								@Override
 								public void onAnimationRepeat(Animator arg0) {}
 								@Override
@@ -115,7 +115,7 @@ public class TimelineScreen extends Activity {
 									tv.setText(R.string.sent_tweet);
 									tv.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
 								}
-								
+
 							});
 							vpa.alpha(0);
 						}
@@ -144,7 +144,7 @@ public class TimelineScreen extends Activity {
 		}
 	}
 	SendTweetUpdater receiver = new SendTweetUpdater();
-	
+
 	private void initialize(Bundle savedInstanceState) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
@@ -161,12 +161,10 @@ public class TimelineScreen extends Activity {
 		ab.setDisplayShowHomeEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		startService(new Intent(this, AccountService.class));
-	    
-	    sentTweetBinder = new SendTweetArrayAdapter(this, 0, 0, SendTweetService.tweets);
-	    
-	    ((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
+		sentTweetBinder = new SendTweetArrayAdapter(this, 0, 0, SendTweetService.tweets);
+		((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
 	}
-	
+
 	@Override
 	protected void onNewIntent (Intent intent){
 		Log.d("boid", "onNewIntent. AC Size: " + AccountService.getAccounts().size());
@@ -367,7 +365,7 @@ public class TimelineScreen extends Activity {
 		setContentView(R.layout.main);
 		initialize(savedInstanceState);
 	}
-		
+
 	/**
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
@@ -384,7 +382,7 @@ public class TimelineScreen extends Activity {
 				// TODO: Handle other URLs
 			}
 		}
-		
+
 		Intent s = new Intent(this, SendTweetService.class);
 		s.setAction(SendTweetService.LOAD_TWEETS);
 		startService(s);
@@ -417,33 +415,33 @@ public class TimelineScreen extends Activity {
 			}
 		}
 		invalidateOptionsMenu();
-		
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SendTweetService.UPDATE_STATUS);
 		filter.addAction(AccountManager.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
-	
-    @Override
-    public void onPause() {
-    	super.onPause();
-    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	prefs.edit().remove("last_profilepic_wipe").apply();
-    	CachingUtils.clearCache(this);
-    	CachingUtils.clearMediaCache(this);
-    	
-    	try { unregisterReceiver(receiver); }
-    	catch(Exception e) { }
-    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-    	outState.putInt("lastTheme", lastTheme);
-    	outState.putBoolean("lastDisplayReal", lastDisplayReal);
-    	outState.putBoolean("lastIconic", lastIconic);
-    	outState.putBoolean("newColumn", newColumn);
-    	super.onSaveInstanceState(outState);
-    }
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		prefs.edit().remove("last_profilepic_wipe").apply();
+		CachingUtils.clearCache(this);
+		CachingUtils.clearMediaCache(this);
+
+		try { unregisterReceiver(receiver); }
+		catch(Exception e) { }
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putInt("lastTheme", lastTheme);
+		outState.putBoolean("lastDisplayReal", lastDisplayReal);
+		outState.putBoolean("lastIconic", lastIconic);
+		outState.putBoolean("newColumn", newColumn);
+		super.onSaveInstanceState(outState);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -459,10 +457,10 @@ public class TimelineScreen extends Activity {
 				ImageManager imageManager = ImageManager.getInstance(this);
 				final int index = i;
 				imageManager.get("https://api.twitter.com/1/users/profile_image?screen_name=" + accs.get(i).getUser().getScreenName() + "&size=bigger", new OnImageReceivedListener() {
-				    @Override
-				    public void onImageReceived(String source, Bitmap bitmap) {
-				    	switcher.getSubMenu().add("@" + accs.get(index).getUser().getScreenName()).setIcon(new BitmapDrawable(getResources(), bitmap)); 
-				    }
+					@Override
+					public void onImageReceived(String source, Bitmap bitmap) {
+						switcher.getSubMenu().add("@" + accs.get(index).getUser().getScreenName()).setIcon(new BitmapDrawable(getResources(), bitmap)); 
+					}
 				});
 			}
 		}
@@ -485,10 +483,10 @@ public class TimelineScreen extends Activity {
 		loadColumns(false, false);
 		getActionBar().setSelectedNavigationItem(getActionBar().getTabCount() - 1);
 
-    }
-    
-    private Boolean performRefresh(){
-    	if(AccountService.getAccounts().size() == 0) return false;
+	}
+
+	private Boolean performRefresh(){
+		if(AccountService.getAccounts().size() == 0) return false;
 		Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
 		if(frag != null) {
 			if(frag instanceof NearbyFragment) ((NearbyFragment)frag).location = null;
@@ -498,8 +496,8 @@ public class TimelineScreen extends Activity {
 			else if(frag instanceof BaseSpinnerFragment) ((BaseSpinnerFragment)frag).performRefresh(false);
 		}
 		return true;
-    }
-	
+	}
+
 	private void removeColumn(int index) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		final String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column";
@@ -513,7 +511,7 @@ public class TimelineScreen extends Activity {
 		loadColumns(false, false);
 		getActionBar().setSelectedNavigationItem(postIndex);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

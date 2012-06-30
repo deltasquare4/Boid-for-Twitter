@@ -61,7 +61,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	private final ViewPager mViewPager;
 	private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 	public boolean filterDefaultColumnSelection = true; 
-	
+
 	static final class TabInfo {
 		private final Class<?> clss;
 		private final Bundle args;
@@ -180,22 +180,22 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	}
 
 	public static abstract class BaseListFragment extends ListFragment {
-		
+
 		public boolean isLoading;
 		private boolean isShown;
 		private boolean isAttemptingToGetTweets = false;
-		
+
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.list_fragment, container, false);
 		}
-		
+
 		public void setProgressShown(boolean shown) {
 			if(getView() == null) return;
 			getView().findViewById(R.id.horizontalProgress).setVisibility((shown == true) ? View.VISIBLE : View.GONE);
@@ -213,7 +213,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			getListView().setVisibility((visible == true) ? View.VISIBLE : View.GONE);
 			boolean condition = (getListAdapter() == null || getListAdapter().isEmpty()) && isShown;
 			getView().findViewById(android.R.id.empty).setVisibility(condition ? View.VISIBLE : View.GONE);
-			
+
 			if(condition && !isAttemptingToGetTweets){
 				performRefresh(false);
 				isAttemptingToGetTweets = true;
@@ -221,21 +221,21 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 	public static abstract class BaseSpinnerFragment extends ListFragment {
-		
+
 		public boolean isLoading;
 		private boolean isShown;
-		
+
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
 		}
-		
+
 		public void setProgressShown(boolean shown) {
 			if(getView() == null) return;
 			getView().findViewById(R.id.horizontalProgress).setVisibility((shown == true) ? View.VISIBLE : View.GONE);
@@ -260,21 +260,21 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 	public static abstract class BaseGridFragment extends Fragment {
-		
+
 		public boolean isLoading;
 		private boolean isShown;
-		
+
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.grid_activity, container, false);
 		}
-		
+
 		public void setListShown(boolean shown) {
 			if(getView() == null) return;
 			isShown = shown;
@@ -306,7 +306,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private Activity context;
 		private FeedListAdapter adapt;
 		public static final String ID = "COLUMNTYPE:TIMELINE";
-		
+
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
@@ -447,7 +447,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-		public static class MentionsFragment extends BaseListFragment {
+	public static class MentionsFragment extends BaseListFragment {
 
 		private FeedListAdapter adapt;
 		private Activity context;
@@ -585,7 +585,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -595,7 +595,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private Activity context;
 		public static final String ID = "COLUMNTYPE:MESSAGES";
 		private boolean isDeleting;
-		
+
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
@@ -631,8 +631,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-						startActivity(new Intent(context, ConversationScreen.class).putExtra("screen_name", ((DMConversation)adapt.getItem(position)).getToScreenName())
-								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));	
+					startActivity(new Intent(context, ConversationScreen.class).putExtra("screen_name", ((DMConversation)adapt.getItem(position)).getToScreenName())
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));	
 				}
 			});
 			setRetainInstance(true);
@@ -729,7 +729,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -748,7 +748,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		private boolean filterSelected;
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -855,9 +855,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
-	
+
 		private void getLocation() {
 			if(isGettingLocation) return;
 			isGettingLocation = true;
@@ -1017,7 +1017,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -1152,7 +1152,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -1287,7 +1287,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -1425,7 +1425,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -1437,7 +1437,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public GeoLocation location;
 		private String radius;
 		private boolean isGettingLocation;
-		
+
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
@@ -1445,7 +1445,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		private boolean filterSelected;
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1532,7 +1532,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			};
 			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 		}
-		
+
 		@Override
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
@@ -1587,7 +1587,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			}).start();
 		}
-		
+
 		@Override
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
@@ -1609,7 +1609,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() { }
 	}
-	
+
 	public static class UserListFragment extends BaseListFragment {
 
 		private FeedListAdapter adapt;
@@ -1754,7 +1754,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -1771,7 +1771,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1818,7 +1818,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedIinstnaceState) {
 			return inflater.inflate(R.layout.grid_activity, null);
 		}
-		
+
 		@Override
 		public void onResume() {
 			super.onResume();
@@ -1831,9 +1831,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onPause();
 			savePosition();
 		}
-		
+
 		private int pageSkips;
-		
+
 		@Override
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;	
@@ -1894,7 +1894,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			}).start();
 		}
-		
+
 		@Override
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
@@ -1928,7 +1928,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() { }
 	}
-	
+
 	public static class ProfileTimelineFragment extends BaseListFragment {
 
 		private ProfileScreen context;
@@ -2104,20 +2104,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						}
 					} else if(pair.getName().equals(context.getString(R.string.followers_str))) {
 						Intent intent = new Intent(context, UserListActivity.class)
-							.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
-							.putExtra("user", adapt.user.getId())
-							.putExtra("username", adapt.user.getScreenName());
+						.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
+						.putExtra("user", adapt.user.getId())
+						.putExtra("username", adapt.user.getScreenName());
 						context.startActivity(intent);
 					} else if(pair.getName().equals(context.getString(R.string.friends_str))) {
 						Intent intent = new Intent(context, UserListActivity.class)
-							.putExtra("mode", UserListActivity.FOLLOWING_LIST)
-							.putExtra("user", adapt.user.getId())
-							.putExtra("username", adapt.user.getScreenName());
+						.putExtra("mode", UserListActivity.FOLLOWING_LIST)
+						.putExtra("user", adapt.user.getId())
+						.putExtra("username", adapt.user.getScreenName());
 						context.startActivity(intent);
 					} else if(pair.getName().equals(context.getString(R.string.favorites_str))) {
 						Intent intent = new Intent(context, TweetListActivity.class)
-							.putExtra("mode", TweetListActivity.USER_FAVORITES)
-							.putExtra("username", adapt.user.getScreenName());
+						.putExtra("mode", TweetListActivity.USER_FAVORITES)
+						.putExtra("username", adapt.user.getScreenName());
 						context.startActivity(intent);
 					}
 				}
@@ -2190,7 +2190,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 }

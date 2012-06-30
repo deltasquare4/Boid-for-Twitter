@@ -9,12 +9,13 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.VIBRATE" />
-	<permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+	<permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"
+		android:protectionLevel="signature" />
 	<uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" />
 
 	<!-- This app has permission to register and receive message -->
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-	
+
 	<supports-screens android:xlargeScreens="true"
 		android:anyDensity="true" android:resizeable="true"
 		android:normalScreens="true" android:largeScreens="true"
@@ -25,7 +26,7 @@
 			android:value=".SearchScreen" />
 		<uses-library android:name="com.google.android.maps" />
 		<provider android:name="SearchSuggestionsProvider"
-			android:authorities="com.teamboid.twitter.SearchSuggestionsProvider" />
+			android:exported="false" android:authorities="com.teamboid.twitter.SearchSuggestionsProvider" />
 		<activity android:name=".TimelineScreen"
 			android:configChanges="screenSize" android:launchMode="singleInstance"
 			android:uiOptions="splitActionBarWhenNarrow"
@@ -40,7 +41,7 @@
 				<data android:mimeType="text/*" />
 				<data android:mimeType="image/*" />
 			</intent-filter>
-			
+
 			<!-- View Tweets/Users from Browser/Other Apps -->
 			<intent-filter android:label="@string/app_name">
 				<action android:name="android.intent.action.VIEW" />
@@ -54,7 +55,8 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
-			android:launchMode="singleTask" android:configChanges="screenSize">
+			android:exported="false" android:launchMode="singleTask"
+			android:configChanges="screenSize">
 			<intent-filter android:label="@string/app_name">
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -71,20 +73,20 @@
 			android:exported="false" android:label="@string/new_tweet_str"
 			android:configChanges="keyboardHidden|orientation|screenSize" />
 		<activity android:name=".SearchScreen" android:label="@string/search_str"
-			android:exported="true" android:configChanges="keyboardHidden|orientation|screenSize">
+			android:configChanges="keyboardHidden|orientation|screenSize">
 			<intent-filter>
 				<action android:name="android.intent.action.SEARCH" />
 			</intent-filter>
 			<meta-data android:name="android.app.searchable"
 				android:resource="@xml/search_config" />
 		</activity>
-		<activity android:name=".ProfileScreen" android:exported="true"
+		<activity android:name=".ProfileScreen"
 			android:configChanges="keyboardHidden|orientation|screenSize" />
-		<activity android:name=".TweetViewer" android:exported="true"
+		<activity android:name=".TweetViewer"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />
 		<activity android:name=".ConversationScreen"
-			android:exported="true" android:configChanges="keyboardHidden|orientation|screenSize"
+			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/messaging_str" android:windowSoftInputMode="adjustResize" />
 		<activity android:name=".MutingManager" android:launchMode="singleTask"
 			android:configChanges="screenSize" android:label="@string/muting_str"
@@ -94,10 +96,9 @@
 		<activity android:name=".TweetListActivity"
 			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize" />
 		<service android:name=".SendTweetService" android:exported="false"
-		    android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
-		<activity android:theme="@android:style/Theme.Holo.Dialog"
-			android:label="@string/photo_service_title" android:launchMode="singleTop"
-			android:name=".SelectMediaScreen">
+			android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
+		<activity android:label="@string/photo_service_title"
+			android:exported="false" android:launchMode="singleTop" android:name=".SelectMediaScreen">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -107,26 +108,29 @@
 		</activity>
 
 		<!-- Tweet Widget Services -->
-		<service android:name=".tweetwidgets.TweetWidgetService">
+		<service android:name=".tweetwidgets.TweetWidgetService"
+			android:exported="false">
 			<intent-filter>
 				<action android:name="com.teamboid.twitter.ACTION_TWEET_WIDGET" />
 			</intent-filter>
 		</service>
-		<receiver android:name=".SendTweetStarter">
+		<receiver android:name=".SendTweetStarter" android:exported="false">
 			<intent-filter>
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 			</intent-filter>
 		</receiver>
 
 		<!-- Internal Tweet Widgets -->
-		<service android:label="@string/youtube_embed" android:name=".YouTubeWidget">
+		<service android:label="@string/youtube_embed" android:name=".YouTubeWidget"
+			android:exported="false">
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
 				<data android:host="youtu.be" android:scheme="http" />
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtube.com" android:pathPrefix="/watch" android:scheme="http" />
+				<data android:host="youtube.com" android:pathPrefix="/watch"
+					android:scheme="http" />
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
@@ -134,7 +138,8 @@
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtube.com" android:pathPrefix="/watch" android:scheme="https" />
+				<data android:host="youtube.com" android:pathPrefix="/watch"
+					android:scheme="https" />
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
@@ -142,7 +147,8 @@
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtube.com" android:pathPrefix="/watch" android:scheme="http" />
+				<data android:host="www.youtube.com" android:pathPrefix="/watch"
+					android:scheme="http" />
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
@@ -150,22 +156,24 @@
 			</intent-filter>
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtube.com" android:pathPrefix="/watch" android:scheme="https" />
+				<data android:host="www.youtube.com" android:pathPrefix="/watch"
+					android:scheme="https" />
 			</intent-filter>
 		</service>
-		
+
 		<service android:name=".PushReceiver$PushWorker" />
-		<receiver android:name=".PushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
-	          <!-- Receive the actual message -->
-	          <intent-filter>
-	              <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-	              <category android:name="com.teamboid.twitter" />
-	          </intent-filter>
-	          <!-- Receive the registration id -->
-	          <intent-filter>
-	              <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-	              <category android:name="com.teamboid.twitter" />
-	          </intent-filter>
-	      </receiver>
+		<receiver android:name=".PushReceiver"
+			android:permission="com.google.android.c2dm.permission.SEND">
+			<!-- Receive the actual message -->
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+				<category android:name="com.teamboid.twitter" />
+			</intent-filter>
+			<!-- Receive the registration id -->
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+				<category android:name="com.teamboid.twitter" />
+			</intent-filter>
+		</receiver>
 	</application>
 </manifest>
