@@ -7,6 +7,9 @@
 	<header android:summary="@string/general_description"
 		android:title="@string/general_title" android:icon="?settingsIcon"
 		android:fragment="com.teamboid.twitter.SettingsScreen$GeneralFragment" />
+	<header android:summary="@string/notifications_str_desc"
+		android:title="@string/notifications_str"
+		android:fragment="com.teamboid.twitter.SettingsScreen$NotificationsFragment" />
 	<header android:summary="@string/composer_desc_str"
 		android:icon="?sendIcon" android:title="@string/composer_str"
 		android:fragment="com.teamboid.twitter.SettingsScreen$ComposerFragment" />

@@ -1,5 +1,8 @@
 package com.teamboid.twitter;
 
+import java.util.ArrayList;
+
+import twitter4j.DirectMessage;
 import twitter4j.Status;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -13,9 +16,37 @@ import com.handlerexploit.prime.utils.ImageManager;
 
 public class MultiAPIMethods {
 
+	public final static int MENTION_NOTIFICATION_ID = 100;
+	public final static int MESSAGE_NOTIFICATION_ID = 200;
+	public static ArrayList<Status> mentionNotifies;
+	public static ArrayList<DirectMessage> messageNotifies;
+	public static boolean notificationExists(Status tweet) {
+		if(mentionNotifies == null) mentionNotifies = new ArrayList<Status>();
+		for(int i = 0; i < mentionNotifies.size(); i++) {
+			if(mentionNotifies.get(i).getId() == tweet.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static boolean notificationExists(DirectMessage msg) {
+		if(messageNotifies == null) messageNotifies = new ArrayList<DirectMessage>();
+		for(int i = 0; i < messageNotifies.size(); i++) {
+			if(messageNotifies.get(i).getId() == msg.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@SuppressLint("NewApi")
-	public static void ShowNotification(Status s, Context context){
+	public static void ShowNotification(Status s, Context context) {
 		NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+		if(mentionNotifies == null) mentionNotifies = new ArrayList<Status>();
+		if(messageNotifies == null) messageNotifies = new ArrayList<DirectMessage>();
+		
+		
+		
 		if(Build.VERSION.SDK_INT < 16) {
 			//TODO ICE CREAM SANDWICH notification
 			Notification.Builder nb = new Notification.Builder(context);

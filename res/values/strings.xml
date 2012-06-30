@@ -26,6 +26,14 @@
     <string name="always_attach_loc_desc">When enabled, your location will be attached to composed tweets by default.</string>
     <string name="display_real_name">Display Real Name</string>
     <string name="display_real_name_desc">When enabled, columns display the full name of a user instead of their screen name.</string>
+    <string name="mention_notify_desc">When enabled, you will receive notifications for new mentions.</string>
+    <string name="messages_notify_desc">When enabled, you will receive notifications for new direct messages.</string>
+    <string name="vibrate_str">Vibration</string>
+    <string name="vibrate_str_desc">When enabled, notifications will cause your phone to vibrate.</string>
+    <string name="ringtone_str">Ringtone</string>
+    <string name="ringtone_str_desc">The optional ringtone played when a notification is received.</string>
+    <string name="notifications_str">Notifications</string>
+    <string name="notifications_str_desc">Settings for enabling or disabling notifications and changing notification alert settings.</string>
     
     <string name="follows_you">Follows You</string>
     <string name="request_sent">Request Sent</string>

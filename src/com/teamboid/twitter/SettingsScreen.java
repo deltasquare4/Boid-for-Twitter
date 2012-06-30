@@ -98,23 +98,6 @@ public class SettingsScreen extends PreferenceActivity  {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.general_category);
-			((SwitchPreference)findPreference("c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					if((Boolean)newValue == true){
-						// Register!
-						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
-						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
-						getActivity().startService(registrationIntent);
-						// TODO: Maybe add some kind of progress?
-					} else{
-						// TODO: Deregister
-					}
-					return true;
-				}
-			});
-			
 			((SwitchPreference)findPreference("enable_ssl")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -186,7 +169,6 @@ public class SettingsScreen extends PreferenceActivity  {
 			});
 		}
 	}
-
 	public static class AppearanceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -206,6 +188,29 @@ public class SettingsScreen extends PreferenceActivity  {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.media_category);
+		}
+	}
+	public static class NotificationsFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.notifications_category);
+			((SwitchPreference)findPreference("c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					if((Boolean)newValue == true){
+						// Register!
+						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
+						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
+						getActivity().startService(registrationIntent);
+						// TODO: Maybe add some kind of progress?
+					} else{
+						// TODO: Deregister
+					}
+					return true;
+				}
+			});
 		}
 	}
 }

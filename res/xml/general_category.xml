@@ -5,7 +5,4 @@
 	<SwitchPreference android:key="enable_ssl"
 		android:layout="@layout/boid_preference" android:summary="@string/enable_ssl_description"
 		android:title="@string/enable_ssl_title" android:persistent="true" />
-	<SwitchPreference android:key="c2dm"
-		android:layout="@layout/boid_preference" android:summary="@string/enable_push"
-		android:title="@string/push_title" android:persistent="false" />
 </PreferenceScreen>
