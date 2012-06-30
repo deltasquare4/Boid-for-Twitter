@@ -16,7 +16,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The activity that represents the mute keywords manager.
@@ -53,20 +55,29 @@ public class MutingManager extends ListActivity {
 				return false;
 			}
 		});
-		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+		final ListView listView = getListView();
+		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-				String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-				ArrayList<String> cols = Utilities.jsonToArray(getApplicationContext(), prefs.getString(prefName, ""));
-				cols.remove(index);
-				prefs.edit().putString(prefName, Utilities.arrayToJson(getApplicationContext(), cols)).commit();
-				Vibrator v = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-				v.vibrate(100);
-				loadKeywords();
+				Toast.makeText(MutingManager.this, R.string.swipe_to_delete_accounts, Toast.LENGTH_LONG).show();
 				return false;
 			}
 		});
+		SwipeDismissListViewTouchListener touchListener =
+				new SwipeDismissListViewTouchListener(listView,
+						new SwipeDismissListViewTouchListener.OnDismissCallback() {
+							@Override
+							public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+								final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+								String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
+								ArrayList<String> cols = Utilities.jsonToArray(getApplicationContext(), prefs.getString(prefName, ""));
+								for (int i : reverseSortedPositions) cols.remove(i);
+								prefs.edit().putString(prefName, Utilities.arrayToJson(getApplicationContext(), cols)).commit();
+								loadKeywords();
+							}
+				});
+		listView.setOnTouchListener(touchListener);
+		listView.setOnScrollListener(touchListener.makeScrollListener());
 	}
 	
 	@Override

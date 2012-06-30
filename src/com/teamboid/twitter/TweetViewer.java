@@ -95,7 +95,7 @@ public class TweetViewer extends MapActivity {
 				finish();
 			}
 		} else if(getIntent().hasExtra("sr_tweet")){
-			displayTweet((Status) Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")), new Status[]{});
+			displayTweet((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")), new Status[]{});
 			loadTweet();
 		} else{
 			preloadTweet();

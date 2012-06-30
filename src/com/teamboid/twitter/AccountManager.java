@@ -1,10 +1,8 @@
 package com.teamboid.twitter;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -14,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * The activity that represents the account manager, allows the user to add and remove accounts.
@@ -23,7 +23,7 @@ public class AccountManager extends ListActivity {
 
 	private int lastTheme;
 	public AccountListAdapter adapter;
-	
+
 	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 	public class UpdateReceiver extends BroadcastReceiver{
 		@Override
@@ -35,7 +35,7 @@ public class AccountManager extends ListActivity {
 		}
 	}
 	UpdateReceiver receiver = new UpdateReceiver();
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if(savedInstanceState != null && savedInstanceState.containsKey("lastTheme")) {
@@ -51,36 +51,35 @@ public class AccountManager extends ListActivity {
 		registerReceiver(receiver, ifilter);
 		adapter = new AccountListAdapter(this);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+		final ListView listView = getListView();
+		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
-			public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long id) {
-				AlertDialog.Builder diag = new AlertDialog.Builder(AccountManager.this);
-				diag.setTitle(R.string.delete_str);
-				diag.setMessage(R.string.confirm_remove_account);
-				diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
-						adapter.notifyDataSetChanged();
-					}
-				});
-				diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
-				});
-				diag.create().show();
-				return true;
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				Toast.makeText(AccountManager.this, R.string.swipe_to_delete_accounts, Toast.LENGTH_LONG).show();
+				return false;
 			}
 		});
+		SwipeDismissListViewTouchListener touchListener =
+				new SwipeDismissListViewTouchListener(listView,
+						new SwipeDismissListViewTouchListener.OnDismissCallback() {
+							@Override
+							public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+								for (int i : reverseSortedPositions) {
+									AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
+									adapter.notifyDataSetChanged();
+								}
+							}
+				});
+		listView.setOnTouchListener(touchListener);
+		listView.setOnScrollListener(touchListener.makeScrollListener());
 	}
 
 	@Override
-    public void onSaveInstanceState(Bundle outState) {
-    	outState.putInt("lastTheme", lastTheme);
-    	super.onSaveInstanceState(outState);
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putInt("lastTheme", lastTheme);
+		super.onSaveInstanceState(outState);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -101,7 +100,7 @@ public class AccountManager extends ListActivity {
 			finish(); //this fixes the issue with the account manager randomly appeared after back is pressed
 		}
 	}
-	
+
 	@Override
 	public void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
@@ -119,22 +118,22 @@ public class AccountManager extends ListActivity {
 		inflater.inflate(R.menu.accountmanager_actionbar, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				if(AccountService.getAccounts().size() == 0) return false;
-				startActivity(new Intent(this, TimelineScreen.class));
-				finish();
-				return true;
-			case R.id.addAccountAction:
-				item.setEnabled(false);
-				AccountService.startAuthorization();
-				item.setEnabled(true);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		case android.R.id.home:
+			if(AccountService.getAccounts().size() == 0) return false;
+			startActivity(new Intent(this, TimelineScreen.class));
+			finish();
+			return true;
+		case R.id.addAccountAction:
+			item.setEnabled(false);
+			AccountService.startAuthorization();
+			item.setEnabled(true);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
