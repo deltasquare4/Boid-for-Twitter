@@ -1,6 +1,7 @@
 package com.teamboid.twitter;
 
 import twitter4j.Status;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,7 +13,9 @@ import com.handlerexploit.prime.utils.ImageManager;
 
 public class MultiAPIMethods {
 
+	@SuppressLint("NewApi")
 	public static void ShowNotification(Status s, Context context){
+		NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		if(Build.VERSION.SDK_INT < 16) {
 			//TODO ICE CREAM SANDWICH notification
 			Notification.Builder nb = new Notification.Builder(context);
@@ -29,6 +32,14 @@ public class MultiAPIMethods {
 			nm.notify("pushnotify", 0, nb.getNotification());
 		} else {
 			//TODO JELLYBEAN expandable notification
+			Notification noti = new Notification.BigTextStyle(
+					new Notification.Builder(context)
+					.setContentTitle("New mentions")
+					.setContentText("New mentions for @afollestad")
+					.setSmallIcon(R.drawable.statusbar_icon))
+			.bigText("Hello, my name is Aidan Follestad. This is a very large expandable notification that should be able to open and close when you use the expand gesture on it. These notifications will eventually be used for push notifications that tell Boid users when they have new mentions or direct messages that can be viewed. Push notifications will come right as the mention or message is received on Twitter because push notifications are instant.")
+			.build();
+			mNotificationManager.notify(1, noti);
 		}
 	}
 }

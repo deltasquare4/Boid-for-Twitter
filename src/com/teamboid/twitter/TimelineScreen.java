@@ -364,6 +364,9 @@ public class TimelineScreen extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		initialize(savedInstanceState);
+		
+		//TODO NOTIFICATION TESTING CODE
+		MultiAPIMethods.ShowNotification(null, this);
 	}
 
 	/**
