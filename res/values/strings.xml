@@ -56,7 +56,7 @@
     <string name="no_accounts">No accounts. Please add one</string>
     <string name="nodescription_str">(No description)</string>
     <string name="no_internet">Please connect to the internet.</string>
-    <string name="error_str">Error. Something went wrong there.</string>
+    <string name="error_str">Error</string>
     
     <string name="follow_str">Follow</string>
     <string name="unfollow_str">Unfollow</string>
