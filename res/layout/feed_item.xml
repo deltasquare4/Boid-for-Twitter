@@ -10,14 +10,18 @@
 		android:layout_marginRight="3dp" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:orientation="horizontal"
 		android:layout_toLeftOf="@+id/feedItemTimerTxt">
-		<com.handlerexploit.prime.widgets.RemoteImageView
-			android:id="@+id/feedItemMediaIndicator" android:layout_weight="1"
-			android:layout_width="17dp" android:layout_height="17dp" android:src="?mediaIndicator"
+		<ImageView android:id="@+id/feedItemVideoIndicator"
+			android:layout_weight="1" android:layout_width="16dp"
+			android:layout_height="17dp" android:src="?videoIndicator"
 			android:visibility="gone" />
-		<com.handlerexploit.prime.widgets.RemoteImageView
-			android:id="@+id/feedItemFavoritedIndicator" android:layout_weight="1"
-			android:layout_width="16dp" android:layout_height="16dp"
-			android:src="?favoritedIndicator" android:visibility="gone" />
+		<ImageView android:id="@+id/feedItemMediaIndicator"
+			android:layout_weight="1" android:layout_width="17dp"
+			android:layout_height="17dp" android:src="?mediaIndicator"
+			android:visibility="gone" />
+		<ImageView android:id="@+id/feedItemFavoritedIndicator"
+			android:layout_weight="1" android:layout_width="16dp"
+			android:layout_height="16dp" android:src="?favoritedIndicator"
+			android:visibility="gone" />
 	</LinearLayout>
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/feedItemProfilePic" android:layout_width="50dp"

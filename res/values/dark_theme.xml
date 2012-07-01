@@ -10,6 +10,7 @@
 		<item name="android:spinnerItemStyle">@style/DropDownNav.Text</item>
 		<item name="mediaIndicator">@drawable/media_light</item>
 		<item name="replyIndicator">@drawable/reply_light</item>
+		<item name="videoIndicator">@drawable/video_light</item>
 		<item name="retweetIndicator">@drawable/retweet_light</item>
 		<item name="timeIndicator">@drawable/time_indicator_dark</item>
 		<item name="cloudIcon">@drawable/cloud_light</item>

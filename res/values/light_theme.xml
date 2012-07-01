@@ -9,6 +9,7 @@
 		<item name="android:spinnerItemStyle">@style/DropDownNav.Light.Text</item>
 		<item name="spinnerDropdownItemColor">@color/black</item>
 		<item name="mediaIndicator">@drawable/media_dark</item>
+		<item name="videoIndicator">@drawable/video_dark</item>
 		<item name="replyIndicator">@drawable/reply_dark</item>
 		<item name="retweetIndicator">@drawable/retweet_dark</item>
 		<item name="timeIndicator">@drawable/time_indicator_light</item>

@@ -263,6 +263,9 @@ public class FeedListAdapter extends BaseAdapter {
 			mediaPreview.setVisibility(View.GONE);
 			mediaPreview.setImageBitmap(null);
 		}
+		if(Utilities.tweetContainsVideo(tweet)) {
+			toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.VISIBLE);
+		} else toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.GONE);
 		if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
 			toReturn.findViewById(R.id.locationFrame).setVisibility(View.VISIBLE);
 			if(tweet.getPlace() != null) {

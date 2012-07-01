@@ -204,7 +204,32 @@ public class Utilities {
 			return found;
 		} else return null;
 	}
+	public static boolean tweetContainsVideo(final Status tweet) {
+		for(int i = 0; i < tweet.getURLEntities().length; i++) {
+			URLEntity urlEntity = tweet.getURLEntities()[i];
+			if(urlEntity == null || urlEntity.getURL() == null) continue;
+			String curEntity = urlEntity.getURL().toString();
+			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+			if(curEntity.contains("youtube.com/watch?v=") || curEntity.contains("youtu.be")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static boolean tweetContainsVideo(final Tweet tweet) {
+		for(int i = 0; i < tweet.getURLEntities().length; i++) {
+			URLEntity urlEntity = tweet.getURLEntities()[i];
+			if(urlEntity == null || urlEntity.getURL() == null) continue;
+			String curEntity = urlEntity.getURL().toString();
+			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+			if(curEntity.contains("youtube.com/watch?v=") || curEntity.contains("youtu.be")) {
+				return true;
+			}
+		}
+		return false;
+	}
 
+	
 	public static Spannable twitterifyText(final Context context, String text, final URLEntity[] urls, final MediaEntity[] pics, final boolean expand) {
 		if(urls != null) {
 			for(URLEntity url : urls) {

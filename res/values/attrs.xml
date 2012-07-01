@@ -8,6 +8,7 @@
 	<attr name="linkColor" format="color|reference" />
 	<attr name="spinnerDropdownItemColor" format="color|reference" />
 	<attr name="mediaIndicator" format="reference" />
+	<attr name="videoIndicator" format="reference" />
 	<attr name="replyIndicator" format="reference" />
 	<attr name="retweetIndicator" format="reference" />
 	<attr name="timeIndicator" format="reference" />

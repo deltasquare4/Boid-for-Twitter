@@ -57,8 +57,9 @@
 					android:layout_height="wrap_content" />
 			</RelativeLayout>
 			<LinearLayout android:layout_below="@+id/tweetMediaFrame"
-				android:layout_width="fill_parent" android:orientation="vertical"
-				android:layout_height="wrap_content" android:id="@+id/widgets" />
+				android:layout_marginTop="5dp" android:layout_width="fill_parent"
+				android:orientation="vertical" android:layout_height="wrap_content"
+				android:id="@+id/widgets" />
 			<ViewStub android:layout_below="@+id/widgets" android:id="@+id/mapView"
 				android:layout_marginTop="5dp" android:inflatedId="@+id/mapViewImported"
 				android:layout="@layout/map_item" android:layout_height="wrap_content"
