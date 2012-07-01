@@ -341,7 +341,6 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		if(savedInstanceState != null) {
 			if(savedInstanceState.containsKey("lastTheme") || savedInstanceState.containsKey("lastDisplayReal")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");
@@ -414,11 +413,10 @@ public class TimelineScreen extends Activity {
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
 				AccountService.selectedAccount = AccountService.getAccounts().get(0).getId();
-				loadColumns(false, false);
+				loadColumns(false, true);
 			}
 		}
 		invalidateOptionsMenu();
-
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SendTweetService.UPDATE_STATUS);
 		filter.addAction(AccountManager.END_LOAD);
