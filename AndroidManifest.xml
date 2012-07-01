@@ -12,8 +12,6 @@
 	<permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"
 		android:protectionLevel="signature" />
 	<uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" />
-
-	<!-- This app has permission to register and receive message -->
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
 	<supports-screens android:xlargeScreens="true"
@@ -170,6 +168,6 @@
 		</receiver>
 		<activity android:name=".LoginHandler" android:theme="@android:style/Theme.Holo.Dialog"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize"/>
+			android:windowSoftInputMode="adjustResize" />
 	</application>
 </manifest>
