@@ -228,7 +228,10 @@ public class Utilities {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
 					public void onClick(View widget) {
-						context.startActivity(new Intent(context, SearchScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("query", hashText));
+						context.startActivity(new Intent(context, SearchScreen.class)
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+							.putExtra("query", hashText));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.MENTION) {
@@ -236,7 +239,10 @@ public class Utilities {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
 					public void onClick(View widget) {
-						context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", screenName).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						context.startActivity(new Intent(context, ProfileScreen.class)
+							.putExtra("screen_name", screenName)
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.URL) {
@@ -247,15 +253,23 @@ public class Utilities {
 						if(realLinks.contains(e.getValue())) url = realLinks.get(e.getValue());
 						else url = e.getValue();
 						if(!url.startsWith("http://") && !url.startsWith("https://")) url = ("http://" + url);
-						context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						context.startActivity(new Intent(Intent.ACTION_VIEW)
+							.setData(Uri.parse(url))
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.SEARCH) {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
 					public void onClick(View arg0) {
-						try { context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(context.getString(R.string.google_url) + URLEncoder.encode(e.getValue(), "UTF-8"))).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); } 
-						catch (UnsupportedEncodingException e) { e.printStackTrace(); }
+						try { 
+							context.startActivity(new Intent(Intent.ACTION_VIEW)
+								.setData(Uri.parse(context.getString(R.string.google_url) +
+										URLEncoder.encode(e.getValue(), "UTF-8")))
+								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+								.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						}  catch (UnsupportedEncodingException e) { e.printStackTrace(); }
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
