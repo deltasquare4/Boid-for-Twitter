@@ -192,6 +192,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
+		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.list_fragment, container, false);
 		}
@@ -232,6 +238,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
+		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
 		}
@@ -271,6 +283,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
+		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.grid_activity, container, false);
 		}
@@ -306,7 +324,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private Activity context;
 		private FeedListAdapter adapt;
 		public static final String ID = "COLUMNTYPE:TIMELINE";
-
+		
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
@@ -1846,7 +1864,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(!paginate) pageSkips = 0;
 			new Thread(new Runnable() {
 				public void run() {
-					Paging paging = new Paging(1, 100);
+					Paging paging = new Paging(1, 50);
 					if(paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 					final Account acc = AccountService.getCurrentAccount();
 					if(acc != null) {
@@ -1870,7 +1888,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
 											context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.media_title) + " (" + Integer.toString(addedCount) + ")");
 										} else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
-									} else if(pageSkips < 5) {
+									} else if(pageSkips < 8) {
 										pageSkips++;
 										performRefresh(true);
 									}

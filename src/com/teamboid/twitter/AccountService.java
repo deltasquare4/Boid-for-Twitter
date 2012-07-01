@@ -7,13 +7,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
 import twitter4j.conf.ConfigurationBuilder;
 
 import java.util.ArrayList;

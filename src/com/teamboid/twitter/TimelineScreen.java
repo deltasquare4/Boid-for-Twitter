@@ -190,14 +190,9 @@ public class TimelineScreen extends Activity {
 				AccountService.selectedAccount = lastSel;
 			}
 		}
-		if(mTabsAdapter == null) {
-			mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
-			mTabsAdapter.filterDefaultColumnSelection = true;
-		}
-		else {
-			mTabsAdapter.filterDefaultColumnSelection = true;
-			mTabsAdapter.clear();
-		}
+		
+		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
+		mTabsAdapter.filterDefaultColumnSelection = true;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 		if(cols.size() == 0) {
@@ -295,8 +290,11 @@ public class TimelineScreen extends Activity {
 			newColumn = false;
 			getActionBar().setSelectedNavigationItem(getActionBar().getTabCount() - 1);		
 		} else {
-			int defaultColumn = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-					.getInt(Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column", 0);
+			int defaultColumn = prefs.getInt(Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column", 0);
+			if(defaultColumn > (getActionBar().getTabCount() - 1)) {
+				defaultColumn = getActionBar().getTabCount() - 1;
+				prefs.edit().putInt(Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column", defaultColumn).apply();
+			}
 			getActionBar().setSelectedNavigationItem(defaultColumn);
 			ViewPager pager = (ViewPager)findViewById(R.id.pager);
 			pager.setAdapter(mTabsAdapter);
@@ -339,6 +337,7 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
 		if(savedInstanceState != null) {
 			if(savedInstanceState.containsKey("lastTheme") || savedInstanceState.containsKey("lastDisplayReal")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");

@@ -63,6 +63,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 			}
 			tweets.add(index, tweet);
 			added = true;
+			notifyDataSetChanged();
 		}
 		return added;
 	}
@@ -78,7 +79,6 @@ public class MediaFeedListAdapter extends BaseAdapter {
 				if(add(tweet, fi)) toReturn++;
 			}
 		}
-		notifyDataSetChanged();
 		return toReturn;
 	}
 	public void remove(int index) {
