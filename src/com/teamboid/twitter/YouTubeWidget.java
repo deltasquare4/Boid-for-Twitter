@@ -58,12 +58,8 @@ public class YouTubeWidget extends TweetWidget {
 		PendingIntent pendingIntent = PendingIntent.getActivity(cntxt, 0, send, 0);
 		rv.setOnClickPendingIntent(R.id.title, pendingIntent);
 		ImageManager imageManager = ImageManager.getInstance(cntxt);
-		imageManager.get("http://i.ytimg.com/vi/" + vidid + "/mqdefault.jpg", new OnImageReceivedListener() {
-		    @Override
-		    public void onImageReceived(String source, Bitmap bitmap) {
-		    	rv.setBitmap(R.id.thumb, "setImageBitmap", bitmap); 
-		    }
-		});
+		rv.setBitmap(R.id.thumb, "setImageBitmap", 
+				imageManager.get("http://i.ytimg.com/vi/" + vidid + "/mqdefault.jpg")); 
 		sendRemoteViews(rv, cntxt, intent);
 	}
 }
