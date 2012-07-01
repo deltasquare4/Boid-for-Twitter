@@ -42,7 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Conviencence methods.
+ * Convenience methods.
  * @author Aidan Follestad
  */
 public class Utilities {

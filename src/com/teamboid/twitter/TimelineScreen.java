@@ -190,9 +190,13 @@ public class TimelineScreen extends Activity {
 				AccountService.selectedAccount = lastSel;
 			}
 		}
-		
-		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
-		mTabsAdapter.filterDefaultColumnSelection = true;
+		if(mTabsAdapter == null) {
+			mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
+			mTabsAdapter.filterDefaultColumnSelection = true;
+		} else {
+			mTabsAdapter.filterDefaultColumnSelection = true;
+			mTabsAdapter.clear();
+		}
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 		if(cols.size() == 0) {
