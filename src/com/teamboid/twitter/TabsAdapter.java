@@ -403,7 +403,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.toArray(new Status[0]), true);
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
@@ -552,7 +552,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.toArray(new Status[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
@@ -984,7 +984,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.toArray(new Status[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
@@ -1113,7 +1113,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = context.tweetAdapter.add(feed.getTweets().toArray(new Tweet[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else getListView().setSelectionFromTop(context.tweetAdapter.savedIndex + addedCount, context.tweetAdapter.savedIndexTop);
 										}
 										Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
@@ -1248,7 +1248,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else getListView().setSelectionFromTop(context.userAdapter.savedIndex + addedCount, context.userAdapter.savedIndexTop);
 										}
 										Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
@@ -1391,7 +1391,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.getTweets().toArray(new Tweet[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else getListView().setSelectionFromTop(adapt.savedIndex + addedCount, adapt.savedIndexTop);
 										}
 										final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1578,7 +1578,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.getTweets().toArray(new Tweet[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else getListView().setSelectionFromTop(adapt.savedIndex + addedCount, adapt.savedIndexTop);
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
@@ -1720,7 +1720,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int addedCount = adapt.add(feed.toArray(new Status[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
-											if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 										}
 										final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -2032,7 +2032,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									int beforeLast = context.adapter.getCount() - 1;
 									int addedCount = context.adapter.add(feed.toArray(new Status[0]));
 									if(getView() != null) {
-										if(paginate) getListView().smoothScrollToPosition(beforeLast + 1);
+										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 										else if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView());
 									}
 									if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {

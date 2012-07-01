@@ -1,4 +1,4 @@
-// THIS IS A BETA! I DON'T RECOMMEND USING IT IN PRODUCTION CODE JUST YET
+//TODO THIS IS A BETA! I DON'T RECOMMEND USING IT IN PRODUCTION CODE JUST YET; https://gist.github.com/2999864
 
 /*
  * Copyright 2012 Roman Nurik
@@ -22,7 +22,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
