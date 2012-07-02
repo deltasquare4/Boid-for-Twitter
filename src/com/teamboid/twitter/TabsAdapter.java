@@ -1882,7 +1882,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									if(addedCount > 0 || beforeLast > 0) {
 										pageSkips = 0;
 										if(getView() != null) {
-											if(paginate) getGridView().smoothScrollToPosition(beforeLast + 1);
+											if(paginate && addedCount > 0) getGridView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getGridView());
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {

@@ -12,6 +12,7 @@ import android.os.Build;
 
 import com.handlerexploit.prime.utils.ImageManager;
 
+@SuppressLint("NewApi")
 public class MultiAPIMethods {
 
 	public final static int MENTION_NOTIFICATION_ID = 100;
@@ -20,12 +21,18 @@ public class MultiAPIMethods {
 	private static Notification mentionNotify;
 	private static Notification messageNotify;
 	
-	@SuppressLint("NewApi")
-	public static void ShowNotification(Status s, Context context) {
-		NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+	public static void ShowNotification(final Status s, final Context context) {
 		String imageURL = s.getUser().getProfileImageURL().toString();
-		Bitmap profileImg = ImageManager.getInstance(context).get(imageURL);
-		
+		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
+			@Override
+			public void onImageReceived(String arg0, Bitmap profileImg) {
+				displayNotification(context, s, profileImg);
+			}
+		});
+	}
+	
+	private static void displayNotification(final Context context, final Status s, final Bitmap profileImg) {
+		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		if(Build.VERSION.SDK_INT < 16) {
 			//TODO ICE CREAM SANDWICH old style notification
 			Notification.Builder nb = 
@@ -37,10 +44,10 @@ public class MultiAPIMethods {
 					.setAutoCancel(true)
 					.setSmallIcon(R.drawable.statusbar_icon)
 					.setTicker(s.getText());
-			nm.notify(MENTION_NOTIFICATION_ID, nb.getNotification());
+			nm.notify(MENTION_NOTIFICATION_ID, nb.build());
 		} else {
 			//TODO JELLYBEAN expandable notification
-			Notification.Builder nb = new Notification.Builder(context)
+			final Notification.Builder nb = new Notification.Builder(context)
 				.setContentTitle(s.getUser().getScreenName())
 				.setContentText(s.getText())
 				.setLargeIcon(profileImg)
@@ -49,18 +56,23 @@ public class MultiAPIMethods {
 				.setSmallIcon(R.drawable.statusbar_icon)
 				.setTicker(s.getText());
 			String media = Utilities.getTweetYFrogTwitpicMedia(s);
-			Notification noti = null;
 			if(media != null && !media.isEmpty()) {
-				noti = new Notification.BigPictureStyle(nb)
-					.bigPicture(ImageManager.getInstance(context).get(media))
-					.bigLargeIcon(profileImg)
-					.build(); 
+				ImageManager.getInstance(context).get(media, new ImageManager.OnImageReceivedListener() {
+					@Override
+					public void onImageReceived(String arg0, Bitmap media) {
+						Notification noti = new Notification.BigPictureStyle(nb)
+							.bigPicture(media)
+							.bigLargeIcon(profileImg)
+							.build();
+						nm.notify(MENTION_NOTIFICATION_ID, noti);
+					}
+				});
 			} else {
-				noti = new Notification.BigTextStyle(nb)
+				Notification noti = new Notification.BigTextStyle(nb)
 					.bigText(s.getText())
 					.build();
+				nm.notify(MENTION_NOTIFICATION_ID, noti);
 			}
-			nm.notify(MENTION_NOTIFICATION_ID, noti);
 		}
 	}
 }

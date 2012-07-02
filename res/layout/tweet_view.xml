@@ -56,12 +56,12 @@
 					android:layout_centerInParent="true" android:layout_width="wrap_content"
 					android:layout_height="wrap_content" />
 			</RelativeLayout>
-			<LinearLayout android:layout_below="@+id/tweetMediaFrame"
-				android:layout_marginTop="5dp" android:layout_width="fill_parent"
-				android:orientation="vertical" android:layout_height="wrap_content"
-				android:id="@+id/widgets" />
-			<ViewStub android:layout_below="@+id/widgets" android:id="@+id/mapView"
-				android:layout_marginTop="5dp" android:inflatedId="@+id/mapViewImported"
+			<LinearLayout android:id="@+id/widgets"
+				android:layout_below="@+id/tweetMediaFrame"
+				android:layout_marginTop="10wdp" android:layout_width="fill_parent"
+				android:orientation="vertical" android:layout_height="wrap_content" />
+			<ViewStub android:id="@+id/mapView" android:layout_below="@+id/widgets"
+				android:layout_marginTop="10dp" android:inflatedId="@+id/mapViewImported"
 				android:layout="@layout/map_item" android:layout_height="wrap_content"
 				android:layout_width="fill_parent" />
 		</RelativeLayout>
