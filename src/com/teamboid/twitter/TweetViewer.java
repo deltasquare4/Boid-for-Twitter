@@ -250,7 +250,7 @@ public class TweetViewer extends MapActivity {
 			findViewById(R.id.tweetConvoDivider).setVisibility(View.GONE); 
 		}
 		RemoteImageView profilePic = (RemoteImageView)findViewById(R.id.tweetProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + status.getUser().getScreenName() + "&size=bigger");
+		profilePic.setImageURL( Utilities.getUserImage(tweet.getUser(), this) );
 		profilePic.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { 

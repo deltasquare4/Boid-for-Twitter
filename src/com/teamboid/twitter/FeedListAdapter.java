@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -216,8 +218,11 @@ public class FeedListAdapter extends BaseAdapter {
 			userNameTxt.setLayoutParams(userNameParams);
 			indicatorTxt.setVisibility(View.GONE);
 		}
+		
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + tweet.getUser().getScreenName() + "&size=bigger");
+		profilePic.setImageResource( R.drawable.silouette );
+		String url = Utilities.getUserImage(tweet.getUser(), mContext);
+		profilePic.setImageURL(url);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());

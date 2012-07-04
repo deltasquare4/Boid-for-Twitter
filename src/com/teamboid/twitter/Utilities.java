@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -555,5 +556,21 @@ public class Utilities {
 			e.printStackTrace();
 			return "";
 		}
+	}
+	
+	public static String getUserImage(twitter4j.User user, Activity mContext){
+		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + user.getScreenName();
+		
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		mContext.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+		int size = (int) (outMetrics.density * 50); // 50dp in pixels
+		if( size >= 73 ){
+			url += "&size=bigger";
+		} else if( size >= 48 ){
+			url += "&size=normal";
+		} else{
+			url += "&size=mini";
+		}
+		return url;
 	}
 }
