@@ -99,6 +99,18 @@ public class SideNavigationView extends LinearLayout {
 		navigationMenu.startAnimation(AnimationUtils.loadAnimation(getContext(),
 				R.anim.side_navigation_in_from_left));
 	}
+	public void moveToNormal(){
+		outsideView.setX(0);
+		navigationMenu.setX(0);
+	}
+	
+	public void moveTo(float x){
+		navigationMenu.setVisibility(View.VISIBLE);
+		navigationMenu.setX( (x - navigationMenu.getWidth() ) );
+		
+		outsideView.setVisibility(View.VISIBLE);
+		outsideView.setX( (x - outsideView.getWidth() ) );
+	}
 
 	public void hideMenu() {
 		outsideView.setVisibility(View.GONE);

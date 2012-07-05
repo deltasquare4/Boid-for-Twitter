@@ -38,13 +38,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnGenericMotionListener;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -72,7 +77,7 @@ public class TweetViewer extends MapActivity {
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
@@ -97,6 +102,51 @@ public class TweetViewer extends MapActivity {
 		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { sideNav.showMenu(); }
+		});
+		
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
+		final int touchDep = (int) (outMetrics.density * 50);
+		final int maxYMovement = (int) (outMetrics.density * 70);
+		findViewById(R.id.tweetDisplay).setOnTouchListener(new OnTouchListener(){
+			boolean inMotion = true;
+			float startedY;
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent me) {
+				if( (me.getAction() == MotionEvent.ACTION_DOWN || me.getAction() == MotionEvent.ACTION_MOVE)
+							&& me.getPointerCount() == 1){
+					if(inMotion == true){
+						// Move it
+						if(startedY + maxYMovement > me.getY() && startedY - maxYMovement < me.getY() ){
+							sideNav.moveTo(me.getX());
+							return true;
+						} else{
+							Log.d("tv", "Motion moved out of bounds");
+							inMotion = false;
+							sideNav.moveToNormal();
+							sideNav.hideMenu();
+						}
+					} else{
+						if( me.getX() < touchDep ){
+							startedY = me.getY();
+							inMotion = true;
+							Log.d("tv", "In Motion");
+							onTouch(v, me);
+						}
+					}
+				} else if(me.getPointerCount() == 1){
+					// User let go.
+					Log.d("tv", "Finger has gone");
+					if(me.getX() > v.getWidth() / 2){
+						sideNav.moveToNormal();
+					} else{
+						sideNav.hideMenu();
+					}
+				}
+				return false;
+			}
+			
 		});
 
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
