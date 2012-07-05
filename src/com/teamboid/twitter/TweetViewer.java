@@ -68,18 +68,18 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class TweetViewer extends MapActivity implements OnGesturePerformedListener {
-	
+
 	private GestureLibrary gestureLib;
 	private long statusId;
 	private boolean isFavorited;
 	private Status status;
 	private int lastTheme;
 	private boolean hasConvo;
-	
+
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
 	}
-	
+
 	@Override
 	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
 		if(!hasConvo) return;
@@ -91,7 +91,7 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 			}
 		}
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
@@ -103,14 +103,14 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tweet_view);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
 		sideNav.setMenuClickCallback(new ISideNavigationCallback() {
 			@Override
 			public void onSideNavigationItemClick(Status tweet) {
-				startActivity(new Intent(getApplicationContext(), TweetViewer.class).putExtra("tweet_id", tweet.getId()).putExtra("user_name", tweet.getUser().getName()).putExtra("user_id", tweet.getUser().getId())
-						.putExtra("screen_name", tweet.getUser().getScreenName()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
-						.putExtra("via", tweet.getSource()).putExtra("isFavorited", tweet.isFavorited()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				context.startActivity(new Intent(context, TweetViewer.class)
+					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
 		GestureOverlayView gestureView = (GestureOverlayView)findViewById(R.id.gestureView);
@@ -119,7 +119,7 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		gestureView.addOnGesturePerformedListener(this);
 		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
 		if (!gestureLib.load()) finish();
-		
+
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
 			try{
 				statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));
@@ -129,12 +129,14 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 				Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT).show();
 				finish();
 			}
+		} else if(getIntent().hasExtra("sr_tweet")){
+			loadConversation((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")));
 		} else{
 			preloadTweet();
 			loadTweet();
 		}
 	}
-	
+
 	private TweetWidgetHostHelper twhh = new TweetWidgetHostHelper();
 
 	@Override
@@ -209,39 +211,11 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					Account acc = AccountService.getCurrentAccount();
 					final Status tweet;
-					
-					if(status == null){
-						tweet = acc.getClient().showStatus(statusId);
-					} else{
-						tweet = status;
-					}
-					
-					if(tweet.getInReplyToStatusId() > 0) {
-						final RelatedResults res = acc.getClient().getRelatedResults(tweet.getId());
-						final ResponseList<Status> toAdd = res.getTweetsWithConversation();
-						boolean found = false;
-						for(Status stat : toAdd) {
-							if(stat.getId() == tweet.getInReplyToStatusId()) {
-								found = true;
-								break;
-							}
-						}
-						if(!found) {
-							final Status repliedTo = acc.getClient().showStatus(tweet.getInReplyToStatusId());
-							toAdd.add(repliedTo);
-						}
-						if(toAdd.size() > 0) {
-							runOnUiThread(new Runnable() {
-								public void run() { displayTweet(tweet, toAdd.toArray(new Status[0])); } 
-							});
-						} else displayTweet(tweet, null);
-					} else {
-						runOnUiThread(new Runnable() {
-							public void run() { displayTweet(tweet, null); }
-						});
-					}
+					if(status == null) {
+						tweet = AccountService.getCurrentAccount().getClient().showStatus(statusId);
+					} else tweet = status;
+					loadConversation(tweet);
 				} catch(TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -257,6 +231,49 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 				});
 			}
 		}).start();
+	}
+
+	private void loadConversation(final Status tweet) {
+		try {
+			if(tweet.getInReplyToStatusId() > 0) {
+				final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
+				final ResponseList<Status> toAdd = res.getTweetsWithConversation();
+				boolean found = false;
+				for(Status stat : toAdd) {
+					if(stat.getId() == tweet.getInReplyToStatusId()) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
+					toAdd.add(repliedTo);
+				}
+				if(toAdd.size() > 0) {
+					runOnUiThread(new Runnable() {
+						public void run() { displayTweet(tweet, toAdd.toArray(new Status[0])); } 
+					});
+				} else {
+					runOnUiThread(new Runnable() {
+						public void run() { displayTweet(tweet, null); }
+					});
+				}
+			} else {
+				runOnUiThread(new Runnable() {
+					public void run() { displayTweet(tweet, null); }
+				});
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
+				}
+			});
+		}
+		runOnUiThread(new Runnable() {
+			public void run() { showProgress(false); }
+		});
 	}
 
 	private void displayTweet(Status tweet, Status[] convo) {
@@ -320,7 +337,7 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 					widgets.addView(v, widgetPos.indexOf(url), new LinearLayout.LayoutParams(
 							LinearLayout.LayoutParams.MATCH_PARENT, 
 							LinearLayout.LayoutParams.WRAP_CONTENT)
-					);
+							);
 				} catch(Exception e){
 					Log.d("tv", "TweetWidget failed:");
 					e.printStackTrace();
