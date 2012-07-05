@@ -31,6 +31,12 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.gesture.Prediction;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -61,18 +67,31 @@ import android.widget.Toast;
  * The activity that represents the tweet viewer, shown when you click a tweet to view more details about it.
  * @author Aidan Follestad
  */
-public class TweetViewer extends MapActivity {
-
+public class TweetViewer extends MapActivity implements OnGesturePerformedListener {
+	
+	private GestureLibrary gestureLib;
 	private long statusId;
 	private boolean isFavorited;
 	private Status status;
 	private int lastTheme;
-	private FeedListAdapter adapt;
-
+	private boolean hasConvo;
+	
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
 	}
-
+	
+	@Override
+	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+		if(!hasConvo) return;
+		ArrayList<Prediction> predictions = gestureLib.recognize(gesture);
+		for (Prediction prediction : predictions) {
+			if (prediction.score > 1.0) {
+				SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
+				if(!sideNav.isShown()) sideNav.showMenu();
+			}
+		}
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
@@ -82,9 +101,25 @@ public class TweetViewer extends MapActivity {
 			} else setTheme(Utilities.getTheme(getApplicationContext()));
 		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.tweet_view);
-		adapt = new FeedListAdapter(this, null);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
+		sideNav.setMenuClickCallback(new ISideNavigationCallback() {
+			@Override
+			public void onSideNavigationItemClick(Status tweet) {
+				startActivity(new Intent(getApplicationContext(), TweetViewer.class).putExtra("tweet_id", tweet.getId()).putExtra("user_name", tweet.getUser().getName()).putExtra("user_id", tweet.getUser().getId())
+						.putExtra("screen_name", tweet.getUser().getScreenName()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+						.putExtra("via", tweet.getSource()).putExtra("isFavorited", tweet.isFavorited()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			}
+		});
+		GestureOverlayView gestureView = (GestureOverlayView)findViewById(R.id.gestureView);
+		gestureView.setFadeOffset(0);
+		gestureView.setGestureVisible(false);
+		gestureView.addOnGesturePerformedListener(this);
+		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+		if (!gestureLib.load()) finish();
+		
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
 			try{
 				statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));
@@ -94,23 +129,12 @@ public class TweetViewer extends MapActivity {
 				Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT).show();
 				finish();
 			}
-		} else if(getIntent().hasExtra("sr_tweet")){
-			displayTweet((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")), new Status[]{});
-			loadTweet();
 		} else{
 			preloadTweet();
 			loadTweet();
 		}
 	}
-
-	private void expandAdapter() {
-		LinearLayout list = (LinearLayout)findViewById(android.R.id.list);
-		for(int i = 0; i < adapt.getCount(); i++) {
-			list.addView(adapt.getView(i, null, list), i);
-		}
-		list.requestLayout();
-	}
-
+	
 	private TweetWidgetHostHelper twhh = new TweetWidgetHostHelper();
 
 	@Override
@@ -239,15 +263,8 @@ public class TweetViewer extends MapActivity {
 		statusId = status.getId();
 		isFavorited = status.isFavorited();
 		if(status.isRetweet()) status = status.getRetweetedStatus();
-		adapt.clear();
 		if(convo != null && convo.length > 0) {
-			findViewById(android.R.id.list).setVisibility(View.VISIBLE);
-			findViewById(R.id.tweetConvoDivider).setVisibility(View.VISIBLE);
-			adapt.addInverted(convo);
-			expandAdapter();
-		} else {
-			findViewById(android.R.id.list).setVisibility(View.GONE);
-			findViewById(R.id.tweetConvoDivider).setVisibility(View.GONE); 
+			((SideNavigationView)findViewById(android.R.id.list)).setMenuItems(this, convo);
 		}
 		RemoteImageView profilePic = (RemoteImageView)findViewById(R.id.tweetProfilePic);
 		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + status.getUser().getScreenName() + "&size=bigger");

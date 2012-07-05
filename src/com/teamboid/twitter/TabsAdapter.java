@@ -339,7 +339,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
 					Status tweet = (Status)adapt.getItem(index);
 					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(tweet)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getUser().getName()).putExtra("user_id", tweet.getUser().getId())
+							.putExtra("screen_name", tweet.getUser().getScreenName()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+							.putExtra("via", tweet.getSource()).putExtra("isFavorited", tweet.isFavorited()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {

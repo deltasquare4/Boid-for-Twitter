@@ -217,7 +217,8 @@ public class FeedListAdapter extends BaseAdapter {
 			indicatorTxt.setVisibility(View.GONE);
 		}
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + tweet.getUser().getScreenName() + "&size=bigger");
+		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());

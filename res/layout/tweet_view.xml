@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<android.gesture.GestureOverlayView
+		android:id="@+id/gestureView" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" />
 	<ScrollView android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 		<RelativeLayout android:id="@+id/tweetDisplay"
 			android:paddingLeft="20dp" android:paddingRight="20dp"
 			android:paddingTop="10dp" android:paddingBottom="10dp"
 			android:layout_width="match_parent" android:layout_height="wrap_content">
-			<LinearLayout android:id="@android:id/list"
-				android:orientation="vertical" android:layout_width="fill_parent"
-				android:visibility="gone" android:layout_height="wrap_content" />
-			<View android:id="@+id/tweetConvoDivider" android:layout_width="fill_parent"
-				android:layout_height="1dp" android:background="@color/blue"
-				android:layout_below="@+android:id/list" android:visibility="gone"
-				android:layout_marginTop="10dp" android:layout_marginBottom="10dp" />
 			<com.handlerexploit.prime.widgets.RemoteImageView
 				android:id="@+id/tweetProfilePic" android:layout_marginRight="10dp"
-				android:layout_below="@+id/tweetConvoDivider"
 				android:layout_marginTop="10dp" android:layout_width="73dp"
 				android:layout_height="73dp" android:src="@drawable/silouette" />
 			<LinearLayout android:id="@+id/userNameDisplay"
@@ -58,7 +53,7 @@
 			</RelativeLayout>
 			<LinearLayout android:id="@+id/widgets"
 				android:layout_below="@+id/tweetMediaFrame"
-				android:layout_marginTop="10wdp" android:layout_width="fill_parent"
+				android:layout_marginTop="10dp" android:layout_width="fill_parent"
 				android:orientation="vertical" android:layout_height="wrap_content" />
 			<ViewStub android:id="@+id/mapView" android:layout_below="@+id/widgets"
 				android:layout_marginTop="10dp" android:inflatedId="@+id/mapViewImported"
@@ -70,4 +65,7 @@
 		android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
 		android:layout_width="fill_parent" android:visibility="gone"
 		android:layout_height="10dp" android:layout_alignParentBottom="true" />
+	<com.teamboid.twitter.SideNavigationView
+		android:id="@android:id/list" android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 </RelativeLayout>
