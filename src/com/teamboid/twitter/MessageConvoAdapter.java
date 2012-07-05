@@ -155,7 +155,8 @@ public class MessageConvoAdapter extends BaseAdapter {
 		else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_convo_item, null);
 		final DMConversation curItem = items.get(position);
 		RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmConvoProfileImg);
-		profileImgView.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + curItem.getToScreenName() + "&size=bigger");
+		profileImgView.setImageResource(R.drawable.silouette);
+		profileImgView.setImageURL(Utilities.getUserImage(curItem.getToScreenName(), context));
 		profileImgView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) { 
 				context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", curItem.getToScreenName())

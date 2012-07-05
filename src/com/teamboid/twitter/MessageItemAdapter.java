@@ -62,8 +62,7 @@ public class MessageItemAdapter extends BaseAdapter {
 		//Can't use convertView here, cause it's possible that this index was a sent item before and now it's a received item.
 		if(curItem.getSenderId() == acc.getId()) {
 			toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item_sent, null);
-		} else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item, null);
-		
+		} else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item, null);		
 		final RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmItemProfileImg);
 		if(curItem.getSenderId() != acc.getId()) {
 			profileImgView.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +75,8 @@ public class MessageItemAdapter extends BaseAdapter {
 				}
 			});
 		}
-		profileImgView.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + curItem.getSenderScreenName() + "&size=bigger");
+		profileImgView.setImageResource(R.drawable.silouette);
+		profileImgView.setImageURL(Utilities.getUserImage(curItem.getSenderScreenName(), context));
 		((TextView)toReturn.findViewById(R.id.dmItemTimeTxt)).setText(Utilities.friendlyTimeLong(context.getApplicationContext(), curItem.getCreatedAt()));
 		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));

@@ -18,6 +18,7 @@ import android.text.SpannableString;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -135,7 +136,8 @@ public class Utilities {
 		case 1:
 			return R.style.Boid_LightTheme;
 		case 2:
-			return R.style.Boid_DarkLightTheme;		}
+			return R.style.Boid_DarkLightTheme;
+		}
 	}
 	public static String getTweetYFrogTwitpicMedia(final Status tweet) {
 		if(tweet.getMediaEntities() != null && tweet.getMediaEntities().length > 0) {
@@ -431,14 +433,20 @@ public class Utilities {
 		}
 	}
 
-	public static File createImageFile() throws IOException {
+	public static String generateImageFileName() {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-		String imageFileName = "IMG_" + timeStamp + "_";
-		File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Boid");
-		storageDir.mkdir();
-		return File.createTempFile(imageFileName, ".jpg", storageDir);
+		String imageFileName = "IMG_" + timeStamp + ".jpg";
+		File fi = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageFileName);
+		fi.mkdirs();
+		return fi.getName();
 	}
 
+	public static File createImageFile() throws IOException {
+		File fi = new File(generateImageFileName());
+		fi.createNewFile();
+		return fi;
+	}
+	
 	public static String arrayToJson(Context context, ArrayList<String> values) {
 		JSONArray a = new JSONArray();
 		for (int i = 0; i < values.size(); i++) a.put(values.get(i));
@@ -558,8 +566,8 @@ public class Utilities {
 		}
 	}
 	
-	public static String getUserImage(twitter4j.User user, Activity mContext){
-		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + user.getScreenName();
+	public static String getUserImage(String screenname, Activity mContext){
+		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		mContext.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
@@ -571,6 +579,7 @@ public class Utilities {
 		} else{
 			url += "&size=mini";
 		}
+		
 		return url;
 	}
 }

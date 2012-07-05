@@ -31,7 +31,7 @@
     <string name="vibrate_str_desc">When enabled, notifications will cause your phone to vibrate.</string>
     <string name="ringtone_str">Ringtone</string>
     <string name="ringtone_str_desc">The optional ringtone played when a notification is received.</string>
-    <string name="notifications_str">Notifications</string>
+    <string name="notifications_str">Notifications (Coming Soon)</string>
     <string name="notifications_str_desc">Settings for enabling or disabling notifications and changing notification alert settings.</string>
     
     <string name="follows_you">Follows You</string>
@@ -87,6 +87,10 @@
 	<string name="what_you_wanna_say">What\'s happening?</string>
 	
 	<string name="loading_lists">Please wait, loading your lists…</string>
+	<string name="loading_savedsearches">Please wait, loading your saved searches…</string>
+	<string name="savedsearch_uploaded">Saved search successfully saved to Twitter!</string>
+	<string name="savedsearch_delete_error">Something happened while removing a saved search from Twitter!</string>
+	<string name="savedsearch_upload_error">Something happened while saving your saved search on Twitter!</string>
 	<string name="no_lists">You don\'t have any lists!</string>
 	<string name="failed_load_lists">Something happened while loading your lists!</string>	
 	<string name="lists_str">Lists</string>
@@ -191,15 +195,11 @@
         <item>Dark</item>
         <item>Light</item>
         <item>Light and Dark</item>
-       	<item>Dark, Blue Actionbar</item>
-       	<item>Light, Blue Actionbar</item>
     </string-array>
     <string-array name="theme_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>  
-        <item>3</item>
-        <item>4</item>
+        <item>2</item>
     </string-array>
     <string-array name="nearby_distances">
         <item>Within 1mi</item>
@@ -235,6 +235,7 @@
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="imgur_note">Images will be uploaded using the same imgur account at the moment and follow the default access settings</string>
+    <string name="view_conversation_str">View Conversation</string>
     
     <string name="photo_service_title">Upload Service</string>
     <string name="confirm_send_setting_title">Send Prompt</string>

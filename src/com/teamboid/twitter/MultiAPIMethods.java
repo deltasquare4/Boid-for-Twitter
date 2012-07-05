@@ -44,6 +44,7 @@ public class MultiAPIMethods {
 					.setAutoCancel(true)
 					.setSmallIcon(R.drawable.statusbar_icon)
 					.setTicker(s.getText());
+			//TODO REMOVE USE OF SR_TWEET EXTRA
 			nm.notify(MENTION_NOTIFICATION_ID, nb.build());
 		} else {
 			//TODO JELLYBEAN expandable notification

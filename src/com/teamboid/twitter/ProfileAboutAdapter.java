@@ -83,7 +83,8 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			if(convertView != null) toReturn = (RelativeLayout)convertView;
 			else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_about, null);
 			final RemoteImageView profileImg = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
-			profileImg.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + user.getScreenName() + "&size=bigger");
+			profileImg.setImageResource(R.drawable.silouette);
+			profileImg.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
 			((TextView)toReturn.findViewById(R.id.userItemName)).setText(user.getName());
 			TextView desc = (TextView)toReturn.findViewById(R.id.userItemDescription);
 			if(user.getDescription() != null && user.getDescription().trim().length() > 0) {

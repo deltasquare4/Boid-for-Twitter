@@ -220,9 +220,8 @@ public class FeedListAdapter extends BaseAdapter {
 		}
 		
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageResource( R.drawable.silouette );
-		String url = Utilities.getUserImage(tweet.getUser(), mContext);
-		profilePic.setImageURL(url);
+		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());

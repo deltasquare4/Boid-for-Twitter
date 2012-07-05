@@ -3,6 +3,7 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import twitter4j.ResponseList;
+import twitter4j.SavedSearch;
 import twitter4j.TwitterException;
 import twitter4j.UserList;
 
@@ -43,12 +44,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
-import android.widget.Button;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -564,20 +568,24 @@ public class TimelineScreen extends Activity {
 			addColumn(MediaTimelineFragment.ID);
 			return true;
 		case R.id.addSavedSearchColAction:
-			final Dialog dialog = new Dialog(this);
-			dialog.setContentView(R.layout.input_dialog);
-			dialog.setCancelable(true);
-			dialog.setTitle(R.string.savedsearch_str);
-			((Button)dialog.findViewById(R.id.dialogOK)).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					String input = ((EditText)dialog.findViewById(R.id.dialogInput)).getText().toString();
-					if(input.trim().length() == 0) return;
-					addColumn(SavedSearchFragment.ID + "@" + input.trim());
-					dialog.dismiss();
+			
+			Toast.makeText(getApplicationContext(), getString(R.string.loading_savedsearches), Toast.LENGTH_SHORT).show();
+			new Thread(new Runnable() {
+				public void run() {
+					Account acc = AccountService.getCurrentAccount();
+					try {
+						final ResponseList<SavedSearch> lists = acc.getClient().getSavedSearches();
+						runOnUiThread(new Runnable() {
+							public void run() { showSavedSearchColumnAdd(lists.toArray(new SavedSearch[0])); }
+						});
+					} catch (TwitterException e) {
+						e.printStackTrace();
+						runOnUiThread(new Runnable() {
+							public void run() { showSavedSearchColumnAdd(null); }
+						});
+					}
 				}
-			});
-			dialog.show();
+			}).start();
 			return true;
 		case R.id.addFavoritesColAction:
 			addColumn(FavoritesFragment.ID);
@@ -644,5 +652,59 @@ public class TimelineScreen extends Activity {
 			}
 		});
 		builder.create().show();
+	}
+	
+	private void showSavedSearchColumnAdd(final SavedSearch[] lists) {
+		final Dialog diag = new Dialog(this);
+		diag.setTitle(R.string.savedsearch_str);
+		diag.setCancelable(true);
+		diag.setContentView(R.layout.savedsearch_dialog);
+		ArrayList<String> items = new ArrayList<String>();
+		for(SavedSearch l : lists) items.add(l.getName());
+		final ListView list = (ListView)diag.findViewById(android.R.id.list); 
+		list.setAdapter(new ArrayAdapter<String>(this, R.layout.trends_list_item, items));
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				SavedSearch curList = lists[index];
+				addColumn(SavedSearchFragment.ID + "@" + curList.getQuery().replace("@", "%40"));
+				diag.dismiss();
+			}
+		});
+		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				Toast.makeText(TimelineScreen.this, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
+				return false;
+			}
+		});
+		final EditText input = (EditText)diag.findViewById(android.R.id.input);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_GO) {
+					final String query = input.getText().toString().trim();
+					diag.dismiss();
+					addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"));
+					new Thread(new Runnable() {
+						public void run() {
+							try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }
+							catch(Exception e) {
+								e.printStackTrace();
+								runOnUiThread(new Runnable() {
+									public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_upload_error, Toast.LENGTH_SHORT).show(); }
+								});
+								return;
+							}
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_uploaded, Toast.LENGTH_SHORT).show(); }
+							});
+						}
+					}).start();
+				}
+				return false;
+			}
+		});
+		diag.show();
 	}
 }

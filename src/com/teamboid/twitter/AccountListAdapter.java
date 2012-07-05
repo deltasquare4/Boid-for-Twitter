@@ -40,7 +40,8 @@ public class AccountListAdapter extends BaseAdapter {
 		final Account account = (Account)getItem(position);
 		final User curUser = account.getUser();
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.accountItemProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + curUser.getScreenName() + "&size=bigger");
+		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageURL(Utilities.getUserImage(curUser.getScreenName(), mContext));
 		((TextView)toReturn.findViewById(R.id.accountItemName)).setText(curUser.getName());
 		if(curUser.getDescription() != null && !curUser.getDescription().trim().isEmpty()) {
 			((TextView)toReturn.findViewById(R.id.accountItemDescription)).setText(Utilities.twitterifyText(

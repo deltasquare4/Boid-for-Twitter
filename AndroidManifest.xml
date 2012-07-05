@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="37"
+	package="com.teamboid.twitter" android:versionCode="40"
 	android:versionName="0.8.1 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -61,8 +61,8 @@
 			android:configChanges="screenSize" />
 		<activity android:name=".ComposerScreen" android:uiOptions="splitActionBarWhenNarrow"
 			android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
-			android:exported="false" android:label="@string/new_tweet_str"
-			android:configChanges="keyboardHidden|orientation|screenSize" />
+			android:label="@string/new_tweet_str"
+			android:configChanges="keyboardHidden|orientation|screenSize" android:launchMode="singleTask"/>
 		<activity android:name=".SearchScreen" android:label="@string/search_str"
 			android:configChanges="keyboardHidden|orientation|screenSize">
 			<intent-filter>

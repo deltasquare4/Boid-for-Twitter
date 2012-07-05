@@ -389,7 +389,7 @@ public class ComposerScreen extends Activity {
 		}
 	}
 	
-	// Uri attachedUri;
+	public static final Integer CAMERA_SELECT_INTENT = 500;
 	public static final Integer GALLERY_SELECT_INTENT = 600;
 
 	@Override
@@ -399,7 +399,6 @@ public class ComposerScreen extends Activity {
 			setUploadWith(intent.getStringExtra("service"));
 			return;
 		}
-		
 		if(resultCode == RESULT_OK) {
 			if(requestCode == GALLERY_SELECT_INTENT){
 				if(getFileSize(new File(stt.attachedImage)) == 0) {
@@ -421,18 +420,11 @@ public class ComposerScreen extends Activity {
 			Toast.makeText(getApplicationContext(), R.string.no_camera_app, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		try {
-			stt.isGalleryImage = false;
-			stt.attachedImage = Utilities.createImageFile().getAbsolutePath();
-			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(stt.attachedImage));
-		} catch (IOException e) {
-			e.printStackTrace();
-			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-			return;
-		}
-		startActivityForResult(takePictureIntent, 500);
+		stt.isGalleryImage = false;
+		stt.attachedImage = Utilities.generateImageFileName();
+		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(stt.attachedImage));
+		startActivityForResult(takePictureIntent, CAMERA_SELECT_INTENT);
 	}
 	private void selectImage() {
 		try {
