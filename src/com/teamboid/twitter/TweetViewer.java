@@ -195,7 +195,10 @@ public class TweetViewer extends MapActivity {
 						tweet = AccountService.getCurrentAccount().getClient().showStatus(statusId);
 					} else tweet = status;
 					runOnUiThread(new Runnable() {
-						public void run() { loadConversation(tweet); } 
+						public void run() {
+							displayTweet(tweet);
+							loadConversation(tweet);
+						} 
 					});
 				} catch(TwitterException e) {
 					e.printStackTrace();
