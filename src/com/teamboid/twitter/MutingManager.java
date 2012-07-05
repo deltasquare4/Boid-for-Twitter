@@ -1,14 +1,8 @@
 package com.teamboid.twitter;
 
-import java.util.ArrayList;
-
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +22,7 @@ import android.widget.Toast;
 
 public class MutingManager extends ListActivity {
 
-	private ArrayAdapter<String> adapt;
+	private MutingListAdapter adapt;
 	private int lastTheme;
 	
 	@Override
@@ -41,20 +36,56 @@ public class MutingManager extends ListActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.muting_manager);
-		adapt = new ArrayAdapter<String>(this, R.layout.trends_list_item);
+		adapt = new MutingListAdapter(this);
 		setListAdapter(adapt);
 		final EditText input = (EditText)findViewById(R.id.keywordInput);
+		final Spinner typeSpin = (Spinner)findViewById(R.id.keywordType);
 		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if(actionId == EditorInfo.IME_ACTION_GO) {
-					String term = input.getText().toString().trim();
+					final String term = input.getText().toString().trim();
+					final String[] types = getResources().getStringArray(R.array.muting_types);
 					if(term.length() == 0) return true;
-					else if(addKeyword(term)) input.setText("");
+					else {
+						switch(typeSpin.getSelectedItemPosition()) {
+						default:
+							if(adapt.add(term)) input.setText("");
+							break;
+						case 1:
+							if(adapt.add(term + "\n" + types[1])) input.setText("");
+							break;
+						case 2:
+							if(adapt.add(term + "\n" + types[2])) input.setText("");
+							break;
+						}
+					}
 				}
 				return false;
 			}
 		});
+		ArrayAdapter<CharSequence> typeAdapt = ArrayAdapter.createFromResource(this,
+		        R.array.muting_types, R.layout.spinner_item_small);
+		typeAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		typeSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1, int index, long id) {
+				switch(index) {
+				default:
+					input.setHint(R.string.muting_hint_keyword);
+					break;
+				case 1:
+					input.setHint(R.string.muting_hint_user);
+					break;
+				case 2:
+					input.setHint(R.string.muting_hint_app);
+					break;
+				}
+			}
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) { }
+		});
+		typeSpin.setAdapter(typeAdapt);
 		final ListView listView = getListView();
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
@@ -68,12 +99,7 @@ public class MutingManager extends ListActivity {
 						new SwipeDismissListViewTouchListener.OnDismissCallback() {
 							@Override
 							public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-								final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-								String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-								ArrayList<String> cols = Utilities.jsonToArray(getApplicationContext(), prefs.getString(prefName, ""));
-								for (int i : reverseSortedPositions) cols.remove(i);
-								prefs.edit().putString(prefName, Utilities.arrayToJson(getApplicationContext(), cols)).commit();
-								loadKeywords();
+								adapt.remove(reverseSortedPositions);
 							}
 				});
 		listView.setOnTouchListener(touchListener);
@@ -89,7 +115,7 @@ public class MutingManager extends ListActivity {
 			recreate();
 			return;
 		}
-		loadKeywords();
+		adapt.notifyDataSetChanged();
 	}
 	
 	@Override
@@ -107,32 +133,6 @@ public class MutingManager extends ListActivity {
 		super.onSaveInstanceState(outState);
 	}
 	
-	private void loadKeywords() {
-		adapt.clear();
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(prefName, ""));
-		if(cols.size() > 0) {
-			for(String c : cols) adapt.add(c);
-			adapt.notifyDataSetChanged();
-		}
-	}
-	private boolean addKeyword(String term) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(prefName, ""));
-		if(!cols.contains(term)) {
-			cols.add(term);
-			adapt.add(term);
-			adapt.notifyDataSetChanged();
-			prefs.edit().putString(prefName, Utilities.arrayToJson(this, cols)).commit();
-			Vibrator v = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-			v.vibrate(100);
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

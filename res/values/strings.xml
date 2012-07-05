@@ -36,7 +36,9 @@
     
     <string name="follows_you">Follows You</string>
     <string name="request_sent">Request Sent</string>
-    <string name="muting_hint">Keyword or hashtag…</string>
+    <string name="muting_hint_keyword">Keyword or hashtag</string>
+    <string name="muting_hint_app">App name</string>
+    <string name="muting_hint_user">Screen name</string>
     <string name="yes_str">Yes</string>
     <string name="no_str">No</string>
     
@@ -120,7 +122,7 @@
     <string name="removecolumn_str">Remove Column</string>
     <string name="add_account_str">Add Account</string>
     <string name="muting_str">Muting</string>
-    <string name="no_muting_str">No keywords</string>
+    <string name="no_muting_str">No rules</string>
     <string name="refresh_str">Refresh</string>
     <string name="delete_str">Delete</string>
     
@@ -245,4 +247,9 @@
     <string name="users_and_tweets">Users and tweets</string>
     <string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.</string>
     <string name="swipe_to_delete_items">Swipe items off the screen to delete them.</string>
+    <string-array name="muting_types">
+        <item>Keyword</item>
+        <item>User</item>
+        <item>App</item>
+    </string-array>
 </resources>

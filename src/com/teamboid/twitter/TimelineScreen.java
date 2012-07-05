@@ -633,7 +633,9 @@ public class TimelineScreen extends Activity {
 		if(requestCode == 600) {
 			for(int i = 0; i < getActionBar().getTabCount(); i++) {
 				Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag != null) ((BaseListFragment)frag).filter();
+				if(frag != null && frag instanceof BaseListFragment) {
+					((BaseListFragment)frag).filter();
+				}
 			}
 		}
 	}

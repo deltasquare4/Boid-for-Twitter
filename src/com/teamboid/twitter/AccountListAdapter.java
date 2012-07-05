@@ -8,8 +8,6 @@ import android.widget.*;
 
 import twitter4j.User;
 
-import java.util.ArrayList;
-
 import com.handlerexploit.prime.widgets.RemoteImageView;
 
 /**
@@ -20,11 +18,9 @@ public class AccountListAdapter extends BaseAdapter {
 
 	public AccountListAdapter(Activity context) {
 		mContext = context;
-		selectedItems = new ArrayList<Long>();
 	}
 
 	private Activity mContext;
-	public ArrayList<Long> selectedItems;
 	
 	@Override
 	public int getCount() { return AccountService.getAccounts().size(); }
@@ -47,9 +43,6 @@ public class AccountListAdapter extends BaseAdapter {
 			((TextView)toReturn.findViewById(R.id.accountItemDescription)).setText(Utilities.twitterifyText(
 					mContext, curUser.getDescription(), null, null, false));
 		} else ((TextView)toReturn.findViewById(R.id.accountItemDescription)).setText(mContext.getApplicationContext().getString(R.string.nodescription_str));
-		if(selectedItems.contains(curUser.getId())) {
-			toReturn.setBackgroundColor(mContext.getTheme().obtainStyledAttributes(new int[] { R.attr.selectedItemColor }).getColor(0, 0));
-		}
 		return toReturn;
 	}
 }
