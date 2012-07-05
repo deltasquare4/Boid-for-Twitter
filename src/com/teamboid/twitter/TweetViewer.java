@@ -109,8 +109,8 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 			@Override
 			public void onSideNavigationItemClick(Status tweet) {
 				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
 		GestureOverlayView gestureView = (GestureOverlayView)findViewById(R.id.gestureView);
@@ -130,7 +130,7 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 				finish();
 			}
 		} else if(getIntent().hasExtra("sr_tweet")){
-			loadConversation((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")));
+			displayTweet((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")));
 		} else{
 			preloadTweet();
 			loadTweet();
@@ -215,7 +215,9 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 					if(status == null) {
 						tweet = AccountService.getCurrentAccount().getClient().showStatus(statusId);
 					} else tweet = status;
-					loadConversation(tweet);
+					runOnUiThread(new Runnable() {
+						public void run() { loadConversation(tweet); } 
+					});
 				} catch(TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -234,56 +236,54 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 	}
 
 	private void loadConversation(final Status tweet) {
-		try {
-			if(tweet.getInReplyToStatusId() > 0) {
-				final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
-				final ResponseList<Status> toAdd = res.getTweetsWithConversation();
-				boolean found = false;
-				for(Status stat : toAdd) {
-					if(stat.getId() == tweet.getInReplyToStatusId()) {
-						found = true;
-						break;
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					if(tweet.getInReplyToStatusId() > 0) {
+						final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
+						final ResponseList<Status> toAdd = res.getTweetsWithConversation();
+						boolean found = false;
+						for(Status stat : toAdd) {
+							if(stat.getId() == tweet.getInReplyToStatusId()) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
+							toAdd.add(repliedTo);
+						}
+						if(toAdd.size() > 0) {
+							runOnUiThread(new Runnable() {
+								public void run() {
+									final Status[] convo = toAdd.toArray(new Status[0]);
+									if(convo != null && convo.length > 0) {
+										((SideNavigationView)findViewById(android.R.id.list)).setMenuItems(TweetViewer.this, convo);
+									}
+								} 
+							});
+						}
 					}
-				}
-				if(!found) {
-					final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
-					toAdd.add(repliedTo);
-				}
-				if(toAdd.size() > 0) {
+				} catch(Exception e) {
+					e.printStackTrace();
 					runOnUiThread(new Runnable() {
-						public void run() { displayTweet(tweet, toAdd.toArray(new Status[0])); } 
-					});
-				} else {
-					runOnUiThread(new Runnable() {
-						public void run() { displayTweet(tweet, null); }
+						public void run() {
+							Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
+						}
 					});
 				}
-			} else {
 				runOnUiThread(new Runnable() {
-					public void run() { displayTweet(tweet, null); }
+					public void run() { showProgress(false); }
 				});
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
-			runOnUiThread(new Runnable() {
-				public void run() {
-					Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
-				}
-			});
-		}
-		runOnUiThread(new Runnable() {
-			public void run() { showProgress(false); }
-		});
+		}).start();
 	}
 
-	private void displayTweet(Status tweet, Status[] convo) {
+	private void displayTweet(Status tweet) {
 		status = tweet;
 		statusId = status.getId();
 		isFavorited = status.isFavorited();
 		if(status.isRetweet()) status = status.getRetweetedStatus();
-		if(convo != null && convo.length > 0) {
-			((SideNavigationView)findViewById(android.R.id.list)).setMenuItems(this, convo);
-		}
 		RemoteImageView profilePic = (RemoteImageView)findViewById(R.id.tweetProfilePic);
 		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + status.getUser().getScreenName() + "&size=bigger");
 		profilePic.setOnClickListener(new View.OnClickListener() {
@@ -304,8 +304,8 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		expandTwtmore(contents);
 		displayLocation();
 		displayMedia();
-		//Widget stuff here
 		for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+		loadConversation(tweet);
 	}
 
 	List<String> widgetPos = new ArrayList<String>();
