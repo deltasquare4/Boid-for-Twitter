@@ -433,14 +433,20 @@ public class Utilities {
 		}
 	}
 
-	public static File createImageFile() throws IOException {
+	public static String generateImageFileName() {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-		String imageFileName = "IMG_" + timeStamp + "_";
-		File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Boid");
-		storageDir.mkdir();
-		return File.createTempFile(imageFileName, ".jpg", storageDir);
+		String imageFileName = "IMG_" + timeStamp + ".jpg";
+		File fi = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageFileName);
+		fi.mkdirs();
+		return fi.getName();
 	}
 
+	public static File createImageFile() throws IOException {
+		File fi = new File(generateImageFileName());
+		fi.createNewFile();
+		return fi;
+	}
+	
 	public static String arrayToJson(Context context, ArrayList<String> values) {
 		JSONArray a = new JSONArray();
 		for (int i = 0; i < values.size(); i++) a.put(values.get(i));

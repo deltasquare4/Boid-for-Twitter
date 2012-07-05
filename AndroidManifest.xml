@@ -61,8 +61,8 @@
 			android:configChanges="screenSize" />
 		<activity android:name=".ComposerScreen" android:uiOptions="splitActionBarWhenNarrow"
 			android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
-			android:exported="false" android:label="@string/new_tweet_str"
-			android:configChanges="keyboardHidden|orientation|screenSize" />
+			android:label="@string/new_tweet_str"
+			android:configChanges="keyboardHidden|orientation|screenSize" android:launchMode="singleTask"/>
 		<activity android:name=".SearchScreen" android:label="@string/search_str"
 			android:configChanges="keyboardHidden|orientation|screenSize">
 			<intent-filter>
