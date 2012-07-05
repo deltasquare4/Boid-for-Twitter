@@ -566,11 +566,11 @@ public class Utilities {
 		}
 	}
 	
-	public static String getUserImage(String screenname, Activity mContext){
+	public static String getUserImage(String screenname, Context mContext){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		
 		DisplayMetrics outMetrics = new DisplayMetrics();
-		mContext.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
 		int size = (int) (outMetrics.density * 50); // 50dp in pixels
 		if( size >= 73 ){
 			url += "&size=bigger";

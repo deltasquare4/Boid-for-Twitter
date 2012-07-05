@@ -16,6 +16,7 @@
 	<TextView android:id="@+id/dmItemTimeTxt" android:textColor="?timerColor"
 		android:layout_below="@+id/dmItemMessageTxt"
 		android:layout_alignRight="@+id/dmItemMessageTxt"
+		android:layout_alignWithParentIfMissing="true"
 		android:layout_marginTop="5dp" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
 </RelativeLayout>

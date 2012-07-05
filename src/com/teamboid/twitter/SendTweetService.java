@@ -23,13 +23,12 @@ import android.util.Log;
  */
 public class SendTweetService extends Service {
 	public static final String NETWORK_AVAIL = "com.teamboid.twitter.NETWORK_AVAIL";
-	public static final String ADD_TWEET = "com.teamboid.twitter.ADD_TWEET";
+	// public static final String ADD_TWEET = "com.teamboid.twitter.ADD_TWEET";
 	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
 	public static final String REMOVE_TWEET = "com.teamboid.twitter.REMOVE_TWEET";
 	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	
-	public static List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
-	
+	public List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
 	
 	public class SendTweetAsyncTask extends AsyncTask<Object,Object,Object>{
 
@@ -111,23 +110,38 @@ public class SendTweetService extends Service {
 			new SendTweetAsyncTask().execute();
 		} catch(Exception e){ e.printStackTrace(); }
 	}
-
+	
+	static SendTweetService scs;
+	static SendTweetService getInstance(){
+		if(scs == null) synchronized(SendTweetService.class) { new SendTweetService(); }
+		return scs;
+	}
+	
+	public SendTweetService(){
+		scs = this;
+		Log.d("sts", "New instance.");
+	}
+	
+	public static void addTweet(SendTweetTask stt){
+		getInstance().tweets.add(stt);
+		
+		
+    	
+		getInstance().startBackground();
+	}
+	public static void initialize(){
+		getInstance().loadTweets();
+		Intent update = new Intent(UPDATE_STATUS);
+    	getInstance().sendBroadcast(update);
+	}
+		
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if(intent == null){
 			return Service.START_STICKY;
 		}
 		
-	    if(intent.getAction().equals(ADD_TWEET)){
-	    	tweets.add(SendTweetTask.fromBundle(intent.getBundleExtra("send_tweet_task")));
-	    	
-	    	// Alert the timeline we have new tweets in progress
-	    	Intent update = new Intent(UPDATE_STATUS);
-	    	sendBroadcast(update);
-	    	
-	    	startBackground();
-	    	
-	    } else if(intent.getAction().equals(NETWORK_AVAIL)){
+	    if(intent.getAction().equals(NETWORK_AVAIL)){
 	    	// If there was no network at the time of send, we get notified here :)
 	    	startBackground();
 	    } else if(intent.getAction().equals(REMOVE_TWEET)){
@@ -141,7 +155,9 @@ public class SendTweetService extends Service {
 	    } else if(intent.getAction().equals(LOAD_TWEETS)){
 	    	loadTweets();
 	    	Intent update = new Intent(UPDATE_STATUS);
+	    	update.putExtra("dontupdate", true);
 	    	sendBroadcast(update);
+	    	startBackground();
 	    }
 		
 	    return Service.START_STICKY;

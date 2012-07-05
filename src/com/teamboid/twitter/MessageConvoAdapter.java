@@ -8,6 +8,7 @@ import android.app.Activity;
 import twitter4j.DirectMessage;
 
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -155,14 +156,18 @@ public class MessageConvoAdapter extends BaseAdapter {
 		else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_convo_item, null);
 		final DMConversation curItem = items.get(position);
 		RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmConvoProfileImg);
-		profileImgView.setImageResource(R.drawable.silouette);
-		profileImgView.setImageURL(Utilities.getUserImage(curItem.getToScreenName(), context));
-		profileImgView.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) { 
-				context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", curItem.getToScreenName())
-						.putExtra("account", AccountService.getCurrentAccount().getId()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
+		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_profileimg_download", true)) {
+			profileImgView.setImageResource(R.drawable.silouette);
+			profileImgView.setImageURL(Utilities.getUserImage(curItem.getToScreenName(), context));
+			profileImgView.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) { 
+					context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", curItem.getToScreenName())
+							.putExtra("account", AccountService.getCurrentAccount().getId()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				}
+			});
+		} else{
+			profileImgView.setVisibility(View.GONE);
+		}
 		final TextView messageTxt = (TextView)toReturn.findViewById(R.id.dmConvoMessageTxt); 
 		if(curItem.getLastSenderIsMe()) {
 			((ImageView)toReturn.findViewById(R.id.dmConvoReplyIndicator)).setVisibility(View.VISIBLE);

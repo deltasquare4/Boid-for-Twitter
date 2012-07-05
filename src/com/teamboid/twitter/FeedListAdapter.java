@@ -219,19 +219,24 @@ public class FeedListAdapter extends BaseAdapter {
 			indicatorTxt.setVisibility(View.GONE);
 		}
 		
-		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageResource(R.drawable.silouette);
-		profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());
-		final Status fTweet = tweet;
-		profilePic.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
-					.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
+		
+		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
+			profilePic.setImageResource(R.drawable.silouette);
+			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
+			final Status fTweet = tweet;
+			profilePic.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
+						.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				}
+			});
+		} else{
+			profilePic.setVisibility(View.GONE);
+		}
 		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);

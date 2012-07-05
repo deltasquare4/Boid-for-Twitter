@@ -370,11 +370,12 @@ public class ComposerScreen extends Activity {
 		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
 		
-		Intent send = new Intent(this, SendTweetService.class);
-		send.setAction(SendTweetService.ADD_TWEET);
-		send.putExtra("send_tweet_task", stt.toBundle());
+		//Intent send = new Intent(this, SendTweetService.class);
+		//send.setAction(SendTweetService.ADD_TWEET);
+		//send.putExtra("send_tweet_task", stt.toBundle());
 		
-		startService(send);
+		//startService(send);
+		SendTweetService.addTweet(stt);
 		finish();
 	}
 	

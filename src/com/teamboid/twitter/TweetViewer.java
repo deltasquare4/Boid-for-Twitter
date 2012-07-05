@@ -296,9 +296,13 @@ public class TweetViewer extends MapActivity {
 		expandTwtmore(contents);
 		displayLocation();
 		displayMedia();
-		for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+		if(tweetWidgetsLoaded == false){
+			tweetWidgetsLoaded = true;
+			for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+		}
 		loadConversation(tweet);
 	}
+	boolean tweetWidgetsLoaded = false;
 
 	List<String> widgetPos = new ArrayList<String>();
 

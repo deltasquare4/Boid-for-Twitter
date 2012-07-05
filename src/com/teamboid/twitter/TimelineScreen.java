@@ -84,19 +84,22 @@ public class TimelineScreen extends Activity {
 				return;
 			}
 			try{
-				if(SendTweetService.tweets != null){
-					Log.d("stu", "Send Tweet Updater RECV running...");
+				sentTweetBinder = new SendTweetArrayAdapter(TimelineScreen.this, 0, 0, SendTweetService.getInstance().tweets);
+				((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
+				
+				if(SendTweetService.getInstance().tweets != null){
+					Log.d("stu", "Send Tweet Updater RECV running... Queue is " + SendTweetService.getInstance().tweets.size() + " tweets long");
 					sentTweetBinder.notifyDataSetInvalidated();
 
-					if(SendTweetService.tweets.size() > 0){
+					if(SendTweetService.getInstance().tweets.size() > 0){
 						findViewById(R.id.progress).setVisibility(View.VISIBLE);
 						findViewById(R.id.progress).setAlpha(1.0f);
 						((SlidingDrawer)findViewById(R.id.progress)).close();
 					} else{
-						if(intent.hasExtra("delete")){ // Tweet was deleted. Don't animate
+						if(intent.hasExtra("delete") || intent.hasExtra("dontrefresh")){ // Tweet was deleted. Don't animate
 							findViewById(R.id.progress).setVisibility(View.GONE);
 						} else { // Tell the user we sent the tweet
-							//TODO This is NOT supported on Gingerbread
+							//TODO This is NOT supported on Gingerbread. If we wanted to in the future, use NineOldDrroids
 							ViewPropertyAnimator vpa = findViewById(R.id.progress).animate();
 							vpa.setStartDelay(300);
 							vpa.setDuration(3000);
@@ -126,19 +129,19 @@ public class TimelineScreen extends Activity {
 						return;
 					}
 					boolean errors = false;
-					for(SendTweetTask stt : SendTweetService.tweets){
+					for(SendTweetTask stt : SendTweetService.getInstance().tweets){
 						if(stt.result.errorCode != Result.WAITING && stt.result.sent == false){
 							errors = true;
 						}
 					}
 					TextView tv = (TextView)findViewById(R.id.progress_handle);
 					if(errors == true){
-						tv.setText(getString(R.string.send_error_tweets).replace("{sending}", SendTweetService.tweets.size() + ""));
+						tv.setText(getString(R.string.send_error_tweets).replace("{sending}", SendTweetService.getInstance().tweets.size() + ""));
 					} else{
-						if(SendTweetService.tweets.size() == 1){
+						if(SendTweetService.getInstance().tweets.size() == 1){
 							tv.setText(R.string.sending_tweet);
 						} else{
-							tv.setText(getString(R.string.sending_tweets).replace("{sending}", SendTweetService.tweets.size() + ""));
+							tv.setText(getString(R.string.sending_tweets).replace("{sending}", SendTweetService.getInstance().tweets.size() + ""));
 						}
 					}
 				}
@@ -165,8 +168,6 @@ public class TimelineScreen extends Activity {
 		ab.setDisplayShowHomeEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		startService(new Intent(this, AccountService.class));
-		sentTweetBinder = new SendTweetArrayAdapter(this, 0, 0, SendTweetService.tweets);
-		((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
 	}
 
 	@Override
@@ -434,7 +435,10 @@ public class TimelineScreen extends Activity {
 		prefs.edit().remove("last_profilepic_wipe").apply();
 		CachingUtils.clearCache(this);
 		CachingUtils.clearMediaCache(this);
-
+	}
+	
+	@Override
+	public void onDestroy() {
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
 	}
