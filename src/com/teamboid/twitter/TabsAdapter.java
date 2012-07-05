@@ -1362,9 +1362,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
 					Tweet tweet = (Tweet)adapt.getItem(position);
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
+							.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+							.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
 			setRetainInstance(true);
