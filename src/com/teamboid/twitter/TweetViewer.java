@@ -108,7 +108,7 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		sideNav.setMenuClickCallback(new ISideNavigationCallback() {
 			@Override
 			public void onSideNavigationItemClick(Status tweet) {
-				context.startActivity(new Intent(context, TweetViewer.class)
+				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
 					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
