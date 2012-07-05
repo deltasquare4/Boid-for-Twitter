@@ -422,14 +422,14 @@ public class ComposerScreen extends Activity {
 		}
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		stt.isGalleryImage = false;
-		stt.attachedImage = Utilities.generateImageFileName();
+		stt.attachedImage = Utilities.generateImageFileName(this);
 		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(stt.attachedImage));
 		startActivityForResult(takePictureIntent, CAMERA_SELECT_INTENT);
 	}
 	private void selectImage() {
 		try {
 			stt.isGalleryImage = true;
-			stt.attachedImage = Utilities.createImageFile().getAbsolutePath();
+			stt.attachedImage = Utilities.createImageFile(this).getAbsolutePath();
 			Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null).setType("image/*")
 					.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(stt.attachedImage))
 					.putExtra("outputFormat", Bitmap.CompressFormat.PNG.name());
