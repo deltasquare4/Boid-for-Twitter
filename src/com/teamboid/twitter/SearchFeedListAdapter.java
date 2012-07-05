@@ -119,13 +119,17 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
 		final Tweet tweet = tweets.get(position);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageResource(R.drawable.silouette);
-		profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
-		profilePic.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) { 
-				mContext.startActivity(new Intent(mContext, ProfileScreen.class).putExtra("screen_name", tweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		}); 
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
+			profilePic.setImageResource(R.drawable.silouette);
+			profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
+			profilePic.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) { 
+					mContext.startActivity(new Intent(mContext, ProfileScreen.class).putExtra("screen_name", tweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				}
+			}); 
+		} else{
+			profilePic.setVisibility(View.GONE);
+		}
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			((TextView)toReturn.findViewById(R.id.feedItemUserName)).setText(tweet.getFromUserName());
 		} else ((TextView)toReturn.findViewById(R.id.feedItemUserName)).setText(tweet.getFromUser());

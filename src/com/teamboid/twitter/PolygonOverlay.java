@@ -42,7 +42,6 @@ public class PolygonOverlay extends Overlay {
 					
 					pr.toPixels(googlePoint, ap);
 					path.lineTo(ap.x, ap.y);
-					Log.d("d", ap.x + " " + ap.y);
 				}
 			//}
 			
@@ -56,8 +55,6 @@ public class PolygonOverlay extends Overlay {
 			p.setAlpha(240);
 			p.setStyle(Style.STROKE);
 			canvas.drawPath(path, p);
-			
-			Log.d("d", "POLYGON DRAW");
 		}
 		return super.draw(canvas, mapView, shadow, when);
 	}

@@ -565,16 +565,21 @@ public class Utilities {
 			return "";
 		}
 	}
-
-	public static String getUserImage(String screenName, Context mContext) {
-		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenName;
-		WindowManager wm = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
+	
+	public static String getUserImage(String screenname, Context mContext){
+		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
+		
 		DisplayMetrics outMetrics = new DisplayMetrics();
-		wm.getDefaultDisplay().getMetrics(outMetrics);
+		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
 		int size = (int) (outMetrics.density * 50); // 50dp in pixels
-		if( size >= 73 ) url += "&size=bigger";
-		else if( size >= 48 ) url += "&size=normal";
-		else url += "&size=mini";
+		if( size >= 73 ){
+			url += "&size=bigger";
+		} else if( size >= 48 ){
+			url += "&size=normal";
+		} else{
+			url += "&size=mini";
+		}
+		
 		return url;
 	}
 }

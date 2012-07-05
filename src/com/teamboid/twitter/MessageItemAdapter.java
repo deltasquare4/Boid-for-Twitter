@@ -9,6 +9,7 @@ import twitter4j.DirectMessage;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,19 +65,23 @@ public class MessageItemAdapter extends BaseAdapter {
 			toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item_sent, null);
 		} else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item, null);		
 		final RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmItemProfileImg);
-		if(curItem.getSenderId() != acc.getId()) {
-			profileImgView.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) { 
-					String toOpen = curItem.getSenderScreenName();
-					if(toOpen.equals(acc.getUser().getScreenName())) {
-						toOpen = curItem.getRecipientScreenName();
+		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_profileimg_download", true)) {
+			if(curItem.getSenderId() != acc.getId()) {
+				profileImgView.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) { 
+						String toOpen = curItem.getSenderScreenName();
+						if(toOpen.equals(acc.getUser().getScreenName())) {
+							toOpen = curItem.getRecipientScreenName();
+						}
+						context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", toOpen).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 					}
-					context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", toOpen).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
+				});
+			}
+			profileImgView.setImageResource(R.drawable.silouette);
+			profileImgView.setImageURL(Utilities.getUserImage(curItem.getSenderScreenName(), context));
+		} else{
+			profileImgView.setVisibility(View.GONE);
 		}
-		profileImgView.setImageResource(R.drawable.silouette);
-		profileImgView.setImageURL(Utilities.getUserImage(curItem.getSenderScreenName(), context));
 		((TextView)toReturn.findViewById(R.id.dmItemTimeTxt)).setText(Utilities.friendlyTimeLong(context.getApplicationContext(), curItem.getCreatedAt()));
 		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));

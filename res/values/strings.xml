@@ -145,7 +145,7 @@
     <string name="profile_picture_header">Profile Pictures</string>
     <string name="enable_download">Enable Download</string>
     <string name="tweet_media_header">Tweet Media</string>
-    <string name="enable_profilepic_download_desc">Enabling allows Boid to download profile pictures while viewing Tweets and profiles.</string>
+    <string name="enable_profilepic_download_desc">Enabling allows Boid to download profile pictures while viewing Tweets and profiles. Disabling hides profile pictures altogether</string>
     <string name="enable_media_download_desc">Enabling allows Boid to download the media held in Tweets while viewing a Tweet.</string>
     <string name="enable_drafts_title">Drafts</string>
     <string name="enable_drafts_desc">Enable or disable Tweet drafting, not including replies. Drafts are saved for each account.</string>
