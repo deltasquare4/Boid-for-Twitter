@@ -11,7 +11,6 @@ import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -231,7 +230,6 @@ public class Utilities {
 		}
 		return false;
 	}
-
 	
 	public static Spannable twitterifyText(final Context context, String text, final URLEntity[] urls, final MediaEntity[] pics, final boolean expand) {
 		if(urls != null) {
@@ -433,16 +431,18 @@ public class Utilities {
 		}
 	}
 
-	public static String generateImageFileName() {
+	public static String generateImageFileName(Context context) {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "IMG_" + timeStamp + ".jpg";
-		File fi = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageFileName);
-		fi.mkdirs();
+		File storageDir = context.getExternalCacheDir();
+		System.out.println(storageDir.getAbsolutePath() + ": " + storageDir.mkdirs());
+		File fi = new File(storageDir, imageFileName);
+		System.out.println("FILE PATH: " + fi.getName());
 		return fi.getName();
 	}
 
-	public static File createImageFile() throws IOException {
-		File fi = new File(generateImageFileName());
+	public static File createImageFile(Context context) throws IOException {
+		File fi = new File(generateImageFileName(context));
 		fi.createNewFile();
 		return fi;
 	}
