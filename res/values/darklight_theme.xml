@@ -17,6 +17,7 @@
 		<item name="helpIcon">@drawable/help_dark</item>
 		<item name="settingsIcon">@drawable/settings_dark</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
+		<item name="sideNavigationColor">#ff000000</item>
 		
 		<item name="timelineTab">@drawable/home_tab</item>
 		<item name="mentionsTab">@drawable/mentions_tab</item>

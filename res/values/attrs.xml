@@ -18,6 +18,7 @@
 	<attr name="helpIcon" format="reference" />
 	<attr name="settingsIcon" format="reference" />
 	<attr name="accountSwitchIcon" format="reference" />
+	<attr name="sideNavigationColor" format="color|reference" />
 	
 	<attr name="pinIcon" format="reference" />
 	<attr name="newTweetIcon" format="reference" />
