@@ -613,7 +613,12 @@ public class TweetViewer extends MapActivity {
 			}).start();
 			return;
 		}
-		View m = ((ViewStub)findViewById(R.id.mapView)).inflate();
+		View m;
+		if(findViewById(R.id.mapView) != null)
+			m = ((ViewStub)findViewById(R.id.mapView)).inflate();
+		else
+			m = findViewById(R.id.mapViewImported);
+		
 		m.setOnClickListener(new OnClickListener(){
 
 			@Override
