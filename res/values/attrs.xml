@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="themeColor" format="color|reference" />
-	<attr name="usernameColor" format="color|reference" />
-	<attr name="selectedItemColor" format="color|reference" />
-	<attr name="timerColor" format="color|reference" />
-	<attr name="tweetColor" format="color|reference" />
-	<attr name="linkColor" format="color|reference" />
-	<attr name="spinnerDropdownItemColor" format="color|reference" />
+    <attr name="themeColor" format="color" />
+	<attr name="usernameColor" format="color" />
+	<attr name="selectedItemColor" format="color" />
+	<attr name="timerColor" format="color" />
+	<attr name="tweetColor" format="color" />
+	<attr name="linkColor" format="color" />
+	<attr name="spinnerDropdownItemColor" format="color" />
 	<attr name="mediaIndicator" format="reference" />
 	<attr name="videoIndicator" format="reference" />
 	<attr name="replyIndicator" format="reference" />
@@ -18,7 +18,7 @@
 	<attr name="helpIcon" format="reference" />
 	<attr name="settingsIcon" format="reference" />
 	<attr name="accountSwitchIcon" format="reference" />
-	<attr name="sideNavigationColor" format="color|reference" />
+	<attr name="sideNavigationColor" format="color" />
 	
 	<attr name="pinIcon" format="reference" />
 	<attr name="newTweetIcon" format="reference" />
