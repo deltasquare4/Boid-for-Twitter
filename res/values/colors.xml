@@ -8,5 +8,4 @@
 	<color name="blue_secondary">@android:color/holo_blue_light</color>
 
 	<color name="side_navigation_outside_background">#7000</color>
-	<color name="side_navigation_list_divider_color">#4f4f4f</color>
 </resources>

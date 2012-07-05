@@ -6,14 +6,13 @@
 		android:background="@color/side_navigation_outside_background"
 		android:clickable="true" android:visibility="gone" />
 	<LinearLayout android:id="@+id/side_navigation_menu"
-		android:paddingRight="5dp" android:layout_width="wrap_content"
-		android:layout_height="match_parent" android:visibility="gone">
+		android:background="?sideNavColor" android:paddingRight="5dp"
+		android:layout_width="wrap_content" android:layout_height="match_parent"
+		android:visibility="gone">
 		<ListView android:id="@+id/side_navigation_listview"
 			android:layout_width="@dimen/side_navigation_width"
-			android:layout_height="match_parent" android:background="?sideNavigationColor"
-			android:cacheColorHint="#00000000" android:divider="@color/side_navigation_list_divider_color"
+			android:layout_height="match_parent" android:background="?sideNavColor"
+			android:cacheColorHint="?sideNavColor" android:divider="@null"
 			android:dividerHeight="1dp" />
-		<View android:id="@+id/shadow" android:layout_width="6dp"
-			android:layout_height="match_parent" android:background="@drawable/side_navigation_shadow" />
 	</LinearLayout>
 </RelativeLayout>
