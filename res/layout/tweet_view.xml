@@ -14,25 +14,27 @@
 				android:id="@+id/tweetProfilePic" android:layout_marginRight="10dp"
 				android:layout_marginTop="10dp" android:layout_width="73dp"
 				android:layout_height="73dp" android:src="@drawable/silouette" />
-			<LinearLayout android:id="@+id/userNameDisplay"
-				android:orientation="vertical" android:layout_alignTop="@+id/tweetProfilePic"
+			<RelativeLayout android:id="@+id/userNameDisplay"
+				android:layout_alignTop="@+id/tweetProfilePic"
 				android:layout_toRightOf="@+id/tweetProfilePic"
 				android:layout_width="wrap_content" android:layout_height="73dp">
 				<TextView android:id="@+id/tweetUserName"
-					android:layout_gravity="center_vertical" android:textColor="?usernameColor"
-					android:textStyle="bold" android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:singleLine="true"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
+					android:textColor="?usernameColor" android:textStyle="bold"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:singleLine="true" android:textAppearance="?android:attr/textAppearanceLarge" />
 				<TextView android:id="@+id/tweetScreenName"
-					android:layout_weight="1" android:layout_gravity="center_vertical"
-					android:textColor="?tweetColor" android:layout_width="wrap_content"
-					android:layout_height="0dp" android:singleLine="true"
-					android:textAppearance="?android:attr/textAppearanceMedium" />
-			</LinearLayout>
+					android:layout_below="@+id/tweetUserName" android:textColor="?tweetColor"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:singleLine="true" android:textAppearance="?android:attr/textAppearanceMedium" />
+			</RelativeLayout>
+			<Button android:id="@+id/tweetViewConvoBtn"
+				android:layout_marginTop="5dp" android:layout_below="@+id/userNameDisplay"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:visibility="gone" android:text="@string/view_conversation_str" />
 			<TextView android:id="@+id/tweetContents" android:textColor="?tweetColor"
-				android:layout_marginTop="10dp" android:textColorLink="?linkColor"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_below="@+id/tweetProfilePic" android:linksClickable="true"
+				android:layout_marginTop="5dp" android:layout_below="@+id/tweetViewConvoBtn"
+				android:textColorLink="?linkColor" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:linksClickable="true"
 				android:textAppearance="?android:attr/textAppearanceLarge" />
 			<TextView android:id="@+id/tweetTimer" android:textColor="@color/dark"
 				android:layout_marginTop="5dp" android:layout_width="wrap_content"

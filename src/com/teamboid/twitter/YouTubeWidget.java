@@ -7,14 +7,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import com.handlerexploit.prime.utils.ImageManager;
-import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.tweetwidgets.TweetWidget;
 
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;

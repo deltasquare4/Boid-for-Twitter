@@ -31,7 +31,7 @@
     <string name="vibrate_str_desc">When enabled, notifications will cause your phone to vibrate.</string>
     <string name="ringtone_str">Ringtone</string>
     <string name="ringtone_str_desc">The optional ringtone played when a notification is received.</string>
-    <string name="notifications_str">Notifications</string>
+    <string name="notifications_str">Notifications (Coming Soon)</string>
     <string name="notifications_str_desc">Settings for enabling or disabling notifications and changing notification alert settings.</string>
     
     <string name="follows_you">Follows You</string>
@@ -235,6 +235,7 @@
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="imgur_note">Images will be uploaded using the same imgur account at the moment and follow the default access settings</string>
+    <string name="view_conversation_str">View Conversation</string>
     
     <string name="photo_service_title">Upload Service</string>
     <string name="confirm_send_setting_title">Send Prompt</string>

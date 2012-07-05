@@ -83,7 +83,7 @@ public class SideNavigationView extends LinearLayout {
 
 	public void setMenuItems(Activity mContext, Status[] items) {
 		adapter = new FeedListAdapter(mContext, null);
-		adapter.add(items);
+		adapter.addInverted(items);
 		listView.setAdapter(adapter);
 	}
 

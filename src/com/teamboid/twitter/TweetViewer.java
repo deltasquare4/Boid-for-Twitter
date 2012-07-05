@@ -31,12 +31,6 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.gesture.Gesture;
-import android.gesture.GestureLibraries;
-import android.gesture.GestureLibrary;
-import android.gesture.GestureOverlayView;
-import android.gesture.GestureOverlayView.OnGesturePerformedListener;
-import android.gesture.Prediction;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -54,6 +48,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -67,29 +62,15 @@ import android.widget.Toast;
  * The activity that represents the tweet viewer, shown when you click a tweet to view more details about it.
  * @author Aidan Follestad
  */
-public class TweetViewer extends MapActivity implements OnGesturePerformedListener {
+public class TweetViewer extends MapActivity {
 
-	private GestureLibrary gestureLib;
 	private long statusId;
 	private boolean isFavorited;
 	private Status status;
 	private int lastTheme;
-	private boolean hasConvo;
 
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
-	}
-
-	@Override
-	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-		if(!hasConvo) return;
-		ArrayList<Prediction> predictions = gestureLib.recognize(gesture);
-		for (Prediction prediction : predictions) {
-			if (prediction.score > 1.0) {
-				SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
-				if(!sideNav.isShown()) sideNav.showMenu();
-			}
-		}
 	}
 
 	@Override
@@ -104,21 +85,19 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		setContentView(R.layout.tweet_view);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
+		final SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
 		sideNav.setMenuClickCallback(new ISideNavigationCallback() {
 			@Override
 			public void onSideNavigationItemClick(Status tweet) {
 				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
-		GestureOverlayView gestureView = (GestureOverlayView)findViewById(R.id.gestureView);
-		gestureView.setFadeOffset(0);
-		gestureView.setGestureVisible(false);
-		gestureView.addOnGesturePerformedListener(this);
-		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
-		if (!gestureLib.load()) finish();
+		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { sideNav.showMenu(); }
+		});
 
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
 			try{
@@ -240,6 +219,13 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 			public void run() {
 				try {
 					if(tweet.getInReplyToStatusId() > 0) {
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Button convoBtn = (Button)findViewById(R.id.tweetViewConvoBtn);
+								convoBtn.setEnabled(false);
+								convoBtn.setVisibility(View.VISIBLE);
+							}
+						});
 						final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
 						final ResponseList<Status> toAdd = res.getTweetsWithConversation();
 						boolean found = false;
@@ -273,7 +259,10 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 					});
 				}
 				runOnUiThread(new Runnable() {
-					public void run() { showProgress(false); }
+					public void run() {
+						showProgress(false);
+						((Button)findViewById(R.id.tweetViewConvoBtn)).setEnabled(true);
+					}
 				});
 			}
 		}).start();
