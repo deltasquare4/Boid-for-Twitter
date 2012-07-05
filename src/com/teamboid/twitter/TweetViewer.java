@@ -166,7 +166,8 @@ public class TweetViewer extends MapActivity implements OnGesturePerformedListen
 		setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
 		RelativeLayout toReturn = (RelativeLayout)findViewById(R.id.tweetDisplay);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.tweetProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + screenName + "&size=bigger");
+		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageURL(Utilities.getUserImage(screenName, this));
 		profilePic.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { 
