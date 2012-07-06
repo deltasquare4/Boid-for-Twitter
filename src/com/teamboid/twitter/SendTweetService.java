@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.SendTweetTask.Result;
+import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 
 import android.app.Service;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Sends Tweets for us in the background
@@ -25,7 +27,7 @@ public class SendTweetService extends Service {
 	public static final String NETWORK_AVAIL = "com.teamboid.twitter.NETWORK_AVAIL";
 	// public static final String ADD_TWEET = "com.teamboid.twitter.ADD_TWEET";
 	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
-	public static final String REMOVE_TWEET = "com.teamboid.twitter.REMOVE_TWEET";
+	//public static final String REMOVE_TWEET = "com.teamboid.twitter.REMOVE_TWEET";
 	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	
 	public List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
@@ -40,13 +42,29 @@ public class SendTweetService extends Service {
 			loadTweets();
 			
 			for(int i = 0; i < tweets.size(); i++) { //this prevents concurrent thread modification exceptions
-				SendTweetTask stt = tweets.get(i);
+				final SendTweetTask stt = tweets.get(i);
 				Log.d("sts", "Sending Tweet...");
 				stt.result.errorCode = Result.WAITING;
 				Intent update = new Intent(UPDATE_STATUS);
 				sendBroadcast(update);
 				
 				if(stt.sendTweet(SendTweetService.this).sent == true) {
+					try{
+						AccountService.activity.runOnUiThread(new Runnable(){
+	
+							@Override
+							public void run() {
+								AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID).add(new twitter4j.Status[]{stt.tweet});
+							}
+							
+						});
+					}catch(Exception e){}
+					try{
+						if(!AccountService.activity.hasWindowFocus()){
+							Toast.makeText(getApplicationContext(), R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+						}
+					}catch(Exception e){}
+					
 					tweets.remove(i);
 				} else{
 					tweets.set(i, stt);
@@ -134,6 +152,16 @@ public class SendTweetService extends Service {
 		Intent update = new Intent(UPDATE_STATUS);
     	getInstance().sendBroadcast(update);
 	}
+	
+	public static void removeTweet(SendTweetTask tweet){
+		getInstance().loadTweets();
+		getInstance().tweets.remove(tweet);
+		getInstance().saveTweets();
+    	
+    	Intent update = new Intent(UPDATE_STATUS);
+    	update.putExtra("delete", true);
+    	getInstance().sendBroadcast(update);
+	}
 		
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -144,14 +172,6 @@ public class SendTweetService extends Service {
 	    if(intent.getAction().equals(NETWORK_AVAIL)){
 	    	// If there was no network at the time of send, we get notified here :)
 	    	startBackground();
-	    } else if(intent.getAction().equals(REMOVE_TWEET)){
-	    	loadTweets();
-	    	tweets.remove(intent.getIntExtra("tweet", 0));
-	    	saveTweets();
-	    	
-	    	Intent update = new Intent(UPDATE_STATUS);
-	    	update.putExtra("delete", true);
-	    	sendBroadcast(update);
 	    } else if(intent.getAction().equals(LOAD_TWEETS)){
 	    	loadTweets();
 	    	Intent update = new Intent(UPDATE_STATUS);
