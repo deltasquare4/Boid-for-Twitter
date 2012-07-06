@@ -72,6 +72,12 @@ public class FeedListAdapter extends BaseAdapter {
 			if(tweet.getUser().getScreenName().toLowerCase().equals(query.substring(1).toLowerCase())) {
 				return true;
 			}
+			if(tweet.isRetweet()) {
+				tweet = tweet.getRetweetedStatus();
+				if(tweet.getUser().getScreenName().toLowerCase().equals(query.substring(1).toLowerCase())) {
+					return true;
+				}
+			}
 		} else if(types[2].equals(type)) {
 			if(Html.fromHtml(tweet.getSource()).toString().toLowerCase().equals(query.toLowerCase())) {
 				return true;

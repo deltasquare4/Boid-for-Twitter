@@ -142,6 +142,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 											public void run() {
 												following = FollowingType.UNFOLLOWED;
 												followBtn.setText(R.string.follow_str);
+												((ProfileScreen)mContext).recreate();
 											}
 										});
 									} catch (final TwitterException e) {
@@ -171,16 +172,19 @@ public class ProfileAboutAdapter extends BaseAdapter {
 							public void run() {
 								try {
 									final boolean isBlocked = acc.getClient().existsBlock(user.getId());
-									if(isBlocked) {
-										mContext.runOnUiThread(new Runnable() {
-											public void run() { 
+									mContext.runOnUiThread(new Runnable() {
+										public void run() { 
+											if(isBlocked) {
 												following = FollowingType.BLOCKED;
 												followBtn.setText(R.string.unblock_str);
 												followBtn.setEnabled(true);
 											}
-										});
-										return;
-									}
+											((ProfileScreen)mContext).isBlocked = isBlocked;
+											((ProfileScreen)mContext).getActionBar().setSelectedNavigationItem(1);
+											((ProfileScreen)mContext).invalidateOptionsMenu();
+										}
+									});
+									if(isBlocked) return;
 								} catch (final TwitterException e) {
 									e.printStackTrace();
 									mContext.runOnUiThread(new Runnable() {

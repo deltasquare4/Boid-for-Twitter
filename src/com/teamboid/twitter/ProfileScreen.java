@@ -11,7 +11,6 @@ import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -40,6 +39,7 @@ public class ProfileScreen extends Activity {
 	public FeedListAdapter adapter;
 	public MediaFeedListAdapter mediaAdapter;
 	public User user;
+	public boolean isBlocked;
 	
 	public void showProgress(boolean visible) {
 		if(showProgress == visible) return;
@@ -102,7 +102,8 @@ public class ProfileScreen extends Activity {
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
 			if(user != null) {
-				menu.findItem(R.id.blockAction).setEnabled(true);
+				if(!isBlocked) menu.findItem(R.id.blockAction).setEnabled(true);
+				else menu.findItem(R.id.blockAction).setVisible(false);
 				menu.findItem(R.id.reportAction).setEnabled(true);
 			}
 		}
@@ -182,6 +183,7 @@ public class ProfileScreen extends Activity {
 							public void run() {
 								toast.cancel();
 								Toast.makeText(ProfileScreen.this, R.string.blocked_str, Toast.LENGTH_SHORT).show();
+								recreate();
 							}
 						});
 					}

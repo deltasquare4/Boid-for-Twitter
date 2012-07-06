@@ -75,7 +75,7 @@
     <string name="friends_str">Following</string>
     <string name="followers_str">Followers</string>
     <string name="location_str">Location</string>
-    <string name="directmessage_str">Send Direct Message</string>
+    <string name="directmessage_str">Direct Message</string>
     <string name="report_str">Report</string>
     <string name="retweeted_status">Successfully retweeted!</string>
     <string name="failed_retweet">Something happened while retweeting this Tweet!</string>
