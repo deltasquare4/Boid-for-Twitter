@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,15 +123,36 @@ public class FeedListAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	public void filter(String[] keywords) {
+		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
 		for(int i = 0; i < tweets.size(); i++) {
-			for(String mute : keywords) {
-				if(tweets.get(i).getText().toString().contains(mute.toLowerCase())) {
-					tweets.remove(i);
-					if(i > 0) i--;
-				}
+			for(String rule : keywords) {
+				if(rule.contains("@")) {
+					if(rule.endsWith("@" + types[1])) {
+						processFilterRule(rule.substring(0, rule.indexOf("@")), types[1], tweets.get(i), i);
+					} else processFilterRule(rule.substring(0, rule.indexOf("@")), types[2], tweets.get(i), i);
+				} else processFilterRule(rule, types[0], tweets.get(i), i);
 			}
 		}
 		notifyDataSetChanged();
+	}
+	private void processFilterRule(String query, String type, Status tweet, int index) {
+		if(index == 0) {
+			System.out.println("QUERY: " + query + "\nTYPE: " + type);
+		}
+		query = query.replace("%40", "@");
+		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
+		boolean remove = false;
+		if(types[0].equals(type)) {
+			if(tweet.getText().toString().toLowerCase().contains(query.toLowerCase())) remove = true;
+		} else if(types[1].equals(type)) {
+			if(tweet.getUser().getScreenName().equals(query.substring(1))) remove = true;
+		} else if(types[2].equals(type)) {
+			if(tweet.getSource().equals(query)) remove = true;
+		}
+		if(remove) {
+			tweets.remove(index);
+			if(index > 0) index--;
+		}
 	}
 	public void clear() {
 		tweets.clear();

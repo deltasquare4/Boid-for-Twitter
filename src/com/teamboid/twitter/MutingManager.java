@@ -44,7 +44,7 @@ public class MutingManager extends ListActivity {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if(actionId == EditorInfo.IME_ACTION_GO) {
-					final String term = input.getText().toString().trim();
+					String term = input.getText().toString().trim().replace("@", "%40");
 					final String[] types = getResources().getStringArray(R.array.muting_types);
 					if(term.length() == 0) return true;
 					else {
@@ -53,10 +53,11 @@ public class MutingManager extends ListActivity {
 							if(adapt.add(term)) input.setText("");
 							break;
 						case 1:
-							if(adapt.add(term + "\n" + types[1])) input.setText("");
+							if(term.startsWith("@")) term = ("@" + term);
+							if(adapt.add(term + "@" + types[1])) input.setText("");
 							break;
 						case 2:
-							if(adapt.add(term + "\n" + types[2])) input.setText("");
+							if(adapt.add(term + "@" + types[2])) input.setText("");
 							break;
 						}
 					}
