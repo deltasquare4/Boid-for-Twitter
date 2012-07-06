@@ -41,10 +41,7 @@ public class SendTweetArrayAdapter extends ArrayAdapter<SendTweetTask> {
 		btn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(getContext(), SendTweetService.class);
-				intent.setAction(SendTweetService.REMOVE_TWEET);
-				intent.putExtra("tweet", position);
-				getContext().startService(intent);
+				SendTweetService.removeTweet(stt);
 			}		
 		});
 		btn = (ImageButton)convertView.findViewById(R.id.resend);
@@ -66,10 +63,8 @@ public class SendTweetArrayAdapter extends ArrayAdapter<SendTweetTask> {
 				Intent intent = new Intent(getContext(), ComposerScreen.class);
 				intent.putExtra("stt", stt.toBundle());
 				getContext().startActivity(intent);
-				intent = new Intent(getContext(), SendTweetService.class);
-				intent.setAction(SendTweetService.REMOVE_TWEET);
-				intent.putExtra("tweet", position);
-				getContext().startService(intent);
+				
+				SendTweetService.removeTweet(stt);
 			}			
 		});
 		return convertView;
