@@ -525,9 +525,6 @@ public class TimelineScreen extends Activity {
 		case R.id.refreshAction:
 			performRefresh();
 			return true;
-		case R.id.manageAccountsAction:
-			startActivity(new Intent(this, AccountManager.class));
-			return true;
 		case R.id.searchAction:
 			if(AccountService.getAccounts().size() == 0) return false;
 			super.onSearchRequested();
@@ -539,9 +536,6 @@ public class TimelineScreen extends Activity {
 		case R.id.removeColumnAction:
 			if(getActionBar().getTabCount() == 0) return false;
 			removeColumn(getActionBar().getSelectedNavigationIndex());
-			return true;
-		case R.id.mutingAction:
-			startActivityForResult(new Intent(this, MutingManager.class), 600);
 			return true;
 		case R.id.myProfileAction:
 			if(AccountService.getAccounts().size() == 0) return false;

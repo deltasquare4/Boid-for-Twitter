@@ -183,13 +183,6 @@ public class SettingsScreen extends PreferenceActivity  {
 			});
 		}
 	}
-	public static class MediaFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.media_category);
-		}
-	}
 	public static class NotificationsFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {

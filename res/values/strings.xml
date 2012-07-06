@@ -31,7 +31,7 @@
     <string name="vibrate_str_desc">When enabled, notifications will cause your phone to vibrate.</string>
     <string name="ringtone_str">Ringtone</string>
     <string name="ringtone_str_desc">The optional ringtone played when a notification is received.</string>
-    <string name="notifications_str">Notifications (Coming Soon)</string>
+    <string name="notifications_str">Notifications</string>
     <string name="notifications_str_desc">Settings for enabling or disabling notifications and changing notification alert settings.</string>
     
     <string name="follows_you">Follows You</string>
@@ -116,13 +116,15 @@
     <string name="copy_str">Copy</string>
     
     <string name="search_str">Search</string>
-    <string name="manage_accounts_str">Manage Accounts</string>
+    <string name="manage_accounts_str">Accounts</string>
+    <string name="manage_accounts_str_desc">Add or remove your Twitter accounts.</string>
     <string name="my_profile_str">My Profile</string>
     <string name="settings_str">Settings</string>
     <string name="addcolumn_str">Add Column</string>
     <string name="removecolumn_str">Remove Column</string>
     <string name="add_account_str">Add Account</string>
     <string name="muting_str">Muting</string>
+    <string name="muting_str_desc">Add or remove timeline muting rules to filter tweets.</string>
     <string name="no_muting_str">No rules</string>
     <string name="refresh_str">Refresh</string>
     <string name="delete_str">Delete</string>

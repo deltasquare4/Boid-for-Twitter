@@ -2,18 +2,23 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 	<header android:summary="@string/help_description" android:icon="?helpIcon"
 		android:title="@string/help_title" android:fragment="com.teamboid.twitter.SettingsScreen$HelpFragment" />
+	<header android:summary="@string/manage_accounts_str_desc"
+		android:title="@string/manage_accounts_str">
+		<intent android:targetPackage="com.teamboid.twitter"
+			android:targetClass="com.teamboid.twitter.AccountManager" />
+	</header>
+	<header android:summary="@string/muting_str_desc" android:title="@string/muting_str">
+		<intent android:targetPackage="com.teamboid.twitter"
+			android:targetClass="com.teamboid.twitter.MutingManager" />
+	</header>
 	<header android:summary="@string/appearance_category_desc"
 		android:title="@string/appearance_category" android:fragment="com.teamboid.twitter.SettingsScreen$AppearanceFragment" />
 	<header android:summary="@string/general_description"
 		android:title="@string/general_title" android:icon="?settingsIcon"
 		android:fragment="com.teamboid.twitter.SettingsScreen$GeneralFragment" />
-	<header android:summary="@string/notifications_str_desc"
-		android:title="@string/notifications_str"
+	<header android:summary="Coming soon." android:title="@string/notifications_str"
 		android:fragment="com.teamboid.twitter.SettingsScreen$NotificationsFragment" />
 	<header android:summary="@string/composer_desc_str"
 		android:icon="?sendIcon" android:title="@string/composer_str"
 		android:fragment="com.teamboid.twitter.SettingsScreen$ComposerFragment" />
-	<header android:summary="@string/media_description"
-		android:icon="?mediaIndicator" android:title="@string/media_title"
-		android:fragment="com.teamboid.twitter.SettingsScreen$MediaFragment" />
 </preference-headers>

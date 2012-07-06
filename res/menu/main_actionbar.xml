@@ -36,7 +36,5 @@
 		</menu>
 	</item>
 	<item android:id="@+id/removeColumnAction" android:title="@string/removecolumn_str" />
-	<item android:id="@+id/mutingAction" android:title="@string/muting_str" />
-	<item android:id="@+id/manageAccountsAction" android:title="@string/manage_accounts_str" />
 	<item android:id="@+id/settingsAction" android:title="@string/settings_str" />
 </menu>

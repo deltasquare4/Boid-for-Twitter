@@ -98,10 +98,7 @@ public class AccountManager extends ListActivity {
 	@Override
 	public void onBackPressed() {
 		if(AccountService.getAccounts().size() == 0) return;
-		else {
-			startActivity(new Intent(this, TimelineScreen.class));
-			finish(); //this fixes the issue with the account manager randomly appeared after back is pressed
-		}
+		else finish();
 	}
 	
 	@Override
@@ -125,7 +122,6 @@ public class AccountManager extends ListActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			if(AccountService.getAccounts().size() == 0) return false;
-			startActivity(new Intent(this, TimelineScreen.class));
 			finish();
 			return true;
 		case R.id.addAccountAction:
