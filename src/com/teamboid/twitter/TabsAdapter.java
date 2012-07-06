@@ -2165,9 +2165,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									if(accs.get(i).getId() == acc.getId()) AccountService.setAccount(i, acc);
 								}
 							} else temp = acc.getClient().showUser(screenName);
-							final User user = temp; 
+							final User user = temp;
 							context.runOnUiThread(new Runnable() {
-								public void run() { adapt.setUser(user); }
+								public void run() {
+									((ProfileScreen)context).user = user;
+									((ProfileScreen)context).invalidateOptionsMenu();
+									adapt.setUser(user);
+								}
 							});
 						} catch(TwitterException e) {
 							e.printStackTrace();

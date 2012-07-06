@@ -2,16 +2,22 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import twitter4j.TwitterException;
+import twitter4j.User;
+
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
+import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,6 +39,7 @@ public class ProfileScreen extends Activity {
 	private boolean showProgress;
 	public FeedListAdapter adapter;
 	public MediaFeedListAdapter mediaAdapter;
+	public User user;
 	
 	public void showProgress(boolean visible) {
 		if(showProgress == visible) return;
@@ -92,7 +99,13 @@ public class ProfileScreen extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		if(AccountService.getCurrentAccount() != null && AccountService.getCurrentAccount().getUser().getScreenName().equals(getIntent().getStringExtra("screen_name"))) {
 			inflater.inflate(R.menu.profile_self_actionbar, menu);
-		} else inflater.inflate(R.menu.profile_actionbar, menu);
+		} else {
+			inflater.inflate(R.menu.profile_actionbar, menu);
+			if(user != null) {
+				menu.findItem(R.id.blockAction).setEnabled(true);
+				menu.findItem(R.id.reportAction).setEnabled(true);
+			}
+		}
 		if(showProgress) {
 			final MenuItem refreshAction = menu.findItem(R.id.refreshAction);
 			refreshAction.setEnabled(false);
@@ -123,9 +136,13 @@ public class ProfileScreen extends Activity {
 		case R.id.messageAction:
 			startActivity(new Intent(getApplicationContext(), ConversationScreen.class).putExtra("screen_name", getIntent().getStringExtra("screen_name")));
 			return true;
+		case R.id.blockAction:
+			if(user == null) return false;
+			block();
+			return true;
 		case R.id.reportAction:
-			//TODO
-			Toast.makeText(getApplicationContext(), "Coming soon!", Toast.LENGTH_SHORT).show();
+			if(user == null) return false;
+			report();
 			return true;
 		case R.id.refreshAction:
 			for(int i = 0; i < getActionBar().getTabCount(); i++) {
@@ -139,6 +156,80 @@ public class ProfileScreen extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	public void block() {
+		AlertDialog.Builder diag = new AlertDialog.Builder(this);
+		diag.setTitle(R.string.block_str);
+		diag.setMessage(R.string.confirm_block_str);
+		diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				final Toast toast = Toast.makeText(ProfileScreen.this, R.string.blocking_str, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							AccountService.getCurrentAccount().getClient().createBlock(user.getId());
+						} catch (TwitterException e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_block_str, Toast.LENGTH_LONG).show(); }
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(ProfileScreen.this, R.string.blocked_str, Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}).start();
+			}
+		});
+		diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+		});
+		diag.create().show();
+	}
+	
+	public void report() {
+		AlertDialog.Builder diag = new AlertDialog.Builder(this);
+		diag.setTitle(R.string.report_str);
+		diag.setMessage(R.string.confirm_report_str);
+		diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				final Toast toast = Toast.makeText(ProfileScreen.this, R.string.reporting_str, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							AccountService.getCurrentAccount().getClient().reportSpam(user.getId());
+						} catch (TwitterException e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_report_str, Toast.LENGTH_LONG).show(); }
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(ProfileScreen.this, R.string.reported_str, Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}).start();
+			}
+		});
+		diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+		});
+		diag.create().show();
 	}
 
 	@Override
