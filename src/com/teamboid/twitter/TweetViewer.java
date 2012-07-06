@@ -55,6 +55,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewStub;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -77,6 +78,9 @@ public class TweetViewer extends MapActivity {
 	private Status status;
 	private int lastTheme;
 	private String mediaUrl;
+	
+	private List<Status> conversation = new ArrayList<Status>();
+	private FeedListAdapter binder;
 
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
@@ -94,63 +98,26 @@ public class TweetViewer extends MapActivity {
 		setContentView(R.layout.tweet_view);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		final SideNavigationView sideNav = (SideNavigationView)findViewById(android.R.id.list);
-		sideNav.setMenuClickCallback(new ISideNavigationCallback() {
+		
+		final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(android.R.id.list);
+		
+		binder = new FeedListAdapter(this, "CONVERSATION");
+		ListView list = ((ListView)findViewById(android.R.id.list));
+		list.setAdapter(binder);
+		list.setOnItemClickListener(new OnItemClickListener() {
+
 			@Override
-			public void onSideNavigationItemClick(Status tweet) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
+					long arg3) {
 				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+					.putExtra("sr_tweet", Utilities.serializeObject( conversation.get(pos) ))
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
+		
 		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) { sideNav.showMenu(); }
-		});
-		
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
-		final int touchDep = (int) (outMetrics.density * 50);
-		final int maxYMovement = (int) (outMetrics.density * 70);
-		findViewById(R.id.tweetDisplay).setOnTouchListener(new OnTouchListener(){
-			boolean inMotion = true;
-			float startedY;
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent me) {
-				if( (me.getAction() == MotionEvent.ACTION_DOWN || me.getAction() == MotionEvent.ACTION_MOVE)
-							&& me.getPointerCount() == 1){
-					if(inMotion == true){
-						// Move it
-						if(startedY + maxYMovement > me.getY() && startedY - maxYMovement < me.getY() ){
-							sideNav.moveTo(me.getX());
-							return true;
-						} else{
-							Log.d("tv", "Motion moved out of bounds");
-							inMotion = false;
-							sideNav.moveToNormal();
-							sideNav.hideMenu();
-						}
-					} else{
-						if( me.getX() < touchDep ){
-							startedY = me.getY();
-							inMotion = true;
-							Log.d("tv", "In Motion");
-							onTouch(v, me);
-						}
-					}
-				} else if(me.getPointerCount() == 1){
-					// User let go.
-					Log.d("tv", "Finger has gone");
-					if(me.getX() > v.getWidth() / 2){
-						sideNav.moveToNormal();
-					} else{
-						sideNav.hideMenu();
-					}
-				}
-				return false;
-			}
-			
+			public void onClick(View v) { sideNav.showNavigationView(); }
 		});
 
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
@@ -297,14 +264,8 @@ public class TweetViewer extends MapActivity {
 							toAdd.add(repliedTo);
 						}
 						if(toAdd.size() > 0) {
-							runOnUiThread(new Runnable() {
-								public void run() {
-									final Status[] convo = toAdd.toArray(new Status[0]);
-									if(convo != null && convo.length > 0) {
-										((SideNavigationView)findViewById(android.R.id.list)).setMenuItems(TweetViewer.this, convo);
-									}
-								} 
-							});
+							conversation.addAll(toAdd);
+							binder.notifyDataSetChanged();
 						}
 					}
 				} catch(Exception e) {
