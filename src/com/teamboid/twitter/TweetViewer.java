@@ -1,5 +1,8 @@
 package com.teamboid.twitter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +35,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -72,6 +76,7 @@ public class TweetViewer extends MapActivity {
 	private boolean isFavorited;
 	private Status status;
 	private int lastTheme;
+	private String mediaUrl;
 
 	public void showProgress(boolean show) {
 		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
@@ -796,14 +801,34 @@ public class TweetViewer extends MapActivity {
 	}
 
 	private void displayMedia() {
-		String media = Utilities.getTweetYFrogTwitpicMedia(status);
-		if(media != null) {
+		mediaUrl = Utilities.getTweetYFrogTwitpicMedia(status);
+		if(mediaUrl != null) {
 			final ImageView imageView = (ImageView)findViewById(R.id.tweetMedia);
+			imageView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					ImageManager download = ImageManager.getInstance(getApplicationContext());
+					download.get(mediaUrl, new ImageManager.OnImageReceivedListener() {
+						@Override
+						public void onImageReceived(String source, Bitmap bitmap) {
+							try {
+								String file = Utilities.generateImageFileName(TweetViewer.this);
+								if(bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+									startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(new File(file)), "image/*"));
+								}
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+								Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+							}
+						}
+					});
+				}
+			});
 			final ProgressBar progress = (ProgressBar)findViewById(R.id.tweetMediaProgress);
 			findViewById(R.id.tweetMediaFrame).setVisibility(View.VISIBLE);
 			progress.setVisibility(View.VISIBLE);
 			ImageManager download = ImageManager.getInstance(getApplicationContext());
-			download.get(media, new ImageManager.OnImageReceivedListener() {
+			download.get(mediaUrl, new ImageManager.OnImageReceivedListener() {
 				@Override
 				public void onImageReceived(String source, Bitmap bitmap) {
 					imageView.setVisibility(View.VISIBLE);

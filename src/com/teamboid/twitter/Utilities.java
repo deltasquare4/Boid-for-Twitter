@@ -435,10 +435,9 @@ public class Utilities {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "IMG_" + timeStamp + ".jpg";
 		File storageDir = context.getExternalCacheDir();
-		System.out.println(storageDir.getAbsolutePath() + ": " + storageDir.mkdirs());
+		storageDir.mkdirs();
 		File fi = new File(storageDir, imageFileName);
-		System.out.println("FILE PATH: " + fi.getName());
-		return fi.getName();
+		return fi.getAbsolutePath();
 	}
 
 	public static File createImageFile(Context context) throws IOException {
