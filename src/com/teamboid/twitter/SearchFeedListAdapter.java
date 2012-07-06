@@ -179,6 +179,12 @@ public class SearchFeedListAdapter extends BaseAdapter {
 				mediaPreview.setVisibility(View.GONE);
 				mediaPreview.setImageBitmap(null);
 			}
+		} else {
+			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
+			toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
+			mediaPreview.setVisibility(View.GONE);
+			mediaPreview.setImageBitmap(null);
 		}
 		if(Utilities.tweetContainsVideo(tweet)) {
 			toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.VISIBLE);

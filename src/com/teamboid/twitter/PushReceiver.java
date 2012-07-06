@@ -48,11 +48,10 @@ public class PushReceiver extends BroadcastReceiver {
 					@Override
 					public void run() {
 						Bundle b = intent.getBundleExtra("hm");
-						try{
+						try {
 							JSONObject status = new JSONObject(b.getString("tweet"));
-							/* note: Twitter4J hack again ;) */
 							twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
-							MultiAPIMethods.ShowNotification(s, PushWorker.this);
+							MultiAPIMethods.showNotification(s, PushWorker.this);
 						} catch(Exception e) {
 							e.printStackTrace();
 						}

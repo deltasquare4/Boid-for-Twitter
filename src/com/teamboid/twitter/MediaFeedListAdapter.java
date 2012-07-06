@@ -76,10 +76,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
 		for(Status tweet : toAdd) {
 			if(Utilities.getTweetYFrogTwitpicMedia(tweet) != null) {
-				if(add(tweet, fi)) {
-					MultiAPIMethods.ShowNotification(tweet, mContext);
-					toReturn++;
-				}
+				if(add(tweet, fi)) toReturn++;
 			}
 		}
 		return toReturn;

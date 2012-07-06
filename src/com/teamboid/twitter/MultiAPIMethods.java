@@ -21,7 +21,7 @@ public class MultiAPIMethods {
 	private static Notification mentionNotify;
 	private static Notification messageNotify;
 	
-	public static void ShowNotification(final Status s, final Context context) {
+	public static void showNotification(final Status s, final Context context) {
 		String imageURL = s.getUser().getProfileImageURL().toString();
 		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
 			@Override
