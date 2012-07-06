@@ -115,7 +115,8 @@ public class FeedListAdapter extends BaseAdapter {
 		int toReturn = 0;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		String[] fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
+		String[] fi = null;
+		if(filter) fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
 		for(Status tweet : toAdd) {
 			if(add(tweet, fi)) toReturn++;
 		}

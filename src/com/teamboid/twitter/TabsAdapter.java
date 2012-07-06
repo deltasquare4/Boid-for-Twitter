@@ -402,7 +402,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 								public void run() {
 									setEmptyText(context.getString(R.string.no_tweets));
 									int beforeLast = adapt.getCount() - 1;
-									int addedCount = adapt.add(feed.toArray(new Status[0]), true);
+									final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+									int addedCount = adapt.add(feed.toArray(new Status[0]), prefs.getBoolean("enable_muting", true));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
 											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);

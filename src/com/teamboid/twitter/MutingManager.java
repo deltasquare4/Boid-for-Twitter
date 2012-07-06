@@ -1,16 +1,22 @@
 package com.teamboid.twitter;
 
 import android.app.ListActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +109,8 @@ public class MutingManager extends ListActivity {
 				});
 		listView.setOnTouchListener(touchListener);
 		listView.setOnScrollListener(touchListener.makeScrollListener());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(!prefs.contains("enable_muting")) prefs.edit().putBoolean("enable_muting", true).apply();
 	}
 	
 	@Override
@@ -127,6 +135,23 @@ public class MutingManager extends ListActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
 		super.onSaveInstanceState(outState);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mutingmanager_actionbar, menu);
+		Switch s = new Switch(this);
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		s.setChecked(prefs.getBoolean("enable_muting", true));
+		s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				prefs.edit().putBoolean("enable_muting", isChecked).apply();
+			}
+		});
+		menu.findItem(R.id.toggleBtn).setActionView(s);
+		return true;
 	}
 	
 	@Override

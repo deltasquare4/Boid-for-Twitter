@@ -8,25 +8,35 @@
 	</item>
 	<item android:id="@+id/searchAction" android:title="@string/search_str"
 		android:icon="?searchIcon" android:showAsAction="ifRoom" />
-	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str" android:icon="?profileIcon" /><item android:id="@+id/refreshAction" android:title="@string/refresh_str"
+	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str"
+		android:icon="?profileIcon" />
+	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
 		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/addColumnAction" android:title="@string/addcolumn_str"
 		android:icon="?addIcon">
 		<menu>
-			<item android:id="@+id/addTimelineColAction" android:title="@string/timeline_str" android:showAsAction="withText" android:icon="?timelineTab"/>
-			<item android:id="@+id/addMentionsColAction" android:title="@string/mentions_str" android:showAsAction="withText" android:icon="?mentionsTab"/>
-			<item android:id="@+id/addMessagesColAction" android:title="@string/messages_str" android:showAsAction="withText" android:icon="?messagesTab"/>
-			<item android:id="@+id/addTrendsColAction" android:title="@string/trends_str" android:showAsAction="withText" android:icon="?trendsTab"/>
-			<item android:id="@+id/addFavoritesColAction" android:title="@string/favorites_str" android:showAsAction="withText" android:icon="?favoritesTab"/>
-			<item android:id="@+id/addSavedSearchColAction" android:title="@string/savedsearch_str" android:showAsAction="withText" android:icon="?savedSearchTab"/>
-			<item android:id="@+id/addUserListColAction" android:title="@string/userlist_str" android:showAsAction="withText" android:icon="?userListTab"/>
-			<item android:id="@+id/addNearbyColAction" android:title="@string/nearby_str" android:showAsAction="withText" android:icon="?nearbyTab"/>
-			<item android:id="@+id/addMediaColAction" android:title="@string/media_timeline_str" android:icon="?mediaTab"/>
+			<item android:id="@+id/addTimelineColAction" android:title="@string/timeline_str"
+				android:showAsAction="withText" android:icon="?timelineTab" />
+			<item android:id="@+id/addMentionsColAction" android:title="@string/mentions_str"
+				android:showAsAction="withText" android:icon="?mentionsTab" />
+			<item android:id="@+id/addMessagesColAction" android:title="@string/messages_str"
+				android:showAsAction="withText" android:icon="?messagesTab" />
+			<item android:id="@+id/addTrendsColAction" android:title="@string/trends_str"
+				android:showAsAction="withText" android:icon="?trendsTab" />
+			<item android:id="@+id/addFavoritesColAction" android:title="@string/favorites_str"
+				android:showAsAction="withText" android:icon="?favoritesTab" />
+			<item android:id="@+id/addSavedSearchColAction" android:title="@string/savedsearch_str"
+				android:showAsAction="withText" android:icon="?savedSearchTab" />
+			<item android:id="@+id/addUserListColAction" android:title="@string/userlist_str"
+				android:showAsAction="withText" android:icon="?userListTab" />
+			<item android:id="@+id/addNearbyColAction" android:title="@string/nearby_str"
+				android:showAsAction="withText" android:icon="?nearbyTab" />
+			<item android:id="@+id/addMediaColAction" android:title="@string/media_timeline_str"
+				android:icon="?mediaTab" />
 		</menu>
 	</item>
 	<item android:id="@+id/removeColumnAction" android:title="@string/removecolumn_str" />
-	<item android:id="@+id/mutingAction" android:title="@string/muting_str"></item><item android:id="@+id/manageAccountsAction" android:title="@string/manage_accounts_str" />
-	
+	<item android:id="@+id/mutingAction" android:title="@string/muting_str" />
+	<item android:id="@+id/manageAccountsAction" android:title="@string/manage_accounts_str" />
 	<item android:id="@+id/settingsAction" android:title="@string/settings_str" />
-	
 </menu>
