@@ -40,6 +40,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -765,6 +766,7 @@ public class TweetViewer extends MapActivity {
 	}
 
 	private void displayMedia() {
+		if(!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_media_download", true)) return;
 		mediaUrl = Utilities.getTweetYFrogTwitpicMedia(status);
 		if(mediaUrl != null) {
 			final ImageView imageView = (ImageView)findViewById(R.id.tweetMedia);

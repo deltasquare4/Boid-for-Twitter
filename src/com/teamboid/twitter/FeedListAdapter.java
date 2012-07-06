@@ -35,7 +35,7 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 
 	private ArrayList<Status> tweets;
-	
+
 	public Status getTweet(int at){ return tweets.get(at); }
 
 	private Activity mContext;
@@ -247,7 +247,7 @@ public class FeedListAdapter extends BaseAdapter {
 			profilePic.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
-						.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
 		} else{
@@ -258,35 +258,37 @@ public class FeedListAdapter extends BaseAdapter {
 		itemTxt.setLinksClickable(false);
 		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
-		String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
-		if(media != null && !media.isEmpty()) {
-			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
-			final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
-			mediaPreview.setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
-			if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
-				progress.setVisibility(View.VISIBLE);
-				ImageManager download = ImageManager.getInstance(mContext);
-				download.get(media, new ImageManager.OnImageReceivedListener() {
-					@Override
-					public void onImageReceived(String source, Bitmap bitmap) {
-						progress.setVisibility(View.GONE);
-						mediaPreview.setVisibility(View.VISIBLE);
-						mediaPreview.setImageBitmap(bitmap);
-					}
-				});
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
+			String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
+			if(media != null && !media.isEmpty()) {
+				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
+				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+				mediaPreview.setVisibility(View.GONE);
+				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
+				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
+					progress.setVisibility(View.VISIBLE);
+					ImageManager download = ImageManager.getInstance(mContext);
+					download.get(media, new ImageManager.OnImageReceivedListener() {
+						@Override
+						public void onImageReceived(String source, Bitmap bitmap) {
+							progress.setVisibility(View.GONE);
+							mediaPreview.setVisibility(View.VISIBLE);
+							mediaPreview.setImageBitmap(bitmap);
+						}
+					});
+				} else {
+					toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
+					toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
+					mediaPreview.setVisibility(View.GONE);
+					mediaPreview.setImageBitmap(null);
+				}
 			} else {
+				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
 				mediaPreview.setVisibility(View.GONE);
 				mediaPreview.setImageBitmap(null);
 			}
-		} else {
-			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-			mediaPreview.setVisibility(View.GONE);
-			mediaPreview.setImageBitmap(null);
 		}
 		if(Utilities.tweetContainsVideo(tweet)) {
 			toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.VISIBLE);
