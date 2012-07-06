@@ -6,7 +6,7 @@
 		<item name="tweetColor">@color/dark</item>
 		<item name="linkColor">@color/blue_secondary</item>
 		<item name="timerColor">@color/lighter_dark</item>
-		<item name="spinnerDropdownItemColor">@color/white</item>
+		<item name="spinnerDropdownItemColor">@color/dark</item>
 		<item name="android:spinnerItemStyle">@style/DropDownNav.Text</item>
 		<item name="mediaIndicator">@drawable/media_dark</item>
 		<item name="videoIndicator">@drawable/video_dark</item>

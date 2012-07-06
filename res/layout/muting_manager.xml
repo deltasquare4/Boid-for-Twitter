@@ -4,15 +4,14 @@
 	<EditText android:id="@+id/keywordInput" android:inputType="textNoSuggestions"
 		android:layout_toLeftOf="@+id/keywordType" android:imeOptions="actionGo"
 		android:layout_marginLeft="10dp" android:layout_marginRight="5dp"
-		android:layout_marginTop="10dp" android:layout_marginBottom="10dp"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:singleLine="true">
+		android:layout_marginTop="10dp" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:singleLine="true">
 		<requestFocus />
 	</EditText>
 	<Spinner android:id="@+id/keywordType" android:layout_width="wrap_content"
 		android:layout_marginRight="10dp" android:layout_height="wrap_content"
-		android:layout_marginTop="10dp" android:layout_marginBottom="10dp"
-		android:layout_alignParentRight="true" android:layout_alignBaseline="@+id/keywordInput" />
+		android:layout_marginTop="10dp" android:layout_alignParentRight="true"
+		android:layout_alignBaseline="@+id/keywordInput" />
 	<RelativeLayout android:id="@+id/keywordListFrame"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:layout_below="@+id/keywordInput">

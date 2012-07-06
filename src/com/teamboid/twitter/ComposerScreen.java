@@ -156,7 +156,7 @@ public class ComposerScreen extends Activity {
 		ArrayList<String> screenNames = new ArrayList<String>();
 		for(Account a : accs) screenNames.add("@" + a.getUser().getScreenName());
 		ArrayAdapter<String> adapt = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, screenNames);
-		adapt.setDropDownViewResource(R.layout.spinner_item);
+		adapt.setDropDownViewResource(R.layout.spinner_item_actionbar);
 		ab.setListNavigationCallbacks(adapt, new OnNavigationListener() {
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {

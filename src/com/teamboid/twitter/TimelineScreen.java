@@ -43,7 +43,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,17 +87,15 @@ public class TimelineScreen extends Activity {
 				((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
 				
 				if(SendTweetService.getInstance().tweets != null){
-					Log.d("stu", "Send Tweet Updater RECV running... Queue is " + SendTweetService.getInstance().tweets.size() + " tweets long");
 					sentTweetBinder.notifyDataSetInvalidated();
-
 					if(SendTweetService.getInstance().tweets.size() > 0){
 						findViewById(R.id.progress).setVisibility(View.VISIBLE);
 						findViewById(R.id.progress).setAlpha(1.0f);
 						((SlidingDrawer)findViewById(R.id.progress)).close();
 					} else{
-						if(intent.hasExtra("delete") || intent.hasExtra("dontrefresh")){ // Tweet was deleted. Don't animate
+						if(intent.hasExtra("delete") || intent.hasExtra("dontrefresh")) {
 							findViewById(R.id.progress).setVisibility(View.GONE);
-						} else { // Tell the user we sent the tweet
+						} else {
 							//TODO This is NOT supported on Gingerbread. If we wanted to in the future, use NineOldDrroids
 							ViewPropertyAnimator vpa = findViewById(R.id.progress).animate();
 							vpa.setStartDelay(300);
@@ -172,7 +169,6 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	protected void onNewIntent (Intent intent){
-		Log.d("boid", "onNewIntent. AC Size: " + AccountService.getAccounts().size());
 		if(AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
@@ -184,8 +180,9 @@ public class TimelineScreen extends Activity {
 	}
 
 	public void loadColumns(boolean firstLoad, boolean accountSwitched) {
-		if(AccountService.getAccounts().size() == 0) return;
-		else {
+		if(AccountService.getAccounts().size() == 0) {
+			return;
+		} else {
 			long lastSel = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getLong("last_sel_account", 0l);
 			if(!AccountService.existsAccount(lastSel)) {
 				lastSel = AccountService.getAccounts().get(0).getId();
@@ -294,7 +291,9 @@ public class TimelineScreen extends Activity {
 			}
 			index++;
 		}
-		if(accountSwitched) AccountService.clearAdapters();
+		if(accountSwitched) {
+			AccountService.clearAdapters();
+		}
 		if(newColumn) {
 			newColumn = false;
 			getActionBar().setSelectedNavigationItem(getActionBar().getTabCount() - 1);		
@@ -384,12 +383,10 @@ public class TimelineScreen extends Activity {
 			if(getIntent().getData().getPath().contains("/status/")){
 				startActivity(getIntent().setClass(this, TweetViewer.class));
 				finish();
-			} else{
-				Log.d("boid", "Can't handle this URL: " + getIntent().getData().toString());
-				// TODO: Handle other URLs
+			} else {
+				//TODO: Handle other URLs
 			}
 		}
-
 		Intent s = new Intent(this, SendTweetService.class);
 		s.setAction(SendTweetService.LOAD_TWEETS);
 		startService(s);
