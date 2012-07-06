@@ -268,6 +268,7 @@ public class TweetViewer extends MapActivity {
 								public void run(){
 									binder.add(toAdd.toArray(new Status[]{}));
 									binder.notifyDataSetChanged();
+									((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
 								}
 							});
 						}

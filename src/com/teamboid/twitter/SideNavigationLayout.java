@@ -157,7 +157,6 @@ public class SideNavigationLayout extends FrameLayout {
             mScrolledVertically = false;
             if (mShowingNavigation && event.getX() > getNavigationViewWidth()) {
                 shouldIntercept = true;
-                showContentView();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (mScrolledVertically) {
@@ -173,7 +172,7 @@ public class SideNavigationLayout extends FrameLayout {
                 || action == MotionEvent.ACTION_CANCEL) {
             mTracker.recycle();
             mTracker = null;
-            scrollToNavigationOrContentView();
+            scrollToNavigationOrContentView((int)event.getX());
         }
         return shouldIntercept;
     }
@@ -219,7 +218,7 @@ public class SideNavigationLayout extends FrameLayout {
                         showContentView();
                     }
                 } else {
-                    scrollToNavigationOrContentView();
+                    scrollToNavigationOrContentView((int) event.getX());
                 }
             } else {
                 // We want to show the content view if the user tapped on it
@@ -236,8 +235,10 @@ public class SideNavigationLayout extends FrameLayout {
      * Scroll to the navigation of content view depending on whichever one the
      * offset is closer to.
      */
-    private void scrollToNavigationOrContentView() {
-        if (mOffsetX < (getNavigationViewWidth() / 2)) {
+    private void scrollToNavigationOrContentView(int x) {
+    	if (mShowingNavigation && x > getNavigationViewWidth()) {
+    		showContentView();
+    	} else if (mOffsetX < (getNavigationViewWidth() / 2)) {
             showContentView();
         } else {
             showNavigationView();
