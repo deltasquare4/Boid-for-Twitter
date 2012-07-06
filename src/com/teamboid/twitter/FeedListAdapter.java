@@ -35,6 +35,8 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 
 	private ArrayList<Status> tweets;
+	
+	public Status getTweet(int at){ return tweets.get(at); }
 
 	private Activity mContext;
 	public String ID;

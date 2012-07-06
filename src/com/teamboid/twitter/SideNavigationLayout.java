@@ -92,6 +92,8 @@ public class SideNavigationLayout extends FrameLayout {
     public void showNavigationView() {
         mScroller.startScroll((int) mOffsetX, 0,
                 (int) (getNavigationViewWidth() - mOffsetX), SCROLL_DURATION);
+        getChildAt(0).animate().alpha(1.0F);
+        getChildAt(1).animate().alpha(0.3F);
         requestLayout();
         invalidate();
     }
@@ -99,6 +101,8 @@ public class SideNavigationLayout extends FrameLayout {
     public void showContentView() {
         mScroller.startScroll((int) mOffsetX, 0, (int) -mOffsetX, 0,
                 SCROLL_DURATION);
+        getChildAt(0).animate().setDuration(70).alpha(0);
+        getChildAt(1).animate().alpha(1);
         requestLayout();
         invalidate();
     }
@@ -153,6 +157,7 @@ public class SideNavigationLayout extends FrameLayout {
             mScrolledVertically = false;
             if (mShowingNavigation && event.getX() > getNavigationViewWidth()) {
                 shouldIntercept = true;
+                showContentView();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (mScrolledVertically) {

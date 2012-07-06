@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Required for Side Nav -->
 <RelativeLayout
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 	<com.teamboid.twitter.SideNavigationLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent">
-	    <!-- Slide Out Content ;) -->
-	    <LinearLayout
-			android:id="@android:id/list" android:layout_width="match_parent"
+	    android:layout_width="match_parent"
+	    android:id="@+id/slide"
+	    android:layout_height="match_parent">
+	    <!-- Slide Out Content ;) (width is only here to settle lint etc, computed in code) -->
+	    <ListView
+	        android:alpha="0"
+	        android:background="?sideNavColor"
+			android:cacheColorHint="?sideNavColor"
+			android:id="@android:id/list" android:layout_width="250dp"
 			android:layout_height="match_parent" />
 	    <!-- Main Content -->
 		<RelativeLayout
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
+			android:layout_width="match_parent" android:layout_height="match_parent">
 			<ScrollView android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:layout_height="match_parent">
 				<RelativeLayout android:id="@+id/tweetDisplay"
 					android:paddingLeft="20dp" android:paddingRight="20dp"
 					android:paddingTop="10dp" android:paddingBottom="10dp"

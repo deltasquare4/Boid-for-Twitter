@@ -58,6 +58,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -79,7 +80,6 @@ public class TweetViewer extends MapActivity {
 	private int lastTheme;
 	private String mediaUrl;
 	
-	private List<Status> conversation = new ArrayList<Status>();
 	private FeedListAdapter binder;
 
 	public void showProgress(boolean show) {
@@ -99,7 +99,7 @@ public class TweetViewer extends MapActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		
-		final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(android.R.id.list);
+		final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
 		
 		binder = new FeedListAdapter(this, "CONVERSATION");
 		ListView list = ((ListView)findViewById(android.R.id.list));
@@ -110,11 +110,11 @@ public class TweetViewer extends MapActivity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
 					long arg3) {
 				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-					.putExtra("sr_tweet", Utilities.serializeObject( conversation.get(pos) ))
+					.putExtra("sr_tweet", Utilities.serializeObject( binder.getTweet(pos) ))
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
-		
+        
 		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { sideNav.showNavigationView(); }
@@ -264,9 +264,16 @@ public class TweetViewer extends MapActivity {
 							toAdd.add(repliedTo);
 						}
 						if(toAdd.size() > 0) {
-							conversation.addAll(toAdd);
-							binder.notifyDataSetChanged();
+							runOnUiThread(new Runnable(){
+								public void run(){
+									binder.add(toAdd.toArray(new Status[]{}));
+									binder.notifyDataSetChanged();
+								}
+							});
 						}
+					} else{
+						final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
+						sideNav.enabled = false;
 					}
 				} catch(Exception e) {
 					e.printStackTrace();
