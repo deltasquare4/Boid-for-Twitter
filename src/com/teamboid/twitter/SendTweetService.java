@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.SendTweetTask.Result;
+import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 
 import android.app.Service;
 import android.content.Context;
@@ -40,13 +41,22 @@ public class SendTweetService extends Service {
 			loadTweets();
 			
 			for(int i = 0; i < tweets.size(); i++) { //this prevents concurrent thread modification exceptions
-				SendTweetTask stt = tweets.get(i);
+				final SendTweetTask stt = tweets.get(i);
 				Log.d("sts", "Sending Tweet...");
 				stt.result.errorCode = Result.WAITING;
 				Intent update = new Intent(UPDATE_STATUS);
 				sendBroadcast(update);
 				
 				if(stt.sendTweet(SendTweetService.this).sent == true) {
+					AccountService.activity.runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID).add(new twitter4j.Status[]{stt.tweet});
+						}
+						
+					});
+					
 					tweets.remove(i);
 				} else{
 					tweets.set(i, stt);

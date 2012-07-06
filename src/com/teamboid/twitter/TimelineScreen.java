@@ -108,7 +108,6 @@ public class TimelineScreen extends Activity {
 								public void onAnimationEnd(Animator arg0) {
 									findViewById(R.id.progress).setVisibility(View.GONE);
 									findViewById(R.id.progress_handle).setBackgroundColor(getResources().getColor(android.R.color.background_dark));
-									performRefresh();
 								}
 
 								@Override

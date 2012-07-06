@@ -72,6 +72,8 @@ public class SendTweetTask {
 	public Account from;
 	public String mediaService;
 	
+	public Status tweet;
+	
 	// Used from Composer only
 	public boolean isGalleryImage = false;
 	
@@ -124,7 +126,7 @@ public class SendTweetTask {
 		if(in_reply_to > 0) update.setInReplyToStatusId(in_reply_to);
 		
 		try{
-			Status tweet = from.getClient().updateStatus(update);
+			tweet = from.getClient().updateStatus(update);
 			if(twtlonger){
 				helper.callback(tweet.getId(), response);
 			}
