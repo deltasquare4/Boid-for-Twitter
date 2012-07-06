@@ -439,6 +439,7 @@ public class TimelineScreen extends Activity {
 	
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
 	}
