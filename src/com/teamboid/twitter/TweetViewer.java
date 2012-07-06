@@ -68,7 +68,7 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class TweetViewer extends MapActivity {
-
+	
 	private long statusId;
 	private boolean isFavorited;
 	private Status status;
@@ -513,7 +513,7 @@ public class TweetViewer extends MapActivity {
 		case R.id.shareAction:
 			final ArrayAdapter<String> listAdapt = new ArrayAdapter<String>(this, R.layout.trends_list_item);
 			listAdapt.add("@" + replyToName + ": " + content);
-			listAdapt.add("\"" + content + "\" (via @" + replyToName + ")");
+			listAdapt.add("“" + content + "” (via @" + replyToName + ")");
 			listAdapt.add("@" + replyToName + ":\n" + content +  "\n\nhttp://twitter.com/" + replyToName + "/status/" + status.getId());
 			final Dialog shareDiag = new Dialog(this);
 			shareDiag.setContentView(R.layout.list_dialog); //re-using layout that has what we need in it

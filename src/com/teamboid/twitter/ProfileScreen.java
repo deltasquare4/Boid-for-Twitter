@@ -183,7 +183,7 @@ public class ProfileScreen extends Activity {
 							public void run() {
 								toast.cancel();
 								Toast.makeText(ProfileScreen.this, R.string.blocked_str, Toast.LENGTH_SHORT).show();
-								recreate();
+								recreate(); //TODO Recreation doesn't seem to update the screen with blocked info for some reason
 							}
 						});
 					}
