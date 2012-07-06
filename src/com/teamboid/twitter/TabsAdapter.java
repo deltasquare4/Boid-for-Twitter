@@ -460,10 +460,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			if(getListView() == null || adapt == null) return;
-			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-			String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-			ArrayList<String> cols = Utilities.jsonToArray(context, prefs.getString(prefName, ""));
-			adapt.filter(cols.toArray(new String[0]));
+			AccountService.clearFeedAdapter(context, TimelineFragment.ID);
+			performRefresh(false);
 		}
 	}
 

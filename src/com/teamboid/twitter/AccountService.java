@@ -289,6 +289,16 @@ public class AccountService extends Service {
 		}
 		return toReturn;
 	}
+	public static void clearFeedAdapter(Activity activity, String id) {
+		if(feedAdapters == null) return;
+		for(int i = 0; i < feedAdapters.size(); i++) {
+			FeedListAdapter curAdapt = feedAdapters.get(i); 
+			if(curAdapt.ID.equals(id)) {
+				curAdapt.clear();
+				feedAdapters.set(i, curAdapt);
+			}
+		}
+	}
 	public static MediaFeedListAdapter getMediaFeedAdapter(Activity activity, String id) {
 		if(mediaAdapters == null) mediaAdapters = new ArrayList<MediaFeedListAdapter>();
 		MediaFeedListAdapter toReturn = null;

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
@@ -58,24 +59,46 @@ public class FeedListAdapter extends BaseAdapter {
 		list.setSelectionFromTop(find(lastViewedTweet), lastViewedTopMargin);
 	}
 
+	private boolean shouldFilter(Status tweet, String query, String type) {
+		query = query.replace("%40", "@");
+		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
+		if(types[0].equals(type)) {
+			if(tweet.getText().toString().toLowerCase().contains(query.toLowerCase())) {
+				return true;
+			}
+		} else if(types[1].equals(type)) {
+			if(tweet.getUser().getScreenName().toLowerCase().equals(query.substring(1).toLowerCase())) {
+				return true;
+			}
+		} else if(types[2].equals(type)) {
+			if(Html.fromHtml(tweet.getSource()).toString().toLowerCase().equals(query.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
+	}
 	private boolean add(Status tweet, String[] filter) {
-		boolean added = false;
-		int index = findAppropIndex(tweet, false);
 		if(!update(tweet)) {
 			if(filter != null) {
-				boolean found = false;
-				for(String mute : filter) {
-					if(tweet.getText().toString().contains(mute.toLowerCase())) {
-						found = true;
-						break;
+				final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
+				boolean mustFilter = false;
+				for(String rule : filter) {
+					if(rule.contains("@")) {
+						if(rule.endsWith("@" + types[1])) {
+							mustFilter = shouldFilter(tweet, rule.substring(0, rule.indexOf("@")), types[1]);
+						} else {
+							mustFilter = shouldFilter(tweet, rule.substring(0, rule.indexOf("@")), types[2]);
+						}
+					} else {
+						mustFilter = shouldFilter(tweet, rule, types[0]);
 					}
+					if(mustFilter) break;
 				}
-				if(found) return false;
+				if(mustFilter) return false;
 			}
-			tweets.add(index, tweet);
-			added = true;
-		}
-		return added;
+			tweets.add(findAppropIndex(tweet, false), tweet);
+			return true;
+		} else return false;
 	}
 	public boolean addInverted(Status tweet) {
 		boolean added = false;
@@ -90,10 +113,9 @@ public class FeedListAdapter extends BaseAdapter {
 	public int add(Status[] toAdd) { return add(toAdd, false); }
 	public int add(Status[] toAdd, boolean filter) {
 		int toReturn = 0;
-		String[] fi = null;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		String prefName = Long.toString(account) + "_muting";
-		fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
+		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
+		String[] fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
 		for(Status tweet : toAdd) {
 			if(add(tweet, fi)) toReturn++;
 		}
@@ -121,38 +143,6 @@ public class FeedListAdapter extends BaseAdapter {
 			index++;
 		}
 		notifyDataSetChanged();
-	}
-	public void filter(String[] keywords) {
-		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
-		for(int i = 0; i < tweets.size(); i++) {
-			for(String rule : keywords) {
-				if(rule.contains("@")) {
-					if(rule.endsWith("@" + types[1])) {
-						processFilterRule(rule.substring(0, rule.indexOf("@")), types[1], tweets.get(i), i);
-					} else processFilterRule(rule.substring(0, rule.indexOf("@")), types[2], tweets.get(i), i);
-				} else processFilterRule(rule, types[0], tweets.get(i), i);
-			}
-		}
-		notifyDataSetChanged();
-	}
-	private void processFilterRule(String query, String type, Status tweet, int index) {
-		if(index == 0) {
-			System.out.println("QUERY: " + query + "\nTYPE: " + type);
-		}
-		query = query.replace("%40", "@");
-		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
-		boolean remove = false;
-		if(types[0].equals(type)) {
-			if(tweet.getText().toString().toLowerCase().contains(query.toLowerCase())) remove = true;
-		} else if(types[1].equals(type)) {
-			if(tweet.getUser().getScreenName().equals(query.substring(1))) remove = true;
-		} else if(types[2].equals(type)) {
-			if(tweet.getSource().equals(query)) remove = true;
-		}
-		if(remove) {
-			tweets.remove(index);
-			if(index > 0) index--;
-		}
 	}
 	public void clear() {
 		tweets.clear();
@@ -237,11 +227,9 @@ public class FeedListAdapter extends BaseAdapter {
 			userNameTxt.setLayoutParams(userNameParams);
 			indicatorTxt.setVisibility(View.GONE);
 		}
-		
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());
-		
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
 			profilePic.setImageResource(R.drawable.silouette);

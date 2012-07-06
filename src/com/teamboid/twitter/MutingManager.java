@@ -1,7 +1,6 @@
 package com.teamboid.twitter;
 
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -16,10 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * The activity that represents the mute keywords manager.
+ * The activity that represents the muting rules manager.
  * @author Aidan Follestad
  */
-
 public class MutingManager extends ListActivity {
 
 	private MutingListAdapter adapt;
@@ -120,12 +118,9 @@ public class MutingManager extends ListActivity {
 	}
 	
 	@Override
-	public void onPause() {
-		super.onPause();
-		if(isFinishing()) {
-			setResult(600, null);
-			finish();
-		}
+	public void onBackPressed() {
+		setResult(600);
+		finish();
 	}
 	
 	@Override
@@ -138,7 +133,7 @@ public class MutingManager extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			startActivity(new Intent(this, TimelineScreen.class));
+			setResult(600);
 			finish();
 			return true;
 		default:
