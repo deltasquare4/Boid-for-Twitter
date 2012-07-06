@@ -53,7 +53,7 @@ public class MutingManager extends ListActivity {
 							if(adapt.add(term)) input.setText("");
 							break;
 						case 1:
-							if(term.startsWith("@")) term = ("@" + term);
+							if(!term.startsWith("%40")) term = ("%40" + term);
 							if(adapt.add(term + "@" + types[1])) input.setText("");
 							break;
 						case 2:
