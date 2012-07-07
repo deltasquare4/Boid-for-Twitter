@@ -79,11 +79,10 @@
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:textColor="?timerColor" android:textColorLink="?linkColor" />
 	</RelativeLayout>
-
 	<RelativeLayout android:id="@+id/feedItemMediaFrame"
 		android:layout_marginTop="5dp" android:layout_width="fill_parent"
-		android:layout_height="80dp" android:layout_below="@+id/feedItemText"
-		android:visibility="invisible">
+		android:layout_height="110dp" android:layout_below="@+id/feedItemText"
+		android:visibility="gone">
 		<ImageView android:id="@+id/feedItemMediaPreview"
 			android:visibility="gone" android:scaleType="centerCrop"
 			android:layout_marginBottom="5dp" android:layout_width="fill_parent"

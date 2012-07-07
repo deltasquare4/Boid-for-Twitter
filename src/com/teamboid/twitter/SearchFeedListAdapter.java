@@ -1,5 +1,8 @@
 package com.teamboid.twitter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.utils.ImageManager;
@@ -12,6 +15,8 @@ import twitter4j.Tweet;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +27,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The list adapter used in activites that search for tweets.
@@ -149,7 +155,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
 		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
-			String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
+			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
 				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
@@ -164,6 +170,26 @@ public class SearchFeedListAdapter extends BaseAdapter {
 							progress.setVisibility(View.GONE);
 							mediaPreview.setVisibility(View.VISIBLE);
 							mediaPreview.setImageBitmap(bitmap);
+						}
+					});
+					mediaPreview.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							ImageManager download = ImageManager.getInstance(mContext);
+							download.get(media, new ImageManager.OnImageReceivedListener() {
+								@Override
+								public void onImageReceived(String source, Bitmap bitmap) {
+									try {
+										String file = Utilities.generateImageFileName(mContext);
+										if(bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+											mContext.startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(new File(file)), "image/*"));
+										}
+									} catch (FileNotFoundException e) {
+										e.printStackTrace();
+										Toast.makeText(mContext, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+									}
+								}
+							});
 						}
 					});
 				} else {

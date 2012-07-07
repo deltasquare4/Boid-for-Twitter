@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spannable;
@@ -17,6 +19,9 @@ import twitter4j.GeoLocation;
 import twitter4j.Place;
 import twitter4j.Status;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.utils.ImageManager;
@@ -259,7 +264,7 @@ public class FeedListAdapter extends BaseAdapter {
 		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
-			String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
+			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
 				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
@@ -274,6 +279,27 @@ public class FeedListAdapter extends BaseAdapter {
 							progress.setVisibility(View.GONE);
 							mediaPreview.setVisibility(View.VISIBLE);
 							mediaPreview.setImageBitmap(bitmap);
+						}
+					});
+					mediaPreview.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							ImageManager download = ImageManager.getInstance(mContext);
+							download.get(media, new ImageManager.OnImageReceivedListener() {
+								@Override
+								public void onImageReceived(String source, Bitmap bitmap) {
+									try {
+										String file = Utilities.generateImageFileName(mContext);
+										if(bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+											System.out.println(file + " created? " + new File(file).exists());
+											mContext.startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(new File(file)), "image/*"));
+										}
+									} catch (FileNotFoundException e) {
+										e.printStackTrace();
+										Toast.makeText(mContext, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+									}
+								}
+							});
 						}
 					});
 				} else {

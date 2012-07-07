@@ -180,7 +180,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 												followBtn.setEnabled(true);
 											}
 											((ProfileScreen)mContext).isBlocked = isBlocked;
-											((ProfileScreen)mContext).getActionBar().setSelectedNavigationItem(1);
+											if(isBlocked) ((ProfileScreen)mContext).getActionBar().setSelectedNavigationItem(1);
 											((ProfileScreen)mContext).invalidateOptionsMenu();
 										}
 									});
