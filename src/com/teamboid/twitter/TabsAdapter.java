@@ -182,8 +182,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	public static abstract class BaseListFragment extends ListFragment {
 
 		public boolean isLoading;
-		private boolean isShown;
-		private boolean isAttemptingToGetTweets = false;
 
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
@@ -199,32 +197,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 		
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.list_fragment, container, false);
-		}
-
-		public void setProgressShown(boolean shown) {
-			if(getView() == null) return;
-			getView().findViewById(R.id.horizontalProgress).setVisibility((shown == true) ? View.VISIBLE : View.GONE);
-		}
-		@Override
 		public void setEmptyText(CharSequence text) {
-			if(getView() == null) return;
-			((TextView)getView().findViewById(android.R.id.empty)).setText(text);
-		}
-		@Override
-		public void setListShown(boolean visible) {
-			if(getView() == null) return;
-			isShown = visible;
-			getView().findViewById(android.R.id.progress).setVisibility((visible == false) ? View.VISIBLE : View.GONE);
-			getListView().setVisibility((visible == true) ? View.VISIBLE : View.GONE);
-			boolean condition = (getListAdapter() == null || getListAdapter().isEmpty()) && isShown;
-			getView().findViewById(android.R.id.empty).setVisibility(condition ? View.VISIBLE : View.GONE);
-
-			if(condition && !isAttemptingToGetTweets){
-				performRefresh(false);
-				isAttemptingToGetTweets = true;
-			}
+			if(getView() != null) super.setEmptyText(text);
 		}
 	}
 	public static abstract class BaseSpinnerFragment extends ListFragment {
@@ -250,10 +224,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
 		}
 
-		public void setProgressShown(boolean shown) {
-			if(getView() == null) return;
-			getView().findViewById(R.id.horizontalProgress).setVisibility((shown == true) ? View.VISIBLE : View.GONE);
-		}
 		public Spinner getSpinner() {
 			if(getView() == null) return null;
 			return (Spinner)getView().findViewById(R.id.fragSpinner);
@@ -334,18 +304,18 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
+		public void onListItemClick(ListView l, View v, int index, long id) {
+			super.onListItemClick(l, v, index, id);
+			Status tweet = (Status)adapt.getItem(index);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
+		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
-					Status tweet = (Status)adapt.getItem(index);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -389,8 +359,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;	
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
@@ -428,8 +397,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -482,21 +450,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Status tweet = (Status)adapt.getItem(position);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Status tweet = (Status)adapt.getItem(position);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -540,8 +507,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
@@ -578,8 +544,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -629,7 +594,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (Activity)act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			startActivity(new Intent(context, ConversationScreen.class).putExtra("screen_name",
+					((DMConversation)adapt.getItem(position)).getToScreenName()).
+					addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -655,14 +628,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					startActivity(new Intent(context, ConversationScreen.class).putExtra("screen_name", ((DMConversation)adapt.getItem(position)).getToScreenName())
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));	
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_messages));
 			reloadAdapter(true);
@@ -671,8 +636,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private void deleteConvo(final int index, final DMConversation convo) {
 			if(isDeleting) return;
 			isDeleting = true;
-			setProgressShown(true);
 			final Account acc = AccountService.getCurrentAccount();
+			if(getView() != null) setListShown(false);
 			new Thread(new Runnable() {
 				public void run() {
 					int deletedCount = 0;
@@ -687,7 +652,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void run() {
 							if(count == convo.getMessages().size()) adapt.remove(index);
 							else Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
-							setProgressShown(false);
+							if(getView() != null) setListShown(true);
 							isDeleting = false;
 						}
 					});
@@ -699,8 +664,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			new Thread(new Runnable() {
 				public void run() {
 					final Account acc = AccountService.getCurrentAccount();
@@ -726,8 +690,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -779,18 +742,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		private boolean filterSelected;
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			context.startActivity(new Intent(context, SearchScreen.class).putExtra("query", 
+					(String)adapt.getItem(position)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_trends));
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					context.startActivity(new Intent(context, SearchScreen.class).putExtra("query", (String)adapt.getItem(position)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(context, R.layout.spinner_item);
 			String[] toAdd = context.getResources().getStringArray(R.array.trend_sources);
 			for(String t : toAdd) spinAdapt.add(t);
@@ -818,8 +782,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				getLocation();
 				return;
 			}
-			isLoading = true;
-			setProgressShown(true);
+			isLoading = true;		
 			adapt.clear();
 			if(getView() != null) setListShown(false);
 			new Thread(new Runnable() {
@@ -858,7 +821,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
 							setListShown(true);
 							isLoading = false;
 						}
@@ -895,14 +857,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private void getLocation() {
 			if(isGettingLocation) return;
 			isGettingLocation = true;
-			setProgressShown(true);
 			final LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 			LocationListener locationListener = new LocationListener() {
 				public void onLocationChanged(Location loc) {
 					locationManager.removeUpdates(this);
 					isGettingLocation = false;
 					location = new GeoLocation(loc.getLatitude(), loc.getLongitude());
-					setProgressShown(false);
 					performRefresh(false);
 				}
 				public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -911,7 +871,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			};
 			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 		}
-
 	}
 
 	public static class FavoritesFragment extends BaseListFragment {
@@ -926,6 +885,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			context = (Activity)act;
 		}
 
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Status tweet = (Status)adapt.getItem(position);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {			
 			super.onStart();
@@ -951,16 +920,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Status tweet = (Status)adapt.getItem(position);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_favorites));
 			reloadAdapter(true);
@@ -982,8 +941,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
@@ -1020,8 +978,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1069,7 +1026,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (SearchScreen)act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Tweet tweet = (Tweet)context.tweetAdapter.getItem(position);
+			context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
+					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1092,15 +1058,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Tweet tweet = (Tweet)context.tweetAdapter.getItem(position);
-					context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
-							.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
-							.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_results));
 			query = getArguments().getString("query");
@@ -1111,7 +1068,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || context.tweetAdapter == null) return;
 			isLoading = true;
-			setProgressShown(true);
 			if(context.tweetAdapter.getCount() == 0 && getView() != null) setListShown(false);
 			if(getView() != null && context.tweetAdapter != null) context.tweetAdapter.setLastViewed(getListView());
 			new Thread(new Runnable() {
@@ -1154,8 +1110,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1202,7 +1157,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (SearchScreen)act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", ((User)context.userAdapter.getItem(position)).getScreenName())
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1231,13 +1193,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", ((User)context.userAdapter.getItem(position)).getScreenName())
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_results));
 			query = getArguments().getString("query");
@@ -1248,7 +1203,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || context.userAdapter == null) return;
 			isLoading = true;
-			setProgressShown(true);
 			if(context.userAdapter.getCount() == 0 && getView() != null) setListShown(false);
 			new Thread(new Runnable() {
 				public void run() {
@@ -1290,8 +1244,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1342,7 +1295,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Tweet tweet = (Tweet)adapt.getItem(position);
+			context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
+					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1372,15 +1334,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Tweet tweet = (Tweet)adapt.getItem(position);
-					context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
-							.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
-							.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_results));
 			reloadAdapter(true);
@@ -1390,8 +1343,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
@@ -1429,8 +1381,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1487,17 +1438,17 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private boolean filterSelected;
 
 		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Tweet tweet = (Tweet)adapt.getItem(position);
+			context.startActivity(new Intent(context, TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getFromUserName()).putExtra("user_id", tweet.getFromUserId())
+					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
+		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Tweet tweet = (Tweet)adapt.getItem(position);
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -1551,14 +1502,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private void getLocation() {
 			if(isGettingLocation) return;
 			isGettingLocation = true;
-			setProgressShown(true);
 			final LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 			LocationListener locationListener = new LocationListener() {
 				public void onLocationChanged(Location loc) {
 					locationManager.removeUpdates(this);
 					isGettingLocation = false;
 					location = new GeoLocation(loc.getLatitude(), loc.getLongitude());
-					setProgressShown(false);
 					performRefresh(false);
 				}
 				public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -1570,15 +1519,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void performRefresh(final boolean paginate) {
-			if(context == null || isLoading || adapt == null) return;
+			if(context == null || isLoading || adapt == null && getView() != null) return;
 			else if(location == null) {
 				getLocation();
 				return;
 			}
 			isLoading = true;
-			setProgressShown(true);
 			if(!paginate) adapt.clear();
-			adapt.setLastViewed(getListView());
+			if(getView() != null) adapt.setLastViewed(getListView());
+			if(adapt.getCount() == 0) setListShown(false);
 			new Thread(new Runnable() {
 				public void run() {
 					Query q = new Query("geocode:" + Double.toString(location.getLatitude()) + "," + Double.toString(location.getLongitude()) + "," + radius);
@@ -1613,8 +1562,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						}
 					}
 					context.runOnUiThread(new Runnable() {
-						public void run() { 
-							setProgressShown(false);
+						public void run() {
+							setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1664,6 +1613,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Status tweet = (Status)adapt.getItem(position);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
+		@Override
 		public void onStart() {
 			super.onStart();
 			listName = getArguments().getString("list_name");
@@ -1692,16 +1651,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Status tweet = (Status)adapt.getItem(position);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_tweets));
 			reloadAdapter(true);
@@ -1723,8 +1672,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
@@ -1762,8 +1710,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -1815,7 +1762,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-
+		
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1989,6 +1936,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Status tweet = (Status)context.adapter.getItem(position);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
+		@Override
 		public void onStart() {
 			super.onStart();
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -2013,16 +1970,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Status tweet = (Status)context.adapter.getItem(position);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_tweets));
 			screenName = getArguments().getString("query");
@@ -2045,7 +1992,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || context.adapter == null) return;	
 			isLoading = true;
-			setProgressShown(true);
 			if(context.adapter.getCount() == 0 && getView() != null) setListShown(false);
 			context.adapter.setLastViewed(getListView());
 			new Thread(new Runnable() {
@@ -2081,8 +2027,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});
@@ -2127,52 +2072,52 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			if(position == 0) return;
+			BasicNameValuePair pair = adapt.values.get(position - 1);
+			if(pair.getName().equals(context.getString(R.string.website_str))) {
+				if(!pair.getValue().equals(context.getString(R.string.none_str))) {
+					String url = pair.getValue();
+					try { context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
+					catch(Exception e) { e.printStackTrace(); }
+				}
+			} else if(pair.getName().equals(context.getString(R.string.tweets_str))) {
+				context.getActionBar().setSelectedNavigationItem(0);
+			} else if(pair.getName().equals(context.getString(R.string.location_str))) {
+				String loc = null;
+				try { loc = URLEncoder.encode(pair.getValue(), "UTF-8"); }
+				catch(Exception e) { e.printStackTrace(); }
+				if(!loc.equals(context.getString(R.string.unknown_str))) {
+					try { context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(context.getString(R.string.google_url) + loc)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
+					catch(Exception e) { e.printStackTrace(); }
+				}
+			} else if(pair.getName().equals(context.getString(R.string.followers_str))) {
+				Intent intent = new Intent(context, UserListActivity.class)
+				.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
+				.putExtra("user", adapt.user.getId())
+				.putExtra("username", adapt.user.getScreenName());
+				context.startActivity(intent);
+			} else if(pair.getName().equals(context.getString(R.string.friends_str))) {
+				Intent intent = new Intent(context, UserListActivity.class)
+				.putExtra("mode", UserListActivity.FOLLOWING_LIST)
+				.putExtra("user", adapt.user.getId())
+				.putExtra("username", adapt.user.getScreenName());
+				context.startActivity(intent);
+			} else if(pair.getName().equals(context.getString(R.string.favorites_str))) {
+				Intent intent = new Intent(context, TweetListActivity.class)
+				.putExtra("mode", TweetListActivity.USER_FAVORITES)
+				.putExtra("username", adapt.user.getScreenName());
+				context.startActivity(intent);
+			}
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
 			setRetainInstance(true);
-			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					if(position == 0) return;
-					BasicNameValuePair pair = adapt.values.get(position - 1);
-					if(pair.getName().equals(context.getString(R.string.website_str))) {
-						if(!pair.getValue().equals(context.getString(R.string.none_str))) {
-							String url = pair.getValue();
-							try { context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
-							catch(Exception e) { e.printStackTrace(); }
-						}
-					} else if(pair.getName().equals(context.getString(R.string.tweets_str))) {
-						context.getActionBar().setSelectedNavigationItem(0);
-					} else if(pair.getName().equals(context.getString(R.string.location_str))) {
-						String loc = null;
-						try { loc = URLEncoder.encode(pair.getValue(), "UTF-8"); }
-						catch(Exception e) { e.printStackTrace(); }
-						if(!loc.equals(context.getString(R.string.unknown_str))) {
-							try { context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(context.getString(R.string.google_url) + loc)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
-							catch(Exception e) { e.printStackTrace(); }
-						}
-					} else if(pair.getName().equals(context.getString(R.string.followers_str))) {
-						Intent intent = new Intent(context, UserListActivity.class)
-						.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
-						.putExtra("user", adapt.user.getId())
-						.putExtra("username", adapt.user.getScreenName());
-						context.startActivity(intent);
-					} else if(pair.getName().equals(context.getString(R.string.friends_str))) {
-						Intent intent = new Intent(context, UserListActivity.class)
-						.putExtra("mode", UserListActivity.FOLLOWING_LIST)
-						.putExtra("user", adapt.user.getId())
-						.putExtra("username", adapt.user.getScreenName());
-						context.startActivity(intent);
-					} else if(pair.getName().equals(context.getString(R.string.favorites_str))) {
-						Intent intent = new Intent(context, TweetListActivity.class)
-						.putExtra("mode", TweetListActivity.USER_FAVORITES)
-						.putExtra("username", adapt.user.getScreenName());
-						context.startActivity(intent);
-					}
-				}
-			});
 			screenName = getArguments().getString("query");
 			reloadAdapter(true);
 		}
@@ -2181,8 +2126,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;	
 			isLoading = true;
-			setProgressShown(true);
-			if(adapt.getCount() == 0) setListShown(false);
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
 			new Thread(new Runnable() {
 				public void run() {
 					final Account acc = AccountService.getCurrentAccount();
@@ -2216,8 +2160,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
-							setListShown(true);
+							if(getView() != null) setListShown(true);
 							isLoading = false;
 						}
 					});

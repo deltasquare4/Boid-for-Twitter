@@ -2,22 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent">
 	<Spinner android:id="@+id/fragSpinner" android:layout_width="match_parent"
-		android:layout_height="wrap_content" android:layout_below="@+id/horizontalProgress" />
-	<RelativeLayout android:layout_width="fill_parent" android:layout_below="@+id/fragSpinner"
-		android:layout_height="fill_parent" android:layout_above="@+id/horizontalProgress">
-		<ProgressBar android:id="@+android:id/progress" android:visibility="gone"
-			android:indeterminateOnly="true" style="?android:attr/progressBarStyleLarge"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_centerInParent="true" />
+		android:layout_height="wrap_content" />
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_below="@+id/fragSpinner" android:layout_height="fill_parent">
+		<ProgressBar android:id="@+android:id/progress"
+			android:visibility="gone" android:indeterminateOnly="true"
+			style="?android:attr/progressBarStyleLarge" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_centerInParent="true" />
 		<ListView android:id="@+android:id/list"
 			android:layout_width="match_parent" android:layout_height="fill_parent" />
 		<TextView android:id="@+android:id/empty" android:text="@string/no_results"
-			android:layout_centerInParent="true"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceLarge" />
+			android:layout_centerInParent="true" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" />
 	</RelativeLayout>
-	<ProgressBar android:id="@+id/horizontalProgress"
-		android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
-		android:layout_width="fill_parent" android:visibility="gone"
-		android:layout_height="10dp" android:layout_alignParentBottom="true" />
 </RelativeLayout>
