@@ -93,29 +93,22 @@ public class TweetViewer extends MapActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tweet_view);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		
 		final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
-		
-		binder = new FeedListAdapter(this, "CONVERSATION");
+		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		ListView list = ((ListView)findViewById(android.R.id.list));
 		list.setAdapter(binder);
 		list.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
-					long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
 				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
 					.putExtra("sr_tweet", Utilities.serializeObject( binder.getTweet(pos) ))
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
-		});
-        
+		});       
 		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { sideNav.showNavigationView(); }
 		});
-
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
 			try{
 				statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));

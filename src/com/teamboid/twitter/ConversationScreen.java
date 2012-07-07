@@ -81,7 +81,8 @@ public class ConversationScreen extends ListActivity {
 	}
 	
 	private void loadCachedMessages() {
-		DMConversation convo = AccountService.getMessageConvoAdapter(this).find(getIntent().getStringExtra("screen_name"));
+		DMConversation convo = AccountService.getMessageConvoAdapter(this,
+				AccountService.getCurrentAccount().getId()).find(getIntent().getStringExtra("screen_name"));
 		if(convo != null) adapt.setConversation(convo);
 	}
 	
@@ -100,7 +101,8 @@ public class ConversationScreen extends ListActivity {
 						final ResponseList<DirectMessage> messages = temp; 
 						runOnUiThread(new Runnable() {
 							public void run() { 
-								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(ConversationScreen.this);
+								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(
+										ConversationScreen.this, AccountService.getCurrentAccount().getId());
 								list.add(messages.toArray(new DirectMessage[0]));
 								for(int i = 0; i < list.getCount(); i++) {
 									if(((DMConversation)list.getItem(i)).getToScreenName().equals(screenName)) {
@@ -197,7 +199,8 @@ public class ConversationScreen extends ListActivity {
 								content.getText().toString().trim());
 						runOnUiThread(new Runnable() {
 							public void run() {
-								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(ConversationScreen.this);
+								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(
+										ConversationScreen.this, AccountService.getCurrentAccount().getId());
 								list.add(new DirectMessage[] { sentMsg });
 								adapt.add(sentMsg);
 								content.setText("");

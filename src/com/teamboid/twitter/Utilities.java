@@ -51,7 +51,7 @@ public class Utilities {
 	public static void recreateFeedAdapter(Activity context, FeedListAdapter adapt) {
 		Status[] before = null;
 		if(adapt.getCount() > 0) before = adapt.toArray();
-		adapt = new FeedListAdapter(context, adapt.ID);
+		adapt = new FeedListAdapter(context, adapt.ID, adapt.account);
 		if(before != null) adapt.add(before, true);
 		int index = 0;
 		for(FeedListAdapter a : AccountService.feedAdapters) {
@@ -63,39 +63,26 @@ public class Utilities {
 	}
 	public static void recreateMessageAdapter(Activity context, MessageConvoAdapter adapt) {
 		DMConversation[] before = null;
-		int index = -1;
-		int top = -1;
-		if(adapt.getCount() > 0 && adapt.list != null) {
-			index = adapt.list.getFirstVisiblePosition();
-			View v = adapt.list.getChildAt(0);
-			top = (v == null) ? 0 : v.getTop();
-			before = adapt.toArray();
+		if(adapt.getCount() > 0) before = adapt.toArray();
+		adapt = new MessageConvoAdapter(context, adapt.account);
+		if(before != null) adapt.add(before);
+		int index = 0;
+		for(MessageConvoAdapter a : AccountService.messageAdapters) {
+			if(a.account == adapt.account) {
+				AccountService.messageAdapters.set(index, adapt);
+			}
+			index++;
 		}
-		adapt = new MessageConvoAdapter(context);
-		if(before != null) {
-			adapt.add(before);
-			if(adapt.list != null) adapt.list.setSelectionFromTop(index + (before.length + 1), top);
-		}		
-		AccountService.messageAdapter = adapt;
 	}
 	public static void recreateSearchAdapter(Activity context, SearchFeedListAdapter adapt) {
 		Tweet[] before = null;
-		int index = -1;
-		int top = -1;
-		if(adapt.getCount() > 0) {
-			index = adapt.savedIndex;
-			top = adapt.savedIndexTop;
-			before = adapt.toArray();
-		}
-		adapt = new SearchFeedListAdapter(context, adapt.ID);
-		if(before != null) {
-			adapt.add(before);
-			if(adapt.list != null) adapt.list.setSelectionFromTop(index + (before.length + 1), top);
-		}
-		index = 0;
+		if(adapt.getCount() > 0) before = adapt.toArray();
+		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account);
+		if(before != null) adapt.add(before);
+		int index = 0;
 		if(AccountService.searchFeedAdapters != null) {
 			for(SearchFeedListAdapter a : AccountService.searchFeedAdapters) {
-				if(a.ID.equals(adapt.ID)) {
+				if(a.ID.equals(adapt.ID) && a.account == adapt.account) {
 					AccountService.searchFeedAdapters.set(index, adapt);
 				}
 				index++;
@@ -105,7 +92,7 @@ public class Utilities {
 	public static void recreateMediaFeedAdapter(Activity context, MediaFeedListAdapter adapt) {
 		Status[] before = null;
 		if(adapt.getCount() > 0) before = adapt.toArray();
-		adapt = new MediaFeedListAdapter(context, adapt.ID);
+		adapt = new MediaFeedListAdapter(context, adapt.ID, adapt.account);
 		if(before != null) adapt.add(before, true);
 		int index = 0;
 		for(MediaFeedListAdapter a : AccountService.mediaAdapters) {

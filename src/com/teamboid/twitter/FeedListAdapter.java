@@ -33,23 +33,23 @@ import com.handlerexploit.prime.widgets.RemoteImageView;
  */
 public class FeedListAdapter extends BaseAdapter {
 
-	public FeedListAdapter(Activity context, String id) {
+	public FeedListAdapter(Activity context, String id, long _account) {
 		mContext = context;
 		tweets = new ArrayList<Status>();
 		ID = id;
+		account = _account;
 	}
 
 	private ArrayList<Status> tweets;
 
-	public Status getTweet(int at){ return tweets.get(at); }
+	public Status getTweet(int at) { return tweets.get(at); }
 
 	private Activity mContext;
 	public String ID;
-	public int selectedItem = -1;
 	private long lastViewedTweet;
 	private int lastViewedTopMargin;
-	public long account;
 	public String user;
+	public long account;
 
 	public void setLastViewed(ListView list) {
 		if(list == null) return;
@@ -291,7 +291,6 @@ public class FeedListAdapter extends BaseAdapter {
 									try {
 										String file = Utilities.generateImageFileName(mContext);
 										if(bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
-											System.out.println(file + " created? " + new File(file).exists());
 											mContext.startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(new File(file)), "image/*"));
 										}
 									} catch (FileNotFoundException e) {

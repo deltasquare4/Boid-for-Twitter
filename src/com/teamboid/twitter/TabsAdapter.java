@@ -188,6 +188,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
+		public abstract void restorePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
 
@@ -234,6 +235,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
+		public abstract void restorePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
 
@@ -389,7 +391,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(adapt.getCount() == 0) setListShown(false);
-			if(getView() != null && adapt != null) adapt.setLastViewed(getListView());
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
@@ -440,7 +442,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(context == null && getActivity() != null) context = getActivity();
 			if(AccountService.getCurrentAccount() != null) {
 				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
-				adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID);
+				adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId());
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) {
@@ -454,6 +456,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
 		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
+		
+		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
 		}
@@ -461,7 +466,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void filter() {
 			if(getListView() == null || adapt == null) return;
-			AccountService.clearFeedAdapter(context, TimelineFragment.ID);
+			AccountService.clearFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId());
 			performRefresh(false);
 		}
 	}
@@ -537,7 +542,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(adapt.getCount() == 0) setListShown(false);
-			if(getView() != null && adapt != null) adapt.setLastViewed(getListView());
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
@@ -587,15 +592,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(context == null && getActivity() != null) context = (Activity)getActivity();
 			if(AccountService.getCurrentAccount() != null) {
 				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
-				adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID);
+				adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID, AccountService.getCurrentAccount().getId());
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
+		
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
+		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
+		
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -730,13 +739,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void reloadAdapter(boolean firstInitialize) {
 			if(context == null && getActivity() != null) context = (Activity)getActivity();
 			if(AccountService.getCurrentAccount() != null) {
-				adapt = AccountService.getMessageConvoAdapter(context);
+				adapt = AccountService.getMessageConvoAdapter(context, AccountService.getCurrentAccount().getId());
 				if(getView() != null) adapt.list = getListView();
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 			}
 		}
 
+		@Override
+		public void restorePosition() { }
+		
 		@Override
 		public void savePosition() { }
 
@@ -867,6 +879,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void savePosition() { }
 
 		@Override
+		public void restorePosition() { }
+		
+		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
 		}
@@ -969,7 +984,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(adapt.getCount() == 0) setListShown(false);
-			if(getView() != null && adapt != null) adapt.setLastViewed(getListView());
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
@@ -1018,16 +1033,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void reloadAdapter(boolean firstInitialize) {
 			if(context == null && getActivity() != null) context = (Activity)getActivity();
 			if(AccountService.getCurrentAccount() != null) {
-				if(adapt != null) if(getView() != null && adapt != null) adapt.setLastViewed(getListView());
-				adapt = AccountService.getFeedAdapter(context, FavoritesFragment.ID);
+				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
+				adapt = AccountService.getFeedAdapter(context, FavoritesFragment.ID, AccountService.getCurrentAccount().getId());
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
+		
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
+		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
+		
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -1060,11 +1079,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) performRefresh(true);
-					if(context.tweetAdapter != null && getView() != null) {
-						context.tweetAdapter.savedIndex = firstVisibleItem;
-						View v = getListView().getChildAt(0);
-						context.tweetAdapter.savedIndexTop = (v == null) ? 0 : v.getTop();
-					}
 					if(firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
 				}
 			});
@@ -1099,6 +1113,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(context.tweetAdapter.getCount() == 0 && getView() != null) setListShown(false);
+			if(getView() != null && context.tweetAdapter != null) context.tweetAdapter.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Query q = new Query(query);
@@ -1115,7 +1130,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
 											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
-											else getListView().setSelectionFromTop(context.tweetAdapter.savedIndex + addedCount, context.tweetAdapter.savedIndexTop);
+											else context.tweetAdapter.restoreLastViewed(getListView());
 										}
 										Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
 										String curTitle = "";
@@ -1151,18 +1166,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
-				if(context.tweetAdapter == null) context.tweetAdapter = new SearchFeedListAdapter(context, null);
+				if(context.tweetAdapter == null) context.tweetAdapter = new SearchFeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
 				if(getView() != null) context.tweetAdapter.list = getListView();
 				setListAdapter(context.tweetAdapter);
 				if(context.tweetAdapter.getCount() == 0) performRefresh(false);
-				else if(context.tweetAdapter.savedIndex > 0 && context.tweetAdapter.list != null) {
-					getListView().setSelectionFromTop(context.tweetAdapter.savedIndex, context.tweetAdapter.savedIndexTop);
-				}
 			}
 		}
+		
 		@Override
 		public void savePosition() { }
 
+		@Override
+		public void restorePosition() { }
+		
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -1295,8 +1311,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			}
 		}
+		
 		@Override
 		public void savePosition() { }
+		
+		@Override
+		public void restorePosition() { }
 
 		@Override
 		public void jumpTop() {
@@ -1333,11 +1353,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) performRefresh(true);
-					if(adapt != null && getView() != null) {
-						adapt.savedIndex = firstVisibleItem;
-						View v = getListView().getChildAt(0);
-						adapt.savedIndexTop = (v == null) ? 0 : v.getTop();
-					}
 					if(firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 						final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 						if(!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean("textual_savedsearch_tabs", true)) {
@@ -1377,6 +1392,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(adapt.getCount() == 0) setListShown(false);
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Query q = new Query(query);
@@ -1393,7 +1409,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
 											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
-											else getListView().setSelectionFromTop(adapt.savedIndex + addedCount, adapt.savedIndexTop);
+											else adapt.restoreLastViewed(getListView());
 										}
 										final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 										if(!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean("textual_savedsearch_tabs", true)) {
@@ -1426,15 +1442,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void reloadAdapter(boolean firstInitialize) {
 			if(context == null && getActivity() != null) context = (Activity)getActivity();
 			if(AccountService.getCurrentAccount() != null) {
-				adapt = AccountService.getSearchFeedAdapter(context, SavedSearchFragment.ID + "@" + query);
+				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
+				adapt = AccountService.getSearchFeedAdapter(context, SavedSearchFragment.ID + "@" + query, AccountService.getCurrentAccount().getId());
 				if(getView() != null) adapt.list = getListView();
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
-				else if(adapt.savedIndex > 0 && adapt.list != null) getListView().setSelectionFromTop(adapt.savedIndex, adapt.savedIndexTop);
+				else adapt.restoreLastViewed(getListView());
 			}
 		}
+		
 		@Override
-		public void savePosition() { }
+		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
+
+		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
 
 		@Override
 		public void jumpTop() {
@@ -1483,11 +1504,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) performRefresh(true);
-					if(adapt != null && getView() != null) {
-						adapt.savedIndex = firstVisibleItem;
-						View v = getListView().getChildAt(0);
-						adapt.savedIndexTop = (v == null) ? 0 : v.getTop();
-					}
 					if(firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 						if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.nearby_str);
 						else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
@@ -1562,6 +1578,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(!paginate) adapt.clear();
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Query q = new Query("geocode:" + Double.toString(location.getLatitude()) + "," + Double.toString(location.getLongitude()) + "," + radius);
@@ -1572,15 +1589,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							final QueryResult feed = acc.getClient().search(q);
 							context.runOnUiThread(new Runnable() {
 								public void run() {
-									if(getView() != null) {
-										setEmptyText(context.getString(R.string.no_results));
-									}
+									if(getView() != null) setEmptyText(context.getString(R.string.no_results));
 									int beforeLast = adapt.getCount() - 1;
 									int addedCount = adapt.add(feed.getTweets().toArray(new Tweet[0]));
 									if(addedCount > 0 || beforeLast > 0) {
 										if(getView() != null) {
 											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
-											else getListView().setSelectionFromTop(adapt.savedIndex + addedCount, adapt.savedIndexTop);
+											else adapt.restoreLastViewed(getListView());
 										}
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
 											context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.nearby_str) + " (" + Integer.toString(addedCount) + ")");
@@ -1610,15 +1625,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
+				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
 				adapt = AccountService.getNearbyAdapter(context);
 				if(getView() != null) adapt.list = getListView();
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
-				else if(adapt.savedIndex > 0 && adapt.list != null) getListView().setSelectionFromTop(adapt.savedIndex, adapt.savedIndexTop);
+				else adapt.restoreLastViewed(getListView());
 			}
 		}
+		
 		@Override
-		public void savePosition() { }
+		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
+
+		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
 
 		@Override
 		public void jumpTop() {
@@ -1705,7 +1725,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(adapt.getCount() == 0) setListShown(false);
-			if(getView() != null && adapt != null) adapt.setLastViewed(getListView());
+			adapt.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
@@ -1756,14 +1776,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(context == null && getActivity() != null) context = (Activity)getActivity();
 			if(AccountService.getCurrentAccount() != null) {
 				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
-				adapt = AccountService.getFeedAdapter(context, UserListFragment.ID + "@" + listName.replace("@", "%40") + "@" + Integer.toString(listID));
+				adapt = AccountService.getFeedAdapter(context, UserListFragment.ID + "@" + listName.replace("@", "%40") +
+							"@" + Integer.toString(listID), AccountService.getCurrentAccount().getId());
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
+		
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
+
+		@Override
+		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
 
 		@Override
 		public void jumpTop() {
@@ -1919,9 +1944,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(AccountService.getCurrentAccount() != null) {
 				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getGridView());
 				if(screenName != null && !screenName.trim().isEmpty()) {
-					if(((ProfileScreen)context).mediaAdapter == null) ((ProfileScreen)context).mediaAdapter = new MediaFeedListAdapter(context, null);
+					if(((ProfileScreen)context).mediaAdapter == null) {
+						((ProfileScreen)context).mediaAdapter = new MediaFeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
+					}
 					adapt = ((ProfileScreen)context).mediaAdapter;
-				} else adapt = AccountService.getMediaFeedAdapter(context, MediaTimelineFragment.ID);
+				} else {
+					adapt = AccountService.getMediaFeedAdapter(context, MediaTimelineFragment.ID,AccountService.getCurrentAccount().getId());
+				}
 				getGridView().setAdapter(adapt);
 				if(getView() != null) {
 					if(adapt.getCount() > 0) {
@@ -2018,7 +2047,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			isLoading = true;
 			setProgressShown(true);
 			if(context.adapter.getCount() == 0 && getView() != null) setListShown(false);
-			if(getView() != null && context.adapter != null) context.adapter.setLastViewed(getListView());
+			context.adapter.setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
@@ -2065,7 +2094,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
 				if(context.adapter != null && !firstInitialize && getView() != null) context.adapter.setLastViewed(getListView());
-				if(context.adapter == null) context.adapter = new FeedListAdapter(context, null);
+				if(context.adapter == null) context.adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
 				setListAdapter(context.adapter);
 				if(context.adapter.getCount() == 0) performRefresh(false);
 				else if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView());
@@ -2074,6 +2103,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void savePosition() { if(getView() != null && context.adapter != null) context.adapter.setLastViewed(getListView()); }
+
+		@Override
+		public void restorePosition() { if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView()); }
 
 		@Override
 		public void jumpTop() {
@@ -2204,6 +2236,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void savePosition() { }
+		
+		@Override
+		public void restorePosition() { }
 
 		@Override
 		public void jumpTop() {

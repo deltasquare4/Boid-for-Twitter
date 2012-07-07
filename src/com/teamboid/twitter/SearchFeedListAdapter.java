@@ -10,6 +10,7 @@ import com.handlerexploit.prime.widgets.RemoteImageView;
 
 import twitter4j.GeoLocation;
 import twitter4j.Place;
+import twitter4j.Status;
 import twitter4j.Tweet;
 
 import android.content.Context;
@@ -35,22 +36,40 @@ import android.widget.Toast;
  */
 public class SearchFeedListAdapter extends BaseAdapter {
 
-	public SearchFeedListAdapter(Context context) {
+	public SearchFeedListAdapter(Context context, long _account) {
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
+		account = _account;
 	}
-	public SearchFeedListAdapter(Context context, String _id) {
+	public SearchFeedListAdapter(Context context, String _id, long _account) {
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
 		ID = _id;
+		account = _account;
 	}
 
 	private Context mContext;
 	private ArrayList<Tweet> tweets;
 	public String ID;
 	public ListView list;
-	public int savedIndex;
-	public int savedIndexTop;
+	private long lastViewedTweet;
+	private int lastViewedTopMargin;
+	public long account;
+
+	public void setLastViewed(ListView list) {
+		if(list == null) return;
+		else if(getCount() == 0) return;
+		Status t = (Status)getItem(list.getFirstVisiblePosition());
+		if(t == null) return;
+		lastViewedTweet = t.getId();
+		View v = list.getChildAt(0);
+		lastViewedTopMargin = (v == null) ? 0 : v.getTop();
+	}
+	public void restoreLastViewed(ListView list) {
+		if(lastViewedTweet == 0 || list == null) return;
+		else if(getCount() == 0) return;
+		list.setSelectionFromTop(find(lastViewedTweet), lastViewedTopMargin);
+	}
 
 	private boolean add(Tweet tweet) {
 		boolean added = false;
@@ -104,6 +123,19 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		return toReturn;
 	}
 
+	public int find(long statusId) {
+		int index = 0;
+		ArrayList<Tweet> temp = tweets;
+		for(int i = 0; i < temp.size(); i++) {
+			if(temp.get(i).getId() == statusId) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+
+	
 	@Override
 	public int getCount() { return tweets.size(); }
 	@Override

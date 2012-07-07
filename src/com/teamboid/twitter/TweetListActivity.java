@@ -50,7 +50,7 @@ public class TweetListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.list_fragment);
-		binder = new FeedListAdapter(this, null);
+		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		setListAdapter(binder);
 		refresh();
 		getListView().setOnItemClickListener(new OnItemClickListener(){

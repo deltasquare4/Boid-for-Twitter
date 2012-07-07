@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -24,127 +23,94 @@ import android.widget.Toast;
  *
  */
 public class SendTweetService extends Service {
-	public static final String NETWORK_AVAIL = "com.teamboid.twitter.NETWORK_AVAIL";
-	// public static final String ADD_TWEET = "com.teamboid.twitter.ADD_TWEET";
-	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
-	//public static final String REMOVE_TWEET = "com.teamboid.twitter.REMOVE_TWEET";
-	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	
+	public static final String NETWORK_AVAIL = "com.teamboid.twitter.NETWORK_AVAIL";
+	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
+	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	public List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
 	
-	public class SendTweetAsyncTask extends AsyncTask<Object,Object,Object>{
-
+	public class SendTweetAsyncTask extends AsyncTask<Object,Object,Object> {
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			// Check if we can actually send data
 			if(!NetworkUtils.haveNetworkConnection(SendTweetService.this)) return null;
-			
 			loadTweets();
-			
-			for(int i = 0; i < tweets.size(); i++) { //this prevents concurrent thread modification exceptions
+			for(int i = 0; i < tweets.size(); i++) {
 				final SendTweetTask stt = tweets.get(i);
-				Log.d("sts", "Sending Tweet...");
 				stt.result.errorCode = Result.WAITING;
 				Intent update = new Intent(UPDATE_STATUS);
 				sendBroadcast(update);
-				
 				if(stt.sendTweet(SendTweetService.this).sent == true) {
-					try{
-						AccountService.activity.runOnUiThread(new Runnable(){
-	
+					try { 
+						AccountService.activity.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID).add(new twitter4j.Status[]{stt.tweet});
-							}
-							
+								AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID,
+										AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{stt.tweet});
+							}						
 						});
-					}catch(Exception e){}
-					try{
-						if(!AccountService.activity.hasWindowFocus()){
+					} catch(Exception e) { e.printStackTrace(); }
+					try {
+						if(!AccountService.activity.hasWindowFocus()) {
 							Toast.makeText(getApplicationContext(), R.string.sent_tweet, Toast.LENGTH_SHORT).show();
 						}
-					}catch(Exception e){}
-					
+					} catch(Exception e) { e.printStackTrace(); }
 					tweets.remove(i);
-				} else{
-					tweets.set(i, stt);
-				}
-				
-				Log.d("sts", "Updating Timeline screen....");
-				// Intent update = new Intent(UPDATE_STATUS);
-				//update.putExtra("tweet", stt.toBundle());
+				} else tweets.set(i, stt);
 				sendBroadcast(update);
 			}
-			
 			saveTweets();
-			
 			return null;
 		}
-		
 	}
 	
 	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
+	public IBinder onBind(Intent arg0) { return null; }
 	
 	private static final String TWEETS = "sendtweetservice-queue";
 	
-	SharedPreferences getPrefs(){
+	private SharedPreferences getPrefs() {
 		return getSharedPreferences(TWEETS, Context.MODE_PRIVATE);
 	}
 	private static boolean loaded = false;
 	
-	void loadTweets(){
+	private void loadTweets() {
 		if(loaded) return;
 		SharedPreferences sp = getPrefs();
-		for(String key : sp.getAll().keySet()){
-			try{
-				tweets.add(SendTweetTask.fromJSONObject(new JSONObject(sp.getString(key, "{}"))));
-			}catch(Exception e){
-				e.printStackTrace();
-			}
+		for(String key : sp.getAll().keySet()) {
+			try { tweets.add(SendTweetTask.fromJSONObject(new JSONObject(sp.getString(key, "{}")))); }
+			catch(Exception e) { e.printStackTrace(); }
 		}
 		loaded = true;
 		sp.edit().clear().commit();
 	}
 	
-	void saveTweets(){
+	private void saveTweets(){
 		Editor ed = getPrefs().edit();
-	
-		for(int i = 0; i < tweets.size(); i++) { //this prevents concurrent thread modification exceptions
+		for(int i = 0; i < tweets.size(); i++) {
 			SendTweetTask stt = tweets.get(i);
-			try{
-				ed.putString(i + "", stt.toJSONObject().toString());
-			} catch(Exception e){
-				e.printStackTrace();
-			}
+			try { ed.putString(i + "", stt.toJSONObject().toString()); }
+			catch(Exception e) { e.printStackTrace(); }
 		}
 		ed.commit();
 	}
 	
-	void startBackground(){
-		try{
-			new SendTweetAsyncTask().execute();
-		} catch(Exception e){ e.printStackTrace(); }
+	private void startBackground() {
+		try { new SendTweetAsyncTask().execute(); }
+		catch(Exception e) { e.printStackTrace(); }
 	}
 	
-	static SendTweetService scs;
-	static SendTweetService getInstance(){
-		if(scs == null) synchronized(SendTweetService.class) { new SendTweetService(); }
+	private static SendTweetService scs;
+	public static SendTweetService getInstance() {
+		if(scs == null) {
+			synchronized(SendTweetService.class) { new SendTweetService(); }
+		}
 		return scs;
 	}
 	
-	public SendTweetService(){
-		scs = this;
-		Log.d("sts", "New instance.");
-	}
+	public SendTweetService() { scs = this; }
 	
 	public static void addTweet(SendTweetTask stt){
 		getInstance().tweets.add(stt);
-		
-		
-    	
 		getInstance().startBackground();
 	}
 	public static void initialize(){
@@ -157,7 +123,6 @@ public class SendTweetService extends Service {
 		getInstance().loadTweets();
 		getInstance().tweets.remove(tweet);
 		getInstance().saveTweets();
-    	
     	Intent update = new Intent(UPDATE_STATUS);
     	update.putExtra("delete", true);
     	getInstance().sendBroadcast(update);
@@ -165,22 +130,16 @@ public class SendTweetService extends Service {
 		
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if(intent == null){
-			return Service.START_STICKY;
-		}
-		
-	    if(intent.getAction().equals(NETWORK_AVAIL)){
-	    	// If there was no network at the time of send, we get notified here :)
+		if(intent == null) return Service.START_STICKY;
+	    if(intent.getAction().equals(NETWORK_AVAIL)) {
 	    	startBackground();
-	    } else if(intent.getAction().equals(LOAD_TWEETS)){
+	    } else if(intent.getAction().equals(LOAD_TWEETS)) {
 	    	loadTweets();
 	    	Intent update = new Intent(UPDATE_STATUS);
 	    	update.putExtra("dontupdate", true);
 	    	sendBroadcast(update);
 	    	startBackground();
-	    }
-		
+	    }	
 	    return Service.START_STICKY;
-	}
-	
+	}	
 }

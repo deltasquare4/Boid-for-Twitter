@@ -78,14 +78,16 @@ public class MessageConvoAdapter extends BaseAdapter {
 		}
 	}
 
-	public MessageConvoAdapter(Activity _context) {
+	public MessageConvoAdapter(Activity _context, long _account) {
 		context = _context;
 		items = new ArrayList<DMConversation>();
+		account = _account;
 	}
 
 	private Activity context;
 	private ArrayList<DMConversation> items;
 	public ListView list;
+	public long account;
 	
 	public void add(DMConversation[] convos) {
 		for(DMConversation c : convos) items.add(c);

@@ -85,18 +85,16 @@ public class TimelineScreen extends Activity {
 			try{
 				sentTweetBinder = new SendTweetArrayAdapter(TimelineScreen.this, 0, 0, SendTweetService.getInstance().tweets);
 				((ListView)findViewById(R.id.progress_content)).setAdapter(sentTweetBinder);
-				
 				if(SendTweetService.getInstance().tweets != null){
 					sentTweetBinder.notifyDataSetInvalidated();
 					if(SendTweetService.getInstance().tweets.size() > 0){
 						findViewById(R.id.progress).setVisibility(View.VISIBLE);
 						findViewById(R.id.progress).setAlpha(1.0f);
 						((SlidingDrawer)findViewById(R.id.progress)).close();
-					} else{
+					} else {
 						if(intent.hasExtra("delete") || intent.hasExtra("dontrefresh")) {
 							findViewById(R.id.progress).setVisibility(View.GONE);
 						} else {
-							//TODO This is NOT supported on Gingerbread. If we wanted to in the future, use NineOldDrroids
 							ViewPropertyAnimator vpa = findViewById(R.id.progress).animate();
 							vpa.setStartDelay(300);
 							vpa.setDuration(3000);
@@ -126,15 +124,15 @@ public class TimelineScreen extends Activity {
 					}
 					boolean errors = false;
 					for(SendTweetTask stt : SendTweetService.getInstance().tweets){
-						if(stt.result.errorCode != Result.WAITING && stt.result.sent == false){
+						if(stt.result.errorCode != Result.WAITING && stt.result.sent == false) {
 							errors = true;
 						}
 					}
 					TextView tv = (TextView)findViewById(R.id.progress_handle);
-					if(errors == true){
+					if(errors == true) {
 						tv.setText(getString(R.string.send_error_tweets).replace("{sending}", SendTweetService.getInstance().tweets.size() + ""));
 					} else{
-						if(SendTweetService.getInstance().tweets.size() == 1){
+						if(SendTweetService.getInstance().tweets.size() == 1) {
 							tv.setText(R.string.sending_tweet);
 						} else{
 							tv.setText(getString(R.string.sending_tweets).replace("{sending}", SendTweetService.getInstance().tweets.size() + ""));
@@ -290,9 +288,6 @@ public class TimelineScreen extends Activity {
 			}
 			index++;
 		}
-		if(accountSwitched) {
-			AccountService.clearAdapters();
-		}
 		if(newColumn) {
 			newColumn = false;
 			getActionBar().setSelectedNavigationItem(getActionBar().getTabCount() - 1);		
@@ -317,8 +312,10 @@ public class TimelineScreen extends Activity {
 				Utilities.recreateFeedAdapter(this, AccountService.feedAdapters.get(i));
 			} 
 		}
-		if(AccountService.messageAdapter != null) {
-			Utilities.recreateMessageAdapter(this, AccountService.messageAdapter);
+		if(AccountService.messageAdapters != null) {
+			for(int i = 0; i < AccountService.messageAdapters.size(); i++) {
+				Utilities.recreateMessageAdapter(this, AccountService.messageAdapters.get(i));
+			} 
 		}
 		if(AccountService.trendsAdapter != null) AccountService.trendsAdapter = new TrendsListAdapter(this);
 		if(AccountService.searchFeedAdapters != null) {
@@ -562,8 +559,7 @@ public class TimelineScreen extends Activity {
 		case R.id.addMediaColAction:
 			addColumn(MediaTimelineFragment.ID);
 			return true;
-		case R.id.addSavedSearchColAction:
-			
+		case R.id.addSavedSearchColAction:		
 			Toast.makeText(getApplicationContext(), getString(R.string.loading_savedsearches), Toast.LENGTH_SHORT).show();
 			new Thread(new Runnable() {
 				public void run() {
@@ -605,6 +601,11 @@ public class TimelineScreen extends Activity {
 			}).start();
 			return true;
 		default:
+			for(int i = 0; i < getActionBar().getTabCount(); i++) {
+				Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) ((BaseListFragment)frag).savePosition();
+				else if(frag instanceof BaseSpinnerFragment) ((BaseSpinnerFragment)frag).savePosition();
+			}
 			for(Account acc : AccountService.getAccounts()) {
 				if(acc.getUser().getScreenName().equals(item.getTitle().toString().substring(1))) {
 					if(AccountService.selectedAccount == acc.getId()) break;

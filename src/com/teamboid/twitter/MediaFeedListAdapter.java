@@ -20,10 +20,11 @@ import com.handlerexploit.prime.widgets.RemoteImageView;
  */
 public class MediaFeedListAdapter extends BaseAdapter {
 
-	public MediaFeedListAdapter(Activity context, String id) {
+	public MediaFeedListAdapter(Activity context, String id, long _account) {
 		mContext = context;
 		tweets = new ArrayList<Status>();
 		ID = id;
+		account = _account;
 	}
 
 	public ArrayList<Status> tweets;

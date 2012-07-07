@@ -1,7 +1,6 @@
 package com.teamboid.twitter;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
@@ -18,10 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
-import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
-import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
-
 /**
  * The service that stays running the background; authorizes, loads, and manages the current user's accounts.
  * @author Aidan Follestad
@@ -33,7 +28,7 @@ public class AccountService extends Service {
 	private static ArrayList<Account> accounts;
 	public static ArrayList<FeedListAdapter> feedAdapters;
 	public static ArrayList<MediaFeedListAdapter> mediaAdapters;
-	public static MessageConvoAdapter messageAdapter;
+	public static ArrayList<MessageConvoAdapter> messageAdapters;
 	public static TrendsListAdapter trendsAdapter;
 	public static SearchFeedListAdapter nearbyAdapter;
 	public static ArrayList<SearchFeedListAdapter> searchFeedAdapters;
@@ -41,23 +36,6 @@ public class AccountService extends Service {
 	public static int charactersPerMedia;
 	public static long selectedAccount;
 
-	public static void clearAdapters() {
-		if(feedAdapters != null) feedAdapters.clear();
-		if(mediaAdapters != null) mediaAdapters.clear();
-		if(messageAdapter != null) messageAdapter = null;
-		if(trendsAdapter != null) trendsAdapter = null;
-		if(nearbyAdapter != null) nearbyAdapter = null;
-		if(searchFeedAdapters != null) searchFeedAdapters.clear();
-		for(int i = 0; i < activity.getActionBar().getTabCount(); i++) {
-			Fragment frag = activity.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-			if(frag != null) {
-				if(frag instanceof BaseListFragment) ((BaseListFragment)frag).reloadAdapter(false);
-				else if(frag instanceof BaseSpinnerFragment) ((BaseSpinnerFragment)frag).reloadAdapter(false);
-				else ((BaseGridFragment)frag).reloadAdapter(false);
-			}
-		}
-	}
-	
 	public static ArrayList<Account> getAccounts() {
 		if(accounts == null) accounts = new ArrayList<Account>();
 		return accounts;
@@ -99,20 +77,6 @@ public class AccountService extends Service {
 			}
 		}
 	}
-
-	public enum NotifyType {
-		mentions, messages
-	}
-
-	//	public void showNotification(Account acc, NotifyType type, int unreadCount) {
-	//		NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-	//		Notification notification = new Notification(R.drawable.statusbar_icon, "New mentions!", System.currentTimeMillis());
-	//		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(getApplicationContext(), TimelineScreen.class), 0);
-	//		notification.setLatestEventInfo(getApplicationContext(), "@" + acc.getUser().getScreenName(), 
-	//				Integer.toString(unreadCount) + " new " + type.toString() + "!", contentIntent);
-	//		mNotificationManager.notify(acc.getUser().getScreenName() + "_" + type.toString(), 1, notification);
-	//		//TODO
-	//	}
 	
 	public static ConfigurationBuilder getConfiguration(String token, String secret){
 		return new ConfigurationBuilder()
@@ -274,71 +238,83 @@ public class AccountService extends Service {
 		} else loadAccounts();
 	}
 
-	public static FeedListAdapter getFeedAdapter(Activity activity, String id) {
+	public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account) {
 		if(feedAdapters == null) feedAdapters = new ArrayList<FeedListAdapter>();
 		FeedListAdapter toReturn = null;
 		for(FeedListAdapter adapt : feedAdapters) {
-			if(id.equals(adapt.ID)) {
+			if(id.equals(adapt.ID) && account == adapt.account) {
 				toReturn = adapt;
 				break;
 			}
 		}
 		if(toReturn == null) {
-			toReturn = new FeedListAdapter(activity, id);
+			toReturn = new FeedListAdapter(activity, id, account);
 			feedAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static void clearFeedAdapter(Activity activity, String id) {
+	public static void clearFeedAdapter(Activity activity, String id, long account) {
 		if(feedAdapters == null) return;
 		for(int i = 0; i < feedAdapters.size(); i++) {
 			FeedListAdapter curAdapt = feedAdapters.get(i); 
-			if(curAdapt.ID.equals(id)) {
+			if(curAdapt.ID.equals(id) && curAdapt.account == account) {
 				curAdapt.clear();
 				feedAdapters.set(i, curAdapt);
+				break;
 			}
 		}
 	}
-	public static MediaFeedListAdapter getMediaFeedAdapter(Activity activity, String id) {
+	public static MediaFeedListAdapter getMediaFeedAdapter(Activity activity, String id, long account) {
 		if(mediaAdapters == null) mediaAdapters = new ArrayList<MediaFeedListAdapter>();
 		MediaFeedListAdapter toReturn = null;
 		for(MediaFeedListAdapter adapt : mediaAdapters) {
-			if(id.equals(adapt.ID)) {
+			if(id.equals(adapt.ID) && account == adapt.account) {
 				toReturn = adapt;
 				break;
 			}
 		}
 		if(toReturn == null) {
-			toReturn = new MediaFeedListAdapter(activity, id);
+			toReturn = new MediaFeedListAdapter(activity, id, account);
 			mediaAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static MessageConvoAdapter getMessageConvoAdapter(Activity activity) {
-		if(messageAdapter == null) messageAdapter = new MessageConvoAdapter(activity);
-		return messageAdapter;
+	public static MessageConvoAdapter getMessageConvoAdapter(Activity activity, long account) {
+		if(messageAdapters == null) messageAdapters = new ArrayList<MessageConvoAdapter>();
+		MessageConvoAdapter toReturn = null;
+		for(MessageConvoAdapter adapt : messageAdapters) {
+			if(account == adapt.account) {
+				toReturn = adapt;
+				break;
+			}
+		}
+		if(toReturn == null) {
+			toReturn = new MessageConvoAdapter(activity, account);
+			messageAdapters.add(toReturn);
+		}
+		return toReturn;
 	}
 	public static TrendsListAdapter getTrendsAdapter(Activity activity) {
 		if(trendsAdapter == null) trendsAdapter = new TrendsListAdapter(activity);
 		return trendsAdapter;
 	}
-	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity, String id) {
+	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity, String id, long account) {
 		if(searchFeedAdapters == null) searchFeedAdapters = new ArrayList<SearchFeedListAdapter>();
 		SearchFeedListAdapter toReturn = null;
 		for(SearchFeedListAdapter adapt : searchFeedAdapters) {
-			if(id.equals(adapt.ID)) {
+			if(id.equals(adapt.ID) && account == adapt.account) {
 				toReturn = adapt;
 				break;
 			}
 		}
 		if(toReturn == null) {
-			toReturn = new SearchFeedListAdapter(activity, id);
+			toReturn = new SearchFeedListAdapter(activity, id, account);
 			searchFeedAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
 	public static SearchFeedListAdapter getNearbyAdapter(Activity activity) {
-		if(nearbyAdapter == null) nearbyAdapter = new SearchFeedListAdapter(activity);
+		if(nearbyAdapter == null) nearbyAdapter = new SearchFeedListAdapter(activity, 0);
 		return nearbyAdapter;
 	}
 	
