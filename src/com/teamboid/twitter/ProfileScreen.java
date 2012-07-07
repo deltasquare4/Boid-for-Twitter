@@ -146,12 +146,10 @@ public class ProfileScreen extends Activity {
 			report();
 			return true;
 		case R.id.refreshAction:
-			for(int i = 0; i < getActionBar().getTabCount(); i++) {
-				Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag != null) {
-					if(frag instanceof BaseListFragment) ((BaseListFragment)frag).performRefresh(false);
-					else if(frag instanceof BaseGridFragment) ((BaseGridFragment)frag).performRefresh(false); 
-				}
+			Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
+			if(frag != null) {
+				if(frag instanceof BaseListFragment) ((BaseListFragment)frag).performRefresh(false);
+				else if(frag instanceof BaseGridFragment) ((BaseGridFragment)frag).performRefresh(false); 
 			}
 			return true;
 		default:

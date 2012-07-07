@@ -273,10 +273,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			boolean condition = (getGridView().getAdapter() == null || getGridView().getAdapter().isEmpty()) && isShown;
 			getView().findViewById(android.R.id.empty).setVisibility(condition ? View.VISIBLE : View.GONE);
 		}
-		public void setProgressShown(boolean shown) {
-			if(getView() == null) return;
-			getView().findViewById(R.id.horizontalProgress).setVisibility((shown == true) ? View.VISIBLE : View.GONE);
-		}
 		public GridView getGridView() { 
 			if(getView() == null) return null;
 			return (GridView)getView().findViewById(android.R.id.list);
@@ -1454,7 +1450,9 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
 				@Override
 				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) performRefresh(true);
+					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+						performRefresh(true);
+					}
 					if(firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 						if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.nearby_str);
 						else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
@@ -1829,7 +1827,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void performRefresh(final boolean paginate) {
 			if(context == null || isLoading || adapt == null) return;	
 			isLoading = true;
-			setProgressShown(true);
 			if(getView() != null && adapt != null) {
 				adapt.setLastViewed(getGridView());
 				if(adapt.getCount() == 0) setListShown(false);
@@ -1877,7 +1874,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 					context.runOnUiThread(new Runnable() {
 						public void run() { 
-							setProgressShown(false);
 							isLoading = false;
 							setListShown(true);
 						}
