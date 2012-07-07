@@ -10,7 +10,6 @@ import com.handlerexploit.prime.widgets.RemoteImageView;
 
 import twitter4j.GeoLocation;
 import twitter4j.Place;
-import twitter4j.Status;
 import twitter4j.Tweet;
 
 import android.content.Context;
@@ -59,7 +58,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	public void setLastViewed(ListView list) {
 		if(list == null) return;
 		else if(getCount() == 0) return;
-		Status t = (Status)getItem(list.getFirstVisiblePosition());
+		Tweet t = (Tweet)getItem(list.getFirstVisiblePosition());
 		if(t == null) return;
 		lastViewedTweet = t.getId();
 		View v = list.getChildAt(0);
