@@ -175,21 +175,24 @@ public class Utilities {
 				if(curEntity.endsWith(".jpg") || curEntity.endsWith(".jpeg") || curEntity.endsWith(".png") || curEntity.endsWith(".bmp") || curEntity.endsWith(".gif") || curEntity.endsWith(".bmp")) {
 					found = curEntity;
 					break;
-				} else if(curEntity.startsWith("http://yfrog.com/") || curEntity.startsWith("https://yfrog.com/")) {
+				} else if(curEntity.contains("yfrog.com/")) {
 					found = curEntity + ":medium";
 					break;
-				} else if(curEntity.startsWith("http://twitpic.com/") || curEntity.startsWith("https://twitpic.com/")) {
+				} else if(curEntity.contains("twitpic.com/")) {
 					if(curEntity.contains("/show/")) found = curEntity;
 					else found = curEntity.replace("twitpic.com/", "twitpic.com/show/full/");
 					break;
-				} else if(curEntity.startsWith("http://instagr.am/p/") || curEntity.startsWith("https://instagr.am/p/")) {
-					found = "http://instagr.am/p/" + curEntity.substring(20);
+				} else if(curEntity.contains("instagr.am/p/")) {
+					found = "http://instagr.am/p/" + curEntity.replace("https://", "http://").substring(20);
 					if(!found.endsWith("/")) found += "/";
 					found += "media";
 					break;
-				} else if(curEntity.startsWith("http://img.ly/") || curEntity.startsWith("https://img.ly/")) {
+				} else if(curEntity.contains("img.ly/")) {
 					if(curEntity.contains("/show/")) found = curEntity;
-					else found = "http://img.ly/show/full/" + curEntity.substring(14);
+					else found = "http://img.ly/show/full/" + curEntity.replace("https://", "http://").substring(14);
+					break;
+				} else if(curEntity.contains("lockerz.com/") || curEntity.contains("plixi.com/")) {
+					found = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=" + curEntity + "&size=big";
 					break;
 				}
 			}
