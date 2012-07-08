@@ -77,7 +77,7 @@ public class MessageItemAdapter extends BaseAdapter {
 					}
 				});
 			}
-			profileImgView.setImageResource(R.drawable.silouette);
+			profileImgView.setImageResource(R.drawable.sillouette);
 			profileImgView.setImageURL(Utilities.getUserImage(curItem.getSenderScreenName(), context));
 		} else{
 			profileImgView.setVisibility(View.GONE);

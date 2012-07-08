@@ -157,7 +157,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		final Tweet tweet = tweets.get(position);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
-			profilePic.setImageResource(R.drawable.silouette);
+			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
 			profilePic.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) { 

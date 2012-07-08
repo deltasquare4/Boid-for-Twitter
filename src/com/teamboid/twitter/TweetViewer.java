@@ -27,10 +27,10 @@ import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.URLEntity;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,7 +38,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
@@ -54,7 +53,6 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -75,6 +73,7 @@ public class TweetViewer extends MapActivity {
 	private Status status;
 	private int lastTheme;
 	private String mediaUrl;
+	private boolean hasConvo;
 	
 	private FeedListAdapter binder;
 
@@ -93,7 +92,6 @@ public class TweetViewer extends MapActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tweet_view);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
 		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		ListView list = ((ListView)findViewById(android.R.id.list));
 		list.setAdapter(binder);
@@ -105,10 +103,6 @@ public class TweetViewer extends MapActivity {
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});       
-		((Button)findViewById(R.id.tweetViewConvoBtn)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) { sideNav.showNavigationView(); }
-		});
 		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
 			try{
 				statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));
@@ -157,7 +151,7 @@ public class TweetViewer extends MapActivity {
 		setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
 		RelativeLayout toReturn = (RelativeLayout)findViewById(R.id.tweetDisplay);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.tweetProfilePic);
-		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(screenName, this));
 		profilePic.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -232,13 +226,6 @@ public class TweetViewer extends MapActivity {
 			public void run() {
 				try {
 					if(tweet.getInReplyToStatusId() > 0) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								Button convoBtn = (Button)findViewById(R.id.tweetViewConvoBtn);
-								convoBtn.setEnabled(false);
-								convoBtn.setVisibility(View.VISIBLE);
-							}
-						});
 						final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
 						final ResponseList<Status> toAdd = res.getTweetsWithConversation();
 						boolean found = false;
@@ -261,7 +248,7 @@ public class TweetViewer extends MapActivity {
 								}
 							});
 						}
-					} else{
+					} else {
 						final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
 						sideNav.enabled = false;
 					}
@@ -274,9 +261,10 @@ public class TweetViewer extends MapActivity {
 					});
 				}
 				runOnUiThread(new Runnable() {
-					public void run() {
+					public void run() { 
 						showProgress(false);
-						((Button)findViewById(R.id.tweetViewConvoBtn)).setEnabled(true);
+						hasConvo = true;
+						invalidateOptionsMenu();
 					}
 				});
 			}
@@ -375,6 +363,10 @@ public class TweetViewer extends MapActivity {
 			fav.setTitle(R.string.unfavorite_str);
 			fav.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
 		} else fav.setTitle(R.string.favorite_str);
+		if(hasConvo) {
+			MenuItem convo = menu.findItem(R.id.viewConvoAction);
+			convo.setVisible(true);
+		}
 		return true;
 	}
 
@@ -402,8 +394,6 @@ public class TweetViewer extends MapActivity {
 		}).start();
 	}
 
-	@SuppressWarnings("deprecation")
-	@SuppressLint("NewApi")
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		String content = null;
@@ -554,17 +544,15 @@ public class TweetViewer extends MapActivity {
 			finish();
 			return true;
 		case R.id.copyAction:
-			if(Build.VERSION.SDK_INT < 9) {
-				//TODO REMOVE WHEN NO LONGER SUPPORTING PRE-ICS
-				//USE DEPRECATED CLIPBOARD API
-				android.text.ClipboardManager clipboard = (android.text.ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setText(content);
-			} else {
-				//USE THE LATEST CLIPBOARD API
-				android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", content));
-			}
+			ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+			clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", content));
 			Toast.makeText(getApplicationContext(), R.string.copied_str, Toast.LENGTH_SHORT).show();
+			return true;
+		case R.id.viewConvoAction:
+			SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
+			if(!sideNav.isShowingNavigationView()) {
+				((SideNavigationLayout)findViewById(R.id.slide)).showNavigationView();
+			} else ((SideNavigationLayout)findViewById(R.id.slide)).showContentView();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -632,7 +620,8 @@ public class TweetViewer extends MapActivity {
 		}).start();
 	}
 
-	Place place;
+	private Place place;
+	
 	private void displayLocation() {
 		if(status.getGeoLocation() == null && status.getPlace() == null) return;
 		final GeoLocation point = status.getGeoLocation();

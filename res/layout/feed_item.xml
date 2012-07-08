@@ -26,7 +26,7 @@
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/feedItemProfilePic" android:layout_width="50dp"
 		android:layout_height="50dp" android:layout_marginRight="10dp"
-		android:src="@drawable/silouette" />
+		android:src="@drawable/sillouette" />
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/feedItemRetweetIndicatorImg" android:layout_width="17dp"
 		android:layout_height="17dp" android:layout_marginRight="5dp"

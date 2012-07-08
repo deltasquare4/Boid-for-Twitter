@@ -94,7 +94,7 @@ public class SearchUsersListAdapter extends BaseAdapter {
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.user_list_item, null);
 		final User user = (User)getItem(position);	
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
-		profilePic.setImageResource(R.drawable.silouette);
+		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
 		((TextView)toReturn.findViewById(R.id.userItemName)).setText(user.getName());
 		if(user.getDescription() != null && !user.getDescription().trim().isEmpty()) {

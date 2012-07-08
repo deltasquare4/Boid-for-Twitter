@@ -6,7 +6,7 @@
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/userItemProfilePic" android:layout_width="50dp"
 		android:layout_height="50dp" android:layout_marginRight="10dp"
-		android:src="@drawable/silouette" />
+		android:src="@drawable/sillouette" />
 	<TextView android:id="@+id/userItemName" android:textColor="?usernameColor"
 		android:singleLine="true" android:layout_width="wrap_content"
 		android:layout_marginRight="10dp" android:layout_height="wrap_content"

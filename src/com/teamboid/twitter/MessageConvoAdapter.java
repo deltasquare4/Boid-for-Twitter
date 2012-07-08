@@ -159,7 +159,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 		final DMConversation curItem = items.get(position);
 		RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmConvoProfileImg);
 		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_profileimg_download", true)) {
-			profileImgView.setImageResource(R.drawable.silouette);
+			profileImgView.setImageResource(R.drawable.sillouette);
 			profileImgView.setImageURL(Utilities.getUserImage(curItem.getToScreenName(), context));
 			profileImgView.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) { 

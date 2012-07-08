@@ -130,7 +130,7 @@ public class SideNavigationLayout extends FrameLayout {
                     mShowingNavigation ? View.VISIBLE : View.GONE);
             if (wasShowingNavigation != mShowingNavigation) {
                 if (mListener != null) {
-                    if (mShowingNavigation) {
+                    if(mShowingNavigation) {
                         mListener.onShowNavigationView(this);
                     } else {
                         mListener.onShowContentView(this);

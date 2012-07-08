@@ -6,6 +6,4 @@
 	<color name="black">#000000</color>
 	<color name="blue">@android:color/holo_blue_dark</color>
 	<color name="blue_secondary">@android:color/holo_blue_light</color>
-
-	<color name="side_navigation_outside_background">#7000</color>
 </resources>

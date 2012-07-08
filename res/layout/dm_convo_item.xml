@@ -5,7 +5,7 @@
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/dmConvoProfileImg" android:layout_marginRight="10dp"
 		android:layout_width="55dp" android:layout_height="55dp"
-		android:src="@drawable/silouette" />
+		android:src="@drawable/sillouette" />
 	<TextView android:id="@+id/dmConvoScreenNameTxt"
 		android:textColor="?usernameColor" android:textStyle="bold"
 		android:textAppearance="?android:attr/textAppearanceSmall"

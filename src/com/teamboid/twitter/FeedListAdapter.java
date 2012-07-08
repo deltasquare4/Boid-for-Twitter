@@ -246,7 +246,7 @@ public class FeedListAdapter extends BaseAdapter {
 		} else userNameTxt.setText(tweet.getUser().getScreenName());
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
-			profilePic.setImageResource(R.drawable.silouette);
+			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
 			final Status fTweet = tweet;
 			profilePic.setOnClickListener(new View.OnClickListener() {
@@ -255,7 +255,7 @@ public class FeedListAdapter extends BaseAdapter {
 					.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
-		} else{
+		} else {
 			profilePic.setVisibility(View.GONE);
 		}
 		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 

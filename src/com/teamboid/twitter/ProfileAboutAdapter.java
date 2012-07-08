@@ -83,7 +83,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			if(convertView != null) toReturn = (RelativeLayout)convertView;
 			else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_about, null);
 			final RemoteImageView profileImg = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
-			profileImg.setImageResource(R.drawable.silouette);
+			profileImg.setImageResource(R.drawable.sillouette);
 			profileImg.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
 			((TextView)toReturn.findViewById(R.id.userItemName)).setText(user.getName());
 			TextView desc = (TextView)toReturn.findViewById(R.id.userItemDescription);
