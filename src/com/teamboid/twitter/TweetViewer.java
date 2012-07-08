@@ -242,6 +242,8 @@ public class TweetViewer extends MapActivity {
 						if(toAdd.size() > 0) {
 							runOnUiThread(new Runnable(){
 								public void run(){
+									hasConvo = true;
+									invalidateOptionsMenu();
 									binder.add(toAdd.toArray(new Status[]{}));
 									binder.notifyDataSetChanged();
 									((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
@@ -261,11 +263,7 @@ public class TweetViewer extends MapActivity {
 					});
 				}
 				runOnUiThread(new Runnable() {
-					public void run() { 
-						showProgress(false);
-						hasConvo = true;
-						invalidateOptionsMenu();
-					}
+					public void run() { showProgress(false); }
 				});
 			}
 		}).start();

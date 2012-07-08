@@ -115,8 +115,7 @@ public class SendTweetService extends Service {
 	}
 	public static void initialize(){
 		getInstance().loadTweets();
-		Intent update = new Intent(UPDATE_STATUS);
-    	getInstance().sendBroadcast(update);
+    	getInstance().sendBroadcast(new Intent(UPDATE_STATUS));
 	}
 	
 	public static void removeTweet(SendTweetTask tweet){

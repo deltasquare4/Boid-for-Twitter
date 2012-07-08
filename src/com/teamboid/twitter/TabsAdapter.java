@@ -382,11 +382,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -529,11 +530,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -675,11 +677,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									adapt.add(messages.toArray(new DirectMessage[0]));
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -806,11 +809,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									adapt.add(trends);
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -963,11 +967,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1095,11 +1100,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1229,11 +1235,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1366,11 +1373,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1550,11 +1558,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1697,11 +1706,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1864,10 +1874,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									}
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
-								public void run() { setEmptyText(context.getString(R.string.error_str)); }
+								public void run() { 
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								}
 							});
 						}
 						if(pageSkips <= 5) return;
@@ -2012,11 +2025,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									} else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -2145,11 +2159,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									adapt.setUser(user);
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
 								public void run() { 
 									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}

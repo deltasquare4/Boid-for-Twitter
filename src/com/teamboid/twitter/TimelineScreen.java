@@ -383,9 +383,7 @@ public class TimelineScreen extends Activity {
 				//TODO: Handle other URLs
 			}
 		}
-		Intent s = new Intent(this, SendTweetService.class);
-		s.setAction(SendTweetService.LOAD_TWEETS);
-		startService(s);
+		startService(new Intent(this, SendTweetService.class).setAction(SendTweetService.LOAD_TWEETS));
 	}
 
 	@Override
