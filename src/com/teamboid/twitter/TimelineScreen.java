@@ -171,6 +171,7 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	protected void onNewIntent (Intent intent){
+		Log.i("TIMELINE", "onNewIntent()");
 		if(AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
@@ -428,6 +429,7 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	public void onPause() {
+		Log.i("TIMELINE", "onPause()");
 		super.onPause();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().remove("last_profilepic_wipe").apply();
@@ -437,6 +439,7 @@ public class TimelineScreen extends Activity {
 	
 	@Override
 	public void onDestroy() {
+		Log.i("TIMELINE", "onDestroy()");
 		super.onDestroy();
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
@@ -483,6 +486,7 @@ public class TimelineScreen extends Activity {
 	}
 
 	private void addColumn(String id) {
+		Log.i("TIMELINE", "addColumn()");
 		if(AccountService.getAccounts().size() == 0) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
