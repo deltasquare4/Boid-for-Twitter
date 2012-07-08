@@ -426,16 +426,6 @@ public class TimelineScreen extends Activity {
 		filter.addAction(AccountManager.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
-
-	@Override
-	public void onPause() {
-		Log.i("TIMELINE", "onPause()");
-		super.onPause();
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		prefs.edit().remove("last_profilepic_wipe").apply();
-		CachingUtils.clearCache(this);
-		CachingUtils.clearMediaCache(this);
-	}
 	
 	@Override
 	public void onDestroy() {
