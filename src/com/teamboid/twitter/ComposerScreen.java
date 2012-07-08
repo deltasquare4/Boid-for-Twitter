@@ -44,8 +44,8 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class ComposerScreen extends Activity {
+	
 	private SendTweetTask stt = new SendTweetTask();
-
 	private int lastTheme;
 	private boolean shownLinksMessage;
 	
@@ -55,7 +55,7 @@ public class ComposerScreen extends Activity {
 	private void loadTask(){
 		final EditText content = (EditText)findViewById(R.id.tweetContent);
 		content.setText(stt.contents);
-		this.invalidateOptionsMenu();
+		invalidateOptionsMenu();
 		initializeAccountSwitcher(false);
 	}
 	
@@ -282,8 +282,8 @@ public class ComposerScreen extends Activity {
 			menu.findItem(R.id.sendAction).setEnabled(false);
 		} else menu.findItem(R.id.sendAction).setEnabled(true);
 		
-		findViewById(R.id.upload_with).setVisibility( stt.hasMedia() ? View.VISIBLE : View.GONE );
-		findViewById(R.id.upload_with_label).setVisibility( stt.hasMedia() ? View.VISIBLE : View.GONE );
+		findViewById(R.id.upload_with).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
+		findViewById(R.id.upload_with_label).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
 		return true;
 	}
 
@@ -322,12 +322,14 @@ public class ComposerScreen extends Activity {
 		case R.id.captureAction:
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
+				stt.attachedImageUri = null;
 				invalidateOptionsMenu();
 			} else captureImage();
 			return true;
 		case R.id.galleryAction:
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
+				stt.attachedImageUri = null;
 				invalidateOptionsMenu();
 			} else selectImage();
 			return true;
@@ -379,7 +381,7 @@ public class ComposerScreen extends Activity {
 		finish();
 	}
 	
-	Integer getFileSize(File in){
+	private Integer getFileSize(File in){
 		try{
 			FileInputStream fis = new FileInputStream(in);
 			int r = fis.available();

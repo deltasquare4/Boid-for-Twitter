@@ -29,19 +29,19 @@ import twitter4j.TwitterException;
  *
  */
 public class SendTweetTask {
-	public static HashMap<String, String> MEDIA_API_KEYS = new HashMap<String, String>();
 	
-	static{
+	public static HashMap<String, String> MEDIA_API_KEYS = new HashMap<String, String>();
+	static {
 		MEDIA_API_KEYS.put("plixi", "10b6f8fd-c373-44cb-bd35-bbeb61a199f3");
 		MEDIA_API_KEYS.put("twitpic", "458BDELY0594bdbc2776ba73ac25e8fc96a03c27");
 		MEDIA_API_KEYS.put("yfrog", "e1f3d4d1625ec410a79b573dbbfe0570");
 	}
 		
 	public static class Result{
+		
 		public static final int TWITLONGER_ERROR = -102;
 		public static final int WAITING = -101;
-		public static final int MEDIAIO_ERROR = -90;
-		
+		public static final int MEDIAIO_ERROR = -90;		
 		public boolean sent = false;
 		public int errorCode = WAITING;
 		
@@ -51,7 +51,7 @@ public class SendTweetTask {
 			out.putInt("errorCode", errorCode);
 			return out;
 		}
-		
+	
 		public static Result fromBundle(Bundle in){
 			Result r = new Result();
 			r.errorCode = in.getInt("errorCode");
@@ -59,9 +59,8 @@ public class SendTweetTask {
 			return r;
 		}
 	}
-	
 	public Result result = new Result();
-	
+
 	public String contents;
 	public Boolean twtlonger = false;
 	public GeoLocation location;
@@ -73,10 +72,7 @@ public class SendTweetTask {
 	public String mediaService;
 	
 	public Status tweet;
-	
-	// Used from Composer only
 	public boolean isGalleryImage = false;
-	
 	public boolean hasMedia(){
 		return attachedImageUri != null || attachedImage != null;
 	}
