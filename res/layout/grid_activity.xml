@@ -7,7 +7,7 @@
 		android:layout_height="wrap_content" android:layout_centerInParent="true" />
 	<GridView android:id="@android:id/list" android:layout_width="fill_parent"
 		android:smoothScrollbar="true" android:layout_height="fill_parent"
-		android:columnWidth="140dp" android:numColumns="auto_fit"
+		android:columnWidth="160dp" android:numColumns="auto_fit"
 		android:verticalSpacing="0dp" android:horizontalSpacing="0dp"
 		android:stretchMode="columnWidth" android:gravity="center" />
 	<TextView android:id="@android:id/empty" android:text="@string/no_media"

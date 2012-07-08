@@ -1848,7 +1848,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									if(!manualRefresh) setEmptyText(context.getString(R.string.no_media));
 									else setEmptyText(context.getString(R.string.manual_refresh_hint));
 									int beforeLast = adapt.getCount() - 1;
-									int addedCount = adapt.add(feed.toArray(new Status[0]), true);
+									int addedCount = adapt.add(feed.toArray(new Status[0]), true, MediaTimelineFragment.this);
 									if(addedCount > 0 || beforeLast > 0) {
 										pageSkips = 0;
 										if(getView() != null) {

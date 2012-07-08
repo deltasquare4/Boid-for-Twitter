@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,8 @@ import twitter4j.Status;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.handlerexploit.prime.utils.ImageManager;
+import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 
 /**
  * The list adapter used for the media timeline tab, displays tiles of pictures.
@@ -68,8 +70,8 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		}
 		return added;
 	}
-	public int add(Status[] toAdd) { return add(toAdd, false); }
-	public int add(Status[] toAdd, boolean filter) {
+	public int add(Status[] toAdd, BaseGridFragment frag) { return add(toAdd, false, frag); }
+	public int add(Status[] toAdd, boolean filter, BaseGridFragment frag) {
 		int toReturn = 0;
 		String[] fi = null;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -77,7 +79,10 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
 		for(Status tweet : toAdd) {
 			if(Utilities.getTweetYFrogTwitpicMedia(tweet) != null) {
-				if(add(tweet, fi)) toReturn++;
+				if(add(tweet, fi)) {
+					if(frag != null) frag.setListShown(true);
+					toReturn++;
+				}
 			}
 		}
 		return toReturn;
@@ -168,8 +173,19 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		RelativeLayout toReturn = null;
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.media_list_item, null);
-		RemoteImageView img = (RemoteImageView)toReturn.findViewById(R.id.mediaItemImage);
-		img.setImageURL(Utilities.getTweetYFrogTwitpicMedia(tweets.get(position)));
+		final ImageView img = (ImageView)toReturn.findViewById(R.id.mediaItemImage);
+		final ProgressBar prog = (ProgressBar)toReturn.findViewById(R.id.mediaItemProgress);
+		img.setVisibility(View.GONE);
+		prog.setVisibility(View.VISIBLE);
+		ImageManager downloader = ImageManager.getInstance(mContext);
+		downloader.get(Utilities.getTweetYFrogTwitpicMedia(tweets.get(position)), new ImageManager.OnImageReceivedListener() {
+			@Override
+			public void onImageReceived(String arg0, Bitmap image) {
+				prog.setVisibility(View.GONE);
+				img.setImageBitmap(image);
+				img.setVisibility(View.VISIBLE);
+			}
+		});
 		return toReturn;
 	}
 }

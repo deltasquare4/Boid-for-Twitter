@@ -93,7 +93,7 @@ public class Utilities {
 		Status[] before = null;
 		if(adapt.getCount() > 0) before = adapt.toArray();
 		adapt = new MediaFeedListAdapter(context, adapt.ID, adapt.account);
-		if(before != null) adapt.add(before, true);
+		if(before != null) adapt.add(before, true, null);
 		int index = 0;
 		for(MediaFeedListAdapter a : AccountService.mediaAdapters) {
 			if(a.ID.equals(adapt.ID) && a.account == adapt.account) {
