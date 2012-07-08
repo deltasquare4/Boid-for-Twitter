@@ -43,6 +43,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -77,6 +78,7 @@ public class TimelineScreen extends Activity {
 	public class SendTweetUpdater extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
+			Log.i("TIMELINE", "SendTweetUpdater.onReceive");
 			if(intent.getAction().equals(AccountManager.END_LOAD)) {
 				loadColumns(intent.getBooleanExtra("last_account_count", false), false);
 				accountsLoaded();
@@ -147,6 +149,7 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
+		Log.i("TIMELINE", "initialize()");
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
 		if(!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
@@ -162,6 +165,8 @@ public class TimelineScreen extends Activity {
 		ab.setDisplayShowHomeEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		startService(new Intent(this, AccountService.class));
+		AccountService.activity = this;
+		AccountService.loadTwitterConfig();
 	}
 
 	@Override
@@ -177,6 +182,7 @@ public class TimelineScreen extends Activity {
 	}
 
 	public void loadColumns(boolean firstLoad, boolean accountSwitched) {
+		Log.i("TIMELINE", "loadColumns()");
 		if(AccountService.getAccounts().size() == 0) {
 			return;
 		} else {
@@ -372,6 +378,7 @@ public class TimelineScreen extends Activity {
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
 	public void accountsLoaded(){
+		Log.i("TIMELINE", "accountsLoaded()");
 		if(Intent.ACTION_SEND.equals(getIntent().getAction())){
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
 			finish();
@@ -388,6 +395,7 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	public void onResume() {
+		Log.i("TIMELINE", "onResume");
 		super.onResume();
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
@@ -404,7 +412,6 @@ public class TimelineScreen extends Activity {
 			return;
 		}
 		AccountService.activity = this;
-		AccountService.loadTwitterConfig();
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
@@ -487,6 +494,7 @@ public class TimelineScreen extends Activity {
 	}
 
 	private Boolean performRefresh(){
+		Log.i("TIMELINE", "performRefresh()");
 		if(AccountService.getAccounts().size() == 0) return false;
 		Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
 		if(frag != null) {

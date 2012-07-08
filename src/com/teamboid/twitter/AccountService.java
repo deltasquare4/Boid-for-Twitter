@@ -191,8 +191,10 @@ public class AccountService extends Service {
 					@Override
 					public void run() {
 						if(getAccounts().size() > 0) {
-							selectedAccount = accounts.get(0).getId();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
+							if(getAccounts().size() != lastAccountCount) {
+								selectedAccount = accounts.get(0).getId();
+								activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
+							}
 						} else activity.startActivity(new Intent(activity, AccountManager.class));
 						activity.invalidateOptionsMenu();
 						dialog.dismiss();

@@ -123,6 +123,14 @@ public class TweetViewer extends MapActivity {
 	private TweetWidgetHostHelper twhh = new TweetWidgetHostHelper();
 
 	@Override
+	public void onBackPressed() {
+		SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
+		if(sideNav.isShowingNavigationView()) {
+			sideNav.showContentView();
+		} else super.onBackPressed();
+	}
+	
+	@Override
 	public void onResume() {
 		super.onResume();
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
@@ -549,8 +557,8 @@ public class TweetViewer extends MapActivity {
 		case R.id.viewConvoAction:
 			SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
 			if(!sideNav.isShowingNavigationView()) {
-				((SideNavigationLayout)findViewById(R.id.slide)).showNavigationView();
-			} else ((SideNavigationLayout)findViewById(R.id.slide)).showContentView();
+				sideNav.showNavigationView();
+			} else sideNav.showContentView();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
