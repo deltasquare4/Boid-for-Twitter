@@ -47,10 +47,20 @@ public class MutingListAdapter extends BaseAdapter {
 		return toReturn;
 	}
 	
-	private String[] loadKeywords() {
+	public String[] loadKeywords() {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
 		return Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
+	}
+	public void restorePreference(String[] keywords) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
+		ArrayList<String> cols = Utilities.jsonToArray(mContext, prefs.getString(prefName, ""));
+		for(String key : keywords) {
+			if(!cols.contains(key)) cols.add(key);
+		}
+		prefs.edit().putString(prefName, Utilities.arrayToJson(mContext, cols)).commit();
+		notifyDataSetChanged();
 	}
 	
 	public boolean add(String term) {
@@ -72,5 +82,12 @@ public class MutingListAdapter extends BaseAdapter {
 		ArrayList<String> cols = Utilities.jsonToArray(mContext, prefs.getString(prefName, ""));
 		for (int i : indicies) cols.remove(i);
 		prefs.edit().putString(prefName, Utilities.arrayToJson(mContext, cols)).commit();
+	}
+
+	public void clear() {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
+		prefs.edit().remove(prefName).commit();
+		notifyDataSetChanged();
 	}
 }

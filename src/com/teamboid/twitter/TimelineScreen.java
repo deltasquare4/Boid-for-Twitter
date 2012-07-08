@@ -487,7 +487,7 @@ public class TimelineScreen extends Activity {
 
 	}
 
-	private Boolean performRefresh(){
+	private Boolean performRefresh() {
 		Log.i("TIMELINE", "performRefresh()");
 		if(AccountService.getAccounts().size() == 0) return false;
 		Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));

@@ -1,8 +1,17 @@
 package com.teamboid.twitter;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import android.app.ListActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -161,8 +170,60 @@ public class MutingManager extends ListActivity {
 			setResult(600);
 			finish();
 			return true;
+		case R.id.backupBtn:
+			backup();
+			return true;
+		case R.id.restoreBtn:
+			restore();
+			return true;
+		case R.id.clearBtn:
+			adapt.clear();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public void backup() {
+		try {
+			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
+					Environment.getExternalStorageDirectory(), "Boid_MutingBackup.txt").getAbsolutePath()));
+			String[] toWrite = adapt.loadKeywords();
+			for(String key : toWrite) {
+				buf.write(key);
+				buf.newLine();
+			}
+			buf.flush();
+			buf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.backed_up_muting, Toast.LENGTH_SHORT).show();
+	}
+	public void restore() {
+		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_MutingBackup.txt");
+		if(!fi.exists()) {
+			Toast.makeText(getApplicationContext(), R.string.no_muting_backup, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		try {
+			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));
+			ArrayList<String> toAdd = new ArrayList<String>();
+			while(true) {
+				String line = buf.readLine();
+				if(line == null) break;
+				else if(line.isEmpty()) break;
+				toAdd.add(line);
+			}
+			adapt.restorePreference(toAdd.toArray(new String[0]));
+			buf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.restored_muting, Toast.LENGTH_SHORT).show();
 	}
 }

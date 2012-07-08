@@ -262,4 +262,11 @@
     <string name="reported_str">Successfully reported this user!</string>
     <string name="failed_block_str">Something happened while blocking this user!</string>
     <string name="failed_report_str">Something happened while reporting this user!</string>
+    
+    <string name="clear_str">Clear</string>
+    <string name="backup_str">Backup</string>
+    <string name="restore_str">Restore</string>
+    <string name="backed_up_muting">Your muting filters were successfully backed up!</string>
+    <string name="restored_muting">Your muting filters were successfully restored!</string>
+    <string name="no_muting_backup">No muting filters backup file was found!</string>
 </resources>
