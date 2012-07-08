@@ -247,12 +247,14 @@ public class TweetViewer extends MapActivity {
 							final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
 							toAdd.add(repliedTo);
 						}
+						toAdd.add(tweet);
+						toAdd.addAll(res.getTweetsWithReply());
 						if(toAdd.size() > 0) {
 							runOnUiThread(new Runnable(){
 								public void run(){
 									hasConvo = true;
 									invalidateOptionsMenu();
-									binder.add(toAdd.toArray(new Status[]{}));
+									binder.addInverted(toAdd.toArray(new Status[]{}));
 									binder.notifyDataSetChanged();
 									((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
 								}
