@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
@@ -148,14 +149,13 @@ public class AccountService extends Service {
 		}).start();
 	}
 
-	private static void loadAccounts() {
+	public static void loadAccounts() {
 		if(activity == null) return;
 		final Map<String, ?> accountStore = activity.getSharedPreferences("accounts", 0).getAll();
 		if(accountStore.size() == 0) {
 			activity.startActivity(new Intent(activity, AccountManager.class));			
 			return;
 		} else if(getAccounts().size() == accountStore.size()) return;
-		
 		if(!NetworkUtils.haveNetworkConnection(activity)) {
 			Toast.makeText(activity, activity.getString(R.string.no_internet), Toast.LENGTH_LONG).show();
 			return;
@@ -204,12 +204,13 @@ public class AccountService extends Service {
 		}).start();
 	}
 
-	public static void loadTwitterConfig() {
+	private static void loadTwitterConfig() {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		long lastConfigUpdate = prefs.getLong("last_config_update", new Date().getTime() - 86400000);
 		configShortURLLength = 21;
 		charactersPerMedia = 21;
 		if(lastConfigUpdate <= (new Date().getTime() - 86400000)) {
+			Log.i("BOID", "Loading Twitter config (this should only happen once every 24 hours)...");
 			new Thread(new Runnable() {
 				public void run() {
 					try {
@@ -231,13 +232,9 @@ public class AccountService extends Service {
 							}
 						});
 					}
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() { loadAccounts(); }
-					});
 				}
 			}).start();
-		} else loadAccounts();
+		}
 	}
 
 	public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account) {
@@ -324,6 +321,7 @@ public class AccountService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		accounts = new ArrayList<Account>();
+		loadTwitterConfig();
 	}
 
 	@Override
