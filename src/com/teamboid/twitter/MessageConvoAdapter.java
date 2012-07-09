@@ -172,7 +172,15 @@ public class MessageConvoAdapter extends BaseAdapter {
 		}
 		final TextView messageTxt = (TextView)toReturn.findViewById(R.id.dmConvoMessageTxt); 
 		if(curItem.getLastSenderIsMe()) {
-			((ImageView)toReturn.findViewById(R.id.dmConvoReplyIndicator)).setVisibility(View.VISIBLE);
+			ImageView replyIndic = (ImageView)toReturn.findViewById(R.id.dmConvoReplyIndicator);
+			replyIndic.setVisibility(View.VISIBLE);
+			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)replyIndic.getLayoutParams();
+			layoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.dmConvoProfileImg);
+			layoutParams.addRule(RelativeLayout.BELOW, R.id.dmConvoScreenNameTxt);
+			layoutParams = (RelativeLayout.LayoutParams)messageTxt.getLayoutParams();
+			layoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.dmConvoReplyIndicator);
+			layoutParams.addRule(RelativeLayout.BELOW, R.id.dmConvoScreenNameTxt);
+			messageTxt.setLayoutParams(layoutParams);
 		} else {
 			((ImageView)toReturn.findViewById(R.id.dmConvoReplyIndicator)).setVisibility(View.GONE);
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)messageTxt.getLayoutParams();
