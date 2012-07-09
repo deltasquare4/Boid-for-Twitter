@@ -253,7 +253,7 @@ public class FeedListAdapter extends BaseAdapter {
 		} else {
 			profilePic.setVisibility(View.GONE);
 		}
-		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
+		final TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
 		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
@@ -266,6 +266,7 @@ public class FeedListAdapter extends BaseAdapter {
 				mediaPreview.setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
 				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
+					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 35));
 					progress.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
