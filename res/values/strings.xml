@@ -270,4 +270,7 @@
     <string name="restored_muting">Your muting filters were successfully restored!</string>
     <string name="no_muting_backup">No muting filters backup file was found!</string>
     <string name="loading_str">Loading…</string>
+    
+    <string name="new_mention">1 new mention</string>
+    <string name="new_mentions">{x} new mentions</string>
 </resources>

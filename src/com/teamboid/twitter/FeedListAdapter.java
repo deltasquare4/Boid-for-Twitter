@@ -36,7 +36,7 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 
 	private ArrayList<Status> tweets;
-
+	
 	public Status getTweet(int at) { return tweets.get(at); }
 
 	private Activity mContext;
@@ -168,7 +168,7 @@ public class FeedListAdapter extends BaseAdapter {
 		}
 		return index;
 	}
-
+	
 	public Status[] toArray() {
 		ArrayList<Status> toReturn = new ArrayList<Status>();
 		for(Status t : tweets) toReturn.add(t);
