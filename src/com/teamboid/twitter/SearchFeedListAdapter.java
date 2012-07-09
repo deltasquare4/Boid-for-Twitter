@@ -187,7 +187,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 				mediaPreview.setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
 				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
-					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 35));
+					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30));
 					progress.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
