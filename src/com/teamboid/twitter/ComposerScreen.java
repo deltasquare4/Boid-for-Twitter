@@ -166,14 +166,17 @@ public class ComposerScreen extends Activity {
 					return true;
 				}
 			});
+			if(firstLoad == true){
+				stt.from = AccountService.getCurrentAccount();
+				loadDraft();
+			}
 			for(int i = 0; i < accs.size(); i++) {
 				if(accs.get(i).getId() == stt.from.getId()) {
 					getActionBar().setSelectedNavigationItem(i);
 					break;
 				}
 			}
-		}
-		if(firstLoad == true){
+		} else if(firstLoad == true){
 			stt.from = AccountService.getCurrentAccount();
 			loadDraft();
 		}
