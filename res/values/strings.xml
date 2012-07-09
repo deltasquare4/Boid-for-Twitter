@@ -269,4 +269,5 @@
     <string name="backed_up_muting">Your muting filters were successfully backed up!</string>
     <string name="restored_muting">Your muting filters were successfully restored!</string>
     <string name="no_muting_backup">No muting filters backup file was found!</string>
+    <string name="loading_str">Loading…</string>
 </resources>
