@@ -103,7 +103,6 @@
 	</string>
 
 	<string name="edit_profile_str">Edit Profile</string>
-	<string name="add_str">Add</string>
 	<string name="pin_column_str">Pin as Column</string>
 	<string name="in_reply_to">In reply to</string>
 	<string name="search_query_hint_str">Search Twitter</string>
