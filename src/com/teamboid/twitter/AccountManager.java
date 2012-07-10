@@ -1,14 +1,18 @@
 package com.teamboid.twitter;
 
+import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
+import twitter4j.conf.ConfigurationBuilder;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -114,6 +118,10 @@ public class AccountManager extends ListActivity {
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.accountmanager_actionbar, menu);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+		if(prefs.getBoolean("enable_ssl", false)) {
+			menu.findItem(R.id.toggleSslAction).setTitle(R.string.disable_ssl_str);
+		}
 		return true;
 	}
 
@@ -128,6 +136,23 @@ public class AccountManager extends ListActivity {
 			item.setEnabled(false);
 			startAuth();
 			item.setEnabled(true);
+			return true;
+		case R.id.toggleSslAction:
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+			boolean newValue = !prefs.getBoolean("enable_ssl", false);
+			prefs.edit().putBoolean("enable_ssl", newValue).commit();
+			int index = 0;
+			for(Account acc : AccountService.getAccounts()) {
+				ConfigurationBuilder cb = new ConfigurationBuilder().setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
+						.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
+						.setOAuthAccessToken(acc.getToken()).setOAuthAccessTokenSecret(acc.getSecret())
+						.setUseSSL(!newValue).setJSONStoreEnabled(true);
+				final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
+				acc.setClient(toAdd);
+				AccountService.setAccount(index, acc);
+				index++;
+			}
+			invalidateOptionsMenu();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

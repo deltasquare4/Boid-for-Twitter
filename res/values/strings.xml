@@ -273,4 +273,6 @@
     
     <string name="new_mention">1 new mention</string>
     <string name="new_mentions">{x} new mentions</string>
+    <string name="enable_ssl_str">Enable SSL</string>
+    <string name="disable_ssl_str">Disable SSL</string>
 </resources>
