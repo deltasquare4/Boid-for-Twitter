@@ -5,9 +5,11 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.ConfigurationBuilder;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -69,13 +71,13 @@ public class AccountManager extends ListActivity {
 		SwipeDismissListViewTouchListener touchListener =
 				new SwipeDismissListViewTouchListener(listView,
 						new SwipeDismissListViewTouchListener.OnDismissCallback() {
-							@Override
-							public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-								for (int i : reverseSortedPositions) {
-									AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
-									adapter.notifyDataSetChanged();
-								}
-							}
+					@Override
+					public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+						for (int i : reverseSortedPositions) {
+							AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
+							adapter.notifyDataSetChanged();
+						}
+					}
 				});
 		listView.setOnTouchListener(touchListener);
 		listView.setOnScrollListener(touchListener.makeScrollListener());
@@ -104,7 +106,7 @@ public class AccountManager extends ListActivity {
 		if(AccountService.getAccounts().size() == 0) return;
 		else finish();
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -138,21 +140,39 @@ public class AccountManager extends ListActivity {
 			item.setEnabled(true);
 			return true;
 		case R.id.toggleSslAction:
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
-			boolean newValue = !prefs.getBoolean("enable_ssl", false);
-			prefs.edit().putBoolean("enable_ssl", newValue).commit();
-			int index = 0;
-			for(Account acc : AccountService.getAccounts()) {
-				ConfigurationBuilder cb = new ConfigurationBuilder().setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
-						.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
-						.setOAuthAccessToken(acc.getToken()).setOAuthAccessTokenSecret(acc.getSecret())
-						.setUseSSL(!newValue).setJSONStoreEnabled(true);
-				final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
-				acc.setClient(toAdd);
-				AccountService.setAccount(index, acc);
-				index++;
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+			final boolean newValue = !prefs.getBoolean("enable_ssl", false);
+			if(newValue) {
+				final AlertDialog.Builder diag = new AlertDialog.Builder(AccountManager.this);
+				diag.setTitle(R.string.enable_ssl_str);
+				diag.setMessage(R.string.enable_ssl_confirm_str);
+				diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						prefs.edit().putBoolean("enable_ssl", newValue).commit();
+						invalidateOptionsMenu();
+						int index = 0;
+						for(Account acc : AccountService.getAccounts()) {
+							ConfigurationBuilder cb = new ConfigurationBuilder().setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
+									.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
+									.setOAuthAccessToken(acc.getToken()).setOAuthAccessTokenSecret(acc.getSecret())
+									.setUseSSL(!newValue).setJSONStoreEnabled(true);
+							final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
+							acc.setClient(toAdd);
+							AccountService.setAccount(index, acc);
+							index++;
+						}
+					}
+				});
+				diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+				});
+				diag.create().show();
+			} else {
+				prefs.edit().putBoolean("enable_ssl", newValue).commit();
+				invalidateOptionsMenu();
 			}
-			invalidateOptionsMenu();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -177,7 +197,7 @@ public class AccountManager extends ListActivity {
 			}
 		}).start();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
