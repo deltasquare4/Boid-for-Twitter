@@ -18,9 +18,6 @@ public class MultiAPIMethods {
 	public final static int MENTION_NOTIFICATION_ID = 100;
 	public final static int MESSAGE_NOTIFICATION_ID = 200;
 	
-	private static Notification mentionNotify;
-	private static Notification messageNotify;
-	
 	public static void showNotification(final Status s, final Context context) {
 		String imageURL = s.getUser().getProfileImageURL().toString();
 		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
@@ -33,22 +30,9 @@ public class MultiAPIMethods {
 	
 	private static void displayNotification(final Context context, final Status s, final Bitmap profileImg) {
 		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-		if(Build.VERSION.SDK_INT < 16) {
-			//TODO ICE CREAM SANDWICH old style notification
-			Notification.Builder nb = 
-					new Notification.Builder(context)
-					.setContentTitle(s.getUser().getScreenName())
-					.setContentText(s.getText())
-					.setLargeIcon(profileImg)
-					.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), 0))
-					.setAutoCancel(true)
-					.setSmallIcon(R.drawable.statusbar_icon)
-					.setTicker(s.getText());
-			//TODO REMOVE USE OF SR_TWEET EXTRA
-			nm.notify(MENTION_NOTIFICATION_ID, nb.build());
-		} else {
-			//TODO JELLYBEAN expandable notification
-			final Notification.Builder nb = new Notification.Builder(context)
+		
+		final Notification.Builder nb = 
+				new Notification.Builder(context)
 				.setContentTitle(s.getUser().getScreenName())
 				.setContentText(s.getText())
 				.setLargeIcon(profileImg)
@@ -56,6 +40,9 @@ public class MultiAPIMethods {
 				.setAutoCancel(true)
 				.setSmallIcon(R.drawable.statusbar_icon)
 				.setTicker(s.getText());
+		
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			//TODO JELLYBEAN expandable notification
 			String media = Utilities.getTweetYFrogTwitpicMedia(s);
 			if(media != null && !media.isEmpty()) {
 				ImageManager.getInstance(context).get(media, new ImageManager.OnImageReceivedListener() {

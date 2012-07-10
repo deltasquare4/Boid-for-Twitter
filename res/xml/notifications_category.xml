@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<SwitchPreference android:key="c2dm" android:enabled="false"
+	<SwitchPreference android:key="c2dm" android:enabled="true"
 		android:layout="@layout/boid_preference" android:summary="@string/enable_push"
 		android:title="@string/push_title" android:persistent="false" />
 	<SwitchPreference android:key="c2dm_mentions"
-		android:enabled="false" android:layout="@layout/boid_preference"
+		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 		android:persistent="true" />
 	<SwitchPreference android:key="c2dm_messages"
-		android:enabled="false" android:layout="@layout/boid_preference"
+		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
 		android:persistent="true" />
 	<SwitchPreference android:key="c2dm_vibrate"
-		android:enabled="false" android:layout="@layout/boid_preference"
+		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/vibrate_str_desc" android:title="@string/vibrate_str"
 		android:persistent="true" />
 	<ListPreference android:key="c2dm_ringtone"
-		android:enabled="false" android:summary="@string/ringtone_str_desc"
+		android:enabled="true" android:summary="@string/ringtone_str_desc"
 		android:title="@string/ringtone_str" android:persistent="true" />
 </PreferenceScreen>
