@@ -80,8 +80,8 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		RelativeLayout toReturn = null;
 		if(position == 0) {
-			if(convertView != null) toReturn = (RelativeLayout)convertView;
-			else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_about, null);
+			//Can't recycle here, causes crashing
+			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_about, null);
 			final RemoteImageView profileImg = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
 			profileImg.setImageResource(R.drawable.sillouette);
 			profileImg.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
@@ -255,8 +255,8 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			}
 		} else {
 			BasicNameValuePair curItem = values.get(position - 1);
-			if(convertView != null) toReturn = (RelativeLayout)convertView;
-			else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
+			//Can't recycle here, causes crashing
+			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
 			((TextView)toReturn.findViewById(R.id.infoListItemTitle)).setText(curItem.getName());
 			((TextView)toReturn.findViewById(R.id.infoListItemBody)).setText(curItem.getValue());
 		}
