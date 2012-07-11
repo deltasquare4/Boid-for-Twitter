@@ -68,6 +68,7 @@ public class PushReceiver extends BroadcastReceiver {
 							Log.d("push", "REGISTERED");
 						}
 						urlConnection.disconnect();
+						settingUp = false;
 					}catch(Exception e){ e.printStackTrace(); }
 				}
 				
@@ -78,6 +79,7 @@ public class PushReceiver extends BroadcastReceiver {
 					JSONObject status = new JSONObject(b.getString("tweet"));
 					twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
 					//TODO The account the mention is for should be passed from the server too
+					// We have this now in "account" as a string
 					//Also, we need a way of combining multiple mentions/messages into one notification.
 					Api11.displayNotification(PushWorker.this, s);
 				} catch(Exception e) {
@@ -87,6 +89,8 @@ public class PushReceiver extends BroadcastReceiver {
 			return Service.START_NOT_STICKY;
 		}
 	}
+	
+	public static boolean settingUp = false;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -104,6 +108,9 @@ public class PushReceiver extends BroadcastReceiver {
 	}
 
 	private void handleRegistration(Context context, Intent intent) {
+		if(settingUp == true) return; // Don't double-register
+		settingUp = true;
+		
 		Log.d("boidpush", "REGISTER");
 		String registration = intent.getStringExtra("registration_id"); 
 	    if (intent.getStringExtra("error") != null) {
