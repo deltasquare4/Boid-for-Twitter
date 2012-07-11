@@ -24,11 +24,17 @@ public class UserListDisplayAdapter extends BaseAdapter {
 	private ArrayList<UserList> lists;
 	
 	public void add(UserList list) {
-		lists.add(list);
+		if(!contains(list)) lists.add(list);
 		notifyDataSetChanged();
 	}
 	public void add(UserList[] lists) {
 		for(UserList l : lists) add(l);
+	}
+	public boolean contains(UserList list)  {
+		for(int i = 0; i < lists.size(); i++) {
+			if(lists.get(i).getId() == list.getId()) return true;
+		}
+		return false;
 	}
 	public void remove(int index) {
 		lists.remove(index);
