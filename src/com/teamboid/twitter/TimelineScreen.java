@@ -166,6 +166,7 @@ public class TimelineScreen extends Activity {
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		startService(new Intent(this, AccountService.class));
 		AccountService.activity = this;
+		AccountService.loadTwitterConfig(this);
 		AccountService.loadAccounts();
 	}
 

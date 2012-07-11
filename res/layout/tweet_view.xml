@@ -51,7 +51,7 @@
 						android:layout_width="fill_parent" android:layout_height="wrap_content"
 						android:layout_below="@+id/tweetTimer" android:visibility="invisible">
 						<ImageView android:id="@+id/tweetMedia"
-							android:scaleType="centerCrop" android:adjustViewBounds="true"
+							android:scaleType="fitXY" android:adjustViewBounds="true"
 							android:visibility="gone" android:layout_marginTop="10dp"
 							android:layout_width="fill_parent" android:layout_height="wrap_content" />
 						<ProgressBar android:id="@+id/tweetMediaProgress"

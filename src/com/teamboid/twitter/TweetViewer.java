@@ -285,7 +285,8 @@ public class TweetViewer extends MapActivity {
 		isFavorited = status.isFavorited();
 		if(status.isRetweet()) status = status.getRetweetedStatus();
 		RemoteImageView profilePic = (RemoteImageView)findViewById(R.id.tweetProfilePic);
-		profilePic.setImageURL( Utilities.getUserImage(tweet.getUser().getScreenName(), this) );
+		profilePic.setImageResource(R.drawable.sillouette);
+		profilePic.setImageURL(Utilities.getUserImage(status.getUser().getScreenName(), this));
 		profilePic.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { 

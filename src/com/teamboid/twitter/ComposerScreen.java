@@ -150,30 +150,35 @@ public class ComposerScreen extends Activity {
 	private void initializeAccountSwitcher(boolean firstLoad) {
 		ActionBar ab = getActionBar(); 
 		ab.setDisplayHomeAsUpEnabled(true);
-		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		ab.setDisplayShowTitleEnabled(false);
-		final ArrayList<Account> accs = AccountService.getAccounts();
-		ArrayList<String> screenNames = new ArrayList<String>();
-		for(Account a : accs) screenNames.add("@" + a.getUser().getScreenName());
-		ArrayAdapter<String> adapt = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, screenNames);
-		adapt.setDropDownViewResource(R.layout.spinner_item_actionbar);
-		ab.setListNavigationCallbacks(adapt, new OnNavigationListener() {
-			@Override
-			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-				stt.from = accs.get(itemPosition);
+		if(AccountService.getAccounts().size() > 1) {
+			ab.setDisplayShowTitleEnabled(false);
+			ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			final ArrayList<Account> accs = AccountService.getAccounts();
+			ArrayList<String> screenNames = new ArrayList<String>();
+			for(Account a : accs) screenNames.add("@" + a.getUser().getScreenName());
+			ArrayAdapter<String> adapt = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, screenNames);
+			adapt.setDropDownViewResource(R.layout.spinner_item_actionbar);
+			ab.setListNavigationCallbacks(adapt, new OnNavigationListener() {
+				@Override
+				public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+					stt.from = accs.get(itemPosition);
+					loadDraft();
+					return true;
+				}
+			});
+			if(firstLoad == true){
+				stt.from = AccountService.getCurrentAccount();
 				loadDraft();
-				return true;
 			}
-		});
-		if(firstLoad == true){
+			for(int i = 0; i < accs.size(); i++) {
+				if(accs.get(i).getId() == stt.from.getId()) {
+					getActionBar().setSelectedNavigationItem(i);
+					break;
+				}
+			}
+		} else if(firstLoad == true){
 			stt.from = AccountService.getCurrentAccount();
 			loadDraft();
-		}
-		for(int i = 0; i < accs.size(); i++) {
-			if(accs.get(i).getId() == stt.from.getId()) {
-				getActionBar().setSelectedNavigationItem(i);
-				break;
-			}
 		}
 	}
 

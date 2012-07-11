@@ -412,7 +412,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) {
 					adapt.restoreLastViewed(getListView());
-					filter();
 				}
 			}
 		}
@@ -574,10 +573,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class MessagesFragment extends BaseListFragment {
@@ -720,10 +716,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class TrendsFragment extends BaseSpinnerFragment {
@@ -849,10 +842,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 
 		private void getLocation() {
 			if(isGettingLocation) return;
@@ -896,7 +886,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 		
 		@Override
-		public void onStart() {			
+		public void onStart() {
 			super.onStart();
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
@@ -1011,10 +1001,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class SearchTweetsFragment extends BaseListFragment {
@@ -1142,10 +1129,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class SearchUsersFragment extends BaseListFragment {
@@ -1280,10 +1264,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class SavedSearchFragment extends BaseListFragment {
@@ -1418,10 +1399,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class NearbyFragment extends BaseSpinnerFragment {
@@ -1449,7 +1427,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
 					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1751,10 +1729,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 
 	public static class MediaTimelineFragment extends BaseGridFragment {
@@ -2200,9 +2175,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public void filter() {
-			// TODO Auto-generated method stub
-
-		}
+		public void filter() { }
 	}
 }

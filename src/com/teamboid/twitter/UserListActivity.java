@@ -8,6 +8,7 @@ import twitter4j.TwitterException;
 import twitter4j.User;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -28,16 +29,24 @@ public class UserListActivity extends ListActivity {
 	private ArrayList<Long> ids;
 	private boolean allowPagination = true;
 	private SearchUsersListAdapter binder;
+	private ProgressDialog progDialog;
 
 	public void showProgress(boolean visible) {
-		if(showProgress == visible) return;
-		if(binder.isEmpty() && visible) {
-			findViewById(android.R.id.progress).setVisibility(View.VISIBLE);
-			findViewById(android.R.id.empty).setVisibility(View.GONE);
-		} else findViewById(android.R.id.progress).setVisibility(View.GONE);
-		showProgress = visible;
-		setProgressBarIndeterminateVisibility(visible);
-		findViewById(R.id.horizontalProgress).setVisibility((visible == true) ? View.VISIBLE : View.GONE);
+		if(showProgress == visible && progDialog != null) {
+			return;
+		}
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() { 
+				if(showProgress) {
+					progDialog.dismiss();
+					showProgress = false;
+				} else {
+					progDialog = ProgressDialog.show(UserListActivity.this, "", getString(R.string.loading_str), true);
+					showProgress = true;
+				}
+			}
+		});
 	}
 
 	@Override

@@ -204,8 +204,8 @@ public class AccountService extends Service {
 		}).start();
 	}
 
-	private static void loadTwitterConfig() {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+	public static void loadTwitterConfig(final Activity context) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		long lastConfigUpdate = prefs.getLong("last_config_update", new Date().getTime() - 86400000);
 		configShortURLLength = 21;
 		charactersPerMedia = 21;
@@ -225,10 +225,10 @@ public class AccountService extends Service {
 						e.printStackTrace();
 						configShortURLLength = 21;
 						charactersPerMedia = 21;
-						activity.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() { 
-								Toast.makeText(activity, activity.getString(R.string.failed_fetch_config).replace("{reason}", e.getErrorMessage()), Toast.LENGTH_LONG).show();
+								Toast.makeText(context, context.getString(R.string.failed_fetch_config).replace("{reason}", e.getErrorMessage()), Toast.LENGTH_LONG).show();
 							}
 						});
 					}
@@ -321,7 +321,6 @@ public class AccountService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		accounts = new ArrayList<Account>();
-		loadTwitterConfig();
 	}
 
 	@Override

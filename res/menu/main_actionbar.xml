@@ -3,7 +3,7 @@
 	<item android:id="@+id/newTweetAction" android:title="@string/new_tweet_str"
 		android:icon="?newTweetIcon" android:showAsAction="always" />
 	<item android:id="@+id/accountSwitcher" android:showAsAction="always"
-		android:title="@string/switch_accounts" android:icon="?accountSwitchIcon">
+		android:title="@string/switch_accounts">
 		<menu />
 	</item>
 	<item android:id="@+id/searchAction" android:title="@string/search_str"

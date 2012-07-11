@@ -27,8 +27,8 @@ public class MultiAPIMethods {
 			}
 		});
 	}
-	
-	private static void displayNotification(final Context context, final Status s, final Bitmap profileImg) {
+
+	private static void displayNotification(final Context context, final twitter4j.Status s, final Bitmap profileImg) {
 		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		final Notification.Builder nb = 

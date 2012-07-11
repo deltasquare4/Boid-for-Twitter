@@ -36,7 +36,7 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 
 	private ArrayList<Status> tweets;
-
+	
 	public Status getTweet(int at) { return tweets.get(at); }
 
 	private Activity mContext;
@@ -168,7 +168,7 @@ public class FeedListAdapter extends BaseAdapter {
 		}
 		return index;
 	}
-
+	
 	public Status[] toArray() {
 		ArrayList<Status> toReturn = new ArrayList<Status>();
 		for(Status t : tweets) toReturn.add(t);
@@ -253,7 +253,7 @@ public class FeedListAdapter extends BaseAdapter {
 		} else {
 			profilePic.setVisibility(View.GONE);
 		}
-		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
+		final TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
 		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
@@ -261,11 +261,15 @@ public class FeedListAdapter extends BaseAdapter {
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, R.id.feedItemMediaFrame);
+				itemTxt.setLayoutParams(params);
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
 				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
 				mediaPreview.setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
 				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
+					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30));
 					progress.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
