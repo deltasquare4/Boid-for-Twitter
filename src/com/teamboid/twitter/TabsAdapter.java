@@ -2220,15 +2220,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
 							for(final int pos : reverseSortedPositions) {
 								new Thread(new Runnable() {
-									public void run() {
-										try { AccountService.getCurrentAccount().getClient().destroyUserList(adapt.getListId(pos)); }
-										catch(final TwitterException e) {
-											e.printStackTrace();
-											context.runOnUiThread(new Runnable() {
-												public void run() { Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
-											});
-										}
-									}
+									public void run() { adapt.destroyOrUnsubscribe(pos); }
 								}).start();
 								adapt.remove(pos);
 							}

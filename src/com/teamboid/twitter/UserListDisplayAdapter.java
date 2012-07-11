@@ -2,23 +2,25 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import twitter4j.TwitterException;
 import twitter4j.UserList;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class UserListDisplayAdapter extends BaseAdapter {
 
-	public UserListDisplayAdapter(Context context) {
+	public UserListDisplayAdapter(Activity context) {
 		mContext = context;
 		lists = new ArrayList<UserList>();
 	}
 	
-	private Context mContext;
+	private Activity mContext;
 	private ArrayList<UserList> lists;
 	
 	public void add(UserList list) {
@@ -59,5 +61,51 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		return toReturn;
 	}
 
+	public void destroyOrUnsubscribe(final int pos) {
+		if(lists.get(pos).getUser().getId() == AccountService.getCurrentAccount().getId()) {
+			final Toast toast = Toast.makeText(mContext, R.string.deleting_list_str, Toast.LENGTH_LONG);
+			toast.show();
+			try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
+			catch(final TwitterException e) {
+				e.printStackTrace();
+				mContext.runOnUiThread(new Runnable() {
+					public void run() {
+						toast.cancel();
+						Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+					}
+				});
+				return;
+			}
+			mContext.runOnUiThread(new Runnable() {
+				public void run() { 
+					toast.cancel();
+					Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_LONG).show();
+					remove(pos);
+				}
+			});
+		} else {
+			final Toast toast = Toast.makeText(mContext, R.string.unsubscribing_list_str, Toast.LENGTH_LONG);
+			toast.show();
+			try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
+			catch(final TwitterException e) {
+				e.printStackTrace();
+				mContext.runOnUiThread(new Runnable() {
+					public void run() {
+						toast.cancel();
+						Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+					}
+				});
+				return;
+			}
+			mContext.runOnUiThread(new Runnable() {
+				public void run() { 
+					toast.cancel();
+					Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_LONG).show();
+					remove(pos);
+				}
+			});
+		}
+	}
+	
 	public UserList[] toArray() { return lists.toArray(new UserList[0]); }
 }
