@@ -35,7 +35,7 @@
 		
 		<item name="pinIcon">@drawable/pin_dark</item>
 		<item name="addAccountIcon">@drawable/add_account_dark</item>
-		<item name="newTweetIcon">@drawable/compose_dark</item>
+		<item name="newTweetIcon">@drawable/new_tweet_action_dark</item>
 		<item name="searchIcon">@drawable/search_dark</item>
 		<item name="addIcon">@drawable/add_action_dark</item>
         <item name="removeIcon">@drawable/remove_action_dark</item>
