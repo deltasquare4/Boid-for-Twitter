@@ -44,7 +44,7 @@ public class Api11 {
 						.setContentTitle(s.getUser().getScreenName())
 						.setContentText(s.getText())
 						.setLargeIcon(profileImg)
-						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), 0))
+						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), PendingIntent.FLAG_ONE_SHOT))
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(s.getText());
