@@ -292,6 +292,7 @@ public class TimelineScreen extends Activity {
 				if(iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
 					toAdd.setIcon(icon);
+					if(prefs.getBoolean("textual_userlist_tabs", true)) toAdd.setText(R.string.my_lists_str);
 				}
 				else toAdd.setText(R.string.my_lists_str);
 				mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
@@ -328,6 +329,11 @@ public class TimelineScreen extends Activity {
 			} 
 		}
 		if(AccountService.trendsAdapter != null) AccountService.trendsAdapter = new TrendsListAdapter(this);
+		if(AccountService.myListsAdapter != null) {
+			UserList[] before = AccountService.myListsAdapter.toArray(); 
+			AccountService.myListsAdapter = new UserListDisplayAdapter(this);
+			AccountService.myListsAdapter.add(before);
+		}
 		if(AccountService.searchFeedAdapters != null) {
 			for(int i = 0; i < AccountService.searchFeedAdapters.size(); i++) {
 				Utilities.recreateSearchAdapter(this, AccountService.searchFeedAdapters.get(i));
