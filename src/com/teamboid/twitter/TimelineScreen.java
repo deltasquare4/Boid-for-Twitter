@@ -17,6 +17,7 @@ import com.teamboid.twitter.TabsAdapter.FavoritesFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.MentionsFragment;
 import com.teamboid.twitter.TabsAdapter.MessagesFragment;
+import com.teamboid.twitter.TabsAdapter.MyListsFragment;
 import com.teamboid.twitter.TabsAdapter.NearbyFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 import com.teamboid.twitter.TabsAdapter.TimelineFragment;
@@ -286,6 +287,14 @@ public class TimelineScreen extends Activity {
 				}
 				else toAdd.setText(R.string.media_title);
 				mTabsAdapter.addTab(toAdd, MediaTimelineFragment.class, index);
+			} else if(c.equals(MyListsFragment.ID)) {
+				Tab toAdd = getActionBar().newTab();
+				if(iconic) {
+					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
+					toAdd.setIcon(icon);
+				}
+				else toAdd.setText(R.string.my_lists_str);
+				mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
 			}
 			index++;
 		}
@@ -587,6 +596,9 @@ public class TimelineScreen extends Activity {
 					}
 				}
 			}).start();
+			return true;
+		case R.id.addMyListsColAction:
+			addColumn(MyListsFragment.ID);
 			return true;
 		default:
 			for(int i = 0; i < getActionBar().getTabCount(); i++) {

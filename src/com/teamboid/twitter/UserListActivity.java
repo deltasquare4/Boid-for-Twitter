@@ -31,13 +31,14 @@ public class UserListActivity extends ListActivity {
 	private SearchUsersListAdapter binder;
 	private ProgressDialog progDialog;
 
-	public void showProgress(boolean visible) {
+	public void showProgress(final boolean visible) {
 		if(showProgress == visible && progDialog != null) {
 			return;
 		}
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() { 
+				setProgressBarIndeterminateVisibility(visible);
 				if(showProgress) {
 					progDialog.dismiss();
 					showProgress = false;
@@ -76,9 +77,10 @@ public class UserListActivity extends ListActivity {
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) paginate();
+				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) paginate();
 			}
 		});
+		setProgressBarIndeterminateVisibility(false);
 	}
 
 	public void paginate() {

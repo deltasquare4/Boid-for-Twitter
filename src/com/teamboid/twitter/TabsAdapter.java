@@ -18,6 +18,7 @@ import twitter4j.Trends;
 import twitter4j.Tweet;
 import twitter4j.TwitterException;
 import twitter4j.User;
+import twitter4j.UserList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -2166,6 +2167,118 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void savePosition() { }
 		
+		@Override
+		public void restorePosition() { }
+
+		@Override
+		public void jumpTop() {
+			if(getView() != null) getListView().setSelectionFromTop(0, 0);
+		}
+
+		@Override
+		public void filter() { }
+	}
+
+	public static class MyListsFragment extends BaseListFragment {
+
+		private ImprovedArrayAdapter<String> adapt;
+		private ResponseList<UserList> lists;
+		private Activity context;
+		public static final String ID = "COLUMNTYPE:MYLISTS";
+
+		@Override
+		public void onAttach(Activity act) {
+			super.onAttach(act);
+			context = (Activity)act;
+		}
+
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			final UserList curList = lists.get(position);
+			Intent intent = new Intent(context, TweetListActivity.class)
+				.putExtra("mode", TweetListActivity.USER_LIST)
+				.putExtra("list_name", curList.getName())
+				.putExtra("list_ID", curList.getId());
+			context.startActivity(intent);
+		}
+		
+		@Override
+		public void onStart() {
+			super.onStart();
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+					Toast.makeText(context, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
+					return false;
+				}
+			});
+			setRetainInstance(true);
+			setEmptyText(getString(R.string.no_tweets));
+			reloadAdapter(true);
+		}
+
+		@Override
+		public void performRefresh(final boolean paginate) {
+			if(context == null || isLoading || adapt == null) return;
+			isLoading = true;
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
+			new Thread(new Runnable() {
+				public void run() {
+					Paging paging = new Paging(1, 50);
+					if(paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+					final Account acc = AccountService.getCurrentAccount();
+					if(acc != null) {
+						try {
+							lists = acc.getClient().getAllUserLists(acc.getId());
+							context.runOnUiThread(new Runnable() {
+								public void run() {
+									setEmptyText(context.getString(R.string.no_lists));
+									for(UserList l : lists) {
+										if(!adapt.contains(l.getFullName())) {
+											adapt.add(l.getFullName());
+											adapt.notifyDataSetChanged();
+										}
+									}
+								}
+							});
+						} catch(final TwitterException e) {
+							e.printStackTrace();
+							context.runOnUiThread(new Runnable() {
+								public void run() { 
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								}
+							});
+						}
+					}
+					context.runOnUiThread(new Runnable() {
+						public void run() { 
+							if(getView() != null) setListShown(true);
+							isLoading = false;
+						}
+					});
+				}
+			}).start();
+		}
+
+		@Override
+		public void reloadAdapter(boolean firstInitialize) {
+			if(context == null && getActivity() != null) context = (Activity)getActivity();
+			if(AccountService.getCurrentAccount() != null) {
+				ArrayList<String> before = new ArrayList<String>();
+				if(adapt != null) {
+					for(int i = 0; i < adapt.getCount(); i++) before.add(adapt.getItem(i));
+				}
+				adapt = new ImprovedArrayAdapter<String>(context, R.layout.trends_list_item);
+				setListAdapter(adapt);
+				if(adapt.getCount() == 0) performRefresh(false);
+			}
+		}
+		
+		@Override
+		public void savePosition() { }
+
 		@Override
 		public void restorePosition() { }
 

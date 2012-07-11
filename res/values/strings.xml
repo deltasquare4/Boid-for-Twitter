@@ -332,4 +332,5 @@
 	<string name="enable_ssl_confirm_str">Are you sure you want to enable SSL? Doing so can
 		slow down Boid, but it\'s useful when you\'re on a public network or in
 		a country that requires it to use Twitter.</string>
+	<string name="my_lists_str">My Lists</string>
 </resources>
