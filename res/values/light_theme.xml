@@ -18,7 +18,10 @@
 		<item name="settingsIcon">@drawable/settings_dark</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_dark</item>
 		<item name="sideNavColor">#DDDDDD</item>
-		
+
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+    	<item name="android:actionBarTabStyle">@style/customTabStyle</item>
+				
 		<item name="timelineTab">@drawable/home_tab_dark</item>
 		<item name="mentionsTab">@drawable/mentions_tab_dark</item>
 		<item name="messagesTab">@drawable/messages_tab_dark</item>
@@ -32,7 +35,7 @@
 		
 		<item name="pinIcon">@drawable/pin_dark</item>
 		<item name="addAccountIcon">@drawable/add_account_dark</item>
-		<item name="newTweetIcon">@drawable/new_tweet_action_dark</item>
+		<item name="newTweetIcon">@drawable/compose_dark</item>
 		<item name="searchIcon">@drawable/search_dark</item>
 		<item name="addIcon">@drawable/add_action_dark</item>
         <item name="removeIcon">@drawable/remove_action_dark</item>
@@ -65,9 +68,22 @@
 		<item name="locationAttachedIcon">@drawable/locate_blue</item>
 		<item name="locationDetachedIcon">@drawable/locate_dark</item>
 	</style>
+	
 	<style name="DropDownNav.Light.Text"
 		parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem">
 		<item name="android:textColor">@color/black</item>
 		<item name="android:textSize">24dip</item>
 	</style>
+	<style name="customTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
+    	<item name="android:showDividers">none</item>
+    	<item name="android:measureWithLargestChild">true</item>
+    	<!-- <item name="android:background">@drawable/tab_line</item> -->
+    	<item name="android:gravity">center</item>
+	</style>
+	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
+    	<item name="android:showDividers">middle</item>
+    	<!--  <item name="android:divider">@drawable/divider</item> -->
+    	<item name="android:dividerPadding">15dp</item>
+    	<!-- <item name="android:background">@drawable/tab_unselected</item> -->
+</style>
 </resources>

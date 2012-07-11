@@ -114,13 +114,13 @@ public class Utilities {
 
 	public static int getTheme(Context context) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		final String curTheme = prefs.getString("boid_theme", "1");
+		final String curTheme = prefs.getString("boid_theme", "0");
 		switch(Integer.parseInt(curTheme)) {
 		default:
-			prefs.edit().putString("boid_theme", "1").commit();
-			return R.style.Boid_LightTheme;
-		case 0:
+			prefs.edit().putString("boid_theme", "0").commit();
 			return R.style.Boid_DarkTheme;
+		case 1:
+			return R.style.Boid_LightTheme;
 		case 2:
 			return R.style.Boid_DarkLightTheme;
 		}
