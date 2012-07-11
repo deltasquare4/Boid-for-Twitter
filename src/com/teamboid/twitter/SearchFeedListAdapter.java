@@ -207,6 +207,9 @@ public class SearchFeedListAdapter extends BaseAdapter {
 					mediaPreview.setImageBitmap(null);
 				}
 			} else {
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, R.id.feedItemUserName);
+				itemTxt.setLayoutParams(params);
 				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
 				toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
