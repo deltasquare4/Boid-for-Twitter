@@ -43,7 +43,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -461,7 +460,7 @@ public class TimelineScreen extends Activity {
 		}
 		if(AccountService.getCurrentAccount() != null) {
 			switcher.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
-			myProfile.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
+			if(accs.size() == 1) myProfile.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
 		}
 		return true;
 	}
