@@ -128,7 +128,6 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		return index;
 	}
 
-	
 	@Override
 	public int getCount() { return tweets.size(); }
 	@Override
@@ -182,6 +181,9 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, R.id.feedItemMediaFrame);
+				itemTxt.setLayoutParams(params);
 				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
 				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
 				mediaPreview.setVisibility(View.GONE);
