@@ -55,7 +55,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,7 +69,6 @@ public class TimelineScreen extends Activity {
 	private boolean lastDisplayReal;
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
-	private boolean showProgress;
 	private boolean newColumn;
 
 	private SendTweetArrayAdapter sentTweetBinder;
@@ -78,7 +76,6 @@ public class TimelineScreen extends Activity {
 	public class SendTweetUpdater extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			Log.i("TIMELINE", "SendTweetUpdater.onReceive");
 			if(intent.getAction().equals(AccountManager.END_LOAD)) {
 				loadColumns(intent.getBooleanExtra("last_account_count", false), false);
 				accountsLoaded();
@@ -149,7 +146,6 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
-		Log.i("TIMELINE", "initialize()");
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
 		if(!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
@@ -172,7 +168,6 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	protected void onNewIntent (Intent intent){
-		Log.i("TIMELINE", "onNewIntent()");
 		if(AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
@@ -184,7 +179,6 @@ public class TimelineScreen extends Activity {
 	}
 
 	public void loadColumns(boolean firstLoad, boolean accountSwitched) {
-		Log.i("TIMELINE", "loadColumns()");
 		if(AccountService.getAccounts().size() == 0) {
 			return;
 		} else {
@@ -380,7 +374,6 @@ public class TimelineScreen extends Activity {
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
 	public void accountsLoaded(){
-		Log.i("TIMELINE", "accountsLoaded()");
 		if(Intent.ACTION_SEND.equals(getIntent().getAction())){
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
 			finish();
@@ -392,12 +385,12 @@ public class TimelineScreen extends Activity {
 				//TODO: Handle other URLs
 			}
 		}
+		invalidateOptionsMenu();
 		startService(new Intent(this, SendTweetService.class).setAction(SendTweetService.LOAD_TWEETS));
 	}
 
 	@Override
 	public void onResume() {
-		Log.i("TIMELINE", "onResume");
 		super.onResume();
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
@@ -430,7 +423,6 @@ public class TimelineScreen extends Activity {
 	
 	@Override
 	public void onDestroy() {
-		Log.i("TIMELINE", "onDestroy()");
 		super.onDestroy();
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
@@ -451,9 +443,10 @@ public class TimelineScreen extends Activity {
 		inflater.inflate(R.menu.main_actionbar, menu);
 		final ArrayList<Account> accs = AccountService.getAccounts();
 		final MenuItem switcher = menu.findItem(R.id.accountSwitcher);
-		if(accs.size() < 2) {
+		final MenuItem myProfile = menu.findItem(R.id.myProfileAction);
+		if(accs.size() == 1) {
 			menu.findItem(R.id.accountSwitcher).setVisible(false);
-			menu.findItem(R.id.myProfileAction).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);			
+			myProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);			
 		} else {
 			for(int i = 0; i < accs.size(); i++) {
 				ImageManager imageManager = ImageManager.getInstance(this);
@@ -466,18 +459,14 @@ public class TimelineScreen extends Activity {
 				});
 			}
 		}
-		if(showProgress) {
-			MenuItem refresh = menu.findItem(R.id.refreshAction);
-			refresh.setEnabled(false);
-			refresh.setActionView(new ProgressBar(this, null, android.R.attr.progressBarStyle));
-			refresh.expandActionView();
+		if(AccountService.getCurrentAccount() != null) {
+			switcher.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
+			myProfile.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
 		}
-		if(AccountService.getCurrentAccount() != null) switcher.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
 		return true;
 	}
 
 	private void addColumn(String id) {
-		Log.i("TIMELINE", "addColumn()");
 		if(AccountService.getAccounts().size() == 0) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
@@ -489,7 +478,6 @@ public class TimelineScreen extends Activity {
 	}
 
 	private Boolean performRefresh() {
-		Log.i("TIMELINE", "performRefresh()");
 		if(AccountService.getAccounts().size() == 0) return false;
 		Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
 		if(frag != null) {

@@ -219,6 +219,7 @@ public class ProfileScreen extends Activity {
 							public void run() {
 								toast.cancel();
 								Toast.makeText(ProfileScreen.this, R.string.reported_str, Toast.LENGTH_SHORT).show();
+								recreate();
 							}
 						});
 					}
