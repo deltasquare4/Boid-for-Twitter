@@ -178,6 +178,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 		}
 	}
+	
+	/**
+	 * Recieve events from a fragment
+	 * @author kennydude
+	 *
+	 */
+	public static abstract class TabListener{
+		public abstract void finishedLoading();
+	}
+	public static class NullTabListener extends TabListener{ public void finishedLoading(){} }
 
 	public static abstract class BaseListFragment extends ListFragment {
 
@@ -248,6 +258,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public boolean isLoading;
 		private boolean isShown;
 
+		public TabListener listener = new NullTabListener();
+		
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
@@ -1840,6 +1852,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 											if(paginate && addedCount > 0) getGridView().smoothScrollToPosition(beforeLast + 1);
 											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getGridView());
 										}
+										listener.finishedLoading();
+										
 										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
 											context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.media_title) + " (" + Integer.toString(addedCount) + ")");
 										} else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
@@ -2130,6 +2144,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							context.runOnUiThread(new Runnable() {
 								public void run() {
 									((ProfileScreen)context).user = user;
+									((ProfileScreen)context).setupViews();
 									((ProfileScreen)context).invalidateOptionsMenu();
 									adapt.setUser(user);
 								}

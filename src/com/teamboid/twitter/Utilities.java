@@ -398,6 +398,22 @@ public class Utilities {
 			return Long.toString(diff / 86400000) + "d"; 
 		} else return Long.toString(diff / 604800000) + "w";
 	}
+	public static String friendlyTimeMedium(Date createdAt) {
+		Date now = new Date();
+		long diff = now.getTime() - createdAt.getTime();
+		if(diff <= 60000) {
+			long seconds = (diff / 6000);
+			if(seconds < 5) return "moments";
+			return Long.toString(seconds) + " seconds";
+		} else if(diff <= 3600000) {
+			return Long.toString(diff / 60000) + " minutes";
+		} else if(diff <= 86400000) {
+			return Long.toString(diff / 3600000) + " hours";
+		} else if(diff <= 604800000) {
+			return Long.toString(diff / 86400000) + " days"; 
+		} else return Long.toString(diff / 604800000) + " weeks";
+	}
+	
 	public static String friendlyTimeLong(Context context, Date createdAt) {
 		Calendar time = Calendar.getInstance();
 		time.setTime(createdAt);
@@ -558,9 +574,14 @@ public class Utilities {
 			return "";
 		}
 	}
-	
 	public static String getUserImage(String screenname, Context mContext){
+		return getUserImage(screenname, mContext, null);
+	}
+	public static String getUserImage(String screenname, Context mContext, twitter4j.User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
+		if(user != null){ // Allows us to have auto-updating cache
+			url += "&v=" + Uri.encode(user.getProfileImageURL().toString());
+		}
 		
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);

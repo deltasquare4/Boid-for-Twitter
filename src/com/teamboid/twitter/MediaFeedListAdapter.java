@@ -30,6 +30,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 	}
 
 	public ArrayList<Status> tweets;
+	public Status get(int pos){ return tweets.get(pos); }
 
 	private Activity mContext;
 	public String ID;

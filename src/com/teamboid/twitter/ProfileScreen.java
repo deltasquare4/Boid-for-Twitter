@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import com.handlerexploit.prime.widgets.RemoteImageView;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
@@ -22,10 +23,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -59,10 +63,11 @@ public class ProfileScreen extends Activity {
     	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        setContentView(R.layout.main);
+        setContentView(R.layout.profile_screen);
         setProgressBarIndeterminateVisibility(false);
         initializeTabs(savedInstanceState);
     }
+	private boolean hasShownMedia = false;
 	
 	private TabsAdapter mTabsAdapter;
 	private void initializeTabs(Bundle savedInstanceState) {
@@ -75,12 +80,24 @@ public class ProfileScreen extends Activity {
 		if(iconic) {
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)), ProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)), ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, true);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
 		} else {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), ProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, true);
+			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, false);
 		}
+		
+		((MediaTimelineFragment)mTabsAdapter.getItem(2)).listener = new TabsAdapter.TabListener(){
+
+			@Override
+			public void finishedLoading() {
+				if(hasShownMedia) return;
+				hasShownMedia = true;
+				setupMediaView();
+			}
+			
+		};
+		
 		if(savedInstanceState != null) getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("lastTab", 0));
 	}
 
@@ -241,5 +258,70 @@ public class ProfileScreen extends Activity {
     		outState.putBoolean("showProgress", true);
     	}
 		super.onSaveInstanceState(outState);
+	}
+
+	/**
+	 * Sets up our own views for this
+	 */
+	public void setupViews() {
+		
+		// TODO: Circle
+		RemoteImageView riv = (RemoteImageView)findViewById(R.id.userItemProfilePic);
+		riv.setImageURL(Utilities.getUserImage(user.getScreenName(), this));
+		
+		riv = (RemoteImageView)findViewById(R.id.img);
+		riv.setImageURL(user.getProfileBackgroundImageUrl());
+		
+		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
+		tv.setText(user.getName() + "\n@" + user.getScreenName());
+		
+		tv = (TextView)findViewById(R.id.profileBottomLeftDetail);
+		tv.setText(user.getStatusesCount() + " | " + user.getFriendsCount() + " | " + user.getFollowersCount());
+		
+		tv = (TextView)findViewById(R.id.profileLastTweeted);
+		// TODO: Localize
+		tv.setText("Tweeted " + Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt()) + " ago");
+		
+		tv = (TextView)findViewById(R.id.profileLocation);
+		if(user.getLocation().trim().isEmpty()){
+			tv.setVisibility(View.GONE);
+		} else{
+			tv.setText(user.getLocation());
+		}
+		
+		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener(){
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {}
+
+			@Override
+			public void onPageScrolled(int position, float offset, int offsetPixels) {
+				if(position >= 1){
+					findViewById(R.id.profileHeader).setX(offsetPixels);
+				}
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				findViewById(R.id.profileHeader).setVisibility( position > 1 ? View.GONE : View.VISIBLE );
+			}
+			
+		});
+		
+	}
+	
+	/**
+	 * Set first media
+	 */
+	public void setupMediaView(){
+		RemoteImageView riv = (RemoteImageView)findViewById(R.id.img);
+		try{
+			twitter4j.Status m = mediaAdapter.get(0);
+			String media = Utilities.getTweetYFrogTwitpicMedia(m);
+			riv.setImageURL(media);
+		} catch(Exception e){
+			e.printStackTrace();
+			// Here we should divert to profile bg?
+		}
 	}
 }
