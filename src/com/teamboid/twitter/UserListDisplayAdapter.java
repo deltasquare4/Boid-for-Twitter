@@ -19,10 +19,10 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		mContext = context;
 		lists = new ArrayList<UserList>();
 	}
-	
+
 	private Activity mContext;
 	private ArrayList<UserList> lists;
-	
+
 	public void add(UserList list) {
 		if(!contains(list)) lists.add(list);
 		notifyDataSetChanged();
@@ -49,7 +49,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		lists.clear();
 		notifyDataSetChanged();
 	}
-	
+
 	@Override
 	public int getCount() { return lists.size(); }
 
@@ -57,7 +57,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 	public Object getItem(int position) { return lists.get(position); }
 
 	public int getListId(int position) { return lists.get(position).getId(); }
-	
+
 	@Override
 	public long getItemId(int position) {
 		return lists.get(position).getId();
@@ -77,47 +77,55 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		if(lists.get(pos).getUser().getId() == AccountService.getCurrentAccount().getId()) {
 			final Toast toast = Toast.makeText(mContext, R.string.deleting_list_str, Toast.LENGTH_LONG);
 			toast.show();
-			try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
-			catch(final TwitterException e) {
-				e.printStackTrace();
-				mContext.runOnUiThread(new Runnable() {
-					public void run() {
-						toast.cancel();
-						Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+			new Thread(new Runnable() {
+				public void run() {
+					try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
+					catch(final TwitterException e) {
+						e.printStackTrace();
+						mContext.runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+						return;
 					}
-				});
-				return;
-			}
-			mContext.runOnUiThread(new Runnable() {
-				public void run() { 
-					toast.cancel();
-					Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_LONG).show();
-					remove(id);
+					mContext.runOnUiThread(new Runnable() {
+						public void run() { 
+							toast.cancel();
+							Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_SHORT).show();
+							remove(id);
+						}
+					});
 				}
-			});
+			}).start();
 		} else {
 			final Toast toast = Toast.makeText(mContext, R.string.unsubscribing_list_str, Toast.LENGTH_LONG);
 			toast.show();
-			try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
-			catch(final TwitterException e) {
-				e.printStackTrace();
-				mContext.runOnUiThread(new Runnable() {
-					public void run() {
-						toast.cancel();
-						Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+			new Thread(new Runnable() {
+				public void run() {
+					try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
+					catch(final TwitterException e) {
+						e.printStackTrace();
+						mContext.runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+						return;
 					}
-				});
-				return;
-			}
-			mContext.runOnUiThread(new Runnable() {
-				public void run() { 
-					toast.cancel();
-					Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_LONG).show();
-					remove(id);
+					mContext.runOnUiThread(new Runnable() {
+						public void run() { 
+							toast.cancel();
+							Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_SHORT).show();
+							remove(id);
+						}
+					});
 				}
-			});
+			}).start();
 		}
 	}
-	
+
 	public UserList[] toArray() { return lists.toArray(new UserList[0]); }
 }

@@ -336,6 +336,6 @@
 	<string name="add_to_list_str">Add to List</string>
 	<string name="deleting_list_str">Deleting list…</string>
 	<string name="unsubscribing_list_str">Unsubscribing from list…</string>
-	<string name="deleted_list_str">Successfully deleting the list!</string>
+	<string name="deleted_list_str">Successfully deleted the list!</string>
 	<string name="unsubscribed_list_str">Unsubscribed from the list!</string>
 </resources>
