@@ -42,7 +42,7 @@ public static final ITweetWidgetService.Stub binder = new ITweetWidgetService.St
 	}
 	
 	public void handleCommand(Intent i){
-		if(i.hasExtra("widgetId")){
+		if(i != null && i.hasExtra("widgetId")) {
 			try {
 				if(i.hasExtra("rv")){
 					binder.updateWidget(i.getLongExtra("widgetId", 0), i.getStringExtra("forUrl"), (RemoteViews)i.getParcelableExtra("rv"));
