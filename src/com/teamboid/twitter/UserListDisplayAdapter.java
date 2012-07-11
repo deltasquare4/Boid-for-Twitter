@@ -36,8 +36,13 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		}
 		return false;
 	}
-	public void remove(int index) {
-		lists.remove(index);
+	public void remove(int id) {
+		for(int i = 0; i < lists.size(); i++) {
+			if(lists.get(i).getId() == id) {
+				lists.remove(i);
+				break;
+			}
+		}
 		notifyDataSetChanged();
 	}
 	public void clear() {
@@ -68,6 +73,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 	}
 
 	public void destroyOrUnsubscribe(final int pos) {
+		final int id = lists.get(pos).getId();
 		if(lists.get(pos).getUser().getId() == AccountService.getCurrentAccount().getId()) {
 			final Toast toast = Toast.makeText(mContext, R.string.deleting_list_str, Toast.LENGTH_LONG);
 			toast.show();
@@ -86,7 +92,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 				public void run() { 
 					toast.cancel();
 					Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_LONG).show();
-					remove(pos);
+					remove(id);
 				}
 			});
 		} else {
@@ -107,7 +113,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 				public void run() { 
 					toast.cancel();
 					Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_LONG).show();
-					remove(pos);
+					remove(id);
 				}
 			});
 		}

@@ -2219,10 +2219,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						@Override
 						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
 							for(final int pos : reverseSortedPositions) {
-								new Thread(new Runnable() {
-									public void run() { adapt.destroyOrUnsubscribe(pos); }
-								}).start();
-								adapt.remove(pos);
+								adapt.destroyOrUnsubscribe(pos);
 							}
 						}
 					});
