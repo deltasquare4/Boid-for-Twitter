@@ -2,7 +2,7 @@
 <!-- Required for Side Nav -->
 <RelativeLayout android:layout_width="match_parent"
 	android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-	<com.teamboid.twitter.SideNavigationLayout
+	<com.teamboid.twitter.views.SideNavigationLayout
 		android:layout_width="match_parent" android:id="@+id/slide"
 		android:layout_height="match_parent">
 		<!-- Slide Out Content ;) (width is only here to settle lint etc, computed 
@@ -74,8 +74,8 @@
 				android:layout_width="fill_parent" android:visibility="gone"
 				android:layout_height="10dp" android:layout_alignParentBottom="true" />
 		</RelativeLayout>
-		<com.teamboid.twitter.GlowableRelativeLayout
+		<com.teamboid.twitter.views.GlowableRelativeLayout
 			android:id="@+id/glowstone" android:layout_height="match_parent"
 			android:layout_width="match_parent" />
-	</com.teamboid.twitter.SideNavigationLayout>
+	</com.teamboid.twitter.views.SideNavigationLayout>
 </RelativeLayout>

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 
 /**
  * The list adapter used for the lists that contain tweets, such as the timeline column.

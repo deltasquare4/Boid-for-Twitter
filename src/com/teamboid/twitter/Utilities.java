@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.teamboid.twitter.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 
 import twitter4j.MediaEntity;
 import twitter4j.Status;

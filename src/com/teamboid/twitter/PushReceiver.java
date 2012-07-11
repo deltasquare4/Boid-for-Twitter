@@ -10,6 +10,8 @@ import javax.net.ssl.SSLSession;
 
 import org.json.JSONObject;
 
+import com.teamboid.twitter.compat.Api11;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -77,7 +79,7 @@ public class PushReceiver extends BroadcastReceiver {
 					twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
 					//TODO The account the mention is for should be passed from the server too
 					//Also, we need a way of combining multiple mentions/messages into one notification.
-					MultiAPIMethods.showNotification(s, PushWorker.this);
+					Api11.displayNotification(PushWorker.this, s);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

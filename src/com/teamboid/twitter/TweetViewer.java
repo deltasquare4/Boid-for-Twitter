@@ -19,6 +19,11 @@ import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
+import com.teamboid.twitter.views.BetterMapView;
+import com.teamboid.twitter.views.GeoMapOverlay;
+import com.teamboid.twitter.views.GlowableRelativeLayout;
+import com.teamboid.twitter.views.PolygonOverlay;
+import com.teamboid.twitter.views.SideNavigationLayout;
 
 import twitter4j.GeoLocation;
 import twitter4j.Place;
