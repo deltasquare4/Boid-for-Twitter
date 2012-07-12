@@ -401,7 +401,6 @@ public class TimelineScreen extends Activity {
 		}
 		invalidateOptionsMenu();
 		startService(new Intent(this, SendTweetService.class).setAction(SendTweetService.LOAD_TWEETS));
-		checkShowFollowDialog();
 	}
 
 	@Override
@@ -711,55 +710,5 @@ public class TimelineScreen extends Activity {
 			}
 		});
 		diag.show();
-	}
-
-	private void showFollowDialog() {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		AlertDialog.Builder diag = new AlertDialog.Builder(this);
-		diag.setTitle("@boidapp");
-		diag.setMessage(R.string.follow_boidapp_prompt);
-		diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				prefs.edit().putBoolean("checked_follow_boidapp", true).commit();
-				new Thread(new Runnable() {
-					public void run() {
-						try { AccountService.getCurrentAccount().getClient().createFriendship("boidapp"); }
-						catch (TwitterException e) {
-							e.printStackTrace();
-							runOnUiThread(new Runnable() {
-								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_follow_boidapp, Toast.LENGTH_LONG).show(); }
-							});
-						}
-					}
-				}).start();
-			}
-		});
-		diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) { 
-				dialog.dismiss();
-				prefs.edit().putBoolean("checked_follow_boidapp", true).commit();
-			}
-		});
-		diag.create().show();
-	}
-	private void checkShowFollowDialog() {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
-		if(!prefs.getBoolean("checked_follow_boidapp", false)) {
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						boolean isFollowing = AccountService.getCurrentAccount().getClient().existsFriendship(AccountService.getCurrentAccount().getUser().getScreenName(), "boidapp");
-						if(!isFollowing) {
-							runOnUiThread(new Runnable() {
-								public void run() { showFollowDialog(); }
-							});
-						}
-					} catch (TwitterException e) { e.printStackTrace(); }
-				}
-			}).start();
-		}
 	}
 }

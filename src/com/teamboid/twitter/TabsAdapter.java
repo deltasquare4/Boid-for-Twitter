@@ -326,6 +326,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -341,11 +342,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-					Status item = (Status)adapt.getItem(index);
-					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					return false;
+//					Status item = (Status)adapt.getItem(index);
+//					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
+//							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
+//							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					getListView().setItemChecked(index, true);
+					return true;
 				}
 			});
 			setRetainInstance(true);
@@ -474,6 +476,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -614,54 +617,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
-			ListView list = getListView();
-			list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long id) {
-					Toast.makeText(context, R.string.swipe_to_delete_items, Toast.LENGTH_SHORT).show();
+					
 					return false;
 				}
 			});
-			SwipeDismissListViewTouchListener touchListener =
-					new SwipeDismissListViewTouchListener(list,
-							new SwipeDismissListViewTouchListener.OnDismissCallback() {
-						@Override
-						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-							if(isDeleting) return;
-							final int index = reverseSortedPositions[0];
-							final DMConversation removed = (DMConversation)adapt.getItem(index);
-							adapt.remove(index);
-							AlertDialog.Builder diag = new AlertDialog.Builder(context);
-							diag.setTitle(R.string.delete_str);
-							diag.setMessage(R.string.confirm_delete_convo);
-							diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									new Thread(new Runnable() {
-										public void run() {
-											final boolean success = deleteConvo(index, removed);
-											if(!success) {
-												context.runOnUiThread(new Runnable() {
-													public void run() { adapt.add(new DMConversation[] { removed });  }
-												});
-											}
-										}
-									}).start();
-									dialog.dismiss();
-								}
-							});
-							diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) { 
-									dialog.dismiss();
-									adapt.add(new DMConversation[] { removed });
-								}
-							});
-							diag.create().show();
-						}
-					});
-			list.setOnTouchListener(touchListener);
-			list.setOnScrollListener(touchListener.makeScrollListener());
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_messages));
 			reloadAdapter(true);
@@ -928,6 +891,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }

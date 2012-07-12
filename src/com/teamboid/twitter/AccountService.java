@@ -132,7 +132,7 @@ public class AccountService extends Service {
 						@Override
 						public void run() { 
 							act.cancel();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
+							activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("access_token", accessToken.getToken()));
 						}
 					});
 				} catch (final TwitterException e) {

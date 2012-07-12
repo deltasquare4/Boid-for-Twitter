@@ -40,10 +40,47 @@ public class AccountManager extends ListActivity {
 			if(intent.getAction().equals(END_LOAD)) {
 				setProgressBarIndeterminateVisibility(false);
 				adapter.notifyDataSetChanged();
+				String access = intent.getStringExtra("access_token");
+				for(int i = 0; i < adapter.getCount(); i++) {
+					Account acc = (Account)adapter.getItem(i);
+					if(acc.getToken().equals(access)) {
+						showFollowDialog(acc);
+						break;
+					}
+				}
 			}
 		}
 	}
 	UpdateReceiver receiver = new UpdateReceiver();
+	
+	private void showFollowDialog(final Account acc) {
+		AlertDialog.Builder diag = new AlertDialog.Builder(this);
+		diag.setTitle("@boidapp");
+		diag.setMessage(getString(R.string.follow_boidapp_prompt).replace("{account}", acc.getUser().getScreenName()));
+		diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				new Thread(new Runnable() {
+					public void run() {
+						try { acc.getClient().createFriendship("boidapp"); }
+						catch (final TwitterException e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_follow_boidapp, Toast.LENGTH_LONG).show(); }
+							});
+						}
+					}
+				}).start();
+			}
+		});
+		diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+		});
+		diag.create().show();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
