@@ -243,6 +243,7 @@ public class FeedListAdapter extends BaseAdapter {
 		View replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		View locFrame = toReturn.findViewById(R.id.locationFrame);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		ApplyFontSize(itemTxt, mContext);
 		ApplyFontSize(userNameTxt, mContext);
 		
@@ -280,7 +281,7 @@ public class FeedListAdapter extends BaseAdapter {
 		itemTxt.setLinksClickable(false);
 		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		boolean hasMedia = false;
-		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
+		if(prefs.getBoolean("enable_media_download", true)) {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
 				hasMedia = true;
@@ -289,8 +290,9 @@ public class FeedListAdapter extends BaseAdapter {
 				mediaFrame.setVisibility(View.VISIBLE);
 				mediaPreview.setVisibility(View.GONE);
 				mediaIndic.setVisibility(View.VISIBLE);
-				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
-					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30));
+				if(prefs.getBoolean("enable_inline_previewing", true)) {
+					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30) +
+							Integer.parseInt(prefs.getString("font_size", "16")));
 					mediaProg.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
@@ -335,6 +337,8 @@ public class FeedListAdapter extends BaseAdapter {
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
 		ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
+		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText);
+		itemTxt.setMinHeight(0);
 		mediaIndic.setVisibility(View.GONE);
 		mediaFrame.setVisibility(View.GONE);
 		mediaProg.setVisibility(View.GONE);
