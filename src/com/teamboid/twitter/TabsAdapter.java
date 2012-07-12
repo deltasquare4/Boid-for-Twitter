@@ -601,58 +601,84 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			ListView list = getListView();
+			list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long id) {
-					if(isDeleting) return true;
-					AlertDialog.Builder diag = new AlertDialog.Builder(context);
-					diag.setTitle(R.string.delete_str);
-					diag.setMessage(R.string.confirm_delete_convo);
-					diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							deleteConvo(index, (DMConversation)adapt.getItem(index));
-							dialog.dismiss();
-						}
-					});
-					diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
-					});
-					diag.create().show();
+					Toast.makeText(context, R.string.swipe_to_delete_items, Toast.LENGTH_SHORT).show();
 					return false;
 				}
 			});
+			SwipeDismissListViewTouchListener touchListener =
+					new SwipeDismissListViewTouchListener(list,
+							new SwipeDismissListViewTouchListener.OnDismissCallback() {
+						@Override
+						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+							if(isDeleting) return;
+							final int index = reverseSortedPositions[0];
+							final DMConversation removed = (DMConversation)adapt.getItem(index);
+							adapt.remove(index);
+							AlertDialog.Builder diag = new AlertDialog.Builder(context);
+							diag.setTitle(R.string.delete_str);
+							diag.setMessage(R.string.confirm_delete_convo);
+							diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									new Thread(new Runnable() {
+										public void run() {
+											final boolean success = deleteConvo(index, removed);
+											if(!success) {
+												context.runOnUiThread(new Runnable() {
+													public void run() { adapt.add(new DMConversation[] { removed });  }
+												});
+											}
+										}
+									}).start();
+									dialog.dismiss();
+								}
+							});
+							diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) { 
+									dialog.dismiss();
+									adapt.add(new DMConversation[] { removed });
+								}
+							});
+							diag.create().show();
+						}
+					});
+			list.setOnTouchListener(touchListener);
+			list.setOnScrollListener(touchListener.makeScrollListener());
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_messages));
 			reloadAdapter(true);
 		}
 
-		private void deleteConvo(final int index, final DMConversation convo) {
-			if(isDeleting) return;
+		private boolean deleteConvo(final int index, final DMConversation convo) {
+			if(isDeleting) return false;
 			isDeleting = true;
 			final Account acc = AccountService.getCurrentAccount();
-			if(getView() != null) setListShown(false);
-			new Thread(new Runnable() {
+			context.runOnUiThread(new Runnable() {
 				public void run() {
-					int deletedCount = 0;
-					for(DirectMessage msg : convo.getMessages()) {
-						try { 
-							acc.getClient().destroyDirectMessage(msg.getId());
-							deletedCount++;
-						} catch (TwitterException e) { e.printStackTrace(); }
-					}
-					final int count = deletedCount;
-					context.runOnUiThread(new Runnable() {
-						public void run() {
-							if(count == convo.getMessages().size()) adapt.remove(index);
-							else Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
-							if(getView() != null) setListShown(true);
-							isDeleting = false;
-						}
-					});
+					if(getView() != null) setListShown(false);
 				}
-			}).start();
+			});
+			int deletedCount = 0;
+			for(DirectMessage msg : convo.getMessages()) {
+				try { 
+					acc.getClient().destroyDirectMessage(msg.getId());
+					deletedCount++;
+				} catch (TwitterException e) { e.printStackTrace(); }
+			}
+			final boolean toReturn = (deletedCount == convo.getMessages().size());
+			context.runOnUiThread(new Runnable() {
+				public void run() {
+					if(getView() != null) setListShown(true);
+					isDeleting = false;
+					if(!toReturn) Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
+				}
+			});
+			return toReturn;
 		}
 
 		@Override
