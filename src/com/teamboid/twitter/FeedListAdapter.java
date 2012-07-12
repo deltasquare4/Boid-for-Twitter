@@ -334,6 +334,8 @@ public class FeedListAdapter extends BaseAdapter {
 		ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
+		mediaIndic.setVisibility(View.GONE);
 		mediaFrame.setVisibility(View.GONE);
 		mediaProg.setVisibility(View.GONE);
 		mediaPreview.setVisibility(View.GONE);

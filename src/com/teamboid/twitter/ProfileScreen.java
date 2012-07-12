@@ -9,7 +9,6 @@ import twitter4j.UserList;
 
 import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
-import com.handlerexploit.prime.widgets.RemoteImageView;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
@@ -17,7 +16,6 @@ import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,13 +24,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,7 +72,6 @@ public class ProfileScreen extends Activity {
         setProgressBarIndeterminateVisibility(false);
         initializeTabs(savedInstanceState);
     }
-	private boolean hasShownMedia = false;
 	
 	private TabsAdapter mTabsAdapter;
 	private void initializeTabs(Bundle savedInstanceState) {
