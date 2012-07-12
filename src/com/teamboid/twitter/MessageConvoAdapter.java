@@ -167,9 +167,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 							.putExtra("account", AccountService.getCurrentAccount().getId()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
-		} else{
-			profileImgView.setVisibility(View.GONE);
-		}
+		} else profileImgView.setVisibility(View.GONE);
 		final TextView messageTxt = (TextView)toReturn.findViewById(R.id.dmConvoMessageTxt); 
 		if(curItem.getLastSenderIsMe()) {
 			ImageView replyIndic = (ImageView)toReturn.findViewById(R.id.dmConvoReplyIndicator);
