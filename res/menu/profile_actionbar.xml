@@ -8,6 +8,8 @@
 		android:icon="?newMessageIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/pinAction" android:title="@string/pin_column_str"
 		android:icon="?pinIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/addToListAction" android:title="@string/add_to_list_str"
+		android:showAsAction="never" />
 	<item android:id="@+id/blockAction" android:title="@string/block_str"
 		android:showAsAction="never" android:enabled="false" />
 	<item android:id="@+id/reportAction" android:title="@string/report_str"

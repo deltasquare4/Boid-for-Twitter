@@ -35,6 +35,7 @@ public class TweetListActivity extends ListActivity {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() { 
+				setProgressBarIndeterminateVisibility(visible);
 				if(showProgress) {
 					progDialog.dismiss();
 					showProgress = false;
@@ -76,9 +77,10 @@ public class TweetListActivity extends ListActivity {
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) refresh();
+				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) refresh();
 			}
 		});
+		setProgressBarIndeterminateVisibility(false);
 	}
 
 	public void refresh() {
@@ -88,18 +90,26 @@ public class TweetListActivity extends ListActivity {
 			@Override
 			public void run() {
 				try {
+					Paging paging = new Paging(1, 20);
 					switch(getIntent().getIntExtra("mode", -1)) {
 					case USER_FAVORITES:
-						runOnUiThread(new Runnable(){
+						runOnUiThread(new Runnable() {
 							@Override
 							public void run() { setTitle(getString(R.string.user_favorites).replace("{user}", getIntent().getStringExtra("username"))); }
 						});
-						Paging paging = new Paging(1, 20);
 						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
 						tweets = AccountService.getCurrentAccount().getClient().getFavorites(getIntent().getStringExtra("username"), paging);
 						break;
+					case USER_LIST:
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() { setTitle(getIntent().getStringExtra("list_name")); }
+						});
+						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
+						tweets = AccountService.getCurrentAccount().getClient().getUserListStatuses(getIntent().getIntExtra("list_ID", 0), paging);
+						break;
 					}
-					runOnUiThread(new Runnable(){
+					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							if(tweets.size() == 0) allowPagination = false;
@@ -109,7 +119,7 @@ public class TweetListActivity extends ListActivity {
 					});
 				} catch(final Exception e) { 
 					e.printStackTrace();
-					runOnUiThread(new Runnable(){
+					runOnUiThread(new Runnable() {
 						@Override
 						public void run() { Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show(); }
 					});
@@ -129,6 +139,7 @@ public class TweetListActivity extends ListActivity {
 	}
 
 	public static final int USER_FAVORITES = 1;
+	public static final int USER_LIST = 2;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

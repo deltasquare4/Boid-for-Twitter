@@ -33,6 +33,7 @@ public class AccountService extends Service {
 	public static TrendsListAdapter trendsAdapter;
 	public static SearchFeedListAdapter nearbyAdapter;
 	public static ArrayList<SearchFeedListAdapter> searchFeedAdapters;
+	public static UserListDisplayAdapter myListsAdapter;
 	public static int configShortURLLength;
 	public static int charactersPerMedia;
 	public static long selectedAccount;
@@ -315,6 +316,10 @@ public class AccountService extends Service {
 	public static SearchFeedListAdapter getNearbyAdapter(Activity activity) {
 		if(nearbyAdapter == null) nearbyAdapter = new SearchFeedListAdapter(activity, 0);
 		return nearbyAdapter;
+	}
+	public static UserListDisplayAdapter getMyListsAdapter(Activity activity) {
+		if(myListsAdapter == null) myListsAdapter = new UserListDisplayAdapter(activity);
+		return myListsAdapter;
 	}
 	
 	@Override

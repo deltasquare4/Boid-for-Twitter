@@ -17,6 +17,7 @@ import com.teamboid.twitter.TabsAdapter.FavoritesFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.MentionsFragment;
 import com.teamboid.twitter.TabsAdapter.MessagesFragment;
+import com.teamboid.twitter.TabsAdapter.MyListsFragment;
 import com.teamboid.twitter.TabsAdapter.NearbyFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 import com.teamboid.twitter.TabsAdapter.TimelineFragment;
@@ -43,7 +44,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,7 +55,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,7 +69,6 @@ public class TimelineScreen extends Activity {
 	private boolean lastDisplayReal;
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
-	private boolean showProgress;
 	private boolean newColumn;
 
 	private SendTweetArrayAdapter sentTweetBinder;
@@ -78,7 +76,6 @@ public class TimelineScreen extends Activity {
 	public class SendTweetUpdater extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			Log.i("TIMELINE", "SendTweetUpdater.onReceive");
 			if(intent.getAction().equals(AccountManager.END_LOAD)) {
 				loadColumns(intent.getBooleanExtra("last_account_count", false), false);
 				accountsLoaded();
@@ -149,7 +146,6 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
-		Log.i("TIMELINE", "initialize()");
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
 		if(!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
@@ -172,7 +168,6 @@ public class TimelineScreen extends Activity {
 
 	@Override
 	protected void onNewIntent (Intent intent){
-		Log.i("TIMELINE", "onNewIntent()");
 		if(AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
@@ -184,7 +179,6 @@ public class TimelineScreen extends Activity {
 	}
 
 	public void loadColumns(boolean firstLoad, boolean accountSwitched) {
-		Log.i("TIMELINE", "loadColumns()");
 		if(AccountService.getAccounts().size() == 0) {
 			return;
 		} else {
@@ -293,6 +287,15 @@ public class TimelineScreen extends Activity {
 				}
 				else toAdd.setText(R.string.media_title);
 				mTabsAdapter.addTab(toAdd, MediaTimelineFragment.class, index);
+			} else if(c.equals(MyListsFragment.ID)) {
+				Tab toAdd = getActionBar().newTab();
+				if(iconic) {
+					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
+					toAdd.setIcon(icon);
+					if(prefs.getBoolean("textual_userlist_tabs", true)) toAdd.setText(R.string.my_lists_str);
+				}
+				else toAdd.setText(R.string.my_lists_str);
+				mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
 			}
 			index++;
 		}
@@ -326,6 +329,11 @@ public class TimelineScreen extends Activity {
 			} 
 		}
 		if(AccountService.trendsAdapter != null) AccountService.trendsAdapter = new TrendsListAdapter(this);
+		if(AccountService.myListsAdapter != null) {
+			UserList[] before = AccountService.myListsAdapter.toArray(); 
+			AccountService.myListsAdapter = new UserListDisplayAdapter(this);
+			AccountService.myListsAdapter.add(before);
+		}
 		if(AccountService.searchFeedAdapters != null) {
 			for(int i = 0; i < AccountService.searchFeedAdapters.size(); i++) {
 				Utilities.recreateSearchAdapter(this, AccountService.searchFeedAdapters.get(i));
@@ -380,7 +388,6 @@ public class TimelineScreen extends Activity {
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
 	public void accountsLoaded(){
-		Log.i("TIMELINE", "accountsLoaded()");
 		if(Intent.ACTION_SEND.equals(getIntent().getAction())){
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
 			finish();
@@ -392,12 +399,13 @@ public class TimelineScreen extends Activity {
 				//TODO: Handle other URLs
 			}
 		}
+		invalidateOptionsMenu();
 		startService(new Intent(this, SendTweetService.class).setAction(SendTweetService.LOAD_TWEETS));
+		checkShowFollowDialog();
 	}
 
 	@Override
 	public void onResume() {
-		Log.i("TIMELINE", "onResume");
 		super.onResume();
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
@@ -430,7 +438,6 @@ public class TimelineScreen extends Activity {
 	
 	@Override
 	public void onDestroy() {
-		Log.i("TIMELINE", "onDestroy()");
 		super.onDestroy();
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
@@ -451,9 +458,10 @@ public class TimelineScreen extends Activity {
 		inflater.inflate(R.menu.main_actionbar, menu);
 		final ArrayList<Account> accs = AccountService.getAccounts();
 		final MenuItem switcher = menu.findItem(R.id.accountSwitcher);
-		if(accs.size() < 2) {
+		final MenuItem myProfile = menu.findItem(R.id.myProfileAction);
+		if(accs.size() == 1) {
 			menu.findItem(R.id.accountSwitcher).setVisible(false);
-			menu.findItem(R.id.myProfileAction).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);			
+			myProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);			
 		} else {
 			for(int i = 0; i < accs.size(); i++) {
 				ImageManager imageManager = ImageManager.getInstance(this);
@@ -466,18 +474,14 @@ public class TimelineScreen extends Activity {
 				});
 			}
 		}
-		if(showProgress) {
-			MenuItem refresh = menu.findItem(R.id.refreshAction);
-			refresh.setEnabled(false);
-			refresh.setActionView(new ProgressBar(this, null, android.R.attr.progressBarStyle));
-			refresh.expandActionView();
+		if(AccountService.getCurrentAccount() != null) {
+			switcher.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
+			if(accs.size() == 1) myProfile.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
 		}
-		if(AccountService.getCurrentAccount() != null) switcher.setTitle("@" + AccountService.getCurrentAccount().getUser().getScreenName());
 		return true;
 	}
 
 	private void addColumn(String id) {
-		Log.i("TIMELINE", "addColumn()");
 		if(AccountService.getAccounts().size() == 0) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
@@ -489,7 +493,6 @@ public class TimelineScreen extends Activity {
 	}
 
 	private Boolean performRefresh() {
-		Log.i("TIMELINE", "performRefresh()");
 		if(AccountService.getAccounts().size() == 0) return false;
 		Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
 		if(frag != null) {
@@ -601,6 +604,9 @@ public class TimelineScreen extends Activity {
 				}
 			}).start();
 			return true;
+		case R.id.addMyListsColAction:
+			addColumn(MyListsFragment.ID);
+			return true;
 		default:
 			for(int i = 0; i < getActionBar().getTabCount(); i++) {
 				Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
@@ -705,5 +711,55 @@ public class TimelineScreen extends Activity {
 			}
 		});
 		diag.show();
+	}
+
+	private void showFollowDialog() {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		AlertDialog.Builder diag = new AlertDialog.Builder(this);
+		diag.setTitle("@boidapp");
+		diag.setMessage(R.string.follow_boidapp_prompt);
+		diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				prefs.edit().putBoolean("checked_follow_boidapp", true).commit();
+				new Thread(new Runnable() {
+					public void run() {
+						try { AccountService.getCurrentAccount().getClient().createFriendship("boidapp"); }
+						catch (TwitterException e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_follow_boidapp, Toast.LENGTH_LONG).show(); }
+							});
+						}
+					}
+				}).start();
+			}
+		});
+		diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) { 
+				dialog.dismiss();
+				prefs.edit().putBoolean("checked_follow_boidapp", true).commit();
+			}
+		});
+		diag.create().show();
+	}
+	private void checkShowFollowDialog() {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+		if(!prefs.getBoolean("checked_follow_boidapp", false)) {
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						boolean isFollowing = AccountService.getCurrentAccount().getClient().existsFriendship(AccountService.getCurrentAccount().getUser().getScreenName(), "boidapp");
+						if(!isFollowing) {
+							runOnUiThread(new Runnable() {
+								public void run() { showFollowDialog(); }
+							});
+						}
+					} catch (TwitterException e) { e.printStackTrace(); }
+				}
+			}).start();
+		}
 	}
 }

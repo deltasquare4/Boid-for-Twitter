@@ -18,6 +18,7 @@ import twitter4j.Trends;
 import twitter4j.Tweet;
 import twitter4j.TwitterException;
 import twitter4j.User;
+import twitter4j.UserList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -205,7 +206,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
-		
+
 		@Override
 		public void setEmptyText(CharSequence text) {
 			if(getView() != null) super.setEmptyText(text);
@@ -228,7 +229,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
@@ -271,7 +272,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.grid_activity, container, false);
@@ -304,7 +305,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private Activity context;
 		private FeedListAdapter adapt;
 		public static final String ID = "COLUMNTYPE:TIMELINE";
-		
+
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
@@ -317,10 +318,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			Status tweet = (Status)adapt.getItem(index);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -433,7 +434,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
-		
+
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -458,17 +459,17 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
 			Status tweet = (Status)adapt.getItem(position);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -572,13 +573,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
 		@Override
 		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
-		
+
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -600,7 +601,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (Activity)act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
@@ -608,62 +609,88 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					((DMConversation)adapt.getItem(position)).getToScreenName()).
 					addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			ListView list = getListView();
+			list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long id) {
-					if(isDeleting) return true;
-					AlertDialog.Builder diag = new AlertDialog.Builder(context);
-					diag.setTitle(R.string.delete_str);
-					diag.setMessage(R.string.confirm_delete_convo);
-					diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							deleteConvo(index, (DMConversation)adapt.getItem(index));
-							dialog.dismiss();
-						}
-					});
-					diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
-					});
-					diag.create().show();
+					Toast.makeText(context, R.string.swipe_to_delete_items, Toast.LENGTH_SHORT).show();
 					return false;
 				}
 			});
+			SwipeDismissListViewTouchListener touchListener =
+					new SwipeDismissListViewTouchListener(list,
+							new SwipeDismissListViewTouchListener.OnDismissCallback() {
+						@Override
+						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+							if(isDeleting) return;
+							final int index = reverseSortedPositions[0];
+							final DMConversation removed = (DMConversation)adapt.getItem(index);
+							adapt.remove(index);
+							AlertDialog.Builder diag = new AlertDialog.Builder(context);
+							diag.setTitle(R.string.delete_str);
+							diag.setMessage(R.string.confirm_delete_convo);
+							diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									new Thread(new Runnable() {
+										public void run() {
+											final boolean success = deleteConvo(index, removed);
+											if(!success) {
+												context.runOnUiThread(new Runnable() {
+													public void run() { adapt.add(new DMConversation[] { removed });  }
+												});
+											}
+										}
+									}).start();
+									dialog.dismiss();
+								}
+							});
+							diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) { 
+									dialog.dismiss();
+									adapt.add(new DMConversation[] { removed });
+								}
+							});
+							diag.create().show();
+						}
+					});
+			list.setOnTouchListener(touchListener);
+			list.setOnScrollListener(touchListener.makeScrollListener());
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_messages));
 			reloadAdapter(true);
 		}
 
-		private void deleteConvo(final int index, final DMConversation convo) {
-			if(isDeleting) return;
+		private boolean deleteConvo(final int index, final DMConversation convo) {
+			if(isDeleting) return false;
 			isDeleting = true;
 			final Account acc = AccountService.getCurrentAccount();
-			if(getView() != null) setListShown(false);
-			new Thread(new Runnable() {
+			context.runOnUiThread(new Runnable() {
 				public void run() {
-					int deletedCount = 0;
-					for(DirectMessage msg : convo.getMessages()) {
-						try { 
-							acc.getClient().destroyDirectMessage(msg.getId());
-							deletedCount++;
-						} catch (TwitterException e) { e.printStackTrace(); }
-					}
-					final int count = deletedCount;
-					context.runOnUiThread(new Runnable() {
-						public void run() {
-							if(count == convo.getMessages().size()) adapt.remove(index);
-							else Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
-							if(getView() != null) setListShown(true);
-							isDeleting = false;
-						}
-					});
+					if(getView() != null) setListShown(false);
 				}
-			}).start();
+			});
+			int deletedCount = 0;
+			for(DirectMessage msg : convo.getMessages()) {
+				try { 
+					acc.getClient().destroyDirectMessage(msg.getId());
+					deletedCount++;
+				} catch (TwitterException e) { e.printStackTrace(); }
+			}
+			final boolean toReturn = (deletedCount == convo.getMessages().size());
+			context.runOnUiThread(new Runnable() {
+				public void run() {
+					if(getView() != null) setListShown(true);
+					isDeleting = false;
+					if(!toReturn) Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
+				}
+			});
+			return toReturn;
 		}
 
 		@Override
@@ -718,7 +745,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void restorePosition() { }
-		
+
 		@Override
 		public void savePosition() { }
 
@@ -746,14 +773,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		private boolean filterSelected;
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
 			context.startActivity(new Intent(context, SearchScreen.class).putExtra("query", 
 					(String)adapt.getItem(position)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -847,7 +874,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void restorePosition() { }
-		
+
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -893,10 +920,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			Status tweet = (Status)adapt.getItem(position);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1000,13 +1027,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
 		@Override
 		public void restorePosition() { if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView()); }
-		
+
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -1026,7 +1053,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (SearchScreen)act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
@@ -1035,7 +1062,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
 					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1128,13 +1155,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				if(context.tweetAdapter.getCount() == 0) performRefresh(false);
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { }
 
 		@Override
 		public void restorePosition() { }
-		
+
 		@Override
 		public void jumpTop() {
 			if(getView() != null) getListView().setSelectionFromTop(0, 0);
@@ -1155,14 +1182,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = (SearchScreen)act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
 			context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", ((User)context.userAdapter.getItem(position)).getScreenName())
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1263,10 +1290,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { }
-		
+
 		@Override
 		public void restorePosition() { }
 
@@ -1291,7 +1318,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
@@ -1300,7 +1327,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					.putExtra("screen_name", tweet.getFromUser()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
 					.putExtra("via", tweet.getSource()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1398,7 +1425,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				else adapt.restoreLastViewed(getListView());
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
@@ -1579,7 +1606,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				else adapt.restoreLastViewed(getListView());
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
@@ -1615,10 +1642,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			Status tweet = (Status)adapt.getItem(position);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1722,13 +1749,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(AccountService.getCurrentAccount() != null) {
 				if(adapt != null && !firstInitialize && getView() != null) adapt.setLastViewed(getListView());
 				adapt = AccountService.getFeedAdapter(context, UserListFragment.ID + "@" + listName.replace("@", "%40") +
-							"@" + Integer.toString(listID), AccountService.getCurrentAccount().getId());
+						"@" + Integer.toString(listID), AccountService.getCurrentAccount().getId());
 				setListAdapter(adapt);
 				if(adapt.getCount() == 0) performRefresh(false);
 				else if(getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 			}
 		}
-		
+
 		@Override
 		public void savePosition() { if(getView() != null && adapt != null) adapt.setLastViewed(getListView()); }
 
@@ -1757,7 +1784,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -1780,8 +1807,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					Status tweet = (Status)adapt.getItem(position);
 					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 					context.startActivity(new Intent(context, TweetViewer.class)
-						.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
 			grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -1939,10 +1966,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			Status tweet = (Status)context.adapter.getItem(position);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-				.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -2071,7 +2098,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			super.onAttach(act);
 			context = act;
 		}
-		
+
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
@@ -2112,7 +2139,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				context.startActivity(intent);
 			}
 		}
-		
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -2180,7 +2207,122 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void savePosition() { }
-		
+
+		@Override
+		public void restorePosition() { }
+
+		@Override
+		public void jumpTop() {
+			if(getView() != null) getListView().setSelectionFromTop(0, 0);
+		}
+
+		@Override
+		public void filter() { }
+	}
+
+	public static class MyListsFragment extends BaseListFragment {
+
+		private UserListDisplayAdapter adapt;
+		private Activity context;
+		public static final String ID = "COLUMNTYPE:MYLISTS";
+
+		@Override
+		public void onAttach(Activity act) {
+			super.onAttach(act);
+			context = (Activity)act;
+		}
+
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			final UserList curList = (UserList)adapt.getItem(position);
+			Intent intent = new Intent(context, TweetListActivity.class)
+			.putExtra("mode", TweetListActivity.USER_LIST)
+			.putExtra("list_name", curList.getName())
+			.putExtra("list_ID", curList.getId());
+			context.startActivity(intent);
+		}
+
+		@Override
+		public void onStart() {
+			super.onStart();
+			final ListView list = getListView();
+			list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+					Toast.makeText(context, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
+					return false;
+				}
+			});
+			SwipeDismissListViewTouchListener touchListener =
+					new SwipeDismissListViewTouchListener(list,
+							new SwipeDismissListViewTouchListener.OnDismissCallback() {
+						@Override
+						public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+							for(final int pos : reverseSortedPositions) {
+								adapt.destroyOrUnsubscribe(pos);
+							}
+						}
+					});
+			list.setOnTouchListener(touchListener);
+			list.setOnScrollListener(touchListener.makeScrollListener());
+			setRetainInstance(true);
+			setEmptyText(getString(R.string.no_tweets));
+			reloadAdapter(true);
+		}
+
+		@Override
+		public void performRefresh(final boolean paginate) {
+			if(context == null || isLoading || adapt == null) return;
+			isLoading = true;
+			if(adapt.getCount() == 0 && getView() != null) setListShown(false);
+			new Thread(new Runnable() {
+				public void run() {
+					Paging paging = new Paging(1, 50);
+					if(paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+					final Account acc = AccountService.getCurrentAccount();
+					if(acc != null) {
+						try {
+							final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
+							context.runOnUiThread(new Runnable() {
+								public void run() {
+									setEmptyText(context.getString(R.string.no_lists));
+									adapt.add(lists.toArray(new UserList[0]));
+								}
+							});
+						} catch(final TwitterException e) {
+							e.printStackTrace();
+							context.runOnUiThread(new Runnable() {
+								public void run() { 
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								}
+							});
+						}
+					}
+					context.runOnUiThread(new Runnable() {
+						public void run() { 
+							if(getView() != null) setListShown(true);
+							isLoading = false;
+						}
+					});
+				}
+			}).start();
+		}
+
+		@Override
+		public void reloadAdapter(boolean firstInitialize) {
+			if(context == null && getActivity() != null) context = (Activity)getActivity();
+			if(AccountService.getCurrentAccount() != null) {
+				adapt = AccountService.getMyListsAdapter(context);
+				setListAdapter(adapt);
+				if(adapt.getCount() == 0) performRefresh(false);
+			}
+		}
+
+		@Override
+		public void savePosition() { }
+
 		@Override
 		public void restorePosition() { }
 
