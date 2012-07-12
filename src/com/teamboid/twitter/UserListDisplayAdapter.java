@@ -6,6 +6,8 @@ import twitter4j.TwitterException;
 import twitter4j.UserList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,57 +75,83 @@ public class UserListDisplayAdapter extends BaseAdapter {
 	}
 
 	public void destroyOrUnsubscribe(final int pos) {
-		final int id = lists.get(pos).getId();
-		if(lists.get(pos).getUser().getId() == AccountService.getCurrentAccount().getId()) {
-			final Toast toast = Toast.makeText(mContext, R.string.deleting_list_str, Toast.LENGTH_LONG);
-			toast.show();
-			new Thread(new Runnable() {
-				public void run() {
-					try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
-					catch(final TwitterException e) {
-						e.printStackTrace();
-						mContext.runOnUiThread(new Runnable() {
-							public void run() {
-								toast.cancel();
-								Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+		final UserList list = lists.get(pos);
+		if(list.getUser().getId() == AccountService.getCurrentAccount().getId()) {
+			AlertDialog.Builder diag = new AlertDialog.Builder(mContext);
+			diag.setTitle(R.string.delete_str);
+			diag.setMessage(mContext.getString(R.string.delete_list_prompt).replace("{listname}", list.getFullName()));
+			diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					final Toast toast = Toast.makeText(mContext, R.string.deleting_list_str, Toast.LENGTH_LONG);
+					toast.show();
+					new Thread(new Runnable() {
+						public void run() {
+							try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
+							catch(final TwitterException e) {
+								e.printStackTrace();
+								mContext.runOnUiThread(new Runnable() {
+									public void run() {
+										toast.cancel();
+										Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+									}
+								});
+								return;
 							}
-						});
-						return;
-					}
-					mContext.runOnUiThread(new Runnable() {
-						public void run() { 
-							toast.cancel();
-							Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_SHORT).show();
-							remove(id);
+							mContext.runOnUiThread(new Runnable() {
+								public void run() { 
+									toast.cancel();
+									Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_SHORT).show();
+									remove(list.getId());
+								}
+							});
 						}
-					});
+					}).start();
 				}
-			}).start();
+			});
+			diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+			});
+			diag.create().show();
 		} else {
-			final Toast toast = Toast.makeText(mContext, R.string.unsubscribing_list_str, Toast.LENGTH_LONG);
-			toast.show();
-			new Thread(new Runnable() {
-				public void run() {
-					try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
-					catch(final TwitterException e) {
-						e.printStackTrace();
-						mContext.runOnUiThread(new Runnable() {
-							public void run() {
-								toast.cancel();
-								Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+			AlertDialog.Builder diag = new AlertDialog.Builder(mContext);
+			diag.setTitle(R.string.unsubscribe_str);
+			diag.setMessage(mContext.getString(R.string.unsubscribe_list_prompt).replace("{listname}", list.getFullName()));
+			diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					final Toast toast = Toast.makeText(mContext, R.string.unsubscribing_list_str, Toast.LENGTH_LONG);
+					toast.show();
+					new Thread(new Runnable() {
+						public void run() {
+							try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
+							catch(final TwitterException e) {
+								e.printStackTrace();
+								mContext.runOnUiThread(new Runnable() {
+									public void run() {
+										toast.cancel();
+										Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+									}
+								});
+								return;
 							}
-						});
-						return;
-					}
-					mContext.runOnUiThread(new Runnable() {
-						public void run() { 
-							toast.cancel();
-							Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_SHORT).show();
-							remove(id);
+							mContext.runOnUiThread(new Runnable() {
+								public void run() { 
+									toast.cancel();
+									Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_SHORT).show();
+									remove(list.getId());
+								}
+							});
 						}
-					});
+					}).start();
 				}
-			}).start();
+			});
+			diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
+			});
+			diag.create().show();
 		}
 	}
 

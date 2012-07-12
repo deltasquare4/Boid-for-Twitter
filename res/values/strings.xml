@@ -338,6 +338,11 @@
 	<string name="unsubscribing_list_str">Unsubscribing from list…</string>
 	<string name="deleted_list_str">Successfully deleted the list!</string>
 	<string name="unsubscribed_list_str">Unsubscribed from the list!</string>
+	<string name="unsubscribe_str">Unsubcribe</string>
 	<string name="adding_user_list">Adding user to list…</string>
 	<string name="added_user_list">Added user to the list!</string>
+	<string name="delete_list_prompt">Are you sure you want to delete your list {listname}?</string>
+	<string name="unsubscribe_list_prompt">Are you sure you want to unsubscribe from {listname}?</string>
+	<string name="follow_boidapp_prompt">Do you want to follow @boidapp? You\'ll only be asked once for one account, if you have others you\'ll have to manually follow @boidapp for them.</string>
+	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so manually later.</string>
 </resources>
