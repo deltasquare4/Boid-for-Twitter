@@ -226,8 +226,6 @@ public class FeedListAdapter extends BaseAdapter {
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
 		Status tweet = tweets.get(position);
-		if(position == 6) toReturn.setSelected(true);
-		else toReturn.setSelected(false);
 		
 		TextView indicatorTxt = (TextView)toReturn.findViewById(R.id.feedItemRetweetIndicatorTxt);
 		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
