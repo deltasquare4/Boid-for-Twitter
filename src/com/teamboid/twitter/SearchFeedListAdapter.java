@@ -142,90 +142,93 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		RelativeLayout toReturn = null;
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
-		toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-		final Tweet tweet = tweets.get(position);
+		Tweet tweet = tweets.get(position);
+		
+		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
+		TextView timerTxt = (TextView)toReturn.findViewById(R.id.feedItemTimerTxt);
+		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText);
+		TextView locIndicator = (TextView)toReturn.findViewById(R.id.locationIndicTxt);
+		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
+		ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
+		final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+		View replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
+		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
+		View locFrame = toReturn.findViewById(R.id.locationFrame);
+		FeedListAdapter.ApplyFontSize(itemTxt, mContext);
+		FeedListAdapter.ApplyFontSize(userNameTxt, mContext);
+		
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
+			userNameTxt.setText(tweet.getFromUserName());
+		} else userNameTxt.setText(tweet.getFromUser());
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
 			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
+			final Tweet fTweet = tweet;
 			profilePic.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) { 
-					mContext.startActivity(new Intent(mContext, ProfileScreen.class).putExtra("screen_name", tweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				public void onClick(View v) {
+					mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
+					.putExtra("screen_name", fTweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
-			}); 
-		} else{
-			profilePic.setVisibility(View.GONE);
-		}
-		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
-			((TextView)toReturn.findViewById(R.id.feedItemUserName)).setText(tweet.getFromUserName());
-		} else ((TextView)toReturn.findViewById(R.id.feedItemUserName)).setText(tweet.getFromUser());
-		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
+			});
+		} else profilePic.setVisibility(View.GONE);
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
-		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
-		if(tweet.getPlace() != null || tweet.getGeoLocation() != null) {
-			toReturn.findViewById(R.id.locationFrame).setVisibility(View.VISIBLE);
-			if(tweet.getPlace() != null) {
-				Place p = tweet.getPlace();
-				((TextView)toReturn.findViewById(R.id.locationIndicTxt)).setText(p.getFullName());
-			} else {
-				GeoLocation g = tweet.getGeoLocation();
-				((TextView)toReturn.findViewById(R.id.locationIndicTxt)).setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
-			}
-		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
-		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
+		boolean hasMedia = false;
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, R.id.feedItemMediaFrame);
-				itemTxt.setLayoutParams(params);
-				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
-				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+				hasMedia = true;
+				FeedListAdapter.addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+				FeedListAdapter.addRule(replyFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+				mediaFrame.setVisibility(View.VISIBLE);
 				mediaPreview.setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
+				mediaIndic.setVisibility(View.VISIBLE);
 				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
 					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30));
-					progress.setVisibility(View.VISIBLE);
+					mediaProg.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
 						@Override
 						public void onImageReceived(String source, Bitmap bitmap) {
-							progress.setVisibility(View.GONE);
+							mediaProg.setVisibility(View.GONE);
 							mediaPreview.setVisibility(View.VISIBLE);
 							mediaPreview.setImageBitmap(bitmap);
 						}
 					});
-				} else {
-					toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-					toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-					mediaPreview.setVisibility(View.GONE);
-					mediaPreview.setImageBitmap(null);
-				}
-			} else {
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, R.id.feedItemUserName);
-				itemTxt.setLayoutParams(params);
-				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-				mediaPreview.setVisibility(View.GONE);
-				mediaPreview.setImageBitmap(null);
-			}
-		} else {
-			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-			mediaPreview.setVisibility(View.GONE);
-			mediaPreview.setImageBitmap(null);
-		}
+				} else hideInlineMedia(toReturn);
+			} else hideInlineMedia(toReturn);
+		} else hideInlineMedia(toReturn);
 		if(Utilities.tweetContainsVideo(tweet)) {
-			toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.VISIBLE);
-		} else toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.GONE);
+			videoIndic.setVisibility(View.VISIBLE);
+		} else videoIndic.setVisibility(View.GONE);
+		if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
+			if(!hasMedia) FeedListAdapter.addRule(locFrame, R.id.feedItemText, RelativeLayout.BELOW);
+			locFrame.setVisibility(View.VISIBLE);
+			if(tweet.getPlace() != null) {
+				Place p = tweet.getPlace();
+				locIndicator.setText(p.getFullName());
+			} else {
+				GeoLocation g = tweet.getGeoLocation();
+				locIndicator.setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
+			}
+		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
 		return toReturn;
+	}
+	
+	private void hideInlineMedia(View toReturn) {
+		ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
+		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		mediaFrame.setVisibility(View.GONE);
+		mediaProg.setVisibility(View.GONE);
+		mediaPreview.setVisibility(View.GONE);
+		mediaPreview.setImageBitmap(null);
 	}
 }
