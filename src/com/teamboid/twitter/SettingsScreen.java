@@ -198,6 +198,7 @@ public class SettingsScreen extends PreferenceActivity  {
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 			Dialog diag = new Dialog(getActivity());
 			diag.setContentView(R.layout.font_size_dialog);
+			diag.setCancelable(true);
 			diag.setTitle(R.string.font_size);
 			final TextView display = (TextView)diag.findViewById(R.id.fontSizeDialogExample);
 			final SeekBar slider = (SeekBar)diag.findViewById(R.id.fontSizeDialogSlider);
