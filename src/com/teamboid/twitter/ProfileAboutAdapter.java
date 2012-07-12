@@ -85,8 +85,11 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			final RemoteImageView profileImg = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
 			profileImg.setImageResource(R.drawable.sillouette);
 			profileImg.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
-			((TextView)toReturn.findViewById(R.id.userItemName)).setText(user.getName());
+			TextView userName = (TextView)toReturn.findViewById(R.id.userItemName);
+			userName.setText(user.getName());
+			FeedListAdapter.ApplyFontSize(userName, mContext);
 			TextView desc = (TextView)toReturn.findViewById(R.id.userItemDescription);
+			FeedListAdapter.ApplyFontSize(desc, mContext);
 			if(user.getDescription() != null && user.getDescription().trim().length() > 0) {
 				desc.setText(Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, true));
 				desc.setMovementMethod(LinkMovementMethod.getInstance());
@@ -257,8 +260,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			BasicNameValuePair curItem = values.get(position - 1);
 			//Can't recycle here, causes crashing
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
-			((TextView)toReturn.findViewById(R.id.infoListItemTitle)).setText(curItem.getName());
-			((TextView)toReturn.findViewById(R.id.infoListItemBody)).setText(curItem.getValue());
+			TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
+			title.setText(curItem.getName());
+			FeedListAdapter.ApplyFontSize(title, mContext);
+			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
+			body.setText(curItem.getValue());
+			FeedListAdapter.ApplyFontSize(body, mContext);
 		}
 		return toReturn;
 	}
