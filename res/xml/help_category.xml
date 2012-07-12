@@ -15,4 +15,10 @@
 		android:title="@string/share_boid_title" />
 	<Preference android:key="version" android:title="@string/version_title" />
 	<Preference android:key="build" android:title="@string/build_title" />
+	
+	<Preference android:key="aboutImgAPI" android:summary="@string/about_twicsy_api_summary"
+		android:title="@string/about_twicsy_api">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="http://twicsy.com/" />
+	</Preference>
 </PreferenceScreen>

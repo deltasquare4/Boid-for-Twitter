@@ -7,6 +7,8 @@ import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.UserList;
 
+import com.handlerexploit.prime.utils.ImageManager;
+import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
 import com.handlerexploit.prime.widgets.RemoteImageView;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
@@ -15,6 +17,7 @@ import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,15 +25,20 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,17 +96,6 @@ public class ProfileScreen extends Activity {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, false);
 		}
-		
-		((MediaTimelineFragment)mTabsAdapter.getItem(2)).listener = new TabsAdapter.TabListener(){
-
-			@Override
-			public void finishedLoading() {
-				if(hasShownMedia) return;
-				hasShownMedia = true;
-				setupMediaView();
-			}
-			
-		};
 		
 		if(savedInstanceState != null) getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("lastTab", 0));
 	}
@@ -286,17 +283,29 @@ public class ProfileScreen extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 
+	void setHeaderBackground(String url){
+		ImageManager.getInstance(this).get(url, new OnImageReceivedListener(){
+			
+			@Override
+			public void onImageReceived(String arg0, Bitmap bitmap) {
+				((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
+			}
+		});
+	}
+	
 	/**
 	 * Sets up our own views for this
 	 */
 	public void setupViews() {
 		
-		// TODO: Circle
-		RemoteImageView riv = (RemoteImageView)findViewById(R.id.userItemProfilePic);
-		riv.setImageURL(Utilities.getUserImage(user.getScreenName(), this));
-		
-		riv = (RemoteImageView)findViewById(R.id.img);
-		riv.setImageURL(user.getProfileBackgroundImageUrl());
+		ImageManager.getInstance(this).get(Utilities.getUserImage(user.getScreenName(), this), new OnImageReceivedListener(){
+
+			@Override
+			public void onImageReceived(String arg0, Bitmap bitmap) {
+				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
+			}
+			
+		});
 		
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
@@ -323,13 +332,15 @@ public class ProfileScreen extends Activity {
 			@Override
 			public void onPageScrolled(int position, float offset, int offsetPixels) {
 				if(position >= 1){
-					findViewById(R.id.profileHeader).setX(offsetPixels);
+					findViewById(R.id.profileHeader).setX(-offsetPixels);
 				}
 			}
 
 			@Override
 			public void onPageSelected(int position) {
 				findViewById(R.id.profileHeader).setVisibility( position > 1 ? View.GONE : View.VISIBLE );
+				//findViewById(R.id.profileHeader).animate().alpha(position > 1 ? 0 : 1 );
+				mTabsAdapter.onPageSelected(position);
 			}
 			
 		});
@@ -340,14 +351,13 @@ public class ProfileScreen extends Activity {
 	 * Set first media
 	 */
 	public void setupMediaView(){
-		RemoteImageView riv = (RemoteImageView)findViewById(R.id.img);
 		try{
-			twitter4j.Status m = mediaAdapter.get(0);
-			String media = Utilities.getTweetYFrogTwitpicMedia(m);
-			riv.setImageURL(media);
+			MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
+			setHeaderBackground(m.imgurl);
 		} catch(Exception e){
 			e.printStackTrace();
 			// Here we should divert to profile bg?
+			setHeaderBackground(user.getProfileBackgroundImageUrl());
 		}
 	}
 	

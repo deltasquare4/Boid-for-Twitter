@@ -160,6 +160,7 @@ public class TweetViewer extends MapActivity {
 
 	private void preloadTweet() {
 		statusId = getIntent().getLongExtra("tweet_id", 0l);
+		if(!getIntent().hasExtra("screen_name")) return;
 		final String screenName = getIntent().getStringExtra("screen_name");
 		setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
 		RelativeLayout toReturn = (RelativeLayout)findViewById(R.id.tweetDisplay);

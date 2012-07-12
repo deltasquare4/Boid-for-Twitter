@@ -345,4 +345,7 @@
 	<string name="unsubscribe_list_prompt">Are you sure you want to unsubscribe from {listname}?</string>
 	<string name="follow_boidapp_prompt">Do you want to follow @boidapp? You\'ll only be asked once for one account, if you have others you\'ll have to manually follow @boidapp for them.</string>
 	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so manually later.</string>
+	
+	<string name="about_twicsy_api">Uses Twicsy API</string>
+	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s photo feed. You should check them out</string>
 </resources>

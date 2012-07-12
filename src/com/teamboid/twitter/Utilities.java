@@ -91,10 +91,10 @@ public class Utilities {
 		}
 	}
 	public static void recreateMediaFeedAdapter(Activity context, MediaFeedListAdapter adapt) {
-		Status[] before = null;
+		MediaFeedListAdapter.MediaFeedItem[] before = null;
 		if(adapt.getCount() > 0) before = adapt.toArray();
 		adapt = new MediaFeedListAdapter(context, adapt.ID, adapt.account);
-		if(before != null) adapt.add(before, true, null);
+		if(before != null) adapt.add(before, null);
 		int index = 0;
 		for(MediaFeedListAdapter a : AccountService.mediaAdapters) {
 			if(a.ID.equals(adapt.ID) && a.account == adapt.account) {
@@ -519,7 +519,8 @@ public class Utilities {
 		}
 		return inSampleSize;
 	}
-	public static Bitmap getRoundedImage(Bitmap bitmap) {
+	
+	public static Bitmap getRoundedImage(Bitmap bitmap, float roundPx) {
 		if(bitmap == null) return bitmap;
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
@@ -527,7 +528,7 @@ public class Utilities {
 		final Paint paint = new Paint();
 		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 		final RectF rectF = new RectF(rect);
-		final float roundPx = 4.0f;
+		// final float roundPx = 4.0f;
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(color);
@@ -577,15 +578,18 @@ public class Utilities {
 	public static String getUserImage(String screenname, Context mContext){
 		return getUserImage(screenname, mContext, null);
 	}
+	public static int DpToPx(int dp, Context mContext){
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
+		return (int)(outMetrics.density * dp); // 50dp in pixels
+	}
 	public static String getUserImage(String screenname, Context mContext, twitter4j.User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache
 			url += "&v=" + Uri.encode(user.getProfileImageURL().toString());
 		}
 		
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
-		int size = (int) (outMetrics.density * 50); // 50dp in pixels
+		int size = DpToPx(50, mContext);
 		if( size >= 73 ){
 			url += "&size=bigger";
 		} else if( size >= 48 ){
