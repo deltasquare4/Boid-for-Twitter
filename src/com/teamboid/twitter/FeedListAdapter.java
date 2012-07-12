@@ -32,9 +32,14 @@ public class FeedListAdapter extends BaseAdapter {
 	
 	public static void ApplyFontSize(TextView in, Context c){
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		in.setTextSize(Float.parseFloat(prefs.getString("font_size", "18")));
+		in.setTextSize(Float.parseFloat(prefs.getString("font_size", "16")));
 	}
-
+	public static void addRule(View target, int relativeToId, int rule) {
+		RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)target.getLayoutParams();
+		p.addRule(rule, relativeToId);
+		target.setLayoutParams(p);
+	}
+	
 	public FeedListAdapter(Activity context, String id, long _account) {
 		mContext = context;
 		tweets = new ArrayList<Status>();
@@ -221,32 +226,45 @@ public class FeedListAdapter extends BaseAdapter {
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
 		Status tweet = tweets.get(position);
+		
 		TextView indicatorTxt = (TextView)toReturn.findViewById(R.id.feedItemRetweetIndicatorTxt);
 		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
+		TextView timerTxt = (TextView)toReturn.findViewById(R.id.feedItemTimerTxt);
+		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText);
+		TextView locIndicator = (TextView)toReturn.findViewById(R.id.locationIndicTxt);
+		TextView replyIndic = (TextView)toReturn.findViewById(R.id.inReplyIndicTxt);
+		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		ImageView rtIndic = (ImageView)toReturn.findViewById(R.id.feedItemRetweetIndicatorImg);
+		ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
+		ImageView favoritedIndic = (ImageView)toReturn.findViewById(R.id.feedItemFavoritedIndicator);
+		ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
+		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
+		final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+		View replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
+		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
+		View locFrame = toReturn.findViewById(R.id.locationFrame);
+		ApplyFontSize(itemTxt, mContext);
+		ApplyFontSize(userNameTxt, mContext);
+		
 		if(tweet.isRetweet()) {
 			Spannable rtSpan = new SpannableString("RT by @" + tweet.getUser().getScreenName());
 			rtSpan.setSpan(new NoUnderlineClickableSpan() {
 				@Override
 				public void onClick(View arg0) { }
 			}, 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			tweet = tweet.getRetweetedStatus();			
-			((ImageView)toReturn.findViewById(R.id.feedItemRetweetIndicatorImg)).setVisibility(View.VISIBLE);
-			RelativeLayout.LayoutParams userNameParams = (RelativeLayout.LayoutParams)userNameTxt.getLayoutParams();
-			userNameParams.addRule(RelativeLayout.BELOW, R.id.feedItemRetweetIndicatorTxt);
-			userNameTxt.setLayoutParams(userNameParams);
+			tweet = tweet.getRetweetedStatus();
+			rtIndic.setVisibility(View.VISIBLE);
+			addRule(userNameTxt, R.id.feedItemRetweetIndicatorTxt, RelativeLayout.BELOW);
 			indicatorTxt.setText(rtSpan);
 			indicatorTxt.setVisibility(View.VISIBLE);
 		} else {
-			((ImageView)toReturn.findViewById(R.id.feedItemRetweetIndicatorImg)).setVisibility(View.GONE);
-			RelativeLayout.LayoutParams userNameParams = (RelativeLayout.LayoutParams)userNameTxt.getLayoutParams();
-			userNameParams.addRule(RelativeLayout.BELOW, 0);
-			userNameTxt.setLayoutParams(userNameParams);
+			rtIndic.setVisibility(View.GONE);
+			addRule(userNameTxt, 0, RelativeLayout.BELOW);
 			indicatorTxt.setVisibility(View.GONE);
 		}
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
 		} else userNameTxt.setText(tweet.getUser().getScreenName());
-		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
 			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));
@@ -257,85 +275,68 @@ public class FeedListAdapter extends BaseAdapter {
 					.putExtra("screen_name", fTweet.getUser().getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
 			});
-		} else {
-			profilePic.setVisibility(View.GONE);
-		}
-		final TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
+		} else profilePic.setVisibility(View.GONE);
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
-		ApplyFontSize(itemTxt, mContext);
-		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
-		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
+		boolean hasMedia = false;
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if(media != null && !media.isEmpty()) {
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, R.id.feedItemMediaFrame);
-				itemTxt.setLayoutParams(params);
-				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.VISIBLE);
-				final ProgressBar progress = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+				hasMedia = true;
+				addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+				addRule(replyFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+				mediaFrame.setVisibility(View.VISIBLE);
 				mediaPreview.setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.VISIBLE);
+				mediaIndic.setVisibility(View.VISIBLE);
 				if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_inline_previewing", true)) {
 					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30));
-					progress.setVisibility(View.VISIBLE);
+					mediaProg.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
 					download.get(media, new ImageManager.OnImageReceivedListener() {
 						@Override
 						public void onImageReceived(String source, Bitmap bitmap) {
-							progress.setVisibility(View.GONE);
+							mediaProg.setVisibility(View.GONE);
 							mediaPreview.setVisibility(View.VISIBLE);
 							mediaPreview.setImageBitmap(bitmap);
 						}
 					});
-				} else {
-					toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-					toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-					mediaPreview.setVisibility(View.GONE);
-					mediaPreview.setImageBitmap(null);
-				}
-			} else {
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)itemTxt.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, R.id.feedItemUserName);
-				itemTxt.setLayoutParams(params);
-				toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-				toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-				mediaPreview.setVisibility(View.GONE);
-				mediaPreview.setImageBitmap(null);
-			}
-		} else {
-			toReturn.findViewById(R.id.feedItemMediaIndicator).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaFrame).setVisibility(View.GONE);
-			toReturn.findViewById(R.id.feedItemMediaProgress).setVisibility(View.GONE);
-			mediaPreview.setVisibility(View.GONE);
-			mediaPreview.setImageBitmap(null);
-		}
+				} else hideInlineMedia(toReturn);
+			} else hideInlineMedia(toReturn);
+		} else hideInlineMedia(toReturn);
 		if(Utilities.tweetContainsVideo(tweet)) {
-			toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.VISIBLE);
-		} else toReturn.findViewById(R.id.feedItemVideoIndicator).setVisibility(View.GONE);
+			videoIndic.setVisibility(View.VISIBLE);
+		} else videoIndic.setVisibility(View.GONE);
 		if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
-			toReturn.findViewById(R.id.locationFrame).setVisibility(View.VISIBLE);
+			if(!hasMedia) addRule(locFrame, R.id.feedItemText, RelativeLayout.BELOW);
+			locFrame.setVisibility(View.VISIBLE);
 			if(tweet.getPlace() != null) {
 				Place p = tweet.getPlace();
-				((TextView)toReturn.findViewById(R.id.locationIndicTxt)).setText(p.getFullName());
+				locIndicator.setText(p.getFullName());
 			} else {
 				GeoLocation g = tweet.getGeoLocation();
-				((TextView)toReturn.findViewById(R.id.locationIndicTxt)).setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
+				locIndicator.setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
 			}
 		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
-		if(tweet.isFavorited()) ((ImageView)toReturn.findViewById(R.id.feedItemFavoritedIndicator)).setVisibility(View.VISIBLE);
-		else ((ImageView)toReturn.findViewById(R.id.feedItemFavoritedIndicator)).setVisibility(View.GONE);
-		RelativeLayout replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
+		if(tweet.isFavorited()) favoritedIndic.setVisibility(View.VISIBLE);
+		else favoritedIndic.setVisibility(View.GONE);
 		if(tweet.getInReplyToStatusId() > 0) {
 			replyFrame.setVisibility(View.VISIBLE);
-			((TextView)toReturn.findViewById(R.id.inReplyIndicTxt)).setText(mContext.getString(R.string.in_reply_to) + " @" + tweet.getInReplyToScreenName());
+			replyIndic.setText(mContext.getString(R.string.in_reply_to) + " @" + tweet.getInReplyToScreenName());
 			if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)replyFrame.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, R.id.locationFrame);
-				replyFrame.setLayoutParams(params);
-			}
+				addRule(replyFrame, R.id.locationFrame, RelativeLayout.BELOW);
+			} else if(!hasMedia) addRule(replyFrame, R.id.feedItemText, RelativeLayout.BELOW);
 		} else replyFrame.setVisibility(View.GONE);
 		return toReturn;
+	}
+	
+	private void hideInlineMedia(View toReturn) {
+		ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
+		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+		mediaFrame.setVisibility(View.GONE);
+		mediaProg.setVisibility(View.GONE);
+		mediaPreview.setVisibility(View.GONE);
+		mediaPreview.setImageBitmap(null);
 	}
 }

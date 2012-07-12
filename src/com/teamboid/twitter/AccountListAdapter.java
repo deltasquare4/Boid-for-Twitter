@@ -38,11 +38,14 @@ public class AccountListAdapter extends BaseAdapter {
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.accountItemProfilePic);
 		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(curUser.getScreenName(), mContext));
-		((TextView)toReturn.findViewById(R.id.accountItemName)).setText(curUser.getName());
+		TextView nameTxt = (TextView)toReturn.findViewById(R.id.accountItemName);
+		nameTxt.setText(curUser.getName());
+		FeedListAdapter.ApplyFontSize(nameTxt, mContext);
+		TextView descTxt = (TextView)toReturn.findViewById(R.id.accountItemDescription); 
 		if(curUser.getDescription() != null && !curUser.getDescription().trim().isEmpty()) {
-			((TextView)toReturn.findViewById(R.id.accountItemDescription)).setText(Utilities.twitterifyText(
-					mContext, curUser.getDescription(), null, null, false));
-		} else ((TextView)toReturn.findViewById(R.id.accountItemDescription)).setText(mContext.getApplicationContext().getString(R.string.nodescription_str));
+			descTxt.setText(Utilities.twitterifyText(mContext, curUser.getDescription(), null, null, false));
+		} else descTxt.setText(mContext.getApplicationContext().getString(R.string.nodescription_str));
+		FeedListAdapter.ApplyFontSize(descTxt, mContext);
 		return toReturn;
 	}
 }

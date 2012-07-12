@@ -361,9 +361,9 @@
 	<string-array name="font_sizes_values">
 	    <!-- Scaled Pixels -->
 	    <item>8</item>
-	    <item>12</item>
+	    <item>11</item>
 	    <item>16</item>
-	    <item>30</item>
-	    <item>50</item>
+	    <item>32</item>
+	    <item>48</item>
 	</string-array>
 </resources>
