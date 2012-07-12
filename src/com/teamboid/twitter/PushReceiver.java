@@ -10,9 +10,6 @@ import javax.net.ssl.SSLSession;
 
 import org.json.JSONObject;
 
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
-import com.teamboid.twitter.compat.Api11;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +19,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.teamboid.twitter.TabsAdapter.MentionsFragment;
+import com.teamboid.twitter.compat.Api11;
 
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
@@ -87,7 +87,7 @@ public class PushReceiver extends BroadcastReceiver {
 
 						@Override
 						public void run() {
-							 AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
+							 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
 						}
 						
 					});

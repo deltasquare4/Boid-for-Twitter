@@ -188,6 +188,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 			layoutParams.addRule(RelativeLayout.BELOW, R.id.dmConvoScreenNameTxt);
 			messageTxt.setLayoutParams(layoutParams);
 		}
+		FeedListAdapter.ApplyFontSize(messageTxt, context);
 		((TextView)toReturn.findViewById(R.id.dmConvoScreenNameTxt)).setText(curItem.getToName());
 		messageTxt.setText(Utilities.twitterifyText(context, curItem.getLastMessage().getText().replace("\n", " ").trim(), null, null, true));
 		return toReturn;
