@@ -155,14 +155,18 @@ public class ProfileScreen extends Activity {
 			}
 			return true;
 		case R.id.addToListAction:
-			Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT).show();
+			final Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT);
+			toast.show();
 			new Thread(new Runnable() {
 				public void run() {
 					Account acc = AccountService.getCurrentAccount();
 					try {
 						final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
 						runOnUiThread(new Runnable() {
-							public void run() { showAddToListDialog(lists.toArray(new UserList[0])); }
+							public void run() { 
+								toast.cancel();
+								showAddToListDialog(lists.toArray(new UserList[0]));
+							}
 						});
 					} catch (TwitterException e) {
 						e.printStackTrace();
