@@ -17,7 +17,9 @@
 	<SwitchPreference android:key="show_real_names"
 		android:layout="@layout/boid_preference" android:summary="@string/display_real_name_desc"
 		android:title="@string/display_real_name" android:persistent="true" />
-	<com.teamboid.twitter.FontSizePreference android:key="font_size"
-	    android:layout="@layout/boid_preference" android:summary="@string/font_size_desc"
-		android:title="@string/font_size" android:persistent="true"  android:entryValues="@array/font_sizes_values" android:entries="@array/font_sizes"/>
+	<com.teamboid.twitter.FontSizePreference
+		android:key="font_size" android:layout="@layout/boid_preference"
+		android:summary="@string/font_size_desc" android:title="@string/font_size"
+		android:persistent="true" android:entryValues="@array/font_sizes_values"
+		android:entries="@array/font_sizes" />
 </PreferenceScreen>

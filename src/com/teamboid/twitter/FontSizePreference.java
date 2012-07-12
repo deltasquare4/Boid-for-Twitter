@@ -23,8 +23,7 @@ public class FontSizePreference extends ListPreference {
 
 	private int mClickedDialogEntryIndex;
 	public class FontItem{
-		public FontItem(String key, String value){ this.key = key; this.value = value; }
-		
+		public FontItem(String key, String value){ this.key = key; this.value = value; }	
 		public String key;
 		public String value;
 	}
@@ -32,12 +31,9 @@ public class FontSizePreference extends ListPreference {
 	@Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
-        
-        if (positiveResult && mClickedDialogEntryIndex >= 0 && getEntryValues() != null) {
+        if(positiveResult && mClickedDialogEntryIndex >= 0 && getEntryValues() != null) {
             String value = getEntryValues()[mClickedDialogEntryIndex].toString();
-            if (callChangeListener(value)) {
-                setValue(value);
-            }
+            if(callChangeListener(value)) setValue(value);
         }
     }
 
@@ -48,7 +44,6 @@ public class FontSizePreference extends ListPreference {
 	@Override
     protected void onPrepareDialogBuilder(Builder builder) {
         super.onPrepareDialogBuilder(builder);
-        
         mClickedDialogEntryIndex = getValueIndex();
         final List<FontItem> data = new ArrayList<FontItem>();
         int i = 0;
@@ -56,8 +51,6 @@ public class FontSizePreference extends ListPreference {
         	data.add(new FontItem( getEntries()[i].toString(), getEntryValues()[i].toString() ));
         	i++;
         }
-        
-        // Purely here is the UX gained :') That's all
         ListAdapter adapter = new ArrayAdapter<FontItem>(getContext(), 0, data){
         	@Override
         	public View getView (int position, View convertView, ViewGroup parent){
@@ -65,11 +58,11 @@ public class FontSizePreference extends ListPreference {
         		TextView tv = new TextView(getContext());
         		tv.setText(ft.key);
         		tv.setTextSize( Float.parseFloat( ft.value ) );
-        		tv.setPadding(10, 10, 10, 10);
+        		int tenDp = Utilities.convertDpToPx(getContext(), 10);
+        		tv.setPadding(tenDp, tenDp, tenDp, tenDp);
         		return tv;
         	}
         };
-        
         mClickedDialogEntryIndex = getValueIndex();
         builder.setSingleChoiceItems(adapter, mClickedDialogEntryIndex, new DialogInterface.OnClickListener() {
 			

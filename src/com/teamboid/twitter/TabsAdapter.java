@@ -58,7 +58,6 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Space;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -1902,20 +1901,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					final Account acc = AccountService.getCurrentAccount();
 					if(acc != null) {
 						try {
-							if(screenName != null){
+							if(screenName != null) {
 								// Powered by Twicsy
-								try{
+								try {
 									HttpClient httpclient = new DefaultHttpClient();
-									
 									String url = "http://api.twicsy.com/user/" + Uri.encode(screenName);
-									if(paging.getMaxId() != -1){ url += "/skip/" + paging.getMaxId(); }
+									if(paging.getMaxId() > 0) url += "/skip/" + paging.getMaxId();
 									HttpGet g = new HttpGet(url);
 									HttpResponse r = httpclient.execute(g);
-									if(r.getStatusLine().getStatusCode() == 200){
+									if(r.getStatusLine().getStatusCode() == 200) {
 										JSONObject jo = new JSONObject(EntityUtils.toString(r.getEntity()));
 										JSONArray results = jo.getJSONArray("results");
 										int i = 0;
-										while(i < results.length()){
+										while(i < results.length()) {
 											final JSONObject result = results.getJSONObject(i);
 											i++;
 											context.runOnUiThread(new Runnable(){
@@ -1926,57 +1924,41 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 													try {
 														m.imgurl = result.getString("thumb");
 														m.twicsy_id = result.getString("id");
-														adapt.add(new MediaFeedItem[]{
-																m
-														}, MediaTimelineFragment.this);
-														
+														adapt.add(new MediaFeedItem[] { m }, MediaTimelineFragment.this);
 														// WARN: Should be safer. Persuming ProfileScreen
-														if(adapt.getCount() == 1){
+														if(adapt.getCount() == 1) {
 															((ProfileScreen)context).setupMediaView();
 														}
-													} catch (JSONException e) {
-														// Should never never happen
-														e.printStackTrace();
-													}
+													} catch (JSONException e) { e.printStackTrace(); }
 												}
 												
 											});
 										}
-									} else{ throw new Exception("non-200 response code"); }
+									} else throw new Exception("non-200 response code");
 								} catch(Exception e){
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable(){
-
 										@Override
-										public void run() {
-											setEmptyText(context.getString(R.string.error_str));
-										}
-										
+										public void run() { setEmptyText(context.getString(R.string.error_str));}
 									});
 								}
 								// TODO: temp = acc.getClient().getUserTimeline(screenName, paging);
-							}
-							else{ // OLD mechanism, I wish Twitter made this better
+							} else { // OLD mechanism, I wish Twitter made this better
 								ResponseList<Status> temp = acc.getClient().getHomeTimeline(paging);
 								for(final Status p : temp){
 									if(Utilities.getTweetYFrogTwitpicMedia(p) != null){
 										context.runOnUiThread(new Runnable(){
-
 											@Override
 											public void run() {
 												MediaFeedItem m = new MediaFeedItem();
 												m.imgurl = Utilities.getTweetYFrogTwitpicMedia(p);
 												m.tweet_id = p.getId();
-												adapt.add(new MediaFeedItem[]{
-														m
-												}, MediaTimelineFragment.this);
+												adapt.add(new MediaFeedItem[] { m }, MediaTimelineFragment.this);
 											}
-											
 										});
 									}
 								}
 							}
-							
 						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
