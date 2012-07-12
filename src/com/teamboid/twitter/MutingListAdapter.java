@@ -35,14 +35,18 @@ public class MutingListAdapter extends BaseAdapter {
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.muting_manager_item, null);
 		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
 		final String curRule = loadKeywords()[position];
+		TextView text1 = (TextView)toReturn.findViewById(android.R.id.text1);
+		FeedListAdapter.ApplyFontSize(text1, mContext);
+		TextView text2 = (TextView)toReturn.findViewById(android.R.id.text2);
+		FeedListAdapter.ApplyFontSize(text2, mContext);
 		if(curRule.contains("@")) {
-			((TextView)toReturn.findViewById(android.R.id.text1)).setText(curRule.substring(0, curRule.indexOf("@")).replace("%40", "@"));
+			text1.setText(curRule.substring(0, curRule.indexOf("@")).replace("%40", "@"));
 			if(curRule.endsWith("@" + types[1])) {
-				((TextView)toReturn.findViewById(android.R.id.text2)).setText(types[1].toLowerCase());
-			} else ((TextView)toReturn.findViewById(android.R.id.text2)).setText(types[2].toLowerCase());
+				text2.setText(types[1].toLowerCase());
+			} else text2.setText(types[2].toLowerCase());
 		} else {
-			((TextView)toReturn.findViewById(android.R.id.text1)).setText(curRule.replace("%40", "@"));
-			((TextView)toReturn.findViewById(android.R.id.text2)).setText(types[0].toLowerCase());
+			text1.setText(curRule.replace("%40", "@"));
+			text2.setText(types[0].toLowerCase());
 		}
 		return toReturn;
 	}

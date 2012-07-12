@@ -96,11 +96,14 @@ public class SearchUsersListAdapter extends BaseAdapter {
 		final RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.userItemProfilePic);
 		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(user.getScreenName(), mContext));
-		((TextView)toReturn.findViewById(R.id.userItemName)).setText(user.getName());
+		TextView userName = (TextView)toReturn.findViewById(R.id.userItemName);
+		FeedListAdapter.ApplyFontSize(userName, mContext);
+		TextView userDesc = (TextView)toReturn.findViewById(R.id.userItemDescription);
+		FeedListAdapter.ApplyFontSize(userDesc, mContext);
+		userName.setText(user.getName());
 		if(user.getDescription() != null && !user.getDescription().trim().isEmpty()) {
-			((TextView)toReturn.findViewById(R.id.userItemDescription)).setText(
-					Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, false));
-		} else ((TextView)toReturn.findViewById(R.id.userItemDescription)).setText(mContext.getApplicationContext().getString(R.string.nodescription_str)); 
+			userDesc.setText(Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, false));
+		} else userDesc.setText(mContext.getApplicationContext().getString(R.string.nodescription_str)); 
 		if(user.isVerified()) ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.VISIBLE);
 		else ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.GONE);
 		return toReturn;
