@@ -19,6 +19,11 @@ import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
+import com.teamboid.twitter.views.BetterMapView;
+import com.teamboid.twitter.views.GeoMapOverlay;
+import com.teamboid.twitter.views.GlowableRelativeLayout;
+import com.teamboid.twitter.views.PolygonOverlay;
+import com.teamboid.twitter.views.SideNavigationLayout;
 
 import twitter4j.GeoLocation;
 import twitter4j.Place;
@@ -155,6 +160,7 @@ public class TweetViewer extends MapActivity {
 
 	private void preloadTweet() {
 		statusId = getIntent().getLongExtra("tweet_id", 0l);
+		if(!getIntent().hasExtra("screen_name")) return;
 		final String screenName = getIntent().getStringExtra("screen_name");
 		setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
 		RelativeLayout toReturn = (RelativeLayout)findViewById(R.id.tweetDisplay);

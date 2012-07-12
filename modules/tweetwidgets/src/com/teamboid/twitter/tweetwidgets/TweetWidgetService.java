@@ -42,18 +42,19 @@ public static final ITweetWidgetService.Stub binder = new ITweetWidgetService.St
 	}
 	
 	public void handleCommand(Intent i){
-		if(i != null && i.hasExtra("widgetId")) {
-			try {
+		try {
+			if(i.hasExtra("widgetId")){
 				if(i.hasExtra("rv")){
 					binder.updateWidget(i.getLongExtra("widgetId", 0), i.getStringExtra("forUrl"), (RemoteViews)i.getParcelableExtra("rv"));
 				} else binder.sendError(i.getLongExtra("widgetId", 0), i.getStringExtra("forUrl"));
-			} catch (RemoteException e) { e.printStackTrace(); }
-		}
+			}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 	    handleCommand(intent);
-	    return Service.START_STICKY;
+	    return Service.START_NOT_STICKY;
 	}
 }
+

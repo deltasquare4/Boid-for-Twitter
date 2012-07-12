@@ -1,21 +1,31 @@
 package com.teamboid.twitter;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.json.JSONObject;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.SSLCertificateSocketFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.teamboid.twitter.TabsAdapter.MentionsFragment;
+import com.teamboid.twitter.compat.Api11;
+
 public class PushReceiver extends BroadcastReceiver {
-	public static final String SENDER_EMAIL = "push@boidapp.com";
-	public static final String SERVER = "http://192.168.0.9:1337";
+	public static final String SENDER_EMAIL = "107821281305";
+	public static final String SERVER = "https://192.168.0.9:1337";
 	
 	public static class PushWorker extends Service{
 		
@@ -32,37 +42,64 @@ public class PushReceiver extends BroadcastReceiver {
 				@Override
 				public void run() {
 					try{
-						DefaultHttpClient dhc = new DefaultHttpClient();
-						HttpGet g = new HttpGet(SERVER + "/register?userid="+AccountService.getCurrentAccount().getId()+
-								"&token=" + intent.getStringExtra("reg"));
-						HttpResponse r = dhc.execute(g);
-						if(r.getStatusLine().getStatusCode() == 200){
+						Account acc = AccountService.getCurrentAccount();
+						final URL url = new URL(SERVER + "/register?userid="+acc.getId()+
+								"&token=" + Uri.encode(intent.getStringExtra("reg")) +
+								"&accesstoken=" +  Uri.encode(acc.getToken()) + 
+								"&accesssecret=" +  Uri.encode(acc.getSecret()));
+						
+						HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+						urlConnection.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(3000, null) );
+						urlConnection.setHostnameVerifier(new HostnameVerifier(){
+
+							@Override
+							public boolean verify(String hostname,
+									SSLSession session) {
+								if(hostname.equals(url.getHost())) return true;
+								return false;
+							}
+							
+						});
+						urlConnection.setDoOutput(true);
+						
+						InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+						while(in.read() != -1) { };
+						
+						if(urlConnection.getResponseCode() == 200){
 							Log.d("push", "REGISTERED");
 						}
+						urlConnection.disconnect();
+						settingUp = false;
 					}catch(Exception e){ e.printStackTrace(); }
 				}
 				
 			}).start();
 			} else if(intent.hasExtra("hm")){
-				new Thread(new Runnable(){
-					@Override
-					public void run() {
-						Bundle b = intent.getBundleExtra("hm");
-						try {
-							JSONObject status = new JSONObject(b.getString("tweet"));
-							twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
-							//TODO The account the mention is for should be passed from the server too
-							//Also, we need a way of combining multiple mentions/messages into one notification.
-							MultiAPIMethods.showSingleNotification("@screenname", s, PushWorker.this);
-						} catch(Exception e) {
-							e.printStackTrace();
+				Bundle b = intent.getBundleExtra("hm");
+				try {
+					JSONObject status = new JSONObject(b.getString("tweet"));
+					final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
+					//TODO The account the mention is for should be passed from the server too
+					// We have this now in "account" as a string
+					//Also, we need a way of combining multiple mentions/messages into one notification.
+					Api11.displayNotification(PushWorker.this, s);
+					AccountService.activity.runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
 						}
-					}				
-				}).start();
+						
+					});
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
-			return Service.START_STICKY;
+			return Service.START_NOT_STICKY;
 		}
 	}
+	
+	public static boolean settingUp = false;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -80,6 +117,9 @@ public class PushReceiver extends BroadcastReceiver {
 	}
 
 	private void handleRegistration(Context context, Intent intent) {
+		if(settingUp == true) return; // Don't double-register
+		settingUp = true;
+		
 		Log.d("boidpush", "REGISTER");
 		String registration = intent.getStringExtra("registration_id"); 
 	    if (intent.getStringExtra("error") != null) {

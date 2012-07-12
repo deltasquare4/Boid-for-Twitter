@@ -3,8 +3,17 @@ package com.teamboid.twitter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import com.teamboid.twitter.MediaFeedListAdapter.MediaFeedItem;
 import com.teamboid.twitter.MessageConvoAdapter.DMConversation;
 
 import twitter4j.DirectMessage;
@@ -27,6 +36,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,12 +51,14 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Space;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +89,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		mContext = activity;
 		mActionBar = activity.getActionBar();
 		mViewPager = pager;
+		mViewPager.setOffscreenPageLimit(4);
 		mViewPager.setAdapter(this);
 		mViewPager.setOnPageChangeListener(this);
 	}
@@ -190,6 +203,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void restorePosition();
 		public abstract void jumpTop();
 		public abstract void filter();
+		
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -248,7 +262,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		public boolean isLoading;
 		private boolean isShown;
-
+		
 		public abstract void performRefresh(boolean paginate);
 		public abstract void reloadAdapter(boolean firstInitialize);
 		public abstract void savePosition();
@@ -1790,15 +1804,51 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			});
 			grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				void viewTweet(long tweetid){
+					context.startActivity(new Intent(context, TweetViewer.class)
+						.putExtra("tweet_id", tweetid)
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				}
+				
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-					Status tweet = (Status)adapt.getItem(position);
-					if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-					context.startActivity(new Intent(context, TweetViewer.class)
-					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					final MediaFeedListAdapter.MediaFeedItem tweet = (MediaFeedListAdapter.MediaFeedItem)adapt.getItem(position);
+					if(tweet.tweet_id != -1){
+						viewTweet(tweet.tweet_id);
+					} else{
+						final ProgressDialog pd = new ProgressDialog(context);
+						pd.setMessage(context.getString(R.string.please_wait));
+						pd.show();
+						new Thread(new Runnable(){
+
+							@Override
+							public void run() {
+								try{
+									HttpClient httpclient = new DefaultHttpClient();
+									
+									String url = "http://api.twicsy.com/pic/" + Uri.encode(tweet.twicsy_id)  + "?max=1";
+									HttpGet g = new HttpGet(url);
+									HttpResponse r = httpclient.execute(g);
+									if(r.getStatusLine().getStatusCode() == 200){
+										final long tweetId = Long.parseLong(new JSONObject(EntityUtils.toString(r.getEntity())).getJSONArray("results").getJSONObject(0).getString("twitterStatusId"));
+										context.runOnUiThread(new Runnable(){
+											@Override
+											public void run(){viewTweet(tweetId);}
+										});
+									} else{ throw new Exception("Non 200 response"); }
+								} catch(Exception e){
+									e.printStackTrace();
+									Toast.makeText(context, R.string.error_str, Toast.LENGTH_SHORT).show();
+								}
+								pd.dismiss();
+								
+							}
+							
+						}).start();
+					}
 				}
 			});
+			/* I don' think this works well?
 			grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
@@ -1809,6 +1859,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					return false;
 				}
 			});
+			*/
 			setRetainInstance(true);
 			screenName = (String)getArguments().get("screenName");
 			manualRefresh = getArguments().getBoolean("manualRefresh", false);
@@ -1851,31 +1902,81 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					final Account acc = AccountService.getCurrentAccount();
 					if(acc != null) {
 						try {
-							ResponseList<Status> temp = null;
-							if(screenName != null) temp = acc.getClient().getUserTimeline(screenName, paging);
-							else temp = acc.getClient().getHomeTimeline(paging);
-							final ResponseList<Status> feed = temp;
-							context.runOnUiThread(new Runnable() {
-								public void run() {
-									if(!manualRefresh) setEmptyText(context.getString(R.string.no_media));
-									else setEmptyText(context.getString(R.string.manual_refresh_hint));
-									int beforeLast = adapt.getCount() - 1;
-									int addedCount = adapt.add(feed.toArray(new Status[0]), true, MediaTimelineFragment.this);
-									if(addedCount > 0 || beforeLast > 0) {
-										pageSkips = 0;
-										if(getView() != null) {
-											if(paginate && addedCount > 0) getGridView().smoothScrollToPosition(beforeLast + 1);
-											else if(getView() != null && adapt != null) adapt.restoreLastViewed(getGridView());
+							if(screenName != null){
+								// Powered by Twicsy
+								try{
+									HttpClient httpclient = new DefaultHttpClient();
+									
+									String url = "http://api.twicsy.com/user/" + Uri.encode(screenName);
+									if(paging.getMaxId() != -1){ url += "/skip/" + paging.getMaxId(); }
+									HttpGet g = new HttpGet(url);
+									HttpResponse r = httpclient.execute(g);
+									if(r.getStatusLine().getStatusCode() == 200){
+										JSONObject jo = new JSONObject(EntityUtils.toString(r.getEntity()));
+										JSONArray results = jo.getJSONArray("results");
+										int i = 0;
+										while(i < results.length()){
+											final JSONObject result = results.getJSONObject(i);
+											i++;
+											context.runOnUiThread(new Runnable(){
+
+												@Override
+												public void run() {
+													MediaFeedItem m = new MediaFeedItem();
+													try {
+														m.imgurl = result.getString("thumb");
+														m.twicsy_id = result.getString("id");
+														adapt.add(new MediaFeedItem[]{
+																m
+														}, MediaTimelineFragment.this);
+														
+														// WARN: Should be safer. Persuming ProfileScreen
+														if(adapt.getCount() == 1){
+															((ProfileScreen)context).setupMediaView();
+														}
+													} catch (JSONException e) {
+														// Should never never happen
+														e.printStackTrace();
+													}
+												}
+												
+											});
 										}
-										if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-											context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.media_title) + " (" + Integer.toString(addedCount) + ")");
-										} else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
-									} else if(pageSkips < 8) {
-										pageSkips++;
-										performRefresh(true);
+									} else{ throw new Exception("non-200 response code"); }
+								} catch(Exception e){
+									e.printStackTrace();
+									context.runOnUiThread(new Runnable(){
+
+										@Override
+										public void run() {
+											setEmptyText(context.getString(R.string.error_str));
+										}
+										
+									});
+								}
+								// TODO: temp = acc.getClient().getUserTimeline(screenName, paging);
+							}
+							else{ // OLD mechanism, I wish Twitter made this better
+								ResponseList<Status> temp = acc.getClient().getHomeTimeline(paging);
+								for(final Status p : temp){
+									if(Utilities.getTweetYFrogTwitpicMedia(p) != null){
+										context.runOnUiThread(new Runnable(){
+
+											@Override
+											public void run() {
+												MediaFeedItem m = new MediaFeedItem();
+												m.imgurl = Utilities.getTweetYFrogTwitpicMedia(p);
+												m.tweet_id = p.getId();
+												adapt.add(new MediaFeedItem[]{
+														m
+												}, MediaTimelineFragment.this);
+											}
+											
+										});
 									}
 								}
-							});
+							}
+							
 						} catch(final TwitterException e) {
 							e.printStackTrace();
 							context.runOnUiThread(new Runnable() {
@@ -1935,7 +2036,43 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void filter() { }
 	}
 
-	public static class ProfileTimelineFragment extends BaseListFragment {
+	public static abstract class ProfilePaddedFragment extends BaseListFragment{
+		
+		public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+			return inflater.inflate(R.layout.profile_content, container, false);
+		}
+		
+		@Override
+		public void setEmptyText(CharSequence text) {
+			if(getView() == null) return;
+			((TextView)getView().findViewById(android.R.id.empty)).setText(text);
+		}
+		
+		@Override
+		public void setListShown(boolean shown) {
+			View mProgressContainer = getActivity().findViewById(R.id.progressContainer);
+			View mListContainer = getActivity().findViewById(R.id.listContainer);
+			if(shown){
+				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                        getActivity(), android.R.anim.fade_out));
+	             mListContainer.startAnimation(AnimationUtils.loadAnimation(
+	                        getActivity(), android.R.anim.fade_in));
+	             
+	             mProgressContainer.setVisibility(View.GONE);
+	             mListContainer.setVisibility(View.VISIBLE);
+			} else{
+				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                        getActivity(), android.R.anim.fade_in));
+                 mListContainer.startAnimation(AnimationUtils.loadAnimation(
+                        getActivity(), android.R.anim.fade_out));
+                 
+                 mProgressContainer.setVisibility(View.VISIBLE);
+                 mListContainer.setVisibility(View.GONE);
+			}
+		}
+	}
+	
+	public static class ProfileTimelineFragment extends ProfilePaddedFragment {
 
 		private ProfileScreen context;
 		private String screenName;
@@ -2073,7 +2210,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void filter() { }
 	}
 
-	public static class ProfileAboutFragment extends BaseListFragment {
+	public static class ProfileAboutFragment extends ProfilePaddedFragment {
 
 		private Activity context;
 		private ProfileAboutAdapter adapt;
@@ -2157,6 +2294,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							context.runOnUiThread(new Runnable() {
 								public void run() {
 									((ProfileScreen)context).user = user;
+									((ProfileScreen)context).setupViews();
 									((ProfileScreen)context).invalidateOptionsMenu();
 									adapt.setUser(user);
 								}

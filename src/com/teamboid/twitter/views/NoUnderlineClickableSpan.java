@@ -1,4 +1,4 @@
-package com.teamboid.twitter;
+package com.teamboid.twitter.views;
 
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;

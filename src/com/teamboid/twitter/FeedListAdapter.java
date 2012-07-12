@@ -1,6 +1,7 @@
 package com.teamboid.twitter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -21,12 +22,18 @@ import java.util.ArrayList;
 
 import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 
 /**
  * The list adapter used for the lists that contain tweets, such as the timeline column.
  * @author Aidan Follestad
  */
 public class FeedListAdapter extends BaseAdapter {
+	
+	public static void ApplyFontSize(TextView in, Context c){
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+		in.setTextSize(Float.parseFloat(prefs.getString("font_size", "18")));
+	}
 
 	public FeedListAdapter(Activity context, String id, long _account) {
 		mContext = context;
@@ -256,6 +263,7 @@ public class FeedListAdapter extends BaseAdapter {
 		final TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText); 
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
+		ApplyFontSize(itemTxt, mContext);
 		((TextView)toReturn.findViewById(R.id.feedItemTimerTxt)).setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_media_download", true)) {

@@ -1,4 +1,4 @@
-package com.teamboid.twitter;
+package com.teamboid.twitter.views;
 
 import java.util.List;
 

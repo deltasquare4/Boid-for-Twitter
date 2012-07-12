@@ -21,35 +21,42 @@ import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
  * @author Aidan Follestad
  */
 public class MediaFeedListAdapter extends BaseAdapter {
+	
+	public static class MediaFeedItem{
+		public String imgurl = "";
+		public long tweet_id = -1;
+		public String twicsy_id = "";
+	}
 
 	public MediaFeedListAdapter(Activity context, String id, long _account) {
 		mContext = context;
-		tweets = new ArrayList<Status>();
+		tweets = new ArrayList<MediaFeedItem>();
 		ID = id;
 		account = _account;
 	}
 
-	public ArrayList<Status> tweets;
+	public ArrayList<MediaFeedItem> tweets;
+	public MediaFeedItem get(int pos){ return tweets.get(pos); }
 
 	private Activity mContext;
 	public String ID;
 	public int selectedItem = -1;
 	public long account;
-	private long lastViewedTweet;
+	private int lastViewedTweet;
 
 	public void setLastViewed(GridView list) {
 		if(list == null) return;
 		else if(getCount() == 0) return;
-		Status t = (Status)getItem(list.getFirstVisiblePosition());
-		if(t == null) return;
-		lastViewedTweet = t.getId();
+		lastViewedTweet = list.getFirstVisiblePosition();
 	}
+	
 	public void restoreLastViewed(GridView list) {
 		if(lastViewedTweet == 0 || list == null) return;
 		else if(getCount() == 0) return;
-		list.setSelection(find(lastViewedTweet));
+		list.setSelection(lastViewedTweet);
 	}
 
+	/*
 	private boolean add(Status tweet, String[] filter) {
 		boolean added = false;
 		int index = findAppropIndex(tweet, false);
@@ -70,103 +77,36 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		}
 		return added;
 	}
-	public int add(Status[] toAdd, BaseGridFragment frag) { return add(toAdd, false, frag); }
-	public int add(Status[] toAdd, boolean filter, BaseGridFragment frag) {
+	*/
+	
+	public int add(MediaFeedItem[] toAdd, BaseGridFragment frag) {
 		int toReturn = 0;
-		String[] fi = null;
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
-		for(Status tweet : toAdd) {
-			if(Utilities.getTweetYFrogTwitpicMedia(tweet) != null) {
-				if(add(tweet, fi)) {
-					if(frag != null) frag.setListShown(true);
-					toReturn++;
-				}
-			}
+		for(MediaFeedItem tweet : toAdd) {
+			tweets.add(tweet);
+			if(frag != null) frag.setListShown(true);
+			toReturn++;
 		}
 		return toReturn;
 	}
+	
 	public void remove(int index) {
 		tweets.remove(index);
 		notifyDataSetChanged();
 	}
-	public void remove(long tweetId) {
-		int index = 0;
-		for(Status t : tweets) {
-			if(t.getId() == tweetId) {
-				tweets.remove(index);
-				break;
-			}
-			index++;
-		}
-		notifyDataSetChanged();
-	}
-	public void filter(String[] keywords) {
-		for(int i = 0; i < tweets.size(); i++) {
-			for(String mute : keywords) {
-				if(tweets.get(i).getText().toLowerCase().contains(mute.toLowerCase())) {
-					tweets.remove(i);
-					if(i > 0) i--;
-				}
-			}
-		}
-		notifyDataSetChanged();
-	}
+	
 	public void clear() {
 		tweets.clear();
 		notifyDataSetChanged();
 	}
-	public int find(long statusId) {
-		int index = 0;
-		ArrayList<Status> temp = tweets;
-		for(int i = 0; i < temp.size(); i++) {
-			if(temp.get(i).getId() == statusId) {
-				index = i;
-				break;
-			}
-		}
-		return index;
-	}
-
-	public Status[] toArray() {
-		ArrayList<Status> toReturn = new ArrayList<Status>();
-		for(Status t : tweets) toReturn.add(t);
-		return toReturn.toArray(new Status[0]);
-	}
-
-	private boolean update(Status toFind) {
-		boolean found = false;
-		for(int i = 0; i < tweets.size(); i++) {
-			if(tweets.get(i).getId() == toFind.getId()) {
-				found = true;
-				tweets.set(i, toFind);
-				break;
-			}
-		}
-		return found;
-	}
-
-	private int findAppropIndex(Status tweet, boolean invert) {
-		int toReturn = 0;
-		for(Status t : tweets) {
-			if(invert && t.getCreatedAt().after(tweet.getCreatedAt())) break;
-			else if(!invert && t.getCreatedAt().before(tweet.getCreatedAt())) break;
-			toReturn++;
-		}
-		return toReturn;
+	
+	public MediaFeedItem[] toArray() {
+		return tweets.toArray(new MediaFeedItem[0]);
 	}
 
 	@Override
 	public int getCount() { return tweets.size(); }
 	@Override
 	public Object getItem(int position) { return tweets.get(position); }
-	@Override
-	public long getItemId(int position) {
-		if((position == 0 && tweets.size() == 0) || position > tweets.size()) return 0;
-		else if(position == -1 && tweets.size() == 1) return tweets.get(0).getId();
-		return tweets.get(position).getId();
-	}
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) { 
@@ -178,7 +118,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		img.setVisibility(View.GONE);
 		prog.setVisibility(View.VISIBLE);
 		ImageManager downloader = ImageManager.getInstance(mContext);
-		downloader.get(Utilities.getTweetYFrogTwitpicMedia(tweets.get(position)), new ImageManager.OnImageReceivedListener() {
+		downloader.get(tweets.get(position).imgurl, new ImageManager.OnImageReceivedListener() {
 			@Override
 			public void onImageReceived(String arg0, Bitmap image) {
 				prog.setVisibility(View.GONE);
@@ -187,5 +127,10 @@ public class MediaFeedListAdapter extends BaseAdapter {
 			}
 		});
 		return toReturn;
+	}
+
+	@Override
+	public long getItemId(int arg0) {
+		return arg0;
 	}
 }

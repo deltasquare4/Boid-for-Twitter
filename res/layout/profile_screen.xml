@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <android.support.v4.view.ViewPager
+		android:layout_width="match_parent" android:layout_height="match_parent"
+		android:id="@+id/pager" />
+
+    <!-- Profile Bit -->
+    <RelativeLayout
+        android:id="@+id/profileHeader"
+        android:layout_width="match_parent"
+        android:layout_height="93dp">
+        
+        <!-- Bottom layer -->
+        <ImageView
+            android:id="@+id/img"
+            
+            android:scaleType="centerCrop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            />
+        
+        <!-- 2nd from bottom  -->
+        <ImageView
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            
+            android:scaleType="centerCrop"
+            
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            
+            android:src="@drawable/st" />
+        
+        <!-- Left -->
+        <ImageView
+            android:id="@+id/userItemProfilePic"
+            android:layout_alignParentLeft="true"
+			android:layout_width="73dp"
+			android:layout_height="73dp"
+			android:layout_marginRight="10dp"
+			android:layout_marginLeft="10dp"
+			android:layout_marginTop="10dp"
+			android:src="@drawable/sillouette" />
+        
+        <TextView
+            android:id="@+id/profileTopLeftDetail"
+            android:layout_toRightOf="@+id/userItemProfilePic"
+            android:layout_width="wrap_content"
+            style="@style/SpecialText"
+            android:textAppearance="@style/SpecialText"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/profileBottomLeftDetail"
+            android:layout_toRightOf="@+id/userItemProfilePic"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="10dp"
+            style="@style/SpecialText"
+            android:textAppearance="@style/SpecialText"
+            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content" />
+        
+        <!-- Right -->
+        <TextView
+            android:id="@+id/profileLastTweeted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/profileTopLeftDetail"
+            android:gravity="right"
+            android:textAppearance="@style/SpecialText"
+            
+            android:layout_marginRight="10dp"
+            android:singleLine="true"
+            android:layout_alignWithParentIfMissing="true"
+            style="@style/SpecialText"
+            android:layout_above="@+id/profileLocation" />
+        
+        <TextView
+            android:id="@+id/profileLocation"
+            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textAppearance="@style/SpecialText"
+            android:gravity="center_vertical|right"
+            android:layout_toRightOf="@+id/profileBottomLeftDetail"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            style="@style/SpecialText"
+            android:drawableRight="?locationIndicator"
+            android:layout_alignParentBottom="true">
+        </TextView>
+        
+    </RelativeLayout>
+    
+</FrameLayout>
