@@ -5,8 +5,10 @@ import java.util.List;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -18,6 +20,8 @@ import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -181,6 +185,36 @@ public class SettingsScreen extends PreferenceActivity  {
 					return true;
 				}
 			});
+			findPreference("font_size").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					showFontDialog();
+					return false;
+				}
+			});
+		}
+		
+		private void showFontDialog() {
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			Dialog diag = new Dialog(getActivity());
+			diag.setContentView(R.layout.font_size_dialog);
+			diag.setTitle(R.string.font_size);
+			final TextView display = (TextView)diag.findViewById(R.id.fontSizeDialogExample);
+			final SeekBar slider = (SeekBar)diag.findViewById(R.id.fontSizeDialogSlider);
+			slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) { }
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) { }
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					display.setText(getString(R.string.boid_is_awesome) + " " + progress + "pt");
+					display.setTextSize(progress);
+					prefs.edit().putString("font_size", Integer.toString(progress)).apply();
+				}
+			});
+			slider.setProgress(Integer.parseInt(prefs.getString("font_size", "16")));
+			diag.show();
 		}
 	}
 	public static class NotificationsFragment extends PreferenceFragment {
