@@ -2,8 +2,10 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import twitter4j.ResponseList;
 import twitter4j.TwitterException;
 import twitter4j.User;
+import twitter4j.UserList;
 
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
@@ -152,6 +154,25 @@ public class ProfileScreen extends Activity {
 				else if(frag instanceof BaseGridFragment) ((BaseGridFragment)frag).performRefresh(false); 
 			}
 			return true;
+		case R.id.addToListAction:
+			Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT).show();
+			new Thread(new Runnable() {
+				public void run() {
+					Account acc = AccountService.getCurrentAccount();
+					try {
+						final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
+						runOnUiThread(new Runnable() {
+							public void run() { showAddToListDialog(lists.toArray(new UserList[0])); }
+						});
+					} catch (TwitterException e) {
+						e.printStackTrace();
+						runOnUiThread(new Runnable() {
+							public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_load_lists), Toast.LENGTH_LONG).show(); }
+						});
+					}
+				}
+			}).start();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -242,5 +263,42 @@ public class ProfileScreen extends Activity {
     		outState.putBoolean("showProgress", true);
     	}
 		super.onSaveInstanceState(outState);
+	}
+	
+	public void showAddToListDialog(final UserList[] lists) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setIconAttribute(R.attr.cloudIcon);
+		builder.setTitle(R.string.lists_str);
+		ArrayList<String> items = new ArrayList<String>();
+		for(UserList l : lists) items.add(l.getFullName());
+		builder.setItems(items.toArray(new String[0]), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				final UserList curList = lists[item];
+				final Toast toast = Toast.makeText(getApplicationContext(), R.string.adding_user_list, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try { AccountService.getCurrentAccount().getClient().addUserListMember(curList.getId(), user.getId()); }
+						catch (final TwitterException e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() {
+									toast.cancel();
+									Toast.makeText(getApplicationContext(), e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								}
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(getApplicationContext(), R.string.added_user_list, Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}).start();
+			}
+		});
+		builder.create().show();
 	}
 }
