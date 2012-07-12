@@ -266,6 +266,10 @@ public class ProfileScreen extends Activity {
 	}
 	
 	public void showAddToListDialog(final UserList[] lists) {
+		if(lists == null || lists.length == 0) {
+			Toast.makeText(getApplicationContext(), R.string.no_lists, Toast.LENGTH_SHORT).show();
+			return;
+		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setIconAttribute(R.attr.cloudIcon);
 		builder.setTitle(R.string.lists_str);
