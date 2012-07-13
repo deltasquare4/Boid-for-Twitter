@@ -157,9 +157,9 @@
 		email.
 	</string>
 	<string name="about_title">About</string>
-	<string name="about_description">Created by Aidan Follestad, Graham Macphee, Philip
-		Oakley, and Federico Zubani. Website by Steve Edson, original design
-		by Mike Stevens.
+	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
+		Macphee, Philip
+		Oakley, and Federico Zubani.
 	</string>
 	<string name="version_title">Version</string>
 	<string name="build_title">Build Number</string>
@@ -361,7 +361,8 @@
 	<string name="follow_boidapp_prompt">Do you want to follow @boidapp from @{account}?
 	</string>
 	<string name="failed_check_following_boidapp">Failed to check if you\'re following @boidapp from
-		@{account}!</string>
+		@{account}!
+	</string>
 	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so
 		manually later.
 	</string>
