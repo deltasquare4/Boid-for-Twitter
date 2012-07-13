@@ -54,7 +54,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		if(user == null) return 0;
-		return values.size();
+		return values.size() + 1;
 	}
 
 	@Override
@@ -69,18 +69,21 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		RelativeLayout toReturn = null;
-		if(convertView == null) toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
-		else toReturn = (RelativeLayout)convertView;
-		BasicNameValuePair curItem = values.get(position);
-		TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
-		title.setText(curItem.getName());
-		FeedListAdapter.ApplyFontSize(title, mContext);
-		TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
 		if(position == 0) {
-			body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
-			body.setMovementMethod(LinkMovementMethod.getInstance());
-		} else body.setText(curItem.getValue());
-		FeedListAdapter.ApplyFontSize(body, mContext);
+			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_info_tab, null);
+		} else {
+			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
+			BasicNameValuePair curItem = values.get(position - 1);
+			TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
+			title.setText(curItem.getName());
+			FeedListAdapter.ApplyFontSize(title, mContext);
+			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
+			if(position == 1) {
+				body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
+				body.setMovementMethod(LinkMovementMethod.getInstance());
+			} else body.setText(curItem.getValue());
+			FeedListAdapter.ApplyFontSize(body, mContext);
+		}
 		return toReturn;
 	}
 }
