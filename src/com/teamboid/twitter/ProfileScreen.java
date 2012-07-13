@@ -331,7 +331,7 @@ public class ProfileScreen extends Activity {
 						public void run() {   
 							if(isBlocked) {
 								getActionBar().setSelectedNavigationItem(1);
-								((TextView)findViewById(R.id.profileBottomRightDetail)).setText(R.string.blocked_str);
+								((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.blocked_str);
 							}
 							invalidateOptionsMenu();
 						}
@@ -348,7 +348,7 @@ public class ProfileScreen extends Activity {
 					final boolean followsYou = acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName());
 					if(followsYou) {
 						runOnUiThread(new Runnable() {
-							public void run() { ((TextView)findViewById(R.id.profileBottomRightDetail)).setText(R.string.follows_you_str); }
+							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
 						});
 					}
 				} catch (final TwitterException e) {
