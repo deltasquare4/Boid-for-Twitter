@@ -660,30 +660,27 @@ public class TweetViewer extends MapActivity {
 			}).start();
 			return;
 		}
-		View m;
-		if(findViewById(R.id.mapView) != null)
+		View m = null;
+		if(findViewById(R.id.mapView) != null) {
 			m = ((ViewStub)findViewById(R.id.mapView)).inflate();
-		else
-			m = findViewById(R.id.mapViewImported);
-		
+		} else m = findViewById(R.id.mapViewImported);
 		m.setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View arg0) {
 				Intent geo = new Intent(Intent.ACTION_VIEW);
-				if(point != null){
+				if(point != null) {
 					geo.setData(Uri.parse("geo:" + point.getLatitude() + "," + point.getLongitude()));
-					if(Utilities.isIntentAvailable(TweetViewer.this, geo)){
+					if(Utilities.isIntentAvailable(TweetViewer.this, geo)) {
 						startActivity(geo);
-					} else{
+					} else {
 						geo.setData(Uri.parse("https://maps.google.com/maps?q=" + point.getLatitude() + "," + point.getLongitude()));
 						startActivity(geo);
 					}
-				} else{
+				} else {
 					geo.setData(Uri.parse("geo:0,0?q=" + place.getFullName()));
-					if(Utilities.isIntentAvailable(TweetViewer.this, geo)){
+					if(Utilities.isIntentAvailable(TweetViewer.this, geo)) {
 						startActivity(geo);
-					} else{
+					} else {
 						geo.setData(Uri.parse("https://maps.google.com/maps?q=" + place.getFullName()));
 						startActivity(geo);
 					}
