@@ -67,7 +67,9 @@ public class ProfileScreen extends Activity {
 	    }  else setTheme(Utilities.getTheme(getApplicationContext()));
     	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar ab = getActionBar();
+        ab.setDisplayShowTitleEnabled(false);
+        ab.setDisplayShowHomeEnabled(false);
         setContentView(R.layout.profile_screen);
         setProgressBarIndeterminateVisibility(false);
         initializeTabs(savedInstanceState);

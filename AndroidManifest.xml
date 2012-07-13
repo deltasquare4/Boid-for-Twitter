@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.teamboid.twitter" android:versionCode="52"
-	android:versionName="0.8.1.4 Beta">
+	android:versionName="0.8.1.5 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -72,7 +72,7 @@
 				android:resource="@xml/search_config" />
 		</activity>
 		<activity android:name=".ProfileScreen"
-			android:configChanges="keyboardHidden|orientation|screenSize" />
+			android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
 		<activity android:name=".TweetViewer" android:noHistory="true"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />

@@ -387,9 +387,11 @@
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
 	<string name="boid_is_awesome">Boid is Awesome!</string>
-	<string name="contextual_action_bar">Contextual Actionbar</string>
+	<string name="contextual_action_bar">Contextual Action Bar</string>
 	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
 		to replying.
 	</string>
 	<string name="last_tweeted">Tweeted {time} ago</string>
+	<string name="show_actionbar">Show Action Bar</string>
+	<string name="hide_actionbar">Hide Action Bar</string>
 </resources>
