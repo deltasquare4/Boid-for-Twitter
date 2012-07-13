@@ -54,7 +54,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		if(user == null) return 0;
-		else return (values.size() + 1);
+		return values.size();
 	}
 
 	@Override
