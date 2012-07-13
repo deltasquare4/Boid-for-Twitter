@@ -27,7 +27,7 @@ public class TweetListActivity extends ListActivity {
 	private boolean allowPagination = true;
 	private FeedListAdapter binder;
 	private ProgressDialog progDialog;
-
+	
 	public void showProgress(final boolean visible) {
 		if(showProgress == visible && progDialog != null) {
 			return;
@@ -112,7 +112,7 @@ public class TweetListActivity extends ListActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							if(tweets.size() == 0) allowPagination = false;
+							if(tweets == null || tweets.size() == 0) allowPagination = false;
 							else binder.add(tweets.toArray(new Status[0]));
 							showProgress(false);
 						}

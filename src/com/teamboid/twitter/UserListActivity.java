@@ -91,14 +91,12 @@ public class UserListActivity extends ListActivity {
 		final Twitter cl = AccountService.getCurrentAccount().getClient();
 		showProgress(true);
 		final ArrayList<Long> toLookup = new ArrayList<Long>();
-		//FIRST PASS, transfer first 20 IDs to the temporary list
 		for(int i = 0; i < 20; i++) {
 			if(i >= ids.size()) break;
 			toLookup.add(ids.get(i));
 		}
-		final long[] lookup = new long[toLookup.size()]; //this is messy, but Long[] and long[] are apparently two different things
+		final long[] lookup = new long[toLookup.size()];
 		for(int i = 0; i < toLookup.size(); i++) lookup[i] = toLookup.get(i);
-		//SECOND PASS, remove the first 20 IDs from the results from the last refresh() call so that the next 20 can be retrieved on the next pagination.
 		for(int i = 0; i < 20; i++) {
 			if(i >= ids.size()) break; 
 			ids.remove(i);
@@ -108,7 +106,10 @@ public class UserListActivity extends ListActivity {
 				try {
 					final ResponseList<User> res = cl.lookupUsers(lookup);
 					runOnUiThread(new Runnable() {
-						public void run() { binder.add(res.toArray(new User[0])); }
+						public void run() {
+							if(res == null || res.size() == 0) allowPagination = false;
+							else binder.add(res.toArray(new User[0]));
+						}
 					});	
 				} catch (TwitterException e) { e.printStackTrace(); }
 				runOnUiThread(new Runnable() {
