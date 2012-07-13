@@ -146,7 +146,10 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			});
 		} else {
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
-			BasicNameValuePair curItem = values.get(position - 1);
+			BasicNameValuePair curItem = null;
+			if(AccountService.getCurrentAccount().getUser().getId() == user.getId()) {
+				curItem = values.get(position);
+			} else curItem = values.get(position - 1);
 			TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
 			title.setText(curItem.getName());
 			FeedListAdapter.ApplyFontSize(title, mContext);
