@@ -406,7 +406,8 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 
-		private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+		public ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				MenuInflater inflater = mode.getMenuInflater();
@@ -423,10 +424,8 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 				switch (item.getItemId()) {
 				case R.id.replyAction:
-					mode.finish();
 					return true;
 				default:
-					getListView().clearChoices();
 					return false;
 				}
 			}
@@ -477,24 +476,18 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							if (PreferenceManager.getDefaultSharedPreferences(
-									context).getBoolean("cab", true)) {
-								getListView().setItemChecked(index, true);
-								context.startActionMode(mActionModeCallback);
-							} else {
-								Status item = (Status) adapt.getItem(index);
-								context.startActivity(new Intent(context,
-										ComposerScreen.class)
-								.putExtra("reply_to", item.getId())
-								.putExtra("reply_to_name",
-										item.getUser().getScreenName())
-										.putExtra("append",
-												Utilities.getAllMentions(item))
-												.addFlags(
-														Intent.FLAG_ACTIVITY_CLEAR_TOP));
-							}
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							//							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+							getListView().setItemChecked(index, true);
+							context.startActionMode(mActionModeCallback);
+							//							} else {
+							//								Status item = (Status) adapt.getItem(index);
+							//								context.startActivity(new Intent(context, ComposerScreen.class)
+							//									.putExtra("reply_to", item.getId())
+							//									.putExtra("reply_to_name",item.getUser().getScreenName())
+							//									.putExtra("append",Utilities.getAllMentions(item))
+							//									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+							//							}
 							return true;
 						}
 					});

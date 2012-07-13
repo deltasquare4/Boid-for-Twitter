@@ -71,7 +71,7 @@ public class TimelineScreen extends Activity {
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
 	private boolean newColumn;
-
+	
 	private SendTweetArrayAdapter sentTweetBinder;
 
 	public class SendTweetUpdater extends BroadcastReceiver{
@@ -401,12 +401,12 @@ public class TimelineScreen extends Activity {
 	/**
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
-	public void accountsLoaded(){
-		if(Intent.ACTION_SEND.equals(getIntent().getAction())){
+	public void accountsLoaded() {
+		if(Intent.ACTION_SEND.equals(getIntent().getAction())) {
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
 			finish();
-		} else if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
-			if(getIntent().getData().getPath().contains("/status/")){
+		} else if(Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+			if(getIntent().getData().getPath().contains("/status/")) {
 				startActivity(getIntent().setClass(this, TweetViewer.class));
 				finish();
 			} else {

@@ -19,6 +19,7 @@
 	<attr name="settingsIcon" format="reference" />
 	<attr name="accountSwitchIcon" format="reference" />
 	<attr name="sideNavColor" format="color" />
+	<attr name="spinnerActionBarDropDownColor" format="color" />
 	
 	<attr name="pinIcon" format="reference" />
 	<attr name="newTweetIcon" format="reference" />

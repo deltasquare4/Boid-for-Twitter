@@ -18,6 +18,7 @@
 		<item name="settingsIcon">@drawable/settings_dark</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
 		<item name="sideNavColor">#DDDDDD</item>
+		<item name="spinnerActionBarDropDownColor">@color/white</item>
 		
 		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
     	<item name="android:actionBarTabStyle">@style/customTabStyle</item>
