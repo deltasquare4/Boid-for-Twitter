@@ -3450,38 +3450,33 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			}
 			BasicNameValuePair pair = adapt.values.get(position - 1);
 			if (pair.getName().equals(context.getString(R.string.website_str))) {
-				if (!pair.getValue().equals(
-						context.getString(R.string.none_str))) {
-					String url = pair.getValue();
-					try {
-						context.startActivity(new Intent(Intent.ACTION_VIEW)
-						.setData(Uri.parse(url)).addFlags(
-								Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				String url = pair.getValue();
+				try {
+					context.startActivity(new Intent(Intent.ACTION_VIEW)
+					.setData(Uri.parse(url)).addFlags(
+							Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			} else if (pair.getName().equals(
 					context.getString(R.string.tweets_str))) {
 				context.getActionBar().setSelectedNavigationItem(0);
 			} else if (pair.getName().equals(
 					context.getString(R.string.location_str))) {
-				String loc = pair.getValue();
-				if (!loc.equals(context.getString(R.string.unknown_str))) {
-					try {
-						loc = URLEncoder.encode(pair.getValue(), "UTF-8");
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					Intent geo = new Intent(Intent.ACTION_VIEW);
-					geo.setData(Uri.parse("geo:0,0?q=" + loc));
-					if (Utilities.isIntentAvailable(context, geo)) {
-						startActivity(geo);
-					} else {
-						geo.setData(Uri.parse("https://maps.google.com/maps?q="
-								+ loc));
-						startActivity(geo);
-					}
+				String loc = null;
+				try {
+					loc = URLEncoder.encode(pair.getValue(), "UTF-8");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Intent geo = new Intent(Intent.ACTION_VIEW);
+				geo.setData(Uri.parse("geo:0,0?q=" + loc));
+				if (Utilities.isIntentAvailable(context, geo)) {
+					startActivity(geo);
+				} else {
+					geo.setData(Uri.parse("https://maps.google.com/maps?q="
+							+ loc));
+					startActivity(geo);
 				}
 			} else if (pair.getName().equals(
 					context.getString(R.string.followers_str))) {
@@ -3544,10 +3539,10 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 							context.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									((ProfileScreen) context).user = user;
-									((ProfileScreen) context).setupViews();
-									((ProfileScreen) context)
-									.invalidateOptionsMenu();
+									((ProfileScreen)context).user = user;
+									((ProfileScreen)context).setupViews();
+									((ProfileScreen)context).loadFollowingInfo();
+									((ProfileScreen)context).invalidateOptionsMenu();
 									adapt.setUser(user);
 								}
 							});

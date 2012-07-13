@@ -71,7 +71,7 @@ public class ProfileScreen extends Activity {
         ab.setDisplayShowHomeEnabled(false);
         setContentView(R.layout.profile_screen);
         setProgressBarIndeterminateVisibility(false);
-        initializeTabs(savedInstanceState);
+        initializeTabs(savedInstanceState);        
     }
 	
 	private TabsAdapter mTabsAdapter;
@@ -90,9 +90,68 @@ public class ProfileScreen extends Activity {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, false);
-		}
-		
+		}	
 		if(savedInstanceState != null) getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("lastTab", 0));
+	}
+	
+	public void loadFollowingInfo() {
+		new Thread(new Runnable() {
+			public void run() {
+				final Account acc = AccountService.getCurrentAccount();
+				try {
+					getAboutFragment().getAdapter().updateIsBlocked(acc.getClient().existsBlock(user.getId()));
+					runOnUiThread(new Runnable() {
+						public void run() {   
+							if(getAboutFragment().getAdapter().isBlocked()) {
+								getActionBar().setSelectedNavigationItem(1);
+								((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.blocked_str);
+							}
+							invalidateOptionsMenu();
+						}
+					});
+					if(getAboutFragment().getAdapter().isBlocked()) return;
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+					return;
+				}
+				if(user.isFollowRequestSent()) {
+					getAboutFragment().getAdapter().updateRequestSent(true);
+					return;
+				}
+				try {
+					getAboutFragment().getAdapter().updateIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), user.getScreenName()));
+					if(getAboutFragment().getAdapter().isFollowing()) {
+						runOnUiThread(new Runnable() {
+							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
+						});
+					}
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+				}
+				try {
+					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
+					if(getAboutFragment().getAdapter().isFollowedBy()) {
+						runOnUiThread(new Runnable() {
+							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
+						});
+					}
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+				}
+				runOnUiThread(new Runnable() {
+					public void run() { getAboutFragment().getAdapter().notifyDataSetChanged(); }
+				});
+			}
+		}).start();
 	}
 
 	@Override
@@ -144,6 +203,7 @@ public class ProfileScreen extends Activity {
 			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
 			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
+			finish();
 			return true;
 		case R.id.messageAction:
 			startActivity(new Intent(getApplicationContext(), ConversationScreen.class).putExtra("screen_name", getIntent().getStringExtra("screen_name")));
@@ -325,63 +385,6 @@ public class ProfileScreen extends Activity {
 				mTabsAdapter.onPageSelected(position);
 			}
 		});
-		new Thread(new Runnable() {
-			public void run() {
-				final Account acc = AccountService.getCurrentAccount();
-				try {
-					getAboutFragment().getAdapter().updateIsBlocked(acc.getClient().existsBlock(user.getId()));
-					runOnUiThread(new Runnable() {
-						public void run() {   
-							if(getAboutFragment().getAdapter().isBlocked()) {
-								getActionBar().setSelectedNavigationItem(1);
-								((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.blocked_str);
-							}
-							invalidateOptionsMenu();
-						}
-					});
-					if(getAboutFragment().getAdapter().isBlocked()) return;
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
-					});
-					return;
-				}
-				if(user.isFollowRequestSent()) {
-					getAboutFragment().getAdapter().updateRequestSent(true);
-					return;
-				}
-				try {
-					getAboutFragment().getAdapter().updateIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), user.getScreenName()));
-					if(getAboutFragment().getAdapter().isFollowing()) {
-						runOnUiThread(new Runnable() {
-							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
-						});
-					}
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
-					});
-				}
-				try {
-					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
-					if(getAboutFragment().getAdapter().isFollowedBy()) {
-						runOnUiThread(new Runnable() {
-							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
-						});
-					}
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
-					});
-				}
-				runOnUiThread(new Runnable() {
-					public void run() { getAboutFragment().getAdapter().notifyDataSetChanged(); }
-				});
-			}
-		}).start();
 	}
 	
 	/**

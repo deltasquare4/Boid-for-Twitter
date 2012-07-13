@@ -91,15 +91,11 @@ public class ProfileAboutAdapter extends BaseAdapter {
 		}
 		if(_user.getURL() != null) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.website_str), _user.getURL().toString()));
-		} else {
-			values.add(new BasicNameValuePair(mContext.getString(R.string.website_str), mContext.getString(R.string.none_str)));
 		}
 		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusesCount())));
 		if(_user.getLocation() != null && !_user.getLocation().isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.location_str), _user.getLocation()));
-		} else {
-			values.add(new BasicNameValuePair(mContext.getString(R.string.location_str), mContext.getString(R.string.unknown_str))); 
-		}
+		} 
 		values.add(new BasicNameValuePair(mContext.getString(R.string.friends_str), df.format(_user.getFriendsCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.followers_str), df.format(_user.getFollowersCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.favorites_str), df.format(_user.getFavouritesCount())));
@@ -128,7 +124,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_info_tab, null);
 			final Button followBtn = (Button)toReturn.findViewById(R.id.profileFollowBtn);
 			if(isUnknown) {
-				followBtn.setText(R.string.unknown_str);
+				followBtn.setText(R.string.loading_str);
 				followBtn.setEnabled(false);
 			} else if(isRequestSent) {
 				followBtn.setText(R.string.request_sent_str);
