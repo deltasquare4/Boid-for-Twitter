@@ -105,7 +105,9 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		if(user == null) return 0;
-		return values.size() + 1;
+		if(AccountService.getCurrentAccount().getUser().getId() == user.getId()) {
+			return values.size();
+		} else return values.size() + 1;
 	}
 
 	@Override
