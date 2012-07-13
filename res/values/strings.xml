@@ -244,7 +244,6 @@
 	<string name="user_favorites">{user}\'s Favorites</string>
 
 	<string name="sending_tweet">Sending tweet…</string>
-	<string name="please_wait">Please wait…</string>
 	<string name="sending_tweets">Sending {sending} tweets…</string>
 	<string name="send_error_tweets">Sending {sending} tweets. Some did not send
 	</string>

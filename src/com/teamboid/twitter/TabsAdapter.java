@@ -1988,7 +1988,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 	public static abstract class ProfilePaddedFragment extends BaseListFragment{
 		
-		public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			return inflater.inflate(R.layout.profile_content, container, false);
 		}
 		
