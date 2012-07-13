@@ -12,6 +12,7 @@ import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
+import com.teamboid.twitter.TabsAdapter.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 
@@ -85,7 +86,7 @@ public class ProfileScreen extends Activity {
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
 		} else {
-			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), ProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, false);
 		}

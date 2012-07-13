@@ -2015,7 +2015,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 		}
 	}
-	
+
 	public static class ProfileTimelineFragment extends BaseListFragment {
 
 		private Activity context;
@@ -2029,10 +2029,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			context = act;
 		}
 		
-		private FeedListAdapter getAdapter() {
-			if(context instanceof ProfileScreen) return ((ProfileScreen)context).adapter;
-			else return globalAdapter;
-		}
+		private FeedListAdapter getAdapter() { return globalAdapter; }
 
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
@@ -2146,6 +2143,153 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					} else {
 						globalAdapter = AccountService.getFeedAdapter(context, ProfileTimelineFragment.ID + "@" + screenName, AccountService.getCurrentAccount().getId());
 					}
+				}
+				setListAdapter(getAdapter());
+				if(getAdapter().getCount() == 0) performRefresh(false);
+				else if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
+			}
+		}
+
+		@Override
+		public void savePosition() { 
+			if(getView() != null && getAdapter() != null) getAdapter().setLastViewed(getListView());
+		}
+
+		@Override
+		public void restorePosition() { 
+			if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
+		}
+
+		@Override
+		public void jumpTop() {
+			if(getView() != null) getListView().setSelectionFromTop(0, 0);
+		}
+
+		@Override
+		public void filter() { }
+	}
+
+	public static class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
+
+		private ProfileScreen context;
+		private String screenName;
+
+		@Override
+		public void onAttach(Activity act) {
+			super.onAttach(act);
+			context = (ProfileScreen)act;
+		}
+		
+		private FeedListAdapter getAdapter() { return context.adapter; }
+
+		@Override
+		public void onListItemClick(ListView l, View v, int position, long id) {
+			super.onListItemClick(l, v, position, id);
+			Status tweet = (Status)getAdapter().getItem(position);
+			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+
+		@Override
+		public void onStart() {
+			super.onStart();
+			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) { }
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+					if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) performRefresh(true);
+					if(firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+						if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
+						else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+					}
+				}
+			});
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+					Status item = (Status)getAdapter().getItem(index);
+					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
+							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					return false;
+				}
+			});
+			setRetainInstance(true);
+			setEmptyText(getString(R.string.no_tweets));
+			screenName = getArguments().getString("query");
+			reloadAdapter(true);
+		}
+
+		@Override
+		public void onResume() {
+			super.onResume();
+			if(getView() == null) return;
+			getAdapter().restoreLastViewed(getListView());
+		}
+
+		@Override
+		public void onPause() {
+			super.onPause();
+			savePosition();
+		}
+
+		@Override
+		public void performRefresh(final boolean paginate) {
+			if(context == null || isLoading || getAdapter() == null) return;	
+			isLoading = true;
+			if(getAdapter().getCount() == 0 && getView() != null) setListShown(false);
+			getAdapter().setLastViewed(getListView());
+			new Thread(new Runnable() {
+				public void run() {
+					Paging paging = new Paging(1, 50);
+					if(paginate) paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
+					final Account acc = AccountService.getCurrentAccount();
+					if(acc != null) {
+						try {
+							final ResponseList<Status> feed = acc.getClient().getUserTimeline(screenName, paging);
+							context.runOnUiThread(new Runnable() {
+								public void run() {
+									setEmptyText(context.getString(R.string.no_tweets));
+									int beforeLast = getAdapter().getCount() - 1;
+									int addedCount = getAdapter().add(feed.toArray(new Status[0]));
+									if(getView() != null) {
+										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+										else if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
+									}
+									if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.tweets_str) + " (" + Integer.toString(addedCount) + ")");
+									} else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
+								}
+							});
+						} catch(final TwitterException e) {
+							e.printStackTrace();
+							context.runOnUiThread(new Runnable() {
+								public void run() { 
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								}
+							});
+						}
+					}
+					context.runOnUiThread(new Runnable() {
+						public void run() { 
+							if(getView() != null) setListShown(true);
+							isLoading = false;
+						}
+					});
+				}
+			}).start();
+		}
+
+		@Override
+		public void reloadAdapter(boolean firstInitialize) {
+			if(AccountService.getCurrentAccount() != null) {
+				if(getAdapter() != null && !firstInitialize && getView() != null) getAdapter().setLastViewed(getListView());
+				if(getAdapter() == null) {
+					context.adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
 				}
 				setListAdapter(getAdapter());
 				if(getAdapter().getCount() == 0) performRefresh(false);
