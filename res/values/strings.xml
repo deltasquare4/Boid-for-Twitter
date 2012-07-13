@@ -8,17 +8,10 @@
 	<string name="none_str">None</string>
 	<string name="unknown_str">Unknown</string>
 	<string name="messaging_str">Messaging</string>
-	<string name="failed_check_blocked">Failed to check if this user is blocked!</string>
-	<string name="failed_check_following">Failed to check if you\'re following this user!
-	</string>
-	<string name="failed_check_followed_by">Failed to check if you\'re followed by this user!
-	</string>
+	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
 	<string name="nearby_str">Nearby</string>
 	<string name="no_camera_app">Uh oh! You don\'t have any camera apps!</string>
-	<string name="failed_delete_convo">One or more of the messages in this conversation
-		could not be deleted!
-	</string>
 	<string name="manual_refresh_hint">Press refresh to load</string>
 	<string name="share_boid_title">Share Boid</string>
 	<string name="share_boid_desc">Help spread Boid by sharing it with your friends,
@@ -54,8 +47,6 @@
 	</string>
 	<string name="notifications_str">Notifications</string>
 
-	<string name="follows_you">Follows You</string>
-	<string name="request_sent">Request Sent</string>
 	<string name="muting_hint_keyword">Keyword or hashtag</string>
 	<string name="muting_hint_app">App name</string>
 	<string name="muting_hint_user">Screen name</string>
@@ -93,10 +84,7 @@
 	<string name="no_internet">Please connect to the internet.</string>
 	<string name="error_str">Error</string>
 
-	<string name="follow_str">Follow</string>
-	<string name="unfollow_str">Unfollow</string>
 	<string name="block_str">Block</string>
-	<string name="unblock_str">Unblock</string>
 	<string name="website_str">Website</string>
 	<string name="friends_str">Following</string>
 	<string name="followers_str">Followers</string>
@@ -335,7 +323,7 @@
 	<string name="confirm_report_str">Are you sure you want to report this user?</string>
 	<string name="reporting_str">Reporting this user…</string>
 	<string name="blocking_str">Blocking this user…</string>
-	<string name="blocked_str">Successfully blocked this user!</string>
+	<string name="success_blocked_str">Successfully blocked this user!</string>
 	<string name="reported_str">Successfully reported this user!</string>
 	<string name="failed_block_str">Something happened while blocking this user!
 	</string>
@@ -392,6 +380,8 @@
 		to replying.
 	</string>
 	<string name="last_tweeted">Tweeted {time} ago</string>
-	<string name="show_actionbar">Show Action Bar</string>
-	<string name="hide_actionbar">Hide Action Bar</string>
+	<string name="follows_you_str">follows you</string>
+	<string name="blocked_str">blocked</string>
+	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
+	<string name="description_str">Description</string>
 </resources>

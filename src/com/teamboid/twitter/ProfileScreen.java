@@ -215,7 +215,7 @@ public class ProfileScreen extends Activity {
 						runOnUiThread(new Runnable() {
 							public void run() {
 								toast.cancel();
-								Toast.makeText(ProfileScreen.this, R.string.blocked_str, Toast.LENGTH_SHORT).show();
+								Toast.makeText(ProfileScreen.this, R.string.success_blocked_str, Toast.LENGTH_SHORT).show();
 								recreate(); //TODO Recreation doesn't seem to update the screen with blocked info for some reason
 							}
 						});
@@ -302,12 +302,10 @@ public class ProfileScreen extends Activity {
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
 		tv = (TextView)findViewById(R.id.profileBottomLeftDetail);
 		tv.setText(user.getStatusesCount() + " | " + user.getFriendsCount() + " | " + user.getFollowersCount());
-		tv = (TextView)findViewById(R.id.profileLastTweeted);
-		tv.setText(getString(R.string.last_tweeted).replace("{time}", Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt())));
-		tv = (TextView)findViewById(R.id.profileLocation);
-		if(user.getLocation().trim().isEmpty()){
-			tv.setVisibility(View.GONE);
-		} else tv.setText(user.getLocation());
+//		TODO tv.setText(getString(R.string.last_tweeted).replace("{time}", Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt())));
+//		if(user.getLocation().trim().isEmpty()){
+//			tv.setVisibility(View.GONE);
+//		} else tv.setText(user.getLocation());
 		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener(){
 
 			@Override
@@ -323,8 +321,45 @@ public class ProfileScreen extends Activity {
 				//findViewById(R.id.profileHeader).animate().alpha(position > 1 ? 0 : 1 );
 				mTabsAdapter.onPageSelected(position);
 			}
-			
 		});
+		new Thread(new Runnable() {
+			public void run() {
+				final Account acc = AccountService.getCurrentAccount();
+				try {
+					isBlocked = acc.getClient().existsBlock(user.getId());
+					runOnUiThread(new Runnable() {
+						public void run() {   
+							if(isBlocked) {
+								getActionBar().setSelectedNavigationItem(1);
+								((TextView)findViewById(R.id.profileBottomRightDetail)).setText(R.string.blocked_str);
+							}
+							invalidateOptionsMenu();
+						}
+					});
+					if(isBlocked) return;
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+					return;
+				}
+				try {
+					final boolean followsYou = acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName());
+					if(followsYou) {
+						runOnUiThread(new Runnable() {
+							public void run() { ((TextView)findViewById(R.id.profileBottomRightDetail)).setText(R.string.follows_you_str); }
+						});
+					}
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+					return;
+				}
+			}
+		}).start();
 	}
 	
 	/**
