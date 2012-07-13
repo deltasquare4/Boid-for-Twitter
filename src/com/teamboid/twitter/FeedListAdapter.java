@@ -291,7 +291,7 @@ public class FeedListAdapter extends BaseAdapter {
 				mediaPreview.setVisibility(View.GONE);
 				mediaIndic.setVisibility(View.VISIBLE);
 				if(prefs.getBoolean("enable_inline_previewing", true)) {
-					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30) +
+					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 35) +
 							Integer.parseInt(prefs.getString("font_size", "16")));
 					mediaProg.setVisibility(View.VISIBLE);
 					ImageManager download = ImageManager.getInstance(mContext);
