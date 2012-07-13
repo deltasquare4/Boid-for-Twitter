@@ -368,21 +368,28 @@
 	<string name="adding_user_list">Adding user to list…</string>
 	<string name="added_user_list">Added user to the list!</string>
 	<string name="delete_list_prompt">Are you sure you want to delete your list
-		{listname}?</string>
+		{listname}?
+	</string>
 	<string name="unsubscribe_list_prompt">Are you sure you want to unsubscribe from
-		{listname}?</string>
+		{listname}?
+	</string>
 	<string name="follow_boidapp_prompt">Do you want to follow @boidapp from @{account}?
 	</string>
-	<string name="failed_check_following_boidapp">Failed to check if you\'re following @boidapp from @{account}!</string>
+	<string name="failed_check_following_boidapp">Failed to check if you\'re following @boidapp from
+		@{account}!</string>
 	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so
-		manually later.</string>
+		manually later.
+	</string>
 	<string name="about_twicsy_api">Uses Twicsy API</string>
 	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s
-		photo feed. You should check them out</string>
+		photo feed. You should check them out
+	</string>
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
 	<string name="boid_is_awesome">Boid is Awesome!</string>
 	<string name="contextual_action_bar">Contextual Actionbar</string>
 	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
-		to replying.</string>
+		to replying.
+	</string>
+	<string name="last_tweeted">Tweeted {time} ago</string>
 </resources>

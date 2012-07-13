@@ -82,7 +82,7 @@ public class ProfileScreen extends Activity {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if(iconic) {
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)), ProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)), PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
 		} else {
@@ -279,7 +279,6 @@ public class ProfileScreen extends Activity {
 
 	void setHeaderBackground(String url){
 		ImageManager.getInstance(this).get(url, new OnImageReceivedListener(){
-			
 			@Override
 			public void onImageReceived(String arg0, Bitmap bitmap) {
 				((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
@@ -290,46 +289,32 @@ public class ProfileScreen extends Activity {
 	/**
 	 * Sets up our own views for this
 	 */
-	public void setupViews() {
-		
+	public void setupViews() {		
 		ImageManager.getInstance(this).get(Utilities.getUserImage(user.getScreenName(), this), new OnImageReceivedListener(){
-
 			@Override
 			public void onImageReceived(String arg0, Bitmap bitmap) {
 				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 			}
-			
 		});
-		
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
-		
 		tv = (TextView)findViewById(R.id.profileBottomLeftDetail);
 		tv.setText(user.getStatusesCount() + " | " + user.getFriendsCount() + " | " + user.getFollowersCount());
-		
 		tv = (TextView)findViewById(R.id.profileLastTweeted);
-		// TODO: Localize
-		tv.setText("Tweeted " + Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt()) + " ago");
-		
+		tv.setText(getString(R.string.last_tweeted).replace("{time}", Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt())));
 		tv = (TextView)findViewById(R.id.profileLocation);
 		if(user.getLocation().trim().isEmpty()){
 			tv.setVisibility(View.GONE);
-		} else{
-			tv.setText(user.getLocation());
-		}
-		
+		} else tv.setText(user.getLocation());
 		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener(){
 
 			@Override
-			public void onPageScrollStateChanged(int arg0) {}
+			public void onPageScrollStateChanged(int arg0) { }
 
 			@Override
 			public void onPageScrolled(int position, float offset, int offsetPixels) {
-				if(position >= 1){
-					findViewById(R.id.profileHeader).setX(-offsetPixels);
-				}
+				if(position >= 1) findViewById(R.id.profileHeader).setX(-offsetPixels);
 			}
-
 			@Override
 			public void onPageSelected(int position) {
 				findViewById(R.id.profileHeader).setVisibility( position > 1 ? View.GONE : View.VISIBLE );
@@ -338,7 +323,6 @@ public class ProfileScreen extends Activity {
 			}
 			
 		});
-		
 	}
 	
 	/**

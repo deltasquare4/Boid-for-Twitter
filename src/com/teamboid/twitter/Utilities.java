@@ -535,7 +535,8 @@ public class Utilities {
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);
-		bitmap.recycle();
+		//TODO recycling causes crash because "recycled images cannot be used" or something
+		//bitmap.recycle();
 		return output;
 	}
 	
