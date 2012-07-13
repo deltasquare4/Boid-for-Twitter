@@ -20,7 +20,7 @@ import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
-import android.widget.SeekBar;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 /**
@@ -174,7 +174,8 @@ public class SettingsScreen extends PreferenceActivity  {
 		}
 	}
 	public static class AppearanceFragment extends PreferenceFragment {
-		@Override
+		
+		@Override		
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.appearance_category);
@@ -201,20 +202,18 @@ public class SettingsScreen extends PreferenceActivity  {
 			diag.setCancelable(true);
 			diag.setTitle(R.string.font_size);
 			final TextView display = (TextView)diag.findViewById(R.id.fontSizeDialogExample);
-			final SeekBar slider = (SeekBar)diag.findViewById(R.id.fontSizeDialogSlider);
-			slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			final NumberPicker picker = (NumberPicker)diag.findViewById(R.id.fontSizePicker);
+			picker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
 				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) { }
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) { }
-				@Override
-				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-					display.setText(getString(R.string.boid_is_awesome) + " " + progress + "pt");
-					display.setTextSize(progress);
-					prefs.edit().putString("font_size", Integer.toString(progress)).apply();
+				public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+					display.setText(getString(R.string.boid_is_awesome) + " " + newVal + "pt");
+					display.setTextSize(newVal);
+					prefs.edit().putString("font_size", Integer.toString(newVal)).apply();
 				}
 			});
-			slider.setProgress(Integer.parseInt(prefs.getString("font_size", "16")));
+			picker.setMinValue(11);
+			picker.setMaxValue(26);
+			picker.setValue(Integer.parseInt(prefs.getString("font_size", "16")));
 			diag.show();
 		}
 	}
