@@ -120,7 +120,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		RelativeLayout toReturn = null;
-		if(position == 0) {
+		if(position == 0 && AccountService.getCurrentAccount().getUser().getId() != user.getId()) {
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.profile_info_tab, null);
 			final Button followBtn = (Button)toReturn.findViewById(R.id.profileFollowBtn);
 			if(isUnknown) {
