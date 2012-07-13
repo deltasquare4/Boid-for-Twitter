@@ -1,15 +1,11 @@
 package com.teamboid.twitter;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-
-import twitter4j.Status;
 
 import java.util.ArrayList;
 
