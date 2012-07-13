@@ -19,6 +19,7 @@ import com.teamboid.twitter.TabsAdapter.MentionsFragment;
 import com.teamboid.twitter.TabsAdapter.MessagesFragment;
 import com.teamboid.twitter.TabsAdapter.MyListsFragment;
 import com.teamboid.twitter.TabsAdapter.NearbyFragment;
+import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 import com.teamboid.twitter.TabsAdapter.TrendsFragment;
@@ -244,20 +245,26 @@ public class TimelineScreen extends Activity {
 				if(iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.favoritesTab }).getDrawable(0);
 					toAdd.setIcon(icon);
-				}
-				else toAdd.setText(R.string.favorites_str);
+				} else toAdd.setText(R.string.favorites_str);
 				mTabsAdapter.addTab(toAdd, FavoritesFragment.class, index);
 			} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
-				Tab toAdd = getActionBar().newTab();
-				String query = c.substring(SavedSearchFragment.ID.length() + 1);
-				if(iconic) {
-					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.savedSearchTab }).getDrawable(0);
-					toAdd.setIcon(icon);
-					if(prefs.getBoolean("textual_savedsearch_tabs", true)) {
-						toAdd.setText(query);
-					}
-				} else toAdd.setText(query);
-				mTabsAdapter.addTab(toAdd, SavedSearchFragment.class, index, c.substring(SavedSearchFragment.ID.length() + 1));
+				String fromQuery = SavedSearchFragment.ID + "@from:";
+				if(c.toLowerCase().startsWith(fromQuery.toLowerCase())) {
+					//Convert the from:screenname saved search column to a user feed column
+					c = ProfileTimelineFragment.ID + "@" + c.substring(fromQuery.length()).replace("%40", "");
+					cols.set(index, c);
+				} else {
+					String query = c.substring(SavedSearchFragment.ID.length() + 1);
+					Tab toAdd = getActionBar().newTab();
+					if(iconic) {
+						Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.savedSearchTab }).getDrawable(0);
+						toAdd.setIcon(icon);
+						if(prefs.getBoolean("textual_savedsearch_tabs", true)) {
+							toAdd.setText(query);
+						}
+					} else toAdd.setText(query);
+					mTabsAdapter.addTab(toAdd, SavedSearchFragment.class, index, c.substring(SavedSearchFragment.ID.length() + 1));
+				}
 			} else if(c.startsWith(UserListFragment.ID + "@")) {
 				String name = c.substring(UserListFragment.ID.length() + 1);
 				int id = Integer.parseInt(name.substring(name.indexOf("@") + 1, name.length()));
@@ -277,16 +284,14 @@ public class TimelineScreen extends Activity {
 				if(iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.nearbyTab }).getDrawable(0);
 					toAdd.setIcon(icon);
-				}
-				else toAdd.setText(R.string.nearby_str);
+				} else toAdd.setText(R.string.nearby_str);
 				mTabsAdapter.addTab(toAdd, NearbyFragment.class, index);
 			} else if(c.equals(MediaTimelineFragment.ID)) {
 				Tab toAdd = getActionBar().newTab();
 				if(iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0);
 					toAdd.setIcon(icon);
-				}
-				else toAdd.setText(R.string.media_title);
+				} else toAdd.setText(R.string.media_title);
 				mTabsAdapter.addTab(toAdd, MediaTimelineFragment.class, index);
 			} else if(c.equals(MyListsFragment.ID)) {
 				Tab toAdd = getActionBar().newTab();
@@ -294,9 +299,17 @@ public class TimelineScreen extends Activity {
 					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
 					toAdd.setIcon(icon);
 					if(prefs.getBoolean("textual_userlist_tabs", true)) toAdd.setText(R.string.my_lists_str);
-				}
-				else toAdd.setText(R.string.my_lists_str);
+				} else toAdd.setText(R.string.my_lists_str);
 				mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
+			}
+			if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
+				Tab toAdd = getActionBar().newTab();
+				String screenName = c.substring(ProfileTimelineFragment.ID.length() + 1);
+				if(iconic) {
+					Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
+					toAdd.setIcon(icon);
+				} else toAdd.setText("@" + screenName);
+				mTabsAdapter.addTab(toAdd, ProfileTimelineFragment.class, index, screenName);
 			}
 			index++;
 		}
@@ -435,7 +448,7 @@ public class TimelineScreen extends Activity {
 		filter.addAction(AccountManager.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -658,7 +671,7 @@ public class TimelineScreen extends Activity {
 		});
 		builder.create().show();
 	}
-	
+
 	private void showSavedSearchColumnAdd(final SavedSearch[] lists) {
 		final Dialog diag = new Dialog(this);
 		diag.setTitle(R.string.savedsearch_str);

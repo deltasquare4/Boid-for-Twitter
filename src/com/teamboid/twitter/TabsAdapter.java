@@ -328,7 +328,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 		    @Override
 		    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		    	mode.setTitle(getListView().getCheckedItemCount() + " Tweets Selected");
 		        MenuInflater inflater = mode.getMenuInflater();
 		        inflater.inflate(R.menu.tweetviewer_actionbar, menu);
 		        return true;
@@ -2003,41 +2002,42 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public void setListShown(boolean shown) {
 			View mProgressContainer = getActivity().findViewById(R.id.progressContainer);
 			View mListContainer = getActivity().findViewById(R.id.listContainer);
-			if(shown){
-				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-	                        getActivity(), android.R.anim.fade_out));
-	             mListContainer.startAnimation(AnimationUtils.loadAnimation(
-	                        getActivity(), android.R.anim.fade_in));
-	             
+			if(shown) {
+				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+	             mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
 	             mProgressContainer.setVisibility(View.GONE);
 	             mListContainer.setVisibility(View.VISIBLE);
-			} else{
-				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-	                        getActivity(), android.R.anim.fade_in));
-                 mListContainer.startAnimation(AnimationUtils.loadAnimation(
-                        getActivity(), android.R.anim.fade_out));
-                 
+			} else {
+				 mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+                 mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
                  mProgressContainer.setVisibility(View.VISIBLE);
                  mListContainer.setVisibility(View.GONE);
 			}
 		}
 	}
 	
-	public static class ProfileTimelineFragment extends ProfilePaddedFragment {
+	public static class ProfileTimelineFragment extends BaseListFragment {
 
-		private ProfileScreen context;
+		private Activity context;
+		private FeedListAdapter globalAdapter;
 		private String screenName;
+		public static final String ID = "COLUMNTYPE:PROFILE_FEED";
 
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
-			context = (ProfileScreen)act;
+			context = act;
+		}
+		
+		private FeedListAdapter getAdapter() {
+			if(context instanceof ProfileScreen) return ((ProfileScreen)context).adapter;
+			else return globalAdapter;
 		}
 
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
-			Status tweet = (Status)context.adapter.getItem(position);
+			Status tweet = (Status)getAdapter().getItem(position);
 			if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
 			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
@@ -2062,7 +2062,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-					Status item = (Status)((ProfileScreen)context).adapter.getItem(index);
+					Status item = (Status)getAdapter().getItem(index);
 					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
 							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
 							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -2078,7 +2078,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onResume() {
 			super.onResume();
-			if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView());
+			if(getView() == null) return;
+			getAdapter().restoreLastViewed(getListView());
 		}
 
 		@Override
@@ -2089,14 +2090,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void performRefresh(final boolean paginate) {
-			if(context == null || isLoading || context.adapter == null) return;	
+			if(context == null || isLoading || getAdapter() == null) return;	
 			isLoading = true;
-			if(context.adapter.getCount() == 0 && getView() != null) setListShown(false);
-			context.adapter.setLastViewed(getListView());
+			if(getAdapter().getCount() == 0 && getView() != null) setListShown(false);
+			getAdapter().setLastViewed(getListView());
 			new Thread(new Runnable() {
 				public void run() {
 					Paging paging = new Paging(1, 50);
-					if(paginate) paging.setMaxId(context.adapter.getItemId(context.adapter.getCount() - 1));
+					if(paginate) paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
 					final Account acc = AccountService.getCurrentAccount();
 					if(acc != null) {
 						try {
@@ -2104,11 +2105,11 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							context.runOnUiThread(new Runnable() {
 								public void run() {
 									setEmptyText(context.getString(R.string.no_tweets));
-									int beforeLast = context.adapter.getCount() - 1;
-									int addedCount = context.adapter.add(feed.toArray(new Status[0]));
+									int beforeLast = getAdapter().getCount() - 1;
+									int addedCount = getAdapter().add(feed.toArray(new Status[0]));
 									if(getView() != null) {
 										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
-										else if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView());
+										else if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
 									}
 									if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
 										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(context.getString(R.string.tweets_str) + " (" + Integer.toString(addedCount) + ")");
@@ -2138,19 +2139,29 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void reloadAdapter(boolean firstInitialize) {
 			if(AccountService.getCurrentAccount() != null) {
-				if(context.adapter != null && !firstInitialize && getView() != null) context.adapter.setLastViewed(getListView());
-				if(context.adapter == null) context.adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
-				setListAdapter(context.adapter);
-				if(context.adapter.getCount() == 0) performRefresh(false);
-				else if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView());
+				if(getAdapter() != null && !firstInitialize && getView() != null) getAdapter().setLastViewed(getListView());
+				if(getAdapter() == null) {
+					if(context instanceof ProfileScreen) {
+						((ProfileScreen)context).adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
+					} else {
+						globalAdapter = AccountService.getFeedAdapter(context, ProfileTimelineFragment.ID + "@" + screenName, AccountService.getCurrentAccount().getId());
+					}
+				}
+				setListAdapter(getAdapter());
+				if(getAdapter().getCount() == 0) performRefresh(false);
+				else if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
 			}
 		}
 
 		@Override
-		public void savePosition() { if(getView() != null && context.adapter != null) context.adapter.setLastViewed(getListView()); }
+		public void savePosition() { 
+			if(getView() != null && getAdapter() != null) getAdapter().setLastViewed(getListView());
+		}
 
 		@Override
-		public void restorePosition() { if(getView() != null && context.adapter != null) context.adapter.restoreLastViewed(getListView()); }
+		public void restorePosition() { 
+			if(getView() != null && getAdapter() != null) getAdapter().restoreLastViewed(getListView());
+		}
 
 		@Override
 		public void jumpTop() {

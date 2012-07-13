@@ -14,7 +14,6 @@ import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
 import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -140,7 +139,7 @@ public class ProfileScreen extends Activity {
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    	ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
-			cols.add(SavedSearchFragment.ID + "@from:" + getIntent().getStringExtra("screen_name"));
+			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
 			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
 			return true;
