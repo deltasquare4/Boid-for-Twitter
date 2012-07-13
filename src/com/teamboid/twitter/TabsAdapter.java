@@ -1771,12 +1771,11 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				}
 			});
 			grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				void viewTweet(long tweetid){
+				private void viewTweet(long tweetid){
 					context.startActivity(new Intent(context, TweetViewer.class)
 						.putExtra("tweet_id", tweetid)
 						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				}
-				
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
 					final MediaFeedListAdapter.MediaFeedItem tweet = (MediaFeedListAdapter.MediaFeedItem)adapt.getItem(position);
@@ -1784,7 +1783,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						viewTweet(tweet.tweet_id);
 					} else{
 						final ProgressDialog pd = new ProgressDialog(context);
-						pd.setMessage(context.getString(R.string.please_wait));
+						pd.setMessage(context.getString(R.string.loading_str));
 						pd.show();
 						new Thread(new Runnable(){
 
@@ -1815,18 +1814,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					}
 				}
 			});
-			/* I don' think this works well?
-			grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-				@Override
-				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-					Status item = (Status)adapt.getItem(index);
-					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					return false;
-				}
-			});
-			*/
 			setRetainInstance(true);
 			screenName = (String)getArguments().get("screenName");
 			manualRefresh = getArguments().getBoolean("manualRefresh", false);
@@ -1988,7 +1975,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 	public static abstract class ProfilePaddedFragment extends BaseListFragment{
 		
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.profile_content, container, false);
 		}
 		
