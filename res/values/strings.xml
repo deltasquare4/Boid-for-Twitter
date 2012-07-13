@@ -383,6 +383,9 @@
 	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
 	<string name="description_str">Description</string>
 	<string name="unblock_str">Unblock</string>
+	<string name="failed_unblock_str">Failed to unblock @{user}!</string>
+	<string name="failed_follow_str">Failed to follow @{user}!</string>
+	<string name="failed_unfollow_str">Failed to unfollow @{user}!</string>
 	<string name="follow_str">Follow</string>
 	<string name="follow_back_str">Follow Back</string>
 	<string name="unfollow_str">Unfollow</string>

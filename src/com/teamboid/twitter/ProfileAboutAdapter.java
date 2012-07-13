@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import org.apache.http.message.BasicNameValuePair;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.User;
 
 import android.app.Activity;
@@ -17,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The list adapter used for the "About" tab in the profile activity.
@@ -141,6 +144,10 @@ public class ProfileAboutAdapter extends BaseAdapter {
 					followBtn.setEnabled(true);
 				} else followBtn.setText(R.string.unfollow_str);
 			}
+			followBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) { performFollowClick(followBtn); }
+			});
 		} else {
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
 			BasicNameValuePair curItem = values.get(position - 1);
@@ -155,5 +162,69 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			FeedListAdapter.ApplyFontSize(body, mContext);
 		}
 		return toReturn;
+	}
+
+	private void performFollowClick(final Button btn) {
+		final Twitter cl = AccountService.getCurrentAccount().getClient();
+		btn.setEnabled(false);
+		new Thread(new Runnable() {
+			public void run() {
+				if(isBlocked) {
+					try { cl.destroyBlock(user.getId()); }
+					catch (final TwitterException e) {
+						e.printStackTrace();
+						mContext.runOnUiThread(new Runnable() {
+							public void run() { 
+								Toast.makeText(mContext, mContext.getString(R.string.failed_unblock_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+						return;
+					}
+					mContext.runOnUiThread(new Runnable() {
+						public void run() { 
+							isBlocked = false;
+							notifyDataSetChanged();
+						}
+					});
+				} else if(isFollowing) {
+					try { cl.destroyFriendship(user.getId()); }
+					catch (final TwitterException e) {
+						e.printStackTrace();
+						mContext.runOnUiThread(new Runnable() {
+							public void run() { 
+								Toast.makeText(mContext, mContext.getString(R.string.failed_unfollow_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+						return;
+					}
+					mContext.runOnUiThread(new Runnable() {
+						public void run() { 
+							isFollowing = false;
+							notifyDataSetChanged();
+						}
+					});
+				} else if(!isFollowing) {
+					try { cl.createFriendship(user.getId()); }
+					catch (final TwitterException e) {
+						e.printStackTrace();
+						mContext.runOnUiThread(new Runnable() {
+							public void run() { 
+								Toast.makeText(mContext, mContext.getString(R.string.failed_follow_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+						return;
+					}
+					mContext.runOnUiThread(new Runnable() {
+						public void run() { 
+							isFollowing = true;
+							notifyDataSetChanged();
+						}
+					});
+				}
+				mContext.runOnUiThread(new Runnable() {
+					public void run() { btn.setEnabled(true); }
+				});
+			}
+		}).start();
 	}
 }
