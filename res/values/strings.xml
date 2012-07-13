@@ -378,9 +378,13 @@
 	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
 		to replying.
 	</string>
-	<string name="last_tweeted">Tweeted {time} ago</string>
 	<string name="follows_you_str">follows you</string>
 	<string name="blocked_str">blocked</string>
 	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
 	<string name="description_str">Description</string>
+	<string name="unblock_str">Unblock</string>
+	<string name="follow_str">Follow</string>
+	<string name="follow_back_str">Follow Back</string>
+	<string name="unfollow_str">Unfollow</string>
+	<string name="request_sent_str">Request Sent</string>
 </resources>

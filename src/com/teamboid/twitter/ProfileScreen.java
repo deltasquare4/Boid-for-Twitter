@@ -48,7 +48,6 @@ public class ProfileScreen extends Activity {
 	public FeedListAdapter adapter;
 	public MediaFeedListAdapter mediaAdapter;
 	public User user;
-	public boolean isBlocked;
 	
 	public void showProgress(boolean visible) {
 		if(showProgress == visible) return;
@@ -114,7 +113,7 @@ public class ProfileScreen extends Activity {
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
 			if(user != null) {
-				if(!isBlocked) menu.findItem(R.id.blockAction).setEnabled(true);
+				if(!getAboutFragment().getAdapter().isBlocked()) menu.findItem(R.id.blockAction).setEnabled(true);
 				else menu.findItem(R.id.blockAction).setVisible(false);
 				menu.findItem(R.id.reportAction).setEnabled(true);
 			}
@@ -288,6 +287,10 @@ public class ProfileScreen extends Activity {
 		});
 	}
 	
+	public ProfileAboutFragment getAboutFragment() {
+		return (ProfileAboutFragment)getFragmentManager().findFragmentByTag("page:1");
+	}
+	
 	/**
 	 * Sets up our own views for this
 	 */
@@ -306,8 +309,8 @@ public class ProfileScreen extends Activity {
 //		if(user.getLocation().trim().isEmpty()){
 //			tv.setVisibility(View.GONE);
 //		} else tv.setText(user.getLocation());
-		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener(){
-
+		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
+			
 			@Override
 			public void onPageScrollStateChanged(int arg0) { }
 
@@ -326,17 +329,17 @@ public class ProfileScreen extends Activity {
 			public void run() {
 				final Account acc = AccountService.getCurrentAccount();
 				try {
-					isBlocked = acc.getClient().existsBlock(user.getId());
+					getAboutFragment().getAdapter().updateIsBlocked(acc.getClient().existsBlock(user.getId()));
 					runOnUiThread(new Runnable() {
 						public void run() {   
-							if(isBlocked) {
+							if(getAboutFragment().getAdapter().isBlocked()) {
 								getActionBar().setSelectedNavigationItem(1);
 								((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.blocked_str);
 							}
 							invalidateOptionsMenu();
 						}
 					});
-					if(isBlocked) return;
+					if(getAboutFragment().getAdapter().isBlocked()) return;
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -344,9 +347,13 @@ public class ProfileScreen extends Activity {
 					});
 					return;
 				}
+				if(user.isFollowRequestSent()) {
+					getAboutFragment().getAdapter().updateRequestSent(true);
+					return;
+				}
 				try {
-					final boolean followsYou = acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName());
-					if(followsYou) {
+					getAboutFragment().getAdapter().updateIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), user.getScreenName()));
+					if(getAboutFragment().getAdapter().isFollowing()) {
 						runOnUiThread(new Runnable() {
 							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
 						});
@@ -356,8 +363,23 @@ public class ProfileScreen extends Activity {
 					runOnUiThread(new Runnable() {
 						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
 					});
-					return;
 				}
+				try {
+					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
+					if(getAboutFragment().getAdapter().isFollowedBy()) {
+						runOnUiThread(new Runnable() {
+							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
+						});
+					}
+				} catch (final TwitterException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+					});
+				}
+				runOnUiThread(new Runnable() {
+					public void run() { getAboutFragment().getAdapter().notifyDataSetChanged(); }
+				});
 			}
 		}).start();
 	}

@@ -2305,6 +2305,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private ProfileAboutAdapter adapt;
 		private String screenName;
 
+		public ProfileAboutAdapter getAdapter() { return adapt; }
+		
 		@Override
 		public void onAttach(Activity act) {
 			super.onAttach(act);
