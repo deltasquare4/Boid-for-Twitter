@@ -32,13 +32,11 @@ import twitter4j.UserList;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -48,7 +46,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -323,10 +325,37 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 
+		private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+		    @Override
+		    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		    	mode.setTitle(getListView().getCheckedItemCount() + " Tweets Selected");
+		        MenuInflater inflater = mode.getMenuInflater();
+		        inflater.inflate(R.menu.tweetviewer_actionbar, menu);
+		        return true;
+		    }
+		    @Override
+		    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		        return false;
+		    }
+		    @Override
+		    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		        switch (item.getItemId()) {
+		            case R.id.replyAction:
+		                mode.finish();
+		                return true;
+		            default:
+		            	getListView().clearChoices();
+		                return false;
+		        }
+		    }
+		    @Override
+		    public void onDestroyActionMode(ActionMode mode) { }
+		};
+		
 		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -342,11 +371,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-//					Status item = (Status)adapt.getItem(index);
-//					context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
-//							.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
-//							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					getListView().setItemChecked(index, true);
+					if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+						getListView().setItemChecked(index, true);
+						context.startActionMode(mActionModeCallback);
+					} else {
+						Status item = (Status)adapt.getItem(index);
+						context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", item.getId())
+								.putExtra("reply_to_name", item.getUser().getScreenName()).putExtra("append", Utilities.getAllMentions(item))
+								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					}
 					return true;
 				}
 			});
@@ -598,7 +631,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		private MessageConvoAdapter adapt;
 		private Activity context;
 		public static final String ID = "COLUMNTYPE:MESSAGES";
-		private boolean isDeleting;
 
 		@Override
 		public void onAttach(Activity act) {
@@ -628,33 +660,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			setRetainInstance(true);
 			setEmptyText(getString(R.string.no_messages));
 			reloadAdapter(true);
-		}
-
-		private boolean deleteConvo(final int index, final DMConversation convo) {
-			if(isDeleting) return false;
-			isDeleting = true;
-			final Account acc = AccountService.getCurrentAccount();
-			context.runOnUiThread(new Runnable() {
-				public void run() {
-					if(getView() != null) setListShown(false);
-				}
-			});
-			int deletedCount = 0;
-			for(DirectMessage msg : convo.getMessages()) {
-				try { 
-					acc.getClient().destroyDirectMessage(msg.getId());
-					deletedCount++;
-				} catch (TwitterException e) { e.printStackTrace(); }
-			}
-			final boolean toReturn = (deletedCount == convo.getMessages().size());
-			context.runOnUiThread(new Runnable() {
-				public void run() {
-					if(getView() != null) setListShown(true);
-					isDeleting = false;
-					if(!toReturn) Toast.makeText(context, R.string.failed_delete_convo, Toast.LENGTH_SHORT).show();
-				}
-			});
-			return toReturn;
 		}
 
 		@Override

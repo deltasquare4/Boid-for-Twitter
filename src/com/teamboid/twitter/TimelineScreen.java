@@ -156,6 +156,7 @@ public class TimelineScreen extends Activity {
 		if(!prefs.contains("boid_theme")) prefs.edit().putString("boid_theme", "0").commit();
 		if(!prefs.contains("upload_service")) prefs.edit().putString("upload_service", "twitter").commit();
 		if(!prefs.contains("enable_inline_previewing")) prefs.edit().putBoolean("enable_inline_previewing", true).commit();
+		if(!prefs.contains("cab")) prefs.edit().putBoolean("cab", true).commit();
 		ActionBar ab = getActionBar();
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(false);

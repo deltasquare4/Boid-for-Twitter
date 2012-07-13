@@ -42,13 +42,14 @@
 		android:textColor="?timerColor" android:textColorLink="?linkColor"
 		android:visibility="gone" />
 	<TextView android:id="@+id/feedItemUserName"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_toRightOf="@+id/feedItemProfilePic" android:singleLine="true"
-		android:layout_alignWithParentIfMissing="true"
+		android:duplicateParentState="true" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_toRightOf="@+id/feedItemProfilePic"
+		android:singleLine="true" android:layout_alignWithParentIfMissing="true"
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:textColor="?usernameColor" android:textStyle="bold" />
 	<TextView android:id="@+id/feedItemText" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:layout_toRightOf="@+id/feedItemProfilePic"
+		android:duplicateParentState="true" android:layout_height="wrap_content"
+		android:layout_toRightOf="@+id/feedItemProfilePic"
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:layout_below="@+id/feedItemUserName" android:textColor="?tweetColor"
 		android:textColorLink="?linkColor" />

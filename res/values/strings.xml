@@ -3,7 +3,8 @@
 	<string name="app_name">Boid Beta</string>
 	<string name="account_service_name">Boid Account Service</string>
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
-		your accounts. Stopping the service will disable Boid.</string>
+		your accounts. Stopping the service will disable Boid.
+	</string>
 	<string name="none_str">None</string>
 	<string name="unknown_str">Unknown</string>
 	<string name="messaging_str">Messaging</string>
@@ -15,14 +16,14 @@
 	<string name="google_url">https://www.google.com/search?q=</string>
 	<string name="nearby_str">Nearby</string>
 	<string name="no_camera_app">Uh oh! You don\'t have any camera apps!</string>
-	<string name="confirm_delete_convo">Are you sure you want to delete this conversation?
-	</string>
 	<string name="failed_delete_convo">One or more of the messages in this conversation
-		could not be deleted!</string>
+		could not be deleted!
+	</string>
 	<string name="manual_refresh_hint">Press refresh to load</string>
 	<string name="share_boid_title">Share Boid</string>
 	<string name="share_boid_desc">Help spread Boid by sharing it with your friends,
-		family, and even your co-workers!</string>
+		family, and even your co-workers!
+	</string>
 	<string name="share_boid_content">Check out Boid for Twitter!
 		https://play.google.com/store/apps/details?id=com.teamboid.twitter
 	</string>
@@ -31,20 +32,26 @@
 	<string name="draft_prompt">Do you want to save this Tweet as a draft?</string>
 	<string name="always_attach_loc">Always Attach Location</string>
 	<string name="always_attach_loc_desc">When enabled, your location will be attached to
-		composed tweets by default.</string>
+		composed tweets by default.
+	</string>
 	<string name="display_real_name">Display Real Name</string>
 	<string name="display_real_name_desc">When enabled, columns display the full name of a
-		user instead of their screen name.</string>
+		user instead of their screen name.
+	</string>
 	<string name="mention_notify_desc">When enabled, you will receive notifications for
-		new mentions.</string>
+		new mentions.
+	</string>
 	<string name="messages_notify_desc">When enabled, you will receive notifications for
-		new direct messages.</string>
+		new direct messages.
+	</string>
 	<string name="vibrate_str">Vibration</string>
 	<string name="vibrate_str_desc">When enabled, notifications will cause your phone
-		to vibrate.</string>
+		to vibrate.
+	</string>
 	<string name="ringtone_str">Ringtone</string>
 	<string name="ringtone_str_desc">The optional ringtone played when a notification is
-		received.</string>
+		received.
+	</string>
 	<string name="notifications_str">Notifications</string>
 
 	<string name="follows_you">Follows You</string>
@@ -61,9 +68,11 @@
 	<string name="expanding_twitlonger">Expanding this TwitLonger post…</string>
 	<string name="expanding_twtmore">Expanding this Twtmore post…</string>
 	<string name="failed_expand_twitlonger">Something happened while expanding this TwitLonger
-		post!</string>
+		post!
+	</string>
 	<string name="failed_expand_twtmore">Something happened while expanding this Twtmore
-		post!</string>
+		post!
+	</string>
 	<string name="copied_str">Tweet copied to clipboard!</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
@@ -113,7 +122,8 @@
 	<string name="savedsearch_uploaded">Saved search successfully saved to Twitter!
 	</string>
 	<string name="savedsearch_upload_error">Something happened while saving your saved search
-		on Twitter!</string>
+		on Twitter!
+	</string>
 	<string name="no_lists">You don\'t have any lists!</string>
 	<string name="failed_load_lists">Something happened while loading your lists!
 	</string>
@@ -126,7 +136,8 @@
 	<string name="authorizing_account">Authorizing your account…</string>
 	<string name="failed_load_account">Failed to load an account!</string>
 	<string name="failed_fetch_config">Failed to fetch Twitter\'s current configuration;
-		defaults will be used. Reason: {reason}</string>
+		defaults will be used. Reason: {reason}
+	</string>
 	<string name="failed_load_tweet">Something happened while loading this Tweet!
 	</string>
 
@@ -149,32 +160,38 @@
 	<string name="add_account_str">Add Account</string>
 	<string name="muting_str">Muting</string>
 	<string name="muting_str_desc">Add or remove timeline muting rules to filter
-		tweets.</string>
+		tweets.
+	</string>
 	<string name="no_muting_str">No rules</string>
 	<string name="refresh_str">Refresh</string>
 	<string name="delete_str">Delete</string>
 
 	<string name="help_title">Help</string>
 	<string name="help_description">View information about Boid, and get support via
-		email.</string>
+		email.
+	</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Graham Macphee, Philip
 		Oakley, and Federico Zubani. Website by Steve Edson, original design
-		by Mike Stevens.</string>
+		by Mike Stevens.
+	</string>
 	<string name="version_title">Version</string>
 	<string name="build_title">Build Number</string>
 	<string name="sendfeedback_title">Feedback</string>
 	<string name="sendfeedback_description">Send questions, feature requests, and bug reports
-		to Team Boid.</string>
+		to Team Boid.
+	</string>
 	<string name="general_title">General</string>
 	<string name="general_description">Common settings for modifying functionality.
 	</string>
 	<string name="enable_ssl_title">SSL</string>
 	<string name="enable_ssl_description">Enabling allows to Boid to make a more secure, but
-		slower connection to Twitter.</string>
+		slower connection to Twitter.
+	</string>
 	<string name="iconic_tabs_title">Iconic Tabs</string>
 	<string name="iconic_tabs_description">Enabled by default; disabling displays text on
-		columns instead of icons.</string>
+		columns instead of icons.
+	</string>
 	<string name="theme_title">Theme</string>
 	<string name="theme_description">Boid\'s theme, modifies text and UI colors.
 	</string>
@@ -183,28 +200,34 @@
 	<string name="enable_download">Enable Download</string>
 	<string name="tweet_media_header">Tweet Media</string>
 	<string name="enable_profilepic_download_desc">Enabling allows Boid to download profile pictures
-		while viewing Tweets and profiles. Disabling hides profile pictures
-		altogether</string>
+		while viewing Tweets and profiles.
+	</string>
 	<string name="enable_media_download_desc">Enabling allows Boid to download the media held in
-		Tweets while viewing a Tweet.</string>
+		Tweets while viewing a Tweet.
+	</string>
 	<string name="enable_drafts_title">Drafts</string>
 	<string name="enable_drafts_desc">Enable or disable Tweet drafting, not including
-		replies. Drafts are saved for each account.</string>
+		replies. Drafts are saved for each account.
+	</string>
 	<string name="clear_searchhistory_title">Clear Search History</string>
 	<string name="clear_searchhistory_desc">Clears your search history (that\'s accessed from
-		the timeline screen\'s search interface).</string>
+		the timeline screen\'s search interface).
+	</string>
 	<string name="appearance_category">Appearance</string>
 	<string name="appearance_category_desc">Settings for modifying Boid\'s look and feel.
 	</string>
 	<string name="enable_textual_list_title">Textual User Lists</string>
 	<string name="enable_textual_list_desc">If iconic tabs are enabled, user list columns will
-		display their title along side the icon.</string>
+		display their title along side the icon.
+	</string>
 	<string name="enable_textual_search_title">Textual Saved Searches</string>
 	<string name="enable_textual_search_desc">If iconic tabs are enabled, saved search columns
-		will display their title along side the icon.</string>
+		will display their title along side the icon.
+	</string>
 	<string name="enable_inline_title">Inline Previewing</string>
 	<string name="enable_inline_desc">Enabling allows Boid to display image previews of
-		the media contained in tweets of columns.</string>
+		the media contained in tweets of columns.
+	</string>
 
 	<string name="capture_str">Capture Image</string>
 	<string name="attach_image">Attach Image</string>
@@ -278,22 +301,26 @@
 
 	<string name="push_title">Push Notifications</string>
 	<string name="enable_push">Enabling push notifications will push you updates
-		in near real-time</string>
+		in near real-time
+	</string>
 
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="imgur_note">Images will be uploaded using the same imgur
-		account at the moment and follow the default access settings</string>
+		account at the moment and follow the default access settings
+	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
 
 	<string name="photo_service_title">Upload Service</string>
 	<string name="confirm_send_setting_title">Send Prompt</string>
 	<string name="confirm_send_setting_desc">Boid will ask you to confirm sending your tweets
-		before doing so.</string>
+		before doing so.
+	</string>
 	<string name="confirm_send_prompt">Send this tweet as @{account}?</string>
 	<string name="composer_str">Composer</string>
 	<string name="composer_desc_str">Settings that deal with elements of the tweet
-		composer, such as picture services.</string>
+		composer, such as picture services.
+	</string>
 	<string name="users_and_tweets">Users and tweets</string>
 	<string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.
 	</string>
@@ -324,14 +351,13 @@
 	</string>
 	<string name="no_muting_backup">No muting filters backup file was found!</string>
 	<string name="loading_str">Loading…</string>
-
-	<string name="new_mention">1 new mention</string>
-	<string name="new_mentions">{x} new mentions</string>
 	<string name="enable_ssl_str">Enable SSL</string>
 	<string name="disable_ssl_str">Disable SSL</string>
 	<string name="enable_ssl_confirm_str">Are you sure you want to enable SSL? Doing so can
-		slow down Boid, but it\'s useful when you\'re on a public network or in
-		a country that requires it to use Twitter.</string>
+		slow down Boid, but it\'s useful when you\'re on a public network or
+		in
+		a country that requires it to use Twitter.
+	</string>
 	<string name="my_lists_str">My Lists</string>
 	<string name="add_to_list_str">Add to List</string>
 	<string name="deleting_list_str">Deleting list…</string>
@@ -341,28 +367,22 @@
 	<string name="unsubscribe_str">Unsubcribe</string>
 	<string name="adding_user_list">Adding user to list…</string>
 	<string name="added_user_list">Added user to the list!</string>
-	<string name="delete_list_prompt">Are you sure you want to delete your list {listname}?</string>
-	<string name="unsubscribe_list_prompt">Are you sure you want to unsubscribe from {listname}?</string>
-	<string name="follow_boidapp_prompt">Do you want to follow @boidapp from @{account}?</string>
-	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so manually later.</string>
-	
+	<string name="delete_list_prompt">Are you sure you want to delete your list
+		{listname}?</string>
+	<string name="unsubscribe_list_prompt">Are you sure you want to unsubscribe from
+		{listname}?</string>
+	<string name="follow_boidapp_prompt">Do you want to follow @boidapp from @{account}?
+	</string>
+	<string name="failed_check_following_boidapp">Failed to check if you\'re following @boidapp from @{account}!</string>
+	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so
+		manually later.</string>
 	<string name="about_twicsy_api">Uses Twicsy API</string>
-	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s photo feed. You should check them out</string>
-
+	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s
+		photo feed. You should check them out</string>
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
-	<string-array name="font_sizes">
-	    <item>Small</item>
-	    <item>Normal</item>
-	    <item>Bigger</item>
-	    <item>Large</item>
-	</string-array>
-	<string-array name="font_sizes_values">
-	    <!-- Scaled Pixels -->
-	    <item>12</item>
-	    <item>16</item>
-	    <item>21</item>
-	    <item>26</item>
-	</string-array>
 	<string name="boid_is_awesome">Boid is Awesome!</string>
+	<string name="contextual_action_bar">Contextual Actionbar</string>
+	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
+		to replying.</string>
 </resources>
