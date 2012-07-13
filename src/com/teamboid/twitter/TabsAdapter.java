@@ -2138,11 +2138,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			if(AccountService.getCurrentAccount() != null) {
 				if(getAdapter() != null && !firstInitialize && getView() != null) getAdapter().setLastViewed(getListView());
 				if(getAdapter() == null) {
-					if(context instanceof ProfileScreen) {
-						((ProfileScreen)context).adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
-					} else {
-						globalAdapter = AccountService.getFeedAdapter(context, ProfileTimelineFragment.ID + "@" + screenName, AccountService.getCurrentAccount().getId());
-					}
+					globalAdapter = AccountService.getFeedAdapter(context, ProfileTimelineFragment.ID + "@" + screenName, AccountService.getCurrentAccount().getId());
 				}
 				setListAdapter(getAdapter());
 				if(getAdapter().getCount() == 0) performRefresh(false);
