@@ -85,7 +85,7 @@ public class TimelineCAB {
 
 	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
 		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-			int beforeChecked = list.getCheckedItemCount();
+			int beforeChecked = TimelineCAB.getSelectedTweets().length;
 			if(list.isItemChecked(index)) {
 				list.setItemChecked(index, false);
 			} else list.setItemChecked(index, true);
