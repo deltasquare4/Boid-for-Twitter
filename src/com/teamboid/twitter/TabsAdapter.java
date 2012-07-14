@@ -414,9 +414,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
 								performRefresh(true);
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true))
@@ -637,7 +635,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
@@ -1178,7 +1176,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
@@ -1401,7 +1399,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 								int firstVisibleItem, int visibleItemCount,
 								int totalItemCount) {
 							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
+									&& (firstVisibleItem + visibleItemCount) >= totalItemCount
 									&& totalItemCount > visibleItemCount)
 								performRefresh(true);
 							if (firstVisibleItem == 0
@@ -1450,9 +1448,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void run() {
 					Query q = new Query(query);
-					if (paginate)
-						q.setMaxId(context.tweetAdapter
-								.getItemId(context.tweetAdapter.getCount() - 1));
+					if (paginate) q.setMaxId(context.tweetAdapter.getItemId(context.tweetAdapter.getCount() - 1));
 					final Account acc = AccountService.getCurrentAccount();
 					if (acc != null) {
 						try {
@@ -1460,52 +1456,22 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							context.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									setEmptyText(context
-											.getString(R.string.no_results));
-									int beforeLast = context.tweetAdapter
-											.getCount() - 1;
-									int addedCount = context.tweetAdapter
-											.add(feed.getTweets().toArray(
-													new Tweet[0]));
+									setEmptyText(context.getString(R.string.no_results));
+									int beforeLast = context.tweetAdapter.getCount() - 1;
+									int addedCount = context.tweetAdapter.add(feed.getTweets().toArray(new Tweet[0]));
 									if (addedCount > 0 || beforeLast > 0) {
 										if (getView() != null) {
-											if (paginate && addedCount > 0)
-												getListView()
-												.smoothScrollToPosition(
-														beforeLast + 1);
-											else
-												context.tweetAdapter
-												.restoreLastViewed(getListView());
+											if (paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+											else context.tweetAdapter.restoreLastViewed(getListView());
 										}
-										Tab curTab = context.getActionBar()
-												.getTabAt(
-														getArguments().getInt(
-																"tab_index"));
+										Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
 										String curTitle = "";
-										if (curTab.getText() != null)
-											curTitle = curTab.getText()
-											.toString();
-										if (curTitle != null
-												&& !curTitle.isEmpty()
-												&& curTitle.contains("(")) {
-											curTitle = curTitle.substring(
-													0,
-													curTitle.lastIndexOf("(") - 2);
-											curTitle += (" ("
-													+ Integer
-													.toString(addedCount) + ")");
-										} else
-											curTitle = context
-											.getString(R.string.tweets_str)
-											+ " ("
-											+ Integer
-											.toString(addedCount)
-											+ ")";
-										context.getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-														.setText(curTitle);
+										if (curTab.getText() != null) curTitle = curTab.getText().toString();
+										if (curTitle != null && !curTitle.isEmpty() && curTitle.contains("(")) {
+											curTitle = curTitle.substring(0, curTitle.lastIndexOf("(") - 2);
+											curTitle += (" (" + Integer.toString(addedCount) + ")");
+										} else curTitle = context.getString(R.string.tweets_str) + " (" + Integer.toString(addedCount) + ")";
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(curTitle);
 									}
 								}
 							});
@@ -1600,32 +1566,21 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view,
 								int firstVisibleItem, int visibleItemCount,
 								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
 								performRefresh(true);
-							if (context.userAdapter != null
-									&& getView() != null) {
+							if (context.userAdapter != null && getView() != null) {
 								context.userAdapter.savedIndex = firstVisibleItem;
 								View v = getListView().getChildAt(0);
-								context.userAdapter.savedIndexTop = (v == null) ? 0
-										: v.getTop();
+								context.userAdapter.savedIndexTop = (v == null) ? 0 : v.getTop();
 							}
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 								context.getActionBar()
-								.getTabAt(
-										getArguments().getInt(
-												"tab_index"))
-												.setText(R.string.users_str);
+								.getTabAt(getArguments().getInt("tab_index")).setText(R.string.users_str);
 							}
 						}
 					});
@@ -1651,74 +1606,37 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public void performRefresh(final boolean paginate) {
-			if (context == null || isLoading || context.userAdapter == null)
-				return;
+			if(context == null || isLoading || context.userAdapter == null) return;
 			isLoading = true;
-			if (context.userAdapter.getCount() == 0 && getView() != null)
-				setListShown(false);
+			if(context.userAdapter.getCount() == 0 && getView() != null) setListShown(false);
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					if (paginate)
-						page++;
-					else
-						page = 1;
+					if (paginate) page++;
+					else page = 1;
 					final Account acc = AccountService.getCurrentAccount();
 					if (acc != null) {
 						try {
-							final ResponseList<User> feed = acc.getClient()
-									.searchUsers(query, page);
+							final ResponseList<User> feed = acc.getClient().searchUsers(query, page);
 							context.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									setEmptyText(context
-											.getString(R.string.no_results));
-									int beforeLast = context.userAdapter
-											.getCount() - 1;
-									int addedCount = context.userAdapter
-											.add(feed.toArray(new User[0]));
+									setEmptyText(context.getString(R.string.no_results));
+									int beforeLast = context.userAdapter.getCount() - 1;
+									int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
 									if (addedCount > 0 || beforeLast > 0) {
 										if (getView() != null) {
-											if (paginate && addedCount > 0)
-												getListView()
-												.smoothScrollToPosition(
-														beforeLast + 1);
-											else
-												getListView()
-												.setSelectionFromTop(
-														context.userAdapter.savedIndex
-														+ addedCount,
-														context.userAdapter.savedIndexTop);
+											if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+											else getListView().setSelectionFromTop(context.userAdapter.savedIndex+ addedCount, context.userAdapter.savedIndexTop);
 										}
-										Tab curTab = context.getActionBar()
-												.getTabAt(
-														getArguments().getInt(
-																"tab_index"));
+										Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
 										String curTitle = "";
-										if (curTab.getText() != null)
-											curTitle = curTab.getText()
-											.toString();
-										if (curTitle != null
-												&& !curTitle.isEmpty()
-												&& curTitle.contains("(")) {
-											curTitle = curTitle.substring(
-													0,
-													curTitle.lastIndexOf("(") - 2);
-											curTitle += (" ("
-													+ Integer
-													.toString(addedCount) + ")");
-										} else
-											curTitle = context
-											.getString(R.string.users_str)
-											+ " ("
-											+ Integer
-											.toString(addedCount)
-											+ ")";
-										context.getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-														.setText(curTitle);
+										if (curTab.getText() != null) curTitle = curTab.getText().toString();
+										if (curTitle != null && !curTitle.isEmpty() && curTitle.contains("(")) {
+											curTitle = curTitle.substring(0, curTitle.lastIndexOf("(") - 2);
+											curTitle += (" (" + Integer.toString(addedCount) + ")");
+										} else curTitle = context.getString(R.string.users_str)+ " (" + Integer.toString(addedCount) + ")";
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(curTitle);
 									}
 								}
 							});
@@ -1727,11 +1645,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 							context.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									setEmptyText(context
-											.getString(R.string.error_str));
-									Toast.makeText(context,
-											e.getErrorMessage(),
-											Toast.LENGTH_SHORT).show();
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -1833,7 +1748,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 								int firstVisibleItem, int visibleItemCount,
 								int totalItemCount) {
 							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
+									&& (firstVisibleItem + visibleItemCount) >= totalItemCount
 									&& totalItemCount > visibleItemCount)
 								performRefresh(true);
 							if (firstVisibleItem == 0
@@ -2062,7 +1977,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 								int firstVisibleItem, int visibleItemCount,
 								int totalItemCount) {
 							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
+									&& (firstVisibleItem + visibleItemCount) >= totalItemCount
 									&& totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
@@ -2348,7 +2263,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
@@ -2934,7 +2849,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
@@ -3135,7 +3050,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
 						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
