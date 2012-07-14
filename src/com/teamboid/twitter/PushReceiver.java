@@ -1,13 +1,23 @@
 package com.teamboid.twitter;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import android.app.Service;
@@ -18,6 +28,7 @@ import android.net.SSLCertificateSocketFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Base64;
 import android.util.Log;
 
 import com.teamboid.twitter.TabsAdapter.MentionsFragment;
@@ -25,7 +36,9 @@ import com.teamboid.twitter.compat.Api11;
 
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
-	public static final String SERVER = "https://192.168.0.9:1337";
+	
+	// public static final String SERVER = "http://192.168.0.9:1337";
+	public static final String SERVER = "http://boid.nodester.com";
 	
 	public static class PushWorker extends Service{
 		
@@ -33,6 +46,8 @@ public class PushReceiver extends BroadcastReceiver {
 		public IBinder onBind(Intent arg0) {
 			return null;
 		}
+		
+		private static final String ENCRYPTION_KEY = "boidisalovelyappandijustlovehavingencrpytiontoworkwithnodester...../.khnihi";
 		
 		@Override
 		public int onStartCommand(final Intent intent, int flags, int startId) {
@@ -43,34 +58,40 @@ public class PushReceiver extends BroadcastReceiver {
 				public void run() {
 					try{
 						Account acc = AccountService.getCurrentAccount();
-						final URL url = new URL(SERVER + "/register?userid="+acc.getId()+
-								"&token=" + Uri.encode(intent.getStringExtra("reg")) +
-								"&accesstoken=" +  Uri.encode(acc.getToken()) + 
-								"&accesssecret=" +  Uri.encode(acc.getSecret()));
 						
-						HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-						urlConnection.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(3000, null) );
-						urlConnection.setHostnameVerifier(new HostnameVerifier(){
-
-							@Override
-							public boolean verify(String hostname,
-									SSLSession session) {
-								if(hostname.equals(url.getHost())) return true;
-								return false;
-							}
-							
-						});
-						urlConnection.setDoOutput(true);
+						// Build
+						JSONObject jo = new JSONObject();
+						jo.put("userid", acc.getId());
+						jo.put("accesstoken", acc.getToken());
+						jo.put("token", intent.getStringExtra("reg"));
+						jo.put("accesssecret", acc.getSecret());
 						
-						InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-						while(in.read() != -1) { };
+						// Encrypt
+						byte[] input = jo.toString().getBytes("utf-8");
 						
-						if(urlConnection.getResponseCode() == 200){
+						MessageDigest md = MessageDigest.getInstance("MD5");
+						byte[] thedigest = md.digest(ENCRYPTION_KEY.getBytes("UTF-8"));
+						SecretKeySpec skc = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
+						Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+						cipher.init(Cipher.ENCRYPT_MODE, skc);
+						
+						byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
+					    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+					    ctLength += cipher.doFinal(cipherText, ctLength);
+					    
+					    String query = Base64.encodeToString(cipherText, Base64.DEFAULT);
+						
+						DefaultHttpClient dhc = new DefaultHttpClient();
+						HttpPost p = new HttpPost(SERVER + "/register");
+						p.setEntity( new StringEntity(query) );
+						HttpResponse r = dhc.execute(p);
+						
+						if(r.getStatusLine().getStatusCode() == 200){
 							Log.d("push", "REGISTERED");
-						}
-						urlConnection.disconnect();
-						settingUp = false;
+						} else{ throw new Exception("NON 200 RESPONSE"); }
+						
 					}catch(Exception e){ e.printStackTrace(); }
+					settingUp = false;
 				}
 				
 			}).start();
