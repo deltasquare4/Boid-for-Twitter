@@ -137,11 +137,11 @@ public class ProfileScreen extends Activity {
 				}
 				try {
 					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
-					if(getAboutFragment().getAdapter().isFollowedBy()) {
-						runOnUiThread(new Runnable() {
-							public void run() { updateNameHeader(true); }
-						});
-					}
+					runOnUiThread(new Runnable() {
+						public void run() { 
+							((TextView)findViewById(R.id.profileFollowsYou)).setVisibility(getAboutFragment().getAdapter().isFollowedBy() ? View.VISIBLE : View.GONE);
+						}
+					});
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -352,14 +352,6 @@ public class ProfileScreen extends Activity {
 		return (ProfileAboutFragment)getFragmentManager().findFragmentByTag("page:1");
 	}
 
-	public void updateNameHeader(boolean followsYou) {
-		System.out.println("Update header, follows you? " + followsYou);
-		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
-		String toSet = user.getName() + "\n@" + user.getScreenName();
-		if(followsYou) toSet += "\n\n" + getString(R.string.follows_you_str);
-		tv.setText(toSet);
-	}
-
 	/**
 	 * Sets up our own views for this
 	 */
@@ -370,7 +362,8 @@ public class ProfileScreen extends Activity {
 				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 			}
 		});
-		updateNameHeader(false);
+		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
+		tv.setText(user.getName() + "\n@" + user.getScreenName());
 		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
 
 			@Override
