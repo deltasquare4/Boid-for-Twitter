@@ -8,6 +8,7 @@
 		android:title="@string/switch_accounts">
 		<menu />
 	</item>
+	<item android:id="@+id/donateAction" android:title="@string/donate_str" />
 	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str" />
 	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
 		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
