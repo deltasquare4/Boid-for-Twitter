@@ -152,6 +152,7 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
+		//This callback must stay here, otherwise in-app billing doesn't work for some reason.
 		mBillingObserver = new AbstractBillingObserver(this) {
 			@Override
 			public void onBillingChecked(boolean supported) { }

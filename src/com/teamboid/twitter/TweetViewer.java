@@ -384,14 +384,14 @@ public class TweetViewer extends MapActivity {
 		return true;
 	}
 
-	private void retweet(final MenuItem item) {
+	private void retweet(final MenuItem item, final String screenName) {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
 					final Status result = AccountService.getCurrentAccount().getClient().retweetStatus(statusId);
 					runOnUiThread(new Runnable() {
 						public void run() {
-							Toast.makeText(getApplicationContext(), R.string.retweeted_status, Toast.LENGTH_LONG).show();
+							Toast.makeText(getApplicationContext(), getString(R.string.retweeted_status).replace("{user}", screenName), Toast.LENGTH_LONG).show();
 							AccountService.getFeedAdapter(TweetViewer.this, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new Status[] { result });
 						}
 					});
@@ -422,6 +422,7 @@ public class TweetViewer extends MapActivity {
 			content = getIntent().getStringExtra("content");
 			replyToName = getIntent().getStringExtra("screen_name");
 		}
+		final String screenName = replyToName;
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			startActivity(new Intent(this, TimelineScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -447,7 +448,7 @@ public class TweetViewer extends MapActivity {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { 
-									Toast.makeText(getApplicationContext(), R.string.failed_unfavorite, Toast.LENGTH_LONG).show();
+									Toast.makeText(getApplicationContext(), getString(R.string.failed_unfavorite).replace("{user}", screenName), Toast.LENGTH_LONG).show();
 									item.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
 								}
 							});
@@ -473,7 +474,7 @@ public class TweetViewer extends MapActivity {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { 
-									Toast.makeText(getApplicationContext(), R.string.failed_favorite, Toast.LENGTH_LONG).show();
+									Toast.makeText(getApplicationContext(), getString(R.string.failed_favorite).replace("{user}", screenName), Toast.LENGTH_LONG).show();
 									item.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.unfavoriteIcon }).getDrawable(0));
 								}
 							});
@@ -499,7 +500,7 @@ public class TweetViewer extends MapActivity {
 						dialog.dismiss();
 						item.setEnabled(false);
 						showProgress(true);
-						retweet(item);
+						retweet(item, screenName);
 					}
 				});
 				diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
@@ -507,7 +508,7 @@ public class TweetViewer extends MapActivity {
 					public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
 				});
 				diag.create().show();
-			} else retweet(item);
+			} else retweet(item, replyToName);
 			return true;
 		case R.id.quoteSubItem:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra("text", "RT @" + replyToName + ": " + content).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -548,7 +549,7 @@ public class TweetViewer extends MapActivity {
 		case R.id.copyAction:
 			ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
 			clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", content));
-			Toast.makeText(getApplicationContext(), R.string.copied_str, Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), getString(R.string.copied_str).replace("{user}", replyToName), Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.viewConvoAction:
 			SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
