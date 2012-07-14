@@ -52,49 +52,62 @@ public class PushReceiver extends BroadcastReceiver {
 		@Override
 		public int onStartCommand(final Intent intent, int flags, int startId) {
 			if(intent.hasExtra("reg")){
-			new Thread(new Runnable(){
-
-				@Override
-				public void run() {
-					try{
-						Account acc = AccountService.getCurrentAccount();
-						
-						// Build
-						JSONObject jo = new JSONObject();
-						jo.put("userid", acc.getId());
-						jo.put("accesstoken", acc.getToken());
-						jo.put("token", intent.getStringExtra("reg"));
-						jo.put("accesssecret", acc.getSecret());
-						
-						// Encrypt
-						byte[] input = jo.toString().getBytes("utf-8");
-						
-						MessageDigest md = MessageDigest.getInstance("MD5");
-						byte[] thedigest = md.digest(ENCRYPTION_KEY.getBytes("UTF-8"));
-						SecretKeySpec skc = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
-						Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-						cipher.init(Cipher.ENCRYPT_MODE, skc);
-						
-						byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
-					    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
-					    ctLength += cipher.doFinal(cipherText, ctLength);
-					    
-					    String query = Base64.encodeToString(cipherText, Base64.DEFAULT);
-						
-						DefaultHttpClient dhc = new DefaultHttpClient();
-						HttpPost p = new HttpPost(SERVER + "/register");
-						p.setEntity( new StringEntity(query) );
-						HttpResponse r = dhc.execute(p);
-						
-						if(r.getStatusLine().getStatusCode() == 200){
-							Log.d("push", "REGISTERED");
-						} else{ throw new Exception("NON 200 RESPONSE"); }
-						
-					}catch(Exception e){ e.printStackTrace(); }
-					settingUp = false;
-				}
+				final Intent i = new Intent("com.teamboid.twitter.PUSH_PROGRESS");
+				i.putExtra("progress", 500);
+				sendBroadcast(i);
 				
-			}).start();
+				new Thread(new Runnable(){
+	
+					@Override
+					public void run() {
+						try{
+							Account acc = AccountService.getCurrentAccount();
+							
+							// Build
+							JSONObject jo = new JSONObject();
+							jo.put("userid", acc.getId());
+							jo.put("accesstoken", acc.getToken());
+							jo.put("token", intent.getStringExtra("reg"));
+							jo.put("accesssecret", acc.getSecret());
+							
+							// Encrypt
+							byte[] input = jo.toString().getBytes("utf-8");
+							
+							MessageDigest md = MessageDigest.getInstance("MD5");
+							byte[] thedigest = md.digest(ENCRYPTION_KEY.getBytes("UTF-8"));
+							SecretKeySpec skc = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
+							Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+							cipher.init(Cipher.ENCRYPT_MODE, skc);
+							
+							byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
+						    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+						    ctLength += cipher.doFinal(cipherText, ctLength);
+						    
+						    String query = Base64.encodeToString(cipherText, Base64.DEFAULT);
+						    
+						    i.putExtra("progress", 700);
+							sendBroadcast(i);
+							
+							DefaultHttpClient dhc = new DefaultHttpClient();
+							HttpPost p = new HttpPost(SERVER + "/register");
+							p.setEntity( new StringEntity(query) );
+							HttpResponse r = dhc.execute(p);
+							
+							if(r.getStatusLine().getStatusCode() == 200){
+								Log.d("push", "REGISTERED");
+								i.putExtra("progress", 1000);
+								sendBroadcast(i);
+							} else{ throw new Exception("NON 200 RESPONSE"); }
+							
+						}catch(Exception e){ e.printStackTrace();
+							i.putExtra("progress", 1000);
+							i.putExtra("error", true);
+							sendBroadcast(i);
+						}
+						settingUp = false;
+					}
+					
+				}).start();
 			} else if(intent.hasExtra("hm")){
 				Bundle b = intent.getBundleExtra("hm");
 				try {

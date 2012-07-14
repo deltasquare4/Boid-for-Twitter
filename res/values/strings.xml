@@ -5,6 +5,8 @@
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
 	</string>
+	<string name="push_error">Push could not be setup</string>
+	<string name="push_registered">Push is now registered!</string>
 	<string name="none_str">None</string>
 	<string name="unknown_str">Unknown</string>
 	<string name="messaging_str">Messaging</string>

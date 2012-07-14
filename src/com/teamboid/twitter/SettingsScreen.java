@@ -7,7 +7,11 @@ import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -22,6 +26,7 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -219,9 +224,41 @@ public class SettingsScreen extends PreferenceActivity  {
 		}
 	}
 	public static class NotificationsFragment extends PreferenceFragment {
+		ProgressDialog pd;
+		BroadcastReceiver pupdater;
+		
+		@Override
+		public void onDestroy (){
+			getActivity().unregisterReceiver(pupdater);
+		}
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			pd = new ProgressDialog(getActivity());
+			pd.setMessage(getText(R.string.please_wait));
+			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			
+			pupdater = new BroadcastReceiver(){
+
+				@Override
+				public void onReceive(Context arg0, Intent arg1) {
+					pd.setProgress(arg1.getIntExtra("progress", 1000));
+					if(arg1.getIntExtra("progress", 0) == 1000){
+						pd.dismiss();
+						if(arg1.getBooleanExtra("error", false) == true){
+							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+						} else{
+							Toast.makeText(getActivity(), R.string.push_registered, Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+				
+			};
+			IntentFilter i = new IntentFilter();
+			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
+			getActivity().registerReceiver(pupdater, i);
+			
 			addPreferencesFromResource(R.xml.notifications_category);
 			((SwitchPreference)findPreference("c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
@@ -232,7 +269,8 @@ public class SettingsScreen extends PreferenceActivity  {
 						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
 						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
 						getActivity().startService(registrationIntent);
-						// TODO: Maybe add some kind of progress?
+						
+						pd.show();
 					} else{
 						// TODO: Deregister
 					}
