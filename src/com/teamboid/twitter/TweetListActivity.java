@@ -77,7 +77,9 @@ public class TweetListActivity extends ListActivity {
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) refresh();
+				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
+					refresh();
+				}
 			}
 		});
 		setProgressBarIndeterminateVisibility(false);
@@ -112,8 +114,13 @@ public class TweetListActivity extends ListActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							if(tweets == null || tweets.size() == 0) allowPagination = false;
-							else binder.add(tweets.toArray(new Status[0]));
+							if(tweets == null || tweets.size() == 0) {
+								allowPagination = false;
+								showProgress(false);
+								return;
+							}
+							int addedCount = binder.add(tweets.toArray(new Status[0]));; 
+							if(addedCount == 0) allowPagination = false;
 							showProgress(false);
 						}
 					});

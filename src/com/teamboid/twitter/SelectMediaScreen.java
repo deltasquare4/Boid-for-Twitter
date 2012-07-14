@@ -32,7 +32,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		public MediaPreference(Context context, MediaService m, final String key) {
 			super(context);
 			try { setTitle(context.getResources().getString(m.name)); }
-			catch(Exception e) { /* some stupid one doesn't have a name :@ */ }
+			catch(Exception e) { e.printStackTrace(); }
 			needsConfig = m.needs_config;
 			this.m = m;
 			m.configured = new MediaUtilities.MediaConfigured() {
@@ -49,7 +49,8 @@ public class SelectMediaScreen extends PreferenceActivity {
 
 				@Override
 				public void configured() {
-					getPreferenceScreen().removeAll(); //TODO this function is deprecated.
+					//TODO this function is deprecated and needs to be replaced.
+					getPreferenceScreen().removeAll();
 					setupPreferences();
 				}
 			};
@@ -114,16 +115,16 @@ public class SelectMediaScreen extends PreferenceActivity {
 				}
 
 			};
-			getPreferenceScreen().addPreference(m); //TODO this function is deprecated.
+			//TODO this function is deprecated and needs to be replaced.
+			getPreferenceScreen().addPreference(m);
 		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.select_media); //TODO this is deprecated
+		//TODO this function is deprecated and needs to be replaced.
+		addPreferencesFromResource(R.xml.select_media);
 		setupPreferences();
-
 	}
-
 }

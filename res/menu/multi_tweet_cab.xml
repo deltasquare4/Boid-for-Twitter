@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/favoriteAction" android:title="@string/favorite_str"
+		android:icon="?unfavoriteIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/retweetAction" android:title="@string/retweet_str"
+		android:icon="?retweetIcon" android:showAsAction="ifRoom" />
+</menu>

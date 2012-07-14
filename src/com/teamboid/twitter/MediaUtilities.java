@@ -170,17 +170,14 @@ public class MediaUtilities {
 		public imgurUpload(String token, String secret, String url){
 			auth_token = token;
 			auth_secret = secret;
-
 			name = R.string.upload_imgur;
 			needs_config = true;
 			this.url = url;
 		}
 
 		@Override
-		public StatusUpdate attachMedia(InputStream input, StatusUpdate update,
-				SendTweetTask stt) throws Exception {
+		public StatusUpdate attachMedia(InputStream input, StatusUpdate update, SendTweetTask stt) throws Exception {
 			oauth = getAuth(true);
-
 			HttpClient cl = new HttpClientImpl();
 			HttpRequest get = new HttpRequest(RequestMethod.POST, "http://api.imgur.com/2/account/images.json",
 					new HttpParameter[]{
@@ -191,10 +188,8 @@ public class MediaUtilities {
 			}, oauth, new HashMap<String,String>());
 			HttpResponse r = cl.request(get);
 			if(r.getStatusCode() != 200) throw new Exception("imgur did not repond with 200 ¬_¬");
-
 			JSONObject jo = r.asJSONObject();
 			String url = jo.getJSONObject("images").getJSONObject("links").getString("imgur_page");
-
 			return appendToUpdate(url, stt);
 		}
 
@@ -205,7 +200,7 @@ public class MediaUtilities {
 			cb.setOAuthAuthorizationURL(AUTH_URL).setOAuthAccessTokenURL("https://api.imgur.com/oauth/access_token");
 			OAuthAuthorization oauth = new OAuthAuthorization(cb.build());
 			if(auth == true){
-				// Note: Another twitter4j hack
+				//Note: Another twitter4j hack
 				Log.d("auth", auth_token + " " + auth_secret);
 				oauth.setAccessToken(new RequestToken(auth_token, auth_secret));
 			}
@@ -215,49 +210,39 @@ public class MediaUtilities {
 
 		public void configureView(final Context c, final View v){
 			TextView t = (TextView)v.findViewById(R.id.summary);
-			if(auth_token.equals(""))
-				t.setText(R.string.not_logged_in);
-			else
-				t.setText(c.getString(R.string.logged_in_as).replace("{user}", url));
-
+			if(auth_token.equals("")) t.setText(R.string.not_logged_in);
+			else t.setText(c.getString(R.string.logged_in_as).replace("{user}", url));
 			Button b = (Button)v.findViewById(R.id.action);
-
 			if(auth_token.equals("")){
 				b.setText(R.string.login);
 				b.setOnClickListener(new OnClickListener(){
-
 					@Override
 					public void onClick(View button) {
 						button.setEnabled(false);
-						((Button)button).setText(R.string.please_wait);
-
+						((Button)button).setText(R.string.loading_str);
 						new Thread(new Runnable(){
-
 							@Override
 							public void run() {
-								try{
+								try {
 									oauth = getAuth(false);
 									RequestToken r = oauth.getOAuthRequestToken(configured.getCallback().toString());
 									configured.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(AUTH_URL + "?oauth_token=" + r.getToken())));
-								}catch(Exception e){
-									e.printStackTrace();// TODO: Error message
+								} catch(Exception e) {
+									//TODO: Error message
+									e.printStackTrace();
 								}
 							}
-
 						}).start();
 					}
-
 				});
 			} else{
 				b.setText(R.string.logout);
 				b.setOnClickListener(new OnClickListener(){
-
 					@Override
 					public void onClick(View w) {
 						PreferenceManager.getDefaultSharedPreferences(c).edit().remove("imgur-token").remove("imgur-secret").remove("imgur-url").commit();
 						configureView(c, v);
 					}
-
 				});
 			}
 		}
@@ -267,11 +252,9 @@ public class MediaUtilities {
 		 */
 		public void configure(final Activity c, final Intent i){
 			Log.d("imgur", "Finish config");
-
 			final ProgressDialog d = new ProgressDialog(c);
-			d.setMessage(c.getString(R.string.please_wait));
+			d.setMessage(c.getString(R.string.loading_str));
 			d.show();
-
 			new Thread(new Runnable(){
 
 				@Override
@@ -305,26 +288,18 @@ public class MediaUtilities {
 		public void configure(Activity c){
 			AlertDialog.Builder ab = new AlertDialog.Builder(c);
 			ab.setTitle(R.string.upload_imgur);
-
 			View v = LayoutInflater.from(c).inflate(R.layout.oauth_media_panel, null);
-
 			configureView(c,v);
-
 			TextView t = (TextView)v.findViewById(R.id.notes);
 			t.setText(R.string.imgur_note);
-
 			ab.setView(v);
 			ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			});
-
 			ab.show();
 		}
-
 	}
-
 }

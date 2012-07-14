@@ -12,31 +12,29 @@
 			android:layout_alignParentRight="true"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentTop="true" />
-		<ImageView android:layout_alignParentLeft="true"
+		<ImageView android:src="@drawable/st"
+			android:layout_alignParentLeft="true"
 			android:layout_alignParentRight="true"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentTop="true" android:scaleType="centerCrop"
-			android:layout_width="match_parent" android:layout_height="match_parent"
-			android:src="@drawable/st" />
-		<ImageView android:id="@+id/userItemProfilePic"
+			android:layout_width="match_parent" android:layout_height="match_parent" />
+		<ImageView android:src="@drawable/sillouette" android:id="@+id/userItemProfilePic"
 			android:layout_alignParentLeft="true" android:layout_width="73dp"
 			android:layout_height="73dp" android:layout_marginRight="10dp"
-			android:layout_marginLeft="10dp" android:layout_marginTop="10dp"
-			android:src="@drawable/sillouette" />
+			android:layout_marginLeft="10dp" android:layout_marginTop="10dp" />
 		<TextView android:id="@+id/profileTopLeftDetail"
 			android:layout_toRightOf="@+id/userItemProfilePic"
 			android:layout_width="wrap_content" style="@style/SpecialText"
 			android:textAppearance="@style/SpecialText" android:layout_marginTop="10dp"
 			android:layout_alignParentTop="true" android:layout_height="wrap_content" />
-		<TextView android:id="@+id/profileBottomLeftDetail"
-			android:layout_toRightOf="@+id/userItemProfilePic"
-			android:layout_width="wrap_content" android:layout_marginBottom="10dp"
+		<TextView android:id="@+id/profileFollowsYou"
+			android:visibility="gone" android:text="@string/follows_you_str"
+			android:layout_alignParentRight="true" android:layout_width="wrap_content"
 			style="@style/SpecialText" android:textAppearance="@style/SpecialText"
-			android:layout_alignParentBottom="true" android:layout_height="wrap_content" />
-		<TextView android:id="@+id/profileBottomRightDetail"
-			android:layout_alignParentRight="true" android:layout_marginRight="10dp"
-			android:layout_alignParentBottom="true" android:layout_width="wrap_content"
-			android:layout_marginBottom="10dp" style="@style/SpecialText"
-			android:textAppearance="@style/SpecialText" android:layout_height="wrap_content" />
+			android:layout_marginTop="10dp" android:layout_marginRight="7dp"
+			android:layout_alignParentTop="true" android:layout_height="wrap_content" />
+		<View android:layout_width="fill_parent" android:layout_height="2dp"
+			android:background="@drawable/divider"
+			android:layout_alignParentBottom="true" />
 	</RelativeLayout>
 </RelativeLayout>

@@ -2,6 +2,11 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import net.robotmedia.billing.BillingController;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
+import net.robotmedia.billing.helper.AbstractBillingObserver;
+import net.robotmedia.billing.model.Transaction.PurchaseState;
+
 import twitter4j.ResponseList;
 import twitter4j.SavedSearch;
 import twitter4j.TwitterException;
@@ -71,9 +76,9 @@ public class TimelineScreen extends Activity {
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
 	private boolean newColumn;
-
+	private AbstractBillingObserver mBillingObserver;	
+	
 	private SendTweetArrayAdapter sentTweetBinder;
-
 	public class SendTweetUpdater extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
@@ -147,6 +152,17 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
+		//This callback must stay here, otherwise in-app billing doesn't work for some reason.
+		mBillingObserver = new AbstractBillingObserver(this) {
+			@Override
+			public void onBillingChecked(boolean supported) { }
+			@Override
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
+			@Override
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
+		};
+		BillingController.registerObserver(mBillingObserver);
+		BillingController.checkBillingSupported(this);
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
 		if(!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
@@ -254,7 +270,7 @@ public class TimelineScreen extends Activity {
 					c = ProfileTimelineFragment.ID + "@" + c.substring(fromQuery.length()).replace("%40", "");
 					cols.set(index, c);
 				} else {
-					String query = c.substring(SavedSearchFragment.ID.length() + 1);
+					String query = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
 					Tab toAdd = getActionBar().newTab();
 					if(iconic) {
 						Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.savedSearchTab }).getDrawable(0);
@@ -401,12 +417,12 @@ public class TimelineScreen extends Activity {
 	/**
 	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
 	 */
-	public void accountsLoaded(){
-		if(Intent.ACTION_SEND.equals(getIntent().getAction())){
+	public void accountsLoaded() {
+		if(Intent.ACTION_SEND.equals(getIntent().getAction())) {
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
 			finish();
-		} else if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
-			if(getIntent().getData().getPath().contains("/status/")){
+		} else if(Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+			if(getIntent().getData().getPath().contains("/status/")) {
 				startActivity(getIntent().setClass(this, TweetViewer.class));
 				finish();
 			} else {
@@ -435,6 +451,7 @@ public class TimelineScreen extends Activity {
 			return;
 		}
 		AccountService.activity = this;
+		TimelineCAB.context = this;
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
@@ -535,6 +552,10 @@ public class TimelineScreen extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.donateAction:
+			Toast.makeText(getApplicationContext(), R.string.donations_appreciated, Toast.LENGTH_SHORT).show();
+			BillingController.requestPurchase(this, "com.teamboid.twitter.donate", true);
+			return true;
 		case R.id.refreshAction:
 			performRefresh();
 			return true;

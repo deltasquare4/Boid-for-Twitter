@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="52"
+	package="com.teamboid.twitter" android:versionCode="55"
 	android:versionName="0.8.1.5 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -13,6 +13,7 @@
 		android:protectionLevel="signature" />
 	<uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" />
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+	<uses-permission android:name="com.android.vending.BILLING" />
 
 	<supports-screens android:xlargeScreens="true"
 		android:anyDensity="true" android:resizeable="true"
@@ -72,7 +73,8 @@
 				android:resource="@xml/search_config" />
 		</activity>
 		<activity android:name=".ProfileScreen"
-			android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:uiOptions="splitActionBarWhenNarrow" />
 		<activity android:name=".TweetViewer" android:noHistory="true"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />
@@ -169,5 +171,13 @@
 		<activity android:name=".LoginHandler" android:theme="@android:style/Theme.Holo.Dialog"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
 			android:windowSoftInputMode="adjustResize" />
+		<service android:name="net.robotmedia.billing.BillingService" />
+		<receiver android:name="net.robotmedia.billing.BillingReceiver">
+			<intent-filter>
+				<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+				<action android:name="com.android.vending.billing.RESPONSE_CODE" />
+				<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+			</intent-filter>
+		</receiver>
 	</application>
 </manifest>

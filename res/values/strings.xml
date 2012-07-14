@@ -9,6 +9,7 @@
 	<string name="push_registered">Push is now registered!</string>
 	<string name="none_str">None</string>
 	<string name="unknown_str">Unknown</string>
+	<string name="push_registering">Setting up Push for your device. Hang on!</string>
 	<string name="messaging_str">Messaging</string>
 	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
@@ -66,7 +67,7 @@
 	<string name="failed_expand_twtmore">Something happened while expanding this Twtmore
 		post!
 	</string>
-	<string name="copied_str">Tweet copied to clipboard!</string>
+	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
 	</string>
@@ -93,12 +94,15 @@
 	<string name="location_str">Location</string>
 	<string name="directmessage_str">Direct Message</string>
 	<string name="report_str">Report</string>
-	<string name="retweeted_status">Successfully retweeted!</string>
-	<string name="failed_retweet">Something happened while retweeting this Tweet!
+	<string name="retweeted_status">Successfully retweeted @{user}\'s Tweet!</string>
+	<string name="failed_retweet">Something happened while retweeting @{user}\'s
+		Tweet!
 	</string>
-	<string name="failed_favorite">Something happened while favoriting this Tweet!
+	<string name="failed_favorite">Something happened while favoriting @{user}\'s
+		Tweet!
 	</string>
-	<string name="failed_unfavorite">Something happened while unfavoriting this Tweet!
+	<string name="failed_unfavorite">Something happened while unfavoriting @{user}\'s
+		Tweet!
 	</string>
 
 	<string name="edit_profile_str">Edit Profile</string>
@@ -161,9 +165,9 @@
 		email.
 	</string>
 	<string name="about_title">About</string>
-	<string name="about_description">Created by Aidan Follestad, Graham Macphee, Philip
-		Oakley, and Federico Zubani. Website by Steve Edson, original design
-		by Mike Stevens.
+	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
+		Macphee, Philip
+		Oakley, and Federico Zubani.
 	</string>
 	<string name="version_title">Version</string>
 	<string name="build_title">Build Number</string>
@@ -246,7 +250,6 @@
 	<string name="user_favorites">{user}\'s Favorites</string>
 
 	<string name="sending_tweet">Sending tweet…</string>
-	<string name="please_wait">Please wait…</string>
 	<string name="sending_tweets">Sending {sending} tweets…</string>
 	<string name="send_error_tweets">Sending {sending} tweets. Some did not send
 	</string>
@@ -366,13 +369,14 @@
 	<string name="follow_boidapp_prompt">Do you want to follow @boidapp from @{account}?
 	</string>
 	<string name="failed_check_following_boidapp">Failed to check if you\'re following @boidapp from
-		@{account}!</string>
+		@{account}!
+	</string>
 	<string name="failed_follow_boidapp">Failed to follow @boidapp, you\'ll have to do so
 		manually later.
 	</string>
 	<string name="about_twicsy_api">Uses Twicsy API</string>
 	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s
-		photo feed. You should check them out
+		photo feed. You should check them out.
 	</string>
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
@@ -381,9 +385,21 @@
 	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
 		to replying.
 	</string>
-	<string name="last_tweeted">Tweeted {time} ago</string>
 	<string name="follows_you_str">follows you</string>
-	<string name="blocked_str">blocked</string>
 	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
 	<string name="description_str">Description</string>
+	<string name="unblock_str">unblock</string>
+	<string name="failed_unblock_str">Failed to unblock @{user}!</string>
+	<string name="failed_follow_str">Failed to follow @{user}!</string>
+	<string name="failed_unfollow_str">Failed to unfollow @{user}!</string>
+	<string name="follow_str">follow</string>
+	<string name="follow_back_str">follow back</string>
+	<string name="unfollow_str">unfollow</string>
+	<string name="request_sent_str">Request Sent</string>
+	<string name="tweets_per_day">Tweets per day</string>
+	<string name="one_tweet_selected">1 Tweet Selected</string>
+	<string name="x_tweets_Selected">{X} Tweets Selected</string>
+	<string name="donate_str">Donate</string>
+	<string name="donations_appreciated">Your donations are much appreciated by the
+		teenagers of Team Boid!</string>
 </resources>
