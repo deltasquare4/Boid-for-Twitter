@@ -1,19 +1,9 @@
 package com.teamboid.twitter;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -24,8 +14,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.SSLCertificateSocketFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Base64;
@@ -37,8 +25,8 @@ import com.teamboid.twitter.compat.Api11;
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
 	
-	// public static final String SERVER = "http://192.168.0.9:1337";
-	public static final String SERVER = "http://boid.nodester.com";
+	public static final String SERVER = "http://192.168.0.9:1337";
+	// public static final String SERVER = "http://boid.nodester.com";
 	
 	public static class PushWorker extends Service{
 		
@@ -111,20 +99,30 @@ public class PushReceiver extends BroadcastReceiver {
 			} else if(intent.hasExtra("hm")){
 				Bundle b = intent.getBundleExtra("hm");
 				try {
-					JSONObject status = new JSONObject(b.getString("tweet"));
-					final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
-					//TODO The account the mention is for should be passed from the server too
-					// We have this now in "account" as a string
-					//Also, we need a way of combining multiple mentions/messages into one notification.
-					Api11.displayNotification(PushWorker.this, s);
-					AccountService.activity.runOnUiThread(new Runnable(){
-
-						@Override
-						public void run() {
-							 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
-						}
+					String type = b.getString("type");
+					
+					if(type.equals("reply")){
+						JSONObject status = new JSONObject(b.getString("tweet"));
+						final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
+						//TODO The account the mention is for should be passed from the server too
+						// We have this now in "account" as a string
+						//Also, we need a way of combining multiple mentions/messages into one notification.
+						Api11.displayNotification(PushWorker.this, s);
+						AccountService.activity.runOnUiThread(new Runnable(){
+	
+							@Override
+							public void run() {
+								 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
+							}
+							
+						});
+					} else if(type.equals("dm")){
+						// Yes I know it's "tweet". Deal with it
+						JSONObject json = new JSONObject(b.getString("tweet"));
+						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
 						
-					});
+						// TODO: Display it
+					}
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

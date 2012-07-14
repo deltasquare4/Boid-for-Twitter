@@ -4,10 +4,12 @@
 		android:layout="@layout/boid_preference" android:summary="@string/enable_push"
 		android:title="@string/push_title" android:persistent="false" />
 	<SwitchPreference android:key="c2dm_mentions"
+	    android:defaultValue="true"
 		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 		android:persistent="true" />
 	<SwitchPreference android:key="c2dm_messages"
+	    android:defaultValue="true"
 		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
 		android:persistent="true" />
