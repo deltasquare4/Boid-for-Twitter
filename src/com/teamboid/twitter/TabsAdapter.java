@@ -246,7 +246,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		public abstract void filter();
 
 		public abstract Status[] getSelectedStatuses(); 
-		
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -412,34 +412,17 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 							if (totalItemCount > 0
 									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
 									&& totalItemCount > visibleItemCount)
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(context)
-										.getBoolean("enable_iconic_tabs", true))
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(R.string.timeline_str);
-								else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true))
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.timeline_str);
+								else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
 							}
 						}
 					});
@@ -448,10 +431,28 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+								int beforeChecked = getListView().getCheckedItemCount();
 								if(getListView().isItemChecked(index)) {
 									getListView().setItemChecked(index, false);
 								} else getListView().setItemChecked(index, true);
-								context.startActionMode(TimelineCAB.getTimelineActionMode());
+								if(TimelineCAB.TimelineActionMode == null) {
+									 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
+								} else {
+									final Status[] tweets = TimelineCAB.getSelectedTweets();
+									if(tweets.length == 0) {
+										TimelineCAB.TimelineActionMode.finish();
+									} else {
+										if(beforeChecked == 1 && getListView().getCheckedItemCount() > 1) {
+											TimelineCAB.TimelineActionMode.getMenu().clear();
+											TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.multi_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
+										} else if(beforeChecked > 1 && getListView().getCheckedItemCount() == 1) {
+											TimelineCAB.TimelineActionMode.getMenu().clear();
+											TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
+										}
+										TimelineCAB.updateTitle(tweets);
+										TimelineCAB.updateMenuItems(tweets, TimelineCAB.TimelineActionMode.getMenu());
+									}
+								}
 							} else {
 								Status item = (Status) adapt.getItem(index);
 								context.startActivity(new Intent(context, ComposerScreen.class)
@@ -617,7 +618,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 					AccountService.getCurrentAccount().getId());
 			performRefresh(false);
 		}
-		
+
 		@Override
 		public Status[] getSelectedStatuses() {
 			if(adapt == null) return null;
@@ -857,7 +858,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
-	
+
 		@Override
 		public Status[] getSelectedStatuses() {
 			if(adapt == null) return null;
@@ -999,7 +1000,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
-	
+
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
 	}
@@ -1646,7 +1647,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
-	
+
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
 	}
@@ -2090,7 +2091,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
-	
+
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
 	}

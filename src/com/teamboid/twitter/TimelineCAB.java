@@ -42,47 +42,55 @@ public class TimelineCAB {
 		}
 		return toReturn.toArray(new Status[0]);
 	}
-
-	public static ActionMode.Callback getTimelineActionMode() { return timelineActionMode; }
-	private static ActionMode.Callback timelineActionMode = new ActionMode.Callback() {
+	
+	public static void updateTitle(Status[] selTweets) {
+		if(TimelineCAB.getSelectedTweets().length == 1) {
+			TimelineCAB.TimelineActionMode.setTitle(R.string.one_tweet_selected);
+		} else {
+			TimelineCAB.TimelineActionMode.setTitle(context.getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(selTweets.length)));
+		}
+	}
+	public static void updateMenuItems(Status[] selTweets, Menu menu) {
+		if(selTweets.length > 1) {
+			boolean allFavorited = true;
+			for(Status t : selTweets) {
+				if(!t.isFavorited()) {
+					allFavorited = false;
+					break;
+				}
+			}
+			MenuItem fav = menu.findItem(R.id.favoriteAction);
+			if(allFavorited) {
+				fav.setTitle(R.string.unfavorite_str);
+				fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
+			} else fav.setTitle(R.string.favorite_str);
+		} else {
+			final Status status = getSelectedTweets()[0];
+			if(status.getUser().getId() == AccountService.getCurrentAccount().getId()) {
+				menu.findItem(R.id.retweetAction).setVisible(false);
+				menu.findItem(R.id.deleteAction).setVisible(true);
+			}
+			MenuItem fav = menu.findItem(R.id.favoriteAction);
+			if(status.isFavorited()) {
+				fav.setTitle(R.string.unfavorite_str);
+				fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
+			} else fav.setTitle(R.string.favorite_str);
+		}
+	}
+	
+	
+	public static ActionMode TimelineActionMode;
+	public static ActionMode.Callback TimelineActionModeCallback = new ActionMode.Callback() {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			TimelineCAB.TimelineActionMode = mode;
 			MenuInflater inflater = mode.getMenuInflater();
 			Status[] selTweets = TimelineCAB.getSelectedTweets();
-			if(selTweets.length == 0) {
-				mode.finish();
-				return false;
-			}
-			if(selTweets.length > 1) {
-				inflater.inflate(R.menu.multi_tweet_cab, menu);
-				mode.setTitle(context.getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(selTweets.length)));
-				boolean allFavorited = true;
-				for(Status t : selTweets) {
-					if(!t.isFavorited()) {
-						allFavorited = false;
-						break;
-					}
-				}
-				MenuItem fav = menu.findItem(R.id.favoriteAction);
-				if(allFavorited) {
-					fav.setTitle(R.string.unfavorite_str);
-					fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
-				} else fav.setTitle(R.string.favorite_str);
-			} else {
-				inflater.inflate(R.menu.single_tweet_cab, menu);
-				mode.setTitle(R.string.one_tweet_selected);				
-				final Status status = getSelectedTweets()[0];
-				if(status.getUser().getId() == AccountService.getCurrentAccount().getId()) {
-					menu.findItem(R.id.retweetAction).setVisible(false);
-					menu.findItem(R.id.deleteAction).setVisible(true);
-				}
-				MenuItem fav = menu.findItem(R.id.favoriteAction);
-				if(status.isFavorited()) {
-					fav.setTitle(R.string.unfavorite_str);
-					fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
-				} else fav.setTitle(R.string.favorite_str);
-			}
+			if(selTweets.length > 1) inflater.inflate(R.menu.multi_tweet_cab, menu);
+			else inflater.inflate(R.menu.single_tweet_cab, menu);
+			updateTitle(selTweets);
+			updateMenuItems(selTweets, menu);
 			return true;
 		}
 
@@ -174,6 +182,8 @@ public class TimelineCAB {
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
+			TimelineCAB.clearSelectedItems();
+			TimelineCAB.TimelineActionMode = null;
 		}
 	};
 }
