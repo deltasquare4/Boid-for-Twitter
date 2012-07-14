@@ -62,7 +62,7 @@
 	<string name="failed_expand_twtmore">Something happened while expanding this Twtmore
 		post!
 	</string>
-	<string name="copied_str">Tweet copied to clipboard!</string>
+	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
 	</string>
@@ -89,12 +89,15 @@
 	<string name="location_str">Location</string>
 	<string name="directmessage_str">Direct Message</string>
 	<string name="report_str">Report</string>
-	<string name="retweeted_status">Successfully retweeted!</string>
-	<string name="failed_retweet">Something happened while retweeting this Tweet!
+	<string name="retweeted_status">Successfully retweeted @{user}\'s Tweet!</string>
+	<string name="failed_retweet">Something happened while retweeting @{user}\'s
+		Tweet!
 	</string>
-	<string name="failed_favorite">Something happened while favoriting this Tweet!
+	<string name="failed_favorite">Something happened while favoriting @{user}\'s
+		Tweet!
 	</string>
-	<string name="failed_unfavorite">Something happened while unfavoriting this Tweet!
+	<string name="failed_unfavorite">Something happened while unfavoriting @{user}\'s
+		Tweet!
 	</string>
 
 	<string name="edit_profile_str">Edit Profile</string>
@@ -392,5 +395,6 @@
 	<string name="one_tweet_selected">1 Tweet Selected</string>
 	<string name="x_tweets_Selected">{X} Tweets Selected</string>
 	<string name="donate_str">Donate</string>
-	<string name="donations_appreciated">Thanks! Your donation is much appreciated by the teenagers on Team Boid!</string>
+	<string name="donations_appreciated">Thanks! Your donation is much appreciated by the
+		teenagers on Team Boid!</string>
 </resources>

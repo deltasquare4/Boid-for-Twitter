@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import android.app.Fragment;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -42,7 +45,7 @@ public class TimelineCAB {
 		}
 		return toReturn.toArray(new Status[0]);
 	}
-	
+
 	public static void updateTitle(Status[] selTweets) {
 		if(TimelineCAB.getSelectedTweets().length == 1) {
 			TimelineCAB.TimelineActionMode.setTitle(R.string.one_tweet_selected);
@@ -77,8 +80,7 @@ public class TimelineCAB {
 			} else fav.setTitle(R.string.favorite_str);
 		}
 	}
-	
-	
+
 	public static ActionMode TimelineActionMode;
 	public static ActionMode.Callback TimelineActionModeCallback = new ActionMode.Callback() {
 
@@ -99,81 +101,85 @@ public class TimelineCAB {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			final Status tweet = getSelectedTweets()[0];
+			final Status[] selTweets = getSelectedTweets();  
 			TimelineCAB.clearSelectedItems();
 			mode.finish();
 			switch (item.getItemId()) {
 			case R.id.replyAction:
-				context.startActivity(new Intent(context, ComposerScreen.class).putExtra("reply_to", tweet.getId()).putExtra("reply_to_name", tweet.getUser().getScreenName())
-						.putExtra("append", Utilities.getAllMentions(tweet.getUser().getScreenName(), tweet.getText())).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				context.startActivity(new Intent(context, ComposerScreen.class)
+				.putExtra("reply_to", selTweets[0].getId())
+				.putExtra("reply_to_name", selTweets[0].getUser().getScreenName())
+				.putExtra("append", Utilities.getAllMentions(selTweets[0].getUser().getScreenName(), selTweets[0].getText()))
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			case R.id.favoriteAction:
-				//TODO ((TimelineScreen)context).showProgress(true);
-				if(tweet.isFavorited()) {
+				for(final Status tweet : selTweets) {
+					if(tweet.isFavorited()) {
+						new Thread(new Runnable() {
+							public void run() {
+								//TODO Update the favorite indicator in the corresponding column
+								try { AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId()); }
+								catch(TwitterException e) {
+									e.printStackTrace();
+									context.runOnUiThread(new Runnable() {
+										public void run() { 
+											Toast.makeText(context, context.getString(R.string.failed_unfavorite).replace("{user}", tweet.getUser().getScreenName()), Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+						}).start();
+					} else {
+						new Thread(new Runnable() {
+							public void run() {
+								//TODO Update the favorite indicator in the corresponding column
+								try { AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId()); }
+								catch(TwitterException e) {
+									e.printStackTrace();
+									context.runOnUiThread(new Runnable() {
+										public void run() { 
+											Toast.makeText(context, context.getString(R.string.failed_favorite).replace("{user}", tweet.getUser().getScreenName()), Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+						}).start();
+					}
+				}
+				return true;
+			case R.id.retweetAction:
+				for(final Status tweet : selTweets) {
 					new Thread(new Runnable() {
 						public void run() {
-							//TODO Update the favorite indicator in the corresponding column
-							try { AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId()); }
+							try { 
+								final Status result = AccountService.getCurrentAccount().getClient().retweetStatus(tweet.getId());
+								context.runOnUiThread(new Runnable() {
+									public void run() { 
+										AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new Status[] { result });
+									}
+								});
+							}
 							catch(TwitterException e) {
 								e.printStackTrace();
 								context.runOnUiThread(new Runnable() {
-									public void run() { Toast.makeText(context, R.string.failed_unfavorite, Toast.LENGTH_LONG).show(); }
+									public void run() { 
+										Toast.makeText(context, context.getString(R.string.failed_retweet).replace("{user}", tweet.getUser().getScreenName()), Toast.LENGTH_LONG).show();
+									}
 								});
 							}
-							//								TODO context.runOnUiThread(new Runnable() {
-							//									public void run() { ((TimelineScreen)context).showProgress(true); }
-							//								});
-						}
-					}).start();
-				} else {
-					new Thread(new Runnable() {
-						public void run() {
-							//TODO Update the favorite indicator in the corresponding column
-							try { AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId()); }
-							catch(TwitterException e) {
-								e.printStackTrace();
-								context.runOnUiThread(new Runnable() {
-									public void run() { Toast.makeText(context, R.string.failed_favorite, Toast.LENGTH_LONG).show(); }
-								});
-								return;
-							}
-							//								TODO context.runOnUiThread(new Runnable() {
-							//									public void run() { ((TimelineScreen)context).showProgress(true); }
-							//								});
 						}
 					}).start();
 				}
 				return true;
-			case R.id.retweetAction:
-				//TODO ((TimelineScreen)context).showProgress(true);
-				new Thread(new Runnable() {
-					public void run() {
-						try { 
-							final Status result = AccountService.getCurrentAccount().getClient().retweetStatus(tweet.getId());
-							context.runOnUiThread(new Runnable() {
-								public void run() { AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new Status[] { result }); }
-							});
-						}
-						catch(TwitterException e) {
-							e.printStackTrace();
-							context.runOnUiThread(new Runnable() {
-								public void run() { Toast.makeText(context, R.string.failed_retweet, Toast.LENGTH_LONG).show(); }
-							});
-							return;
-						}
-						context.runOnUiThread(new Runnable() {
-							public void run() { 
-								//TODO ((TimelineScreen)context).showProgress(true);
-								Toast.makeText(context, R.string.retweeted_status, Toast.LENGTH_LONG).show();
-							}
-						});
-					}
-				}).start();
-				return true;
 			case R.id.shareAction:
-				String text = tweet.getText() + "\n\n(via @" + tweet.getUser().getScreenName() + ", http://twitter.com/" + tweet.getUser().getScreenName() + "/status/" + Long.toString(tweet.getId()) + ")";
+				String text = selTweets[0].getText() + "\n\n(via @" + selTweets[0].getUser().getScreenName() + ", http://twitter.com/" + selTweets[0].getUser().getScreenName() + "/status/" + Long.toString(selTweets[0].getId()) + ")";
 				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), 
 						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				return true;
+			case R.id.copyAction:
+				ClipboardManager clipboard = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
+				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", selTweets[0].getText()));
+				Toast.makeText(context, context.getString(R.string.copied_str).replace("{user}", selTweets[0].getUser().getScreenName()), Toast.LENGTH_SHORT).show();
 				return true;
 			default:
 				return false;
