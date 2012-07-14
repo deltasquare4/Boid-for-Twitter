@@ -655,7 +655,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							TimelineCAB.performLongPressAction(getListView(), adapt, index);
-							return false;
+							return true;
 						}
 					});
 			setRetainInstance(true);
@@ -1196,7 +1196,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							TimelineCAB.performLongPressAction(getListView(), adapt, index);
-							return false;
+							return true;
 						}
 					});
 			setRetainInstance(true);
@@ -2368,7 +2368,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							TimelineCAB.performLongPressAction(getListView(), adapt, index);
-							return false;
+							return true;
 						}
 					});
 			setRetainInstance(true);
@@ -2952,7 +2952,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							TimelineCAB.performLongPressAction(getListView(), globalAdapter, index);
-							return false;
+							return true;
 						}
 					});
 			setRetainInstance(true);
@@ -3172,7 +3172,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							TimelineCAB.performLongPressAction(getListView(), context.adapter, index);
-							return false;
+							return true;
 						}
 					});
 			setRetainInstance(true);
