@@ -411,7 +411,13 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				MenuInflater inflater = mode.getMenuInflater();
-				inflater.inflate(R.menu.tweetviewer_actionbar, menu);
+				if(getListView().getCheckedItemCount() > 1) {
+					inflater.inflate(R.menu.multi_tweet_cab, menu);
+					mode.setTitle(getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(getListView().getCheckedItemCount())));
+				} else {
+					inflater.inflate(R.menu.tweetviewer_actionbar, menu);
+					mode.setTitle(R.string.one_tweet_selected);
+				}
 				return true;
 			}
 
@@ -438,7 +444,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void onStart() {
 			super.onStart();
-			getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+			getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
@@ -477,17 +483,17 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 					new AdapterView.OnItemLongClickListener() {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-							//							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-							getListView().setItemChecked(index, true);
-							context.startActionMode(mActionModeCallback);
-							//							} else {
-							//								Status item = (Status) adapt.getItem(index);
-							//								context.startActivity(new Intent(context, ComposerScreen.class)
-							//									.putExtra("reply_to", item.getId())
-							//									.putExtra("reply_to_name",item.getUser().getScreenName())
-							//									.putExtra("append",Utilities.getAllMentions(item))
-							//									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-							//							}
+							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+								getListView().setItemChecked(index, true);
+								context.startActionMode(mActionModeCallback);
+							} else {
+								Status item = (Status) adapt.getItem(index);
+								context.startActivity(new Intent(context, ComposerScreen.class)
+								.putExtra("reply_to", item.getId())
+								.putExtra("reply_to_name",item.getUser().getScreenName())
+								.putExtra("append",Utilities.getAllMentions(item))
+								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+							}
 							return true;
 						}
 					});
@@ -3063,8 +3069,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
 		@Override
 		public void performRefresh(final boolean paginate) {
-			if (context == null || isLoading || getAdapter() == null)
+			if (context == null || isLoading || getAdapter() == null) {
 				return;
+			}
 			isLoading = true;
 			if (getAdapter().getCount() == 0 && getView() != null)
 				setListShown(false);

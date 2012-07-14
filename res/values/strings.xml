@@ -390,4 +390,6 @@
 	<string name="unfollow_str">unfollow</string>
 	<string name="request_sent_str">Request Sent</string>
 	<string name="tweets_per_day">Tweets per day</string>
+	<string name="one_tweet_selected">1 Tweet Selected</string>
+	<string name="x_tweets_Selected">{X} Tweets Selected</string>
 </resources>
