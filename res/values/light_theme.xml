@@ -2,7 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="Boid.LightTheme" parent="@android:style/Theme.Holo.Light">
 		<item name="themeColor">@color/black</item>
-		<item name="usernameColor">@color/username_highlight_selector</item>
+		<item name="usernameColor">@color/username_highlight_selector_light</item>
 		<item name="tweetColor">@color/text_highlight_selector_light</item>
 		<item name="linkColor">@color/link_highlight_selector</item>
 		<item name="timerColor">@color/lighter_dark</item>
