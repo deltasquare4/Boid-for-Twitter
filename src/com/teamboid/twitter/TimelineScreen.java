@@ -452,6 +452,7 @@ public class TimelineScreen extends Activity {
 		}
 		AccountService.activity = this;
 		TimelineCAB.context = this;
+		UserListCAB.context = this;
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {

@@ -72,6 +72,7 @@ public class UserListActivity extends ListActivity {
 					.putExtra("screen_name", ((User)binder.getItem(pos)).getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
+		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -80,6 +81,13 @@ public class UserListActivity extends ListActivity {
 				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) paginate();
 			}
 		});
+		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				UserListCAB.performLongPressAction(getListView(), binder, index);
+				return true;
+			}
+		});		
 		setProgressBarIndeterminateVisibility(false);
 	}
 

@@ -65,7 +65,7 @@
 			android:label="@string/new_tweet_str" android:configChanges="keyboardHidden|orientation|screenSize"
 			android:launchMode="singleTask" />
 		<activity android:name=".SearchScreen" android:label="@string/search_str"
-			android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize">
+			android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow">
 			<intent-filter>
 				<action android:name="android.intent.action.SEARCH" />
 			</intent-filter>

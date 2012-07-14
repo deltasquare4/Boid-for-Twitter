@@ -1563,14 +1563,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		@Override
 		public void onStart() {
 			super.onStart();
+			getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
 						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
 								performRefresh(true);
 							if (context.userAdapter != null && getView() != null) {
@@ -1579,23 +1578,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 								context.userAdapter.savedIndexTop = (v == null) ? 0 : v.getTop();
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-								context.getActionBar()
-								.getTabAt(getArguments().getInt("tab_index")).setText(R.string.users_str);
+								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.users_str);
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							User item = (User) context.userAdapter
-									.getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class).putExtra("append",
-											"@" + item.getScreenName() + " ").addFlags(
-													Intent.FLAG_ACTIVITY_CLEAR_TOP));
-							return false;
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							UserListCAB.performLongPressAction(getListView(), context.userAdapter, index);
+							return true;
 						}
 					});
 			setRetainInstance(true);
