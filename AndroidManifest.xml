@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="55"
+	package="com.teamboid.twitter" android:versionCode="56"
 	android:versionName="0.8.1.5 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -85,9 +85,9 @@
 			android:configChanges="screenSize" android:label="@string/muting_str"
 			android:windowSoftInputMode="adjustResize" />
 		<activity android:name=".UserListActivity" android:noHistory="true"
-			android:configChanges="keyboardHidden|orientation|screenSize" />
+			android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
 		<activity android:name=".TweetListActivity"
-			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize" />
+			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
 		<service android:name=".SendTweetService" android:exported="false"
 			android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
 		<activity android:label="@string/photo_service_title"

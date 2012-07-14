@@ -25,7 +25,7 @@ public class TweetListActivity extends ListActivity {
 	private boolean showProgress;
 	private ResponseList<Status> tweets = null;
 	private boolean allowPagination = true;
-	private FeedListAdapter binder;
+	public FeedListAdapter binder;
 	private ProgressDialog progDialog;
 	
 	public void showProgress(final boolean visible) {
@@ -62,6 +62,7 @@ public class TweetListActivity extends ListActivity {
 		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		setListAdapter(binder);
 		refresh();
+		TimelineCAB.context = this;
 		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
@@ -82,6 +83,14 @@ public class TweetListActivity extends ListActivity {
 				}
 			}
 		});
+		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				TimelineCAB.performLongPressAction(getListView(), binder, index);
+				return true;
+			}
+		});		
 		setProgressBarIndeterminateVisibility(false);
 	}
 

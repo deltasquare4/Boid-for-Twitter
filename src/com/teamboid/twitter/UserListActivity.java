@@ -28,7 +28,7 @@ public class UserListActivity extends ListActivity {
 	private boolean showProgress;
 	private ArrayList<Long> ids;
 	private boolean allowPagination = true;
-	private SearchUsersListAdapter binder;
+	public SearchUsersListAdapter binder;
 	private ProgressDialog progDialog;
 
 	public void showProgress(final boolean visible) {

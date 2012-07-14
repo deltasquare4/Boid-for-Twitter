@@ -244,7 +244,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		public abstract void filter();
 
-		public abstract Status[] getSelectedStatuses(); 
+		public abstract Status[] getSelectedStatuses();
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -1702,6 +1702,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+	
+		public User[] getSelectedUsers() {
+			if(context.userAdapter == null) return null;
+			ArrayList<User> toReturn = new ArrayList<User>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((User)context.userAdapter.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new User[0]);
+		}
 	}
 
 	public static class SavedSearchFragment extends BaseListFragment {

@@ -394,6 +394,8 @@
 	<string name="tweets_per_day">Tweets per day</string>
 	<string name="one_tweet_selected">1 Tweet Selected</string>
 	<string name="x_tweets_Selected">{X} Tweets Selected</string>
+	<string name="one_user_selected">1 User Selected</string>
+	<string name="x_users_selected">{X} Users Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!</string>

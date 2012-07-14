@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 import twitter4j.Status;
 import twitter4j.TwitterException;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,35 +23,60 @@ import android.widget.Toast;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 
+/**
+ * The contextual action bar for any lists/columns that display twitter4j.Status objects.
+ * @author Aidan Follestad
+ */
 public class TimelineCAB {
 
-	public static TimelineScreen context;
+	public static Activity context;
 
 	public static void clearSelectedItems() {
-		for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
-			Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-			if(frag instanceof BaseListFragment) {
-				((BaseListFragment)frag).getListView().clearChoices();
-				((BaseAdapter)((BaseListFragment)frag).getListView().getAdapter()).notifyDataSetChanged();
+		if(context instanceof TweetListActivity) {
+			((TweetListActivity)context).getListView().clearChoices();
+			ListView list = ((TweetListActivity)context).getListView();
+			((BaseAdapter)list.getAdapter()).notifyDataSetChanged();
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					((BaseListFragment)frag).getListView().clearChoices();
+					((BaseAdapter)((BaseListFragment)frag).getListView().getAdapter()).notifyDataSetChanged();
+				}
 			}
 		}
 	}
 	public static Status[] getSelectedTweets() {
-		ArrayList<Status> toReturn = new ArrayList<Status>();
-		for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
-			Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-			if(frag instanceof BaseListFragment) {
-				Status[] toAdd = ((BaseListFragment)frag).getSelectedStatuses();
-				if(toAdd != null && toAdd.length > 0) {
-					for(Status s : toAdd) toReturn.add(s);
+		if(context instanceof TweetListActivity) {
+			TweetListActivity activity = (TweetListActivity)context;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = activity.getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)activity.binder.getItem(checkedItems.keyAt(i)));
+					}
 				}
 			}
+			return toReturn.toArray(new Status[0]);
+		} else {
+			ArrayList<Status> toReturn = new ArrayList<Status>();
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					Status[] toAdd = ((BaseListFragment)frag).getSelectedStatuses();
+					if(toAdd != null && toAdd.length > 0) {
+						for(Status s : toAdd) toReturn.add(s);
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
 		}
-		return toReturn.toArray(new Status[0]);
 	}
 
-	public static void updateTitle(Status[] selTweets) {
-		if(TimelineCAB.getSelectedTweets().length == 1) {
+	public static void updateTitle() {
+		Status[] selTweets = TimelineCAB.getSelectedTweets();
+		if(selTweets.length == 1) {
 			TimelineCAB.TimelineActionMode.setTitle(R.string.one_tweet_selected);
 		} else {
 			TimelineCAB.TimelineActionMode.setTitle(context.getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(selTweets.length)));
@@ -90,7 +117,7 @@ public class TimelineCAB {
 				list.setItemChecked(index, false);
 			} else list.setItemChecked(index, true);
 			if(TimelineCAB.TimelineActionMode == null) {
-				 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
+				context.startActionMode(TimelineCAB.TimelineActionModeCallback);
 			} else {
 				final Status[] tweets = TimelineCAB.getSelectedTweets();
 				if(tweets.length == 0) {
@@ -103,7 +130,7 @@ public class TimelineCAB {
 						TimelineCAB.TimelineActionMode.getMenu().clear();
 						TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
 					}
-					TimelineCAB.updateTitle(tweets);
+					TimelineCAB.updateTitle();
 					TimelineCAB.updateMenuItems(tweets, TimelineCAB.TimelineActionMode.getMenu());
 				}
 			}
@@ -116,7 +143,7 @@ public class TimelineCAB {
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 	}
-	
+
 	public static ActionMode TimelineActionMode;
 	public static ActionMode.Callback TimelineActionModeCallback = new ActionMode.Callback() {
 
@@ -127,7 +154,7 @@ public class TimelineCAB {
 			Status[] selTweets = TimelineCAB.getSelectedTweets();
 			if(selTweets.length > 1) inflater.inflate(R.menu.multi_tweet_cab, menu);
 			else inflater.inflate(R.menu.single_tweet_cab, menu);
-			updateTitle(selTweets);
+			updateTitle();
 			updateMenuItems(selTweets, menu);
 			return true;
 		}
