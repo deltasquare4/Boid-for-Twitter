@@ -188,7 +188,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			title.setText(curItem.getName());
 			FeedListAdapter.ApplyFontSize(title, mContext);
 			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
-			if(position == 1) {
+			if(curItem.getName().equals(mContext.getString(R.string.description_str))) {
 				body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
 				body.setMovementMethod(LinkMovementMethod.getInstance());
 			} else body.setText(curItem.getValue());

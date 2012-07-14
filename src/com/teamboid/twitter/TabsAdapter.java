@@ -3438,10 +3438,13 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
-			if (position == 0) {
-				return;
+			BasicNameValuePair pair = null;
+			if(AccountService.getCurrentAccount().getUser().getScreenName().equals(screenName)) {
+				pair = adapt.values.get(position);
+			} else {
+				if(position == 0) return;
+				pair = adapt.values.get(position - 1);
 			}
-			BasicNameValuePair pair = adapt.values.get(position - 1);
 			if (pair.getName().equals(context.getString(R.string.website_str))) {
 				String url = pair.getValue();
 				try {
@@ -3451,11 +3454,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} else if (pair.getName().equals(
-					context.getString(R.string.tweets_str))) {
+			} else if(pair.getName().equals(context.getString(R.string.tweets_str))) {
 				context.getActionBar().setSelectedNavigationItem(0);
-			} else if (pair.getName().equals(
-					context.getString(R.string.location_str))) {
+			} else if(pair.getName().equals(context.getString(R.string.location_str))) {
 				String loc = null;
 				try {
 					loc = URLEncoder.encode(pair.getValue(), "UTF-8");
@@ -3471,22 +3472,19 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 							+ loc));
 					startActivity(geo);
 				}
-			} else if (pair.getName().equals(
-					context.getString(R.string.followers_str))) {
+			} else if (pair.getName().equals(context.getString(R.string.followers_str))) {
 				Intent intent = new Intent(context, UserListActivity.class)
 				.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
 				.putExtra("user", adapt.user.getId())
 				.putExtra("username", adapt.user.getScreenName());
 				context.startActivity(intent);
-			} else if (pair.getName().equals(
-					context.getString(R.string.friends_str))) {
+			} else if (pair.getName().equals(context.getString(R.string.friends_str))) {
 				Intent intent = new Intent(context, UserListActivity.class)
 				.putExtra("mode", UserListActivity.FOLLOWING_LIST)
 				.putExtra("user", adapt.user.getId())
 				.putExtra("username", adapt.user.getScreenName());
 				context.startActivity(intent);
-			} else if (pair.getName().equals(
-					context.getString(R.string.favorites_str))) {
+			} else if (pair.getName().equals(context.getString(R.string.favorites_str))) {
 				Intent intent = new Intent(context, TweetListActivity.class)
 				.putExtra("mode", TweetListActivity.USER_FAVORITES)
 				.putExtra("username", adapt.user.getScreenName());

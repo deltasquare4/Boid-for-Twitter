@@ -33,5 +33,8 @@
 			style="@style/SpecialText" android:textAppearance="@style/SpecialText"
 			android:layout_marginTop="10dp" android:layout_marginRight="7dp"
 			android:layout_alignParentTop="true" android:layout_height="wrap_content" />
+		<View android:layout_width="fill_parent" android:layout_height="2dp"
+			android:background="@drawable/divider"
+			android:layout_alignParentBottom="true" />
 	</RelativeLayout>
 </RelativeLayout>
