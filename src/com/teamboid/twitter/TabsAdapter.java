@@ -66,8 +66,7 @@ import android.widget.Toast;
  * 
  * @author Aidan Follestad
  */
-public class TabsAdapter extends TaggedFragmentAdapter implements
-ActionBar.TabListener, ViewPager.OnPageChangeListener {
+public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
 	private final Activity mContext;
 	private final ActionBar mActionBar;
@@ -2939,8 +2938,8 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 								performRefresh(true);
 							}
 							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
+								if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName);									
 								} else {
 									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
 								}
@@ -3014,27 +3013,11 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 											getAdapter().restoreLastViewed(
 													getListView());
 									}
-									if (!PreferenceManager
-											.getDefaultSharedPreferences(
-													context).getBoolean(
-															"enable_iconic_tabs", true)) {
-										context.getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-														.setText(
-																context.getString(R.string.tweets_str)
-																+ " ("
-																+ Integer
-																.toString(addedCount)
-																+ ")");
-									} else
-										context.getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-														.setText(
-																Integer.toString(addedCount));
+									if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName + " (" + Integer.toString(addedCount) + ")");
+									} else {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
+									}
 								}
 							});
 						} catch (final TwitterException e) {
@@ -3042,11 +3025,8 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 							context.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									setEmptyText(context
-											.getString(R.string.error_str));
-									Toast.makeText(context,
-											e.getErrorMessage(),
-											Toast.LENGTH_SHORT).show();
+									setEmptyText(context.getString(R.string.error_str));
+									Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
