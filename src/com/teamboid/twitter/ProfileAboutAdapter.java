@@ -1,10 +1,14 @@
 package com.teamboid.twitter;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.http.message.BasicNameValuePair;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -37,48 +41,68 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	public ArrayList<BasicNameValuePair> values;
 
 	private boolean isUnknown = true;
+	private boolean isError = false;
 	private boolean isRequestSent;
 	private boolean isBlocked = false;
 	private boolean isFollowing = false;
 	private boolean isFollowedBy = false;
 
+	public void setIsError(final boolean error) {
+		mContext.runOnUiThread(new Runnable() {
+			public void run() {
+				isError = error;
+				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent && !isError);
+				notifyDataSetChanged();
+			}
+		});
+	}
 	public void updateRequestSent(final boolean requestSent) {
+		if(requestSent) isError = false;
 		mContext.runOnUiThread(new Runnable() {
 			public void run() {
 				isRequestSent = requestSent;
-				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent);
+				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent && !isError);
 				notifyDataSetChanged();
 			}
 		});
 	}
 	public void updateIsBlocked(final boolean blocked) {
+		if(blocked) isError = false;
 		mContext.runOnUiThread(new Runnable() {
 			public void run() {
 				isBlocked = blocked;
-				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent);
+				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent && !isError);
 			}
 		});
 	}
 	public boolean isBlocked() { return isBlocked; }
 	public void updateIsFollowing(final boolean following) {
+		if(following) isError = false;
 		mContext.runOnUiThread(new Runnable() {
 			public void run() {
 				isFollowing = following;
-				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent);
+				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent && !isError);
 			}
 		});
 	}
 	public boolean isFollowing() { return isFollowing; }
 	public void updateIsFollowedBy(final boolean followsYou) {
+		if(followsYou) isError = false;
 		mContext.runOnUiThread(new Runnable() {
 			public void run() {
 				isFollowedBy = followsYou;
-				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent);
+				isUnknown = (!isBlocked && !isFollowing && !isFollowedBy && !isRequestSent && !isError);
 			}
 		});
 	}
 	public boolean isFollowedBy() { return isFollowedBy; }
 
+	public static double round(double unrounded, int precision, int roundingMode) {
+	    BigDecimal bd = new BigDecimal(unrounded);
+	    BigDecimal rounded = bd.setScale(precision, roundingMode);
+	    return rounded.doubleValue();
+	}
+	
 	public void setUser(User _user) {
 		user = _user;
 		values.clear();
@@ -89,16 +113,21 @@ public class ProfileAboutAdapter extends BaseAdapter {
 		if(!desc.isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.description_str), desc));
 		}
+		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusesCount())));
+		double tweetsPerDay = user.getStatusesCount();
+		int days = Days.daysBetween(new DateTime(user.getCreatedAt()), new DateTime(new Date())).getDays();
+		tweetsPerDay /= days;
+		tweetsPerDay = round(tweetsPerDay, 2, BigDecimal.ROUND_HALF_UP);
+		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_per_day), Double.toString(tweetsPerDay)));
 		if(_user.getURL() != null) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.website_str), _user.getURL().toString()));
 		}
-		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusesCount())));
 		if(_user.getLocation() != null && !_user.getLocation().isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.location_str), _user.getLocation()));
 		} 
+		values.add(new BasicNameValuePair(mContext.getString(R.string.favorites_str), df.format(_user.getFavouritesCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.friends_str), df.format(_user.getFriendsCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.followers_str), df.format(_user.getFollowersCount())));
-		values.add(new BasicNameValuePair(mContext.getString(R.string.favorites_str), df.format(_user.getFavouritesCount())));
 		notifyDataSetChanged();
 	}
 
@@ -127,6 +156,9 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			final Button followBtn = (Button)toReturn.findViewById(R.id.profileFollowBtn);
 			if(isUnknown) {
 				followBtn.setText(R.string.loading_str);
+				followBtn.setEnabled(false);
+			} else if(isError) {
+				followBtn.setText(R.string.error_str);
 				followBtn.setEnabled(false);
 			} else if(isRequestSent) {
 				followBtn.setText(R.string.request_sent_str);

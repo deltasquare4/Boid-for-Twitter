@@ -389,4 +389,5 @@
 	<string name="follow_back_str">follow back</string>
 	<string name="unfollow_str">unfollow</string>
 	<string name="request_sent_str">Request Sent</string>
+	<string name="tweets_per_day">Tweets per day</string>
 </resources>

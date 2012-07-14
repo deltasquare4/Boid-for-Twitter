@@ -254,7 +254,7 @@ public class TimelineScreen extends Activity {
 					c = ProfileTimelineFragment.ID + "@" + c.substring(fromQuery.length()).replace("%40", "");
 					cols.set(index, c);
 				} else {
-					String query = c.substring(SavedSearchFragment.ID.length() + 1);
+					String query = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
 					Tab toAdd = getActionBar().newTab();
 					if(iconic) {
 						Drawable icon = getTheme().obtainStyledAttributes(new int[] { R.attr.savedSearchTab }).getDrawable(0);

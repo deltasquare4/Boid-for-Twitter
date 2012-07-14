@@ -48,7 +48,7 @@ public class ProfileScreen extends Activity {
 	public FeedListAdapter adapter;
 	public MediaFeedListAdapter mediaAdapter;
 	public User user;
-	
+
 	public void showProgress(boolean visible) {
 		if(showProgress == visible) return;
 		showProgress = visible;
@@ -56,24 +56,24 @@ public class ProfileScreen extends Activity {
 	}
 
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-    	if(savedInstanceState != null) {
-	    	if(savedInstanceState.containsKey("lastTheme")) {
-	    		lastTheme = savedInstanceState.getInt("lastTheme");
-	    		setTheme(lastTheme);
-	    	} else setTheme(Utilities.getTheme(getApplicationContext()));
-	    	if(savedInstanceState.containsKey("showProgress")) showProgress(true);
-	    }  else setTheme(Utilities.getTheme(getApplicationContext()));
-    	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        super.onCreate(savedInstanceState);
-        ActionBar ab = getActionBar();
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayShowHomeEnabled(false);
-        setContentView(R.layout.profile_screen);
-        setProgressBarIndeterminateVisibility(false);
-        initializeTabs(savedInstanceState);        
-    }
-	
+	public void onCreate(Bundle savedInstanceState) {
+		if(savedInstanceState != null) {
+			if(savedInstanceState.containsKey("lastTheme")) {
+				lastTheme = savedInstanceState.getInt("lastTheme");
+				setTheme(lastTheme);
+			} else setTheme(Utilities.getTheme(getApplicationContext()));
+			if(savedInstanceState.containsKey("showProgress")) showProgress(true);
+		}  else setTheme(Utilities.getTheme(getApplicationContext()));
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		super.onCreate(savedInstanceState);
+		ActionBar ab = getActionBar();
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setDisplayShowHomeEnabled(false);
+		setContentView(R.layout.profile_screen);
+		setProgressBarIndeterminateVisibility(false);
+		initializeTabs(savedInstanceState);        
+	}
+
 	private TabsAdapter mTabsAdapter;
 	private void initializeTabs(Bundle savedInstanceState) {
 		final String screenName = getIntent().getStringExtra("screen_name");
@@ -93,27 +93,30 @@ public class ProfileScreen extends Activity {
 		}	
 		if(savedInstanceState != null) getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("lastTab", 0));
 	}
-	
+
 	public void loadFollowingInfo() {
 		new Thread(new Runnable() {
 			public void run() {
 				final Account acc = AccountService.getCurrentAccount();
 				try {
 					getAboutFragment().getAdapter().updateIsBlocked(acc.getClient().existsBlock(user.getId()));
-					runOnUiThread(new Runnable() {
-						public void run() {   
-							if(getAboutFragment().getAdapter().isBlocked()) {
+					if(getAboutFragment().getAdapter().isBlocked()) {
+						runOnUiThread(new Runnable() {
+							public void run() {   
 								getActionBar().setSelectedNavigationItem(1);
-								((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.blocked_str);
+								getAboutFragment().getAdapter().notifyDataSetChanged();
+								invalidateOptionsMenu();
 							}
-							invalidateOptionsMenu();
-						}
-					});
-					if(getAboutFragment().getAdapter().isBlocked()) return;
+						});
+						return;
+					}
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+						public void run() { 
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
+							getAboutFragment().getAdapter().setIsError(true);
+						}
 					});
 					return;
 				}
@@ -123,22 +126,20 @@ public class ProfileScreen extends Activity {
 				}
 				try {
 					getAboutFragment().getAdapter().updateIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), user.getScreenName()));
-					if(getAboutFragment().getAdapter().isFollowing()) {
-						runOnUiThread(new Runnable() {
-							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
-						});
-					}
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
+						public void run() { 
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
+							getAboutFragment().getAdapter().setIsError(true);
+						}
 					});
 				}
 				try {
 					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
 					if(getAboutFragment().getAdapter().isFollowedBy()) {
 						runOnUiThread(new Runnable() {
-							public void run() { ((TextView)findViewById(R.id.profileTopRightDetail)).setText(R.string.follows_you_str); }
+							public void run() { updateNameHeader(true); }
 						});
 					}
 				} catch (final TwitterException e) {
@@ -199,7 +200,7 @@ public class ProfileScreen extends Activity {
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    	ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
+			ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
 			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
@@ -250,7 +251,7 @@ public class ProfileScreen extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	public void block() {
 		AlertDialog.Builder diag = new AlertDialog.Builder(this);
 		diag.setTitle(R.string.block_str);
@@ -288,7 +289,7 @@ public class ProfileScreen extends Activity {
 		});
 		diag.create().show();
 	}
-	
+
 	public void report() {
 		AlertDialog.Builder diag = new AlertDialog.Builder(this);
 		diag.setTitle(R.string.report_str);
@@ -332,9 +333,9 @@ public class ProfileScreen extends Activity {
 		outState.putInt("lastTheme", lastTheme);
 		outState.putInt("lastTab", getActionBar().getSelectedNavigationIndex());
 		if(showProgress) {
-    		showProgress(false);
-    		outState.putBoolean("showProgress", true);
-    	}
+			showProgress(false);
+			outState.putBoolean("showProgress", true);
+		}
 		super.onSaveInstanceState(outState);
 	}
 
@@ -346,11 +347,18 @@ public class ProfileScreen extends Activity {
 			}
 		});
 	}
-	
+
 	public ProfileAboutFragment getAboutFragment() {
 		return (ProfileAboutFragment)getFragmentManager().findFragmentByTag("page:1");
 	}
-	
+
+	public void updateNameHeader(boolean followsYou) {
+		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
+		String toSet = user.getName() + "\n@" + user.getScreenName();
+		if(followsYou) toSet += "\n" + getString(R.string.follows_you_str);
+		tv.setText(toSet);
+	}
+
 	/**
 	 * Sets up our own views for this
 	 */
@@ -361,16 +369,9 @@ public class ProfileScreen extends Activity {
 				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 			}
 		});
-		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
-		tv.setText(user.getName() + "\n@" + user.getScreenName());
-		tv = (TextView)findViewById(R.id.profileBottomLeftDetail);
-		tv.setText(user.getStatusesCount() + " | " + user.getFriendsCount() + " | " + user.getFollowersCount());
-//		TODO tv.setText(getString(R.string.last_tweeted).replace("{time}", Utilities.friendlyTimeMedium(user.getStatus().getCreatedAt())));
-//		if(user.getLocation().trim().isEmpty()){
-//			tv.setVisibility(View.GONE);
-//		} else tv.setText(user.getLocation());
+		updateNameHeader(false);
 		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
-			
+
 			@Override
 			public void onPageScrollStateChanged(int arg0) { }
 
@@ -386,7 +387,7 @@ public class ProfileScreen extends Activity {
 			}
 		});
 	}
-	
+
 	/**
 	 * Set first media
 	 */
@@ -400,7 +401,7 @@ public class ProfileScreen extends Activity {
 			setHeaderBackground(user.getProfileBackgroundImageUrl());
 		}
 	}
-	
+
 	public void showAddToListDialog(final UserList[] lists) {
 		if(lists == null || lists.length == 0) {
 			Toast.makeText(getApplicationContext(), R.string.no_lists, Toast.LENGTH_SHORT).show();
