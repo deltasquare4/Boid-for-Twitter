@@ -8,10 +8,10 @@
 		android:title="@string/switch_accounts">
 		<menu />
 	</item>
+	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str" />
 	<item android:id="@+id/donateAction" android:title="@string/donate_str" />
 	<item android:id="@+id/searchAction" android:title="@string/search_str"
 		android:icon="?searchIcon" android:showAsAction="ifRoom" />
-	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str" />
 	<item android:id="@+id/addColumnAction" android:title="@string/addcolumn_str"
 		android:icon="?addIcon">
 		<menu>
