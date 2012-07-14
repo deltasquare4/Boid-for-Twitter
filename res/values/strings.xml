@@ -395,6 +395,6 @@
 	<string name="one_tweet_selected">1 Tweet Selected</string>
 	<string name="x_tweets_Selected">{X} Tweets Selected</string>
 	<string name="donate_str">Donate</string>
-	<string name="donations_appreciated">Thanks! Your donation is much appreciated by the
-		teenagers on Team Boid!</string>
+	<string name="donations_appreciated">Your donations are much appreciated by the
+		teenagers of Team Boid!</string>
 </resources>

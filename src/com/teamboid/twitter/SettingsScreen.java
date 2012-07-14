@@ -2,6 +2,8 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
+import net.robotmedia.billing.BillingController;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
@@ -95,6 +97,14 @@ public class SettingsScreen extends PreferenceActivity  {
 					return false;
 				}
 			});
+			((Preference)findPreference("donate")).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					BillingController.requestPurchase(getActivity(), "com.teamboid.twitter.donate", true);
+					return false;
+				}
+			});
+
 		}
 	}
 	public static class GeneralFragment extends PreferenceFragment {

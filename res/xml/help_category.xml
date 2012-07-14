@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<Preference android:key="boidapp" android:title="\@boidapp" />
+	<Preference android:key="donate" android:title="@string/donate_str"
+		android:summary="@string/donations_appreciated" />
 	<Preference android:key="about" android:summary="@string/about_description"
 		android:title="@string/about_title">
 		<intent android:action="android.intent.action.VIEW"
@@ -15,7 +17,7 @@
 		android:title="@string/share_boid_title" />
 	<Preference android:key="version" android:title="@string/version_title" />
 	<Preference android:key="build" android:title="@string/build_title" />
-	
+
 	<Preference android:key="aboutImgAPI" android:summary="@string/about_twicsy_api_summary"
 		android:title="@string/about_twicsy_api">
 		<intent android:action="android.intent.action.VIEW"

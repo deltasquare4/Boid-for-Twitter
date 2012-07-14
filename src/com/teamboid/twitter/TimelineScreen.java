@@ -3,9 +3,6 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.BillingRequest.ResponseCode;
-import net.robotmedia.billing.helper.AbstractBillingObserver;
-import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import twitter4j.ResponseList;
 import twitter4j.SavedSearch;
@@ -75,8 +72,7 @@ public class TimelineScreen extends Activity {
 	private boolean lastDisplayReal;
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
-	private boolean newColumn;
-	private AbstractBillingObserver mBillingObserver;	
+	private boolean newColumn;	
 	
 	private SendTweetArrayAdapter sentTweetBinder;
 	public class SendTweetUpdater extends BroadcastReceiver{
@@ -152,20 +148,6 @@ public class TimelineScreen extends Activity {
 	SendTweetUpdater receiver = new SendTweetUpdater();
 
 	private void initialize(Bundle savedInstanceState) {
-		mBillingObserver = new AbstractBillingObserver(this) {
-			@Override
-			public void onBillingChecked(boolean supported) {
-//				if (!mBillingObserver.isTransactionsRestored()) {
-//					BillingController.restoreTransactions(TimelineScreen.this);
-//				}
-			}
-			@Override
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
-			@Override
-			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
-		};
-		BillingController.registerObserver(mBillingObserver);
-		BillingController.checkBillingSupported(this);
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		if(!prefs.contains("enable_profileimg_download")) prefs.edit().putBoolean("enable_profileimg_download", true).commit();
 		if(!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
