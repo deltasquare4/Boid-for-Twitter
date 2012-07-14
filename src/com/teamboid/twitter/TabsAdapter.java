@@ -430,37 +430,7 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 					new AdapterView.OnItemLongClickListener() {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-								int beforeChecked = getListView().getCheckedItemCount();
-								if(getListView().isItemChecked(index)) {
-									getListView().setItemChecked(index, false);
-								} else getListView().setItemChecked(index, true);
-								if(TimelineCAB.TimelineActionMode == null) {
-									 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
-								} else {
-									final Status[] tweets = TimelineCAB.getSelectedTweets();
-									if(tweets.length == 0) {
-										TimelineCAB.TimelineActionMode.finish();
-									} else {
-										if(beforeChecked == 1 && getListView().getCheckedItemCount() > 1) {
-											TimelineCAB.TimelineActionMode.getMenu().clear();
-											TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.multi_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
-										} else if(beforeChecked > 1 && getListView().getCheckedItemCount() == 1) {
-											TimelineCAB.TimelineActionMode.getMenu().clear();
-											TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
-										}
-										TimelineCAB.updateTitle(tweets);
-										TimelineCAB.updateMenuItems(tweets, TimelineCAB.TimelineActionMode.getMenu());
-									}
-								}
-							} else {
-								Status item = (Status) adapt.getItem(index);
-								context.startActivity(new Intent(context, ComposerScreen.class)
-								.putExtra("reply_to", item.getId())
-								.putExtra("reply_to_name",item.getUser().getScreenName())
-								.putExtra("append",Utilities.getAllMentions(item))
-								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-							}
+							TimelineCAB.performLongPressAction(getListView(), adapt, index);
 							return true;
 						}
 					});
@@ -665,51 +635,26 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(context)
-										.getBoolean("enable_iconic_tabs", true))
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(R.string.mentions_str);
-								else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+							}
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.mentions_str);
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+								}
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							Status item = (Status) adapt.getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class)
-							.putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name",
-									item.getUser().getScreenName())
-									.putExtra("append",
-											Utilities.getAllMentions(item))
-											.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							TimelineCAB.performLongPressAction(getListView(), adapt, index);
 							return false;
 						}
 					});
@@ -1231,51 +1176,26 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(context)
-										.getBoolean("enable_iconic_tabs", true))
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(R.string.favorites_str);
-								else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+							}
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.favorites_str);
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+								}
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							Status item = (Status) adapt.getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class)
-							.putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name",
-									item.getUser().getScreenName())
-									.putExtra("append",
-											Utilities.getAllMentions(item))
-											.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							TimelineCAB.performLongPressAction(getListView(), adapt, index);
 							return false;
 						}
 					});
@@ -2426,54 +2346,28 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								final SharedPreferences prefs = PreferenceManager
-										.getDefaultSharedPreferences(context);
-								if (!prefs.getBoolean("enable_iconic_tabs",
-										true)
-										|| prefs.getBoolean(
-												"textual_userlist_tabs", true)) {
+							}
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+								if (!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean( "textual_userlist_tabs", true)) {
 									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(listName);
-								} else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+									.getTabAt(getArguments().getInt("tab_index")).setText(listName);
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+								}
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							Status item = (Status) adapt.getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class)
-							.putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name",
-									item.getUser().getScreenName())
-									.putExtra("append",
-											Utilities.getAllMentions(item))
-											.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							TimelineCAB.performLongPressAction(getListView(), adapt, index);
 							return false;
 						}
 					});
@@ -3038,51 +2932,26 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(context)
-										.getBoolean("enable_iconic_tabs", true))
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(R.string.tweets_str);
-								else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+							}
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+								}
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							Status item = (Status) getAdapter().getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class)
-							.putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name",
-									item.getUser().getScreenName())
-									.putExtra("append",
-											Utilities.getAllMentions(item))
-											.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							TimelineCAB.performLongPressAction(getListView(), globalAdapter, index);
 							return false;
 						}
 					});
@@ -3283,51 +3152,26 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			getListView().setOnScrollListener(
 					new AbsListView.OnScrollListener() {
 						@Override
-						public void onScrollStateChanged(AbsListView view,
-								int scrollState) {
-						}
-
+						public void onScrollStateChanged(AbsListView view, int scrollState) { }
 						@Override
-						public void onScroll(AbsListView view,
-								int firstVisibleItem, int visibleItemCount,
-								int totalItemCount) {
-							if (totalItemCount > 0
-									&& (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2)
-									&& totalItemCount > visibleItemCount)
+						public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+							if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= (totalItemCount - 2) && totalItemCount > visibleItemCount) {
 								performRefresh(true);
-							if (firstVisibleItem == 0
-									&& context.getActionBar().getTabCount() > 0) {
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(context)
-										.getBoolean("enable_iconic_tabs", true))
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(R.string.tweets_str);
-								else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText("");
+							}
+							if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+								}
 							}
 						}
 					});
 			getListView().setOnItemLongClickListener(
 					new AdapterView.OnItemLongClickListener() {
 						@Override
-						public boolean onItemLongClick(AdapterView<?> arg0,
-								View arg1, int index, long id) {
-							Status item = (Status) getAdapter().getItem(index);
-							context.startActivity(new Intent(context,
-									ComposerScreen.class)
-							.putExtra("reply_to", item.getId())
-							.putExtra("reply_to_name",
-									item.getUser().getScreenName())
-									.putExtra("append",
-											Utilities.getAllMentions(item))
-											.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+							TimelineCAB.performLongPressAction(getListView(), context.adapter, index);
 							return false;
 						}
 					});

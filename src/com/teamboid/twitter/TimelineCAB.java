@@ -9,11 +9,13 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
@@ -81,6 +83,40 @@ public class TimelineCAB {
 		}
 	}
 
+	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
+		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+			int beforeChecked = list.getCheckedItemCount();
+			if(list.isItemChecked(index)) {
+				list.setItemChecked(index, false);
+			} else list.setItemChecked(index, true);
+			if(TimelineCAB.TimelineActionMode == null) {
+				 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
+			} else {
+				final Status[] tweets = TimelineCAB.getSelectedTweets();
+				if(tweets.length == 0) {
+					TimelineCAB.TimelineActionMode.finish();
+				} else {
+					if(beforeChecked == 1 && list.getCheckedItemCount() > 1) {
+						TimelineCAB.TimelineActionMode.getMenu().clear();
+						TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.multi_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
+					} else if(beforeChecked > 1 && list.getCheckedItemCount() == 1) {
+						TimelineCAB.TimelineActionMode.getMenu().clear();
+						TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
+					}
+					TimelineCAB.updateTitle(tweets);
+					TimelineCAB.updateMenuItems(tweets, TimelineCAB.TimelineActionMode.getMenu());
+				}
+			}
+		} else {
+			Status item = (Status)adapt.getItem(index);
+			context.startActivity(new Intent(context, ComposerScreen.class)
+			.putExtra("reply_to", item.getId())
+			.putExtra("reply_to_name",item.getUser().getScreenName())
+			.putExtra("append",Utilities.getAllMentions(item))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+	}
+	
 	public static ActionMode TimelineActionMode;
 	public static ActionMode.Callback TimelineActionModeCallback = new ActionMode.Callback() {
 
