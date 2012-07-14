@@ -378,7 +378,6 @@
 		to replying.
 	</string>
 	<string name="follows_you_str">follows you</string>
-	<string name="blocked_str">blocked</string>
 	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
 	<string name="description_str">Description</string>
 	<string name="unblock_str">unblock</string>

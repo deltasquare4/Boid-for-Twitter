@@ -17,6 +17,7 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.OverlayItem;
 import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.teamboid.twitter.TabsAdapter.TimelineFragment;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
 import com.teamboid.twitter.views.BetterMapView;
@@ -33,7 +34,6 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.URLEntity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -57,7 +57,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -389,9 +388,12 @@ public class TweetViewer extends MapActivity {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					AccountService.getCurrentAccount().getClient().retweetStatus(statusId);
+					final Status result = AccountService.getCurrentAccount().getClient().retweetStatus(statusId);
 					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), R.string.retweeted_status, Toast.LENGTH_LONG).show(); }
+						public void run() {
+							Toast.makeText(getApplicationContext(), R.string.retweeted_status, Toast.LENGTH_LONG).show();
+							AccountService.getFeedAdapter(TweetViewer.this, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new Status[] { result });
+						}
 					});
 				} catch(TwitterException e) {
 					e.printStackTrace();
@@ -511,24 +513,9 @@ public class TweetViewer extends MapActivity {
 			startActivity(new Intent(this, ComposerScreen.class).putExtra("text", "RT @" + replyToName + ": " + content).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.shareAction:
-			final ArrayAdapter<String> listAdapt = new ArrayAdapter<String>(this, R.layout.trends_list_item);
-			listAdapt.add("@" + replyToName + ": " + content);
-			listAdapt.add("“" + content + "” (via @" + replyToName + ")");
-			listAdapt.add("@" + replyToName + ":\n" + content +  "\n\nhttp://twitter.com/" + replyToName + "/status/" + status.getId());
-			final Dialog shareDiag = new Dialog(this);
-			shareDiag.setContentView(R.layout.list_dialog); //re-using layout that has what we need in it
-			shareDiag.setTitle(R.string.choose_how_to_share);
-			ListView list = (ListView)shareDiag.findViewById(android.R.id.list);
-			list.setAdapter(listAdapt);
-			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-					shareDiag.dismiss();
-					startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, listAdapt.getItem(pos)), 
-							getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
-			shareDiag.show();
+			String text = status.getText() + "\n\n(via @" + replyToName + ", http://twitter.com/" + replyToName + "/status/" + Long.toString(status.getId());
+			startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), 
+					getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.deleteAction:
 			showProgress(true);

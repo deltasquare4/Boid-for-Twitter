@@ -46,11 +46,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -248,6 +245,8 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
 		public abstract void filter();
 
+		public abstract Status[] getSelectedStatuses(); 
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -406,41 +405,6 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 
-		public ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-
-			@Override
-			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-				MenuInflater inflater = mode.getMenuInflater();
-				if(getListView().getCheckedItemCount() > 1) {
-					inflater.inflate(R.menu.multi_tweet_cab, menu);
-					mode.setTitle(getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(getListView().getCheckedItemCount())));
-				} else {
-					inflater.inflate(R.menu.tweetviewer_actionbar, menu);
-					mode.setTitle(R.string.one_tweet_selected);
-				}
-				return true;
-			}
-
-			@Override
-			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-				return false;
-			}
-
-			@Override
-			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				switch (item.getItemId()) {
-				case R.id.replyAction:
-					return true;
-				default:
-					return false;
-				}
-			}
-
-			@Override
-			public void onDestroyActionMode(ActionMode mode) {
-			}
-		};
-
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -484,8 +448,10 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 							if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-								getListView().setItemChecked(index, true);
-								context.startActionMode(mActionModeCallback);
+								if(getListView().isItemChecked(index)) {
+									getListView().setItemChecked(index, false);
+								} else getListView().setItemChecked(index, true);
+								context.startActionMode(TimelineCAB.getTimelineActionMode());
 							} else {
 								Status item = (Status) adapt.getItem(index);
 								context.startActivity(new Intent(context, ComposerScreen.class)
@@ -650,6 +616,21 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 			AccountService.clearFeedAdapter(context, TimelineFragment.ID,
 					AccountService.getCurrentAccount().getId());
 			performRefresh(false);
+		}
+		
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(adapt == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
 		}
 	}
 
@@ -876,6 +857,21 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+	
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(adapt == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
+		}
 	}
 
 	public static class MessagesFragment extends BaseListFragment {
@@ -1003,6 +999,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+	
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 
 	public static class TrendsFragment extends BaseSpinnerFragment {
@@ -1424,6 +1423,21 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(adapt == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
+		}
 	}
 
 	public static class SearchTweetsFragment extends BaseListFragment {
@@ -1632,6 +1646,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+	
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 
 	public static class SearchUsersFragment extends BaseListFragment {
@@ -1847,6 +1864,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 
 	public static class SavedSearchFragment extends BaseListFragment {
@@ -2070,6 +2090,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+	
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 
 	public static class NearbyFragment extends BaseSpinnerFragment {
@@ -2602,6 +2625,21 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
 		@Override
 		public void filter() {
+		}
+
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(adapt == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
 		}
 	}
 
@@ -3195,10 +3233,24 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(globalAdapter == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)globalAdapter.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
+		}
 	}
 
-	public static class PaddedProfileTimelineFragment extends
-	ProfilePaddedFragment {
+	public static class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 
 		private ProfileScreen context;
 		private String screenName;
@@ -3424,6 +3476,21 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+
+		@Override
+		public Status[] getSelectedStatuses() {
+			if(context.adapter == null) return null;
+			ArrayList<Status> toReturn = new ArrayList<Status>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Status)context.adapter.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Status[0]);
+		}
 	}
 
 	public static class ProfileAboutFragment extends ProfilePaddedFragment {
@@ -3597,6 +3664,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		@Override
 		public void filter() {
 		}
+
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 
 	public static class MyListsFragment extends BaseListFragment {
@@ -3732,7 +3802,9 @@ ActionBar.TabListener, ViewPager.OnPageChangeListener {
 		}
 
 		@Override
-		public void filter() {
-		}
+		public void filter() { }
+
+		@Override
+		public Status[] getSelectedStatuses() { return null; }
 	}
 }
