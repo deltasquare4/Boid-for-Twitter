@@ -108,7 +108,10 @@ public class UserListActivity extends ListActivity {
 					runOnUiThread(new Runnable() {
 						public void run() {
 							if(res == null || res.size() == 0) allowPagination = false;
-							else binder.add(res.toArray(new User[0]));
+							else {
+								int addedCount = binder.add(res.toArray(new User[0]));
+								if(addedCount == 0) allowPagination = false;
+							}
 						}
 					});	
 				} catch (TwitterException e) { e.printStackTrace(); }

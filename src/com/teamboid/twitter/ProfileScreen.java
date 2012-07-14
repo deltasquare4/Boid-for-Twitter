@@ -353,9 +353,10 @@ public class ProfileScreen extends Activity {
 	}
 
 	public void updateNameHeader(boolean followsYou) {
+		System.out.println("Update header, follows you? " + followsYou);
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
 		String toSet = user.getName() + "\n@" + user.getScreenName();
-		if(followsYou) toSet += "\n" + getString(R.string.follows_you_str);
+		if(followsYou) toSet += "\n\n" + getString(R.string.follows_you_str);
 		tv.setText(toSet);
 	}
 

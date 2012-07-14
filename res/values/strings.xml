@@ -368,7 +368,7 @@
 	</string>
 	<string name="about_twicsy_api">Uses Twicsy API</string>
 	<string name="about_twicsy_api_summary">We use the Twicsy API for the profile screen\'s
-		photo feed. You should check them out
+		photo feed. You should check them out.
 	</string>
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>

@@ -5,7 +5,7 @@
 		android:layout_width="match_parent" android:layout_height="match_parent"
 		android:id="@+id/pager" />
 	<RelativeLayout android:id="@+id/profileHeader"
-		android:layout_width="match_parent" android:layout_height="100dp">
+		android:layout_width="match_parent" android:layout_height="93dp">
 		<ImageView android:id="@+id/img" android:scaleType="centerCrop"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
