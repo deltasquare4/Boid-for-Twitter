@@ -96,10 +96,10 @@ public class TimelineCAB {
 				if(tweets.length == 0) {
 					TimelineCAB.TimelineActionMode.finish();
 				} else {
-					if(beforeChecked == 1 && list.getCheckedItemCount() > 1) {
+					if(beforeChecked == 1 && tweets.length > 1) {
 						TimelineCAB.TimelineActionMode.getMenu().clear();
 						TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.multi_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
-					} else if(beforeChecked > 1 && list.getCheckedItemCount() == 1) {
+					} else if(beforeChecked > 1 && tweets.length == 1) {
 						TimelineCAB.TimelineActionMode.getMenu().clear();
 						TimelineCAB.TimelineActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, TimelineCAB.TimelineActionMode.getMenu());
 					}
