@@ -26,8 +26,11 @@ import com.teamboid.twitter.services.AccountService;
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
 	
-	public static final String SERVER = "http://192.168.0.9:1337";
-	// public static final String SERVER = "http://boid.nodester.com";
+	// In release builds this should be nodester, but I might change it back to my local IP for 
+	// changes ;)
+	
+	// public static final String SERVER = "http://192.168.0.9:1337";
+	public static final String SERVER = "http://boid.nodester.com";
 	
 	public static class PushWorker extends Service{
 		

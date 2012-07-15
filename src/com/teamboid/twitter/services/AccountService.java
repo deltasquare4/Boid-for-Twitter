@@ -190,6 +190,9 @@ public class AccountService extends Service {
 					final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
 					try {
 						final User accountUser = toAdd.verifyCredentials();
+						
+						
+						
 						accounts.add(new Account(activity, toAdd, token).setSecret(accountStore.get(token).toString()).setUser(accountUser));
 					} catch (final TwitterException e) {
 						e.printStackTrace();
