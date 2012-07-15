@@ -27,11 +27,9 @@ import android.widget.Toast;
 
 /**
  * The activity that represents the message conversation viewer screen.
- * 
  * @author Aidan Follestad
  */
-public class ConversationScreen extends ListActivity
-{
+public class ConversationScreen extends ListActivity {
 
 	private int lastTheme;
 	private boolean showProgress;
@@ -39,149 +37,95 @@ public class ConversationScreen extends ListActivity
 	private boolean isLoading;
 	private boolean shownLinksMessage;
 
-	public void showProgress(boolean visible)
-	{
-		if (showProgress == visible)
-			return;
+	public void showProgress(boolean visible) {
+		if(showProgress == visible) return;
 		showProgress = visible;
 		setProgressBarIndeterminateVisibility(visible);
 	}
-
+	
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		if (savedInstanceState != null)
-		{
-			if (savedInstanceState.containsKey("lastTheme"))
-			{
-				lastTheme = savedInstanceState.getInt("lastTheme");
-				setTheme(lastTheme);
-			}
-			else
-				setTheme(Utilities.getTheme(getApplicationContext()));
-			if (savedInstanceState.containsKey("showProgress"))
-				showProgress(true);
-		}
-		else
-			setTheme(Utilities.getTheme(getApplicationContext()));
+	public void onCreate(Bundle savedInstanceState) {
+		if(savedInstanceState != null) {
+	    	if(savedInstanceState.containsKey("lastTheme")) {
+	    		lastTheme = savedInstanceState.getInt("lastTheme");
+	    		setTheme(lastTheme);
+	    	} else setTheme(Utilities.getTheme(getApplicationContext()));
+	    	if(savedInstanceState.containsKey("showProgress")) showProgress(true);
+	    }  else setTheme(Utilities.getTheme(getApplicationContext()));
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		super.onCreate(savedInstanceState);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		setContentView(R.layout.conversation_screen);
-		setProgressBarIndeterminateVisibility(false);
-		setTitle("@" + getIntent().getStringExtra("screen_name"));
-		final EditText content = (EditText) findViewById(R.id.messageInput);
-		content.addTextChangedListener(new TextWatcher()
-		{
+        super.onCreate(savedInstanceState);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.conversation_screen);
+        setProgressBarIndeterminateVisibility(false);
+        setTitle("@" + getIntent().getStringExtra("screen_name"));
+        final EditText content = (EditText)findViewById(R.id.messageInput);
+		content.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void afterTextChanged(Editable s)
-			{
-				getLengthIndicator();
-				invalidateOptionsMenu();
+			public void afterTextChanged(Editable s) {
+				getLengthIndicator(); 
+				invalidateOptionsMenu(); 
 			}
-
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after)
-			{
-			}
-
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count)
-			{
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 		});
-		adapt = new MessageItemAdapter(this);
-		setListAdapter(adapt);
-		loadCachedMessages();
+        adapt = new MessageItemAdapter(this);
+        setListAdapter(adapt);
+        loadCachedMessages();
 	}
-
+	
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
-		if (lastTheme == 0)
-			lastTheme = Utilities.getTheme(getApplicationContext());
-		else if (lastTheme != Utilities.getTheme(getApplicationContext()))
-		{
+		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
+		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
 		}
 	}
-
-	private void loadCachedMessages()
-	{
+	
+	private void loadCachedMessages() {
 		DMConversation convo = AccountService.getMessageConvoAdapter(this,
-				AccountService.getCurrentAccount().getId()).find(
-				getIntent().getStringExtra("screen_name"));
-		if (convo != null)
-			adapt.setConversation(convo);
+				AccountService.getCurrentAccount().getId()).find(getIntent().getStringExtra("screen_name"));
+		if(convo != null) adapt.setConversation(convo);
 	}
-
-	public void reloadMessages()
-	{
-		if (isLoading)
-			return;
+	
+	public void reloadMessages() {
+		if(isLoading) return;
 		isLoading = true;
 		showProgress(true);
 		final String screenName = getIntent().getStringExtra("screen_name");
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
+		new Thread(new Runnable() {
+			public void run() {
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null)
-				{
-					try
-					{
-						ResponseList<DirectMessage> temp = acc.getClient()
-								.getDirectMessages();
+				if(acc != null) {
+					try {
+						ResponseList<DirectMessage> temp = acc.getClient().getDirectMessages();
 						temp.addAll(acc.getClient().getSentDirectMessages());
-						final ResponseList<DirectMessage> messages = temp;
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								MessageConvoAdapter list = (MessageConvoAdapter) AccountService
-										.getMessageConvoAdapter(
-												ConversationScreen.this,
-												AccountService
-														.getCurrentAccount()
-														.getId());
+						final ResponseList<DirectMessage> messages = temp; 
+						runOnUiThread(new Runnable() {
+							public void run() { 
+								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(
+										ConversationScreen.this, AccountService.getCurrentAccount().getId());
 								list.add(messages.toArray(new DirectMessage[0]));
-								for (int i = 0; i < list.getCount(); i++)
-								{
-									if (((DMConversation) list.getItem(i))
-											.getToScreenName().equals(
-													screenName))
-									{
-										adapt.setConversation((DMConversation) list
-												.getItem(i));
+								for(int i = 0; i < list.getCount(); i++) {
+									if(((DMConversation)list.getItem(i)).getToScreenName().equals(screenName)) {
+										adapt.setConversation((DMConversation)list.getItem(i));
 										break;
 									}
 								}
 							}
 						});
-					}
-					catch (final TwitterException e)
-					{
+					} catch(final TwitterException e) {
 						e.printStackTrace();
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								Toast.makeText(getApplicationContext(),
-										e.getErrorMessage(), Toast.LENGTH_LONG)
-										.show();
-							}
+						runOnUiThread(new Runnable() {
+							public void run() { Toast.makeText(getApplicationContext(), e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
 						});
 					}
 				}
-				runOnUiThread(new Runnable()
-				{
-					public void run()
-					{
+				runOnUiThread(new Runnable() {
+					public void run() { 
 						showProgress(false);
 						isLoading = false;
 					}
@@ -189,147 +133,101 @@ public class ConversationScreen extends ListActivity
 			}
 		}).start();
 	}
-
+	
 	@Override
-	public void onSaveInstanceState(Bundle outState)
-	{
+	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
-		if (showProgress)
-		{
-			showProgress(false);
-			outState.putBoolean("showProgress", true);
-		}
+		if(showProgress) {
+    		showProgress(false);
+    		outState.putBoolean("showProgress", true);
+    	}
 		super.onSaveInstanceState(outState);
 	}
 
 	private int lengthIndic;
-
-	private int getLengthIndicator()
-	{
+	private int getLengthIndicator() {
 		int shortLength = AccountService.configShortURLLength;
-		String text = ((EditText) findViewById(R.id.messageInput)).getText()
-				.toString();
+		String text = ((EditText)findViewById(R.id.messageInput)).getText().toString();
 		int toReturn = (140 - text.length());
 		List<String> urls = new Extractor().extractURLs(text);
-		for (String u : urls)
-		{
-			if (!shownLinksMessage)
-			{
+		for(String u : urls) {
+			if(!shownLinksMessage) {
 				shownLinksMessage = true;
-				Toast.makeText(getApplicationContext(),
-						getString(R.string.links_shortened), Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(getApplicationContext(), getString(R.string.links_shortened), Toast.LENGTH_SHORT).show();
 			}
 			toReturn += (u.length() - shortLength);
 		}
 		lengthIndic = toReturn;
-		if (toReturn > 140)
-		{
+		if(toReturn > 140) {
 			toReturn = 140;
 			lengthIndic = 140;
-		}
+		} 
 		invalidateOptionsMenu();
 		return toReturn;
 	}
-
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.conversation_actionbar, menu);
-		if (showProgress)
-		{
+		if(showProgress) {
 			final MenuItem refreshAction = menu.findItem(R.id.refreshAction);
 			refreshAction.setEnabled(false);
 		}
-		final EditText content = (EditText) findViewById(R.id.messageInput);
+		final EditText content = (EditText)findViewById(R.id.messageInput);
 		MenuItem sendAct = menu.findItem(R.id.sendAction);
-		if (lengthIndic < 0
-				|| content.getText().toString().trim().length() == 0)
-		{
-			if (content.getText().toString().trim().length() == 0)
-				lengthIndic = 140;
+		if(lengthIndic < 0 || content.getText().toString().trim().length() == 0) {
+			if(content.getText().toString().trim().length() == 0) lengthIndic = 140;
 			sendAct.setEnabled(false);
-		}
-		else
-			sendAct.setEnabled(true);
-		sendAct.setTitle(getString(R.string.send_str) + " ("
-				+ Integer.toString(lengthIndic) + ")");
+		} else sendAct.setEnabled(true);
+		sendAct.setTitle(getString(R.string.send_str) + " (" + Integer.toString(lengthIndic) + ")");
 		return true;
 	}
-
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case android.R.id.home:
-				startActivity(new Intent(this, TimelineScreen.class));
-				finish();
-				return true;
-			case R.id.refreshAction:
-				reloadMessages();
-				return true;
-			case R.id.sendAction:
-				showProgress(true);
-				item.setEnabled(true);
-				final EditText content = (EditText) findViewById(R.id.messageInput);
-				new Thread(new Runnable()
-				{
-					public void run()
-					{
-						try
-						{
-							final DirectMessage sentMsg = AccountService
-									.getCurrentAccount()
-									.getClient()
-									.sendDirectMessage(
-											getIntent().getStringExtra(
-													"screen_name"),
-											content.getText().toString().trim());
-							runOnUiThread(new Runnable()
-							{
-								public void run()
-								{
-									MessageConvoAdapter list = (MessageConvoAdapter) AccountService
-											.getMessageConvoAdapter(
-													ConversationScreen.this,
-													AccountService
-															.getCurrentAccount()
-															.getId());
-									list.add(new DirectMessage[]
-									{ sentMsg });
-									adapt.add(sentMsg);
-									content.setText("");
-								}
-							});
-						}
-						catch (final TwitterException e)
-						{
-							e.printStackTrace();
-							runOnUiThread(new Runnable()
-							{
-								public void run()
-								{
-									Toast.makeText(getApplicationContext(),
-											R.string.failed_send_message,
-											Toast.LENGTH_SHORT).show();
-								}
-							});
-						}
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								showProgress(false);
-								item.setEnabled(true);
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			startActivity(new Intent(this, TimelineScreen.class));
+			finish();
+			return true;
+		case R.id.refreshAction:
+			reloadMessages();
+			return true;
+		case R.id.sendAction:
+			showProgress(true);
+			item.setEnabled(true);
+			final EditText content = (EditText)findViewById(R.id.messageInput);
+			new Thread(new Runnable() {
+				public void run() {
+					try { 
+						final DirectMessage sentMsg = AccountService.getCurrentAccount().getClient().sendDirectMessage(getIntent().getStringExtra("screen_name"), 
+								content.getText().toString().trim());
+						runOnUiThread(new Runnable() {
+							public void run() {
+								MessageConvoAdapter list = (MessageConvoAdapter)AccountService.getMessageConvoAdapter(
+										ConversationScreen.this, AccountService.getCurrentAccount().getId());
+								list.add(new DirectMessage[] { sentMsg });
+								adapt.add(sentMsg);
+								content.setText("");
 							}
 						});
+					} catch(final TwitterException e) {
+						e.printStackTrace();
+						runOnUiThread(new Runnable() {
+							public void run() { Toast.makeText(getApplicationContext(), R.string.failed_send_message, Toast.LENGTH_SHORT).show(); }
+						});
 					}
-				}).start();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							showProgress(false);
+							item.setEnabled(true);
+						}
+					});
+				}
+			}).start();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 }

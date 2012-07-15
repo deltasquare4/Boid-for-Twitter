@@ -24,62 +24,52 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
 /**
- * Represents the column that lists the user lists of the current user, these
- * user lists are created/subscribed to on Twitter's website.
- * 
+ * Represents the column that lists the user lists of the current user, these user lists are created/subscribed to on Twitter's website. 
  * @author Aidan Follestad
  */
-public class MyListsFragment extends BaseListFragment
-{
+public class MyListsFragment extends BaseListFragment {
 
 	private UserListDisplayAdapter adapt;
 	private Activity context;
 	public static final String ID = "COLUMNTYPE:MYLISTS";
 
 	@Override
-	public void onAttach(Activity act)
-	{
+	public void onAttach(Activity act) {
 		super.onAttach(act);
 		context = act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id)
-	{
+	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		final UserList curList = (UserList) adapt.getItem(position);
 		Intent intent = new Intent(context, TweetListActivity.class)
-				.putExtra("mode", TweetListActivity.USER_LIST)
-				.putExtra("list_name", curList.getName())
-				.putExtra("list_ID", curList.getId());
+		.putExtra("mode", TweetListActivity.USER_LIST)
+		.putExtra("list_name", curList.getName())
+		.putExtra("list_ID", curList.getId());
 		context.startActivity(intent);
 	}
 
 	@Override
-	public void onStart()
-	{
+	public void onStart() {
 		super.onStart();
 		final ListView list = getListView();
-		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-		{
+		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-					int index, long id)
-			{
+					int index, long id) {
 				Toast.makeText(context, R.string.swipe_to_delete_items,
 						Toast.LENGTH_LONG).show();
 				return false;
 			}
 		});
 		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
-				list, new SwipeDismissListViewTouchListener.OnDismissCallback()
-				{
+				list,
+				new SwipeDismissListViewTouchListener.OnDismissCallback() {
 					@Override
 					public void onDismiss(ListView listView,
-							int[] reverseSortedPositions)
-					{
-						for (final int pos : reverseSortedPositions)
-						{
+							int[] reverseSortedPositions) {
+						for (final int pos : reverseSortedPositions) {
 							adapt.destroyOrUnsubscribe(pos);
 						}
 					}
@@ -92,60 +82,48 @@ public class MyListsFragment extends BaseListFragment
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate)
-	{
+	public void performRefresh(final boolean paginate) {
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
-		new Thread(new Runnable()
-		{
+		new Thread(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Paging paging = new Paging(1, 50);
 				if (paginate)
 					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null)
-				{
-					try
-					{
-						final ResponseList<UserList> lists = acc.getClient()
-								.getAllUserLists(acc.getId());
-						context.runOnUiThread(new Runnable()
-						{
+				if (acc != null) {
+					try {
+						final ResponseList<UserList> lists = acc
+								.getClient().getAllUserLists(acc.getId());
+						context.runOnUiThread(new Runnable() {
 							@Override
-							public void run()
-							{
+							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_lists));
 								adapt.add(lists.toArray(new UserList[0]));
 							}
 						});
-					}
-					catch (final TwitterException e)
-					{
+					} catch (final TwitterException e) {
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable()
-						{
+						context.runOnUiThread(new Runnable() {
 							@Override
-							public void run()
-							{
+							public void run() {
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(),
+								Toast.makeText(context,
+										e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable()
-				{
+				context.runOnUiThread(new Runnable() {
 					@Override
-					public void run()
-					{
+					public void run() {
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -156,12 +134,10 @@ public class MyListsFragment extends BaseListFragment
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize)
-	{
+	public void reloadAdapter(boolean firstInitialize) {
 		if (context == null && getActivity() != null)
 			context = getActivity();
-		if (AccountService.getCurrentAccount() != null)
-		{
+		if (AccountService.getCurrentAccount() != null) {
 			adapt = AccountService.getMyListsAdapter(context);
 			setListAdapter(adapt);
 			if (adapt.getCount() == 0)
@@ -170,48 +146,31 @@ public class MyListsFragment extends BaseListFragment
 	}
 
 	@Override
-	public void savePosition()
-	{
+	public void savePosition() {
 	}
 
 	@Override
-	public void restorePosition()
-	{
+	public void restorePosition() {
 	}
 
 	@Override
-	public void jumpTop()
-	{
+	public void jumpTop() {
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter()
-	{
-	}
+	public void filter() { }
 
 	@Override
-	public Status[] getSelectedStatuses()
-	{
-		return null;
-	}
+	public Status[] getSelectedStatuses() { return null; }
 
 	@Override
-	public User[] getSelectedUsers()
-	{
-		return null;
-	}
+	public User[] getSelectedUsers() { return null; }
 
 	@Override
-	public Tweet[] getSelectedTweets()
-	{
-		return null;
-	}
+	public Tweet[] getSelectedTweets() { return null; }
 
 	@Override
-	public DMConversation[] getSelectedMessages()
-	{
-		return null;
-	}
+	public DMConversation[] getSelectedMessages() { return null; }
 }

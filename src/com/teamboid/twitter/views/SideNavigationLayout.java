@@ -24,306 +24,247 @@ import android.widget.Scroller;
 /**
  * A custom FrameLayout that copies the side navigation UI design pattern found
  * in the YouTube app. It expects two child views to be added to it. The first
- * one will be the navigation view and the second one will be the content view. <br/>
- * <br/>
- * See https://github.com/johnkil/SideNavigation/blob/master/sample/src/com/
- * devspark/sidenavigation/sample/MainActivity.java
+ * one will be the navigation view and the second one will be the content view.
+ * <br/><br/>
+ * See https://github.com/johnkil/SideNavigation/blob/master/sample/src/com/devspark/sidenavigation/sample/MainActivity.java
  */
-public class SideNavigationLayout extends FrameLayout
-{
+public class SideNavigationLayout extends FrameLayout {
 
-	public interface SideNavigationListener
-	{
-		public void onShowNavigationView(SideNavigationLayout view);
+    public interface SideNavigationListener {
+        public void onShowNavigationView(SideNavigationLayout view);
 
-		public void onShowContentView(SideNavigationLayout view);
-	}
+        public void onShowContentView(SideNavigationLayout view);
+    }
 
-	private static final int SCROLL_DURATION = 500;
+    private static final int SCROLL_DURATION = 500;
 
-	private Scroller mScroller;
+    private Scroller mScroller;
 
-	private VelocityTracker mTracker;
+    private VelocityTracker mTracker;
 
-	private SideNavigationListener mListener;
+    private SideNavigationListener mListener;
 
-	private float mCurrX;
+    private float mCurrX;
 
-	private float mCurrY;
+    private float mCurrY;
 
-	private int mOffsetX;
+    private int mOffsetX;
 
-	private int mTouchSlop;
+    private int mTouchSlop;
 
-	private int mMinimumVelocity;
+    private int mMinimumVelocity;
 
-	private int mMaximumVelocity;
+    private int mMaximumVelocity;
 
-	private boolean mScrolledHorizontally;
+    private boolean mScrolledHorizontally;
 
-	private boolean mScrolledVertically;
+    private boolean mScrolledVertically;
 
-	private boolean mShowingNavigation;
+    private boolean mShowingNavigation;
 
-	public SideNavigationLayout(Context context)
-	{
-		super(context);
-		init();
-	}
+    public SideNavigationLayout(Context context) {
+        super(context);
+        init();
+    }
 
-	public SideNavigationLayout(Context context, AttributeSet attrs,
-			int defStyle)
-	{
-		super(context, attrs, defStyle);
-		init();
-	}
+    public SideNavigationLayout(Context context, AttributeSet attrs,
+            int defStyle) {
+        super(context, attrs, defStyle);
+        init();
+    }
 
-	public SideNavigationLayout(Context context, AttributeSet attrs)
-	{
-		super(context, attrs);
-		init();
-	}
+    public SideNavigationLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
 
-	private void init()
-	{
-		mScroller = new Scroller(getContext());
-		ViewConfiguration viewConfiguration = ViewConfiguration
-				.get(getContext());
-		mTouchSlop = viewConfiguration.getScaledTouchSlop();
-		mMinimumVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
-		mMaximumVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
-	}
+    private void init() {
+        mScroller = new Scroller(getContext());
+        ViewConfiguration viewConfiguration = ViewConfiguration
+                .get(getContext());
+        mTouchSlop = viewConfiguration.getScaledTouchSlop();
+        mMinimumVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
+        mMaximumVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
+    }
 
-	public void setNavigationListener(SideNavigationListener listener)
-	{
-		mListener = listener;
-	}
+    public void setNavigationListener(SideNavigationListener listener) {
+        mListener = listener;
+    }
 
-	public void showNavigationView()
-	{
-		mScroller.startScroll((int) mOffsetX, 0,
-				(int) (getNavigationViewWidth() - mOffsetX), SCROLL_DURATION);
-		getChildAt(0).animate().alpha(1.0F);
-		getChildAt(1).animate().alpha(0.3F);
-		requestLayout();
-		invalidate();
-	}
+    public void showNavigationView() {
+        mScroller.startScroll((int) mOffsetX, 0,
+                (int) (getNavigationViewWidth() - mOffsetX), SCROLL_DURATION);
+        getChildAt(0).animate().alpha(1.0F);
+        getChildAt(1).animate().alpha(0.3F);
+        requestLayout();
+        invalidate();
+    }
 
-	public void showContentView()
-	{
-		mScroller.startScroll((int) mOffsetX, 0, (int) -mOffsetX, 0,
-				SCROLL_DURATION);
-		getChildAt(0).animate().setDuration(70).alpha(0);
-		getChildAt(1).animate().alpha(1);
-		requestLayout();
-		invalidate();
-	}
+    public void showContentView() {
+        mScroller.startScroll((int) mOffsetX, 0, (int) -mOffsetX, 0,
+                SCROLL_DURATION);
+        getChildAt(0).animate().setDuration(70).alpha(0);
+        getChildAt(1).animate().alpha(1);
+        requestLayout();
+        invalidate();
+    }
 
-	public boolean isShowingNavigationView()
-	{
-		return mShowingNavigation;
-	}
+    public boolean isShowingNavigationView() {
+        return mShowingNavigation;
+    }
 
-	@Override
-	public void computeScroll()
-	{
-		super.computeScroll();
-		if (mScroller.isFinished())
-		{
-			return;
-		}
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        if (mScroller.isFinished()) {
+            return;
+        }
 
-		mScroller.computeScrollOffset();
-		mOffsetX = mScroller.getCurrX();
-		requestLayout();
-		invalidate();
+        mScroller.computeScrollOffset();
+        mOffsetX = mScroller.getCurrX();
+        requestLayout();
+        invalidate();
 
-		if (mScroller.isFinished())
-		{
-			boolean wasShowingNavigation = mShowingNavigation;
-			mShowingNavigation = mOffsetX != 0;
-			getChildAt(0).setVisibility(
-					mShowingNavigation ? View.VISIBLE : View.GONE);
-			if (wasShowingNavigation != mShowingNavigation)
-			{
-				if (mListener != null)
-				{
-					if (mShowingNavigation)
-					{
-						mListener.onShowNavigationView(this);
-					}
-					else
-					{
-						mListener.onShowContentView(this);
-					}
-				}
-			}
-		}
-	}
+        if (mScroller.isFinished()) {
+            boolean wasShowingNavigation = mShowingNavigation;
+            mShowingNavigation = mOffsetX != 0;
+            getChildAt(0).setVisibility(
+                    mShowingNavigation ? View.VISIBLE : View.GONE);
+            if (wasShowingNavigation != mShowingNavigation) {
+                if (mListener != null) {
+                    if(mShowingNavigation) {
+                        mListener.onShowNavigationView(this);
+                    } else {
+                        mListener.onShowContentView(this);
+                    }
+                }
+            }
+        }
+    }
+    
+    public boolean enabled = true;
 
-	public boolean enabled = true;
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+    	if(enabled == false) return false;
+        boolean shouldIntercept = false;
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mScroller.forceFinished(true);
+            mTracker = VelocityTracker.obtain();
+            mTracker.addMovement(event);
+            mCurrX = event.getX();
+            mCurrY = event.getY();
+            mScrolledHorizontally = false;
+            mScrolledVertically = false;
+            if (mShowingNavigation && event.getX() > getNavigationViewWidth()) {
+                shouldIntercept = true;
+            }
+        } else if (action == MotionEvent.ACTION_MOVE) {
+            if (mScrolledVertically) {
+                // Don't intercept if the user has already scrolled vertically.
+            } else if (Math.abs(mCurrY - event.getY()) > mTouchSlop) {
+                mScrolledVertically = true;
+            } else if (Math.abs(mCurrX - event.getX()) > mTouchSlop) {
+                mScrolledHorizontally = true;
+                shouldIntercept = true;
+                getChildAt(0).setVisibility(View.VISIBLE);
+            }
+        } else if (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_CANCEL) {
+            mTracker.recycle();
+            mTracker = null;
+            scrollToNavigationOrContentView((int)event.getX());
+        }
+        return shouldIntercept;
+    }
 
-	@Override
-	public boolean onInterceptTouchEvent(MotionEvent event)
-	{
-		if (enabled == false)
-			return false;
-		boolean shouldIntercept = false;
-		final int action = event.getAction();
-		if (action == MotionEvent.ACTION_DOWN)
-		{
-			mScroller.forceFinished(true);
-			mTracker = VelocityTracker.obtain();
-			mTracker.addMovement(event);
-			mCurrX = event.getX();
-			mCurrY = event.getY();
-			mScrolledHorizontally = false;
-			mScrolledVertically = false;
-			if (mShowingNavigation && event.getX() > getNavigationViewWidth())
-			{
-				shouldIntercept = true;
-			}
-		}
-		else if (action == MotionEvent.ACTION_MOVE)
-		{
-			if (mScrolledVertically)
-			{
-				// Don't intercept if the user has already scrolled vertically.
-			}
-			else if (Math.abs(mCurrY - event.getY()) > mTouchSlop)
-			{
-				mScrolledVertically = true;
-			}
-			else if (Math.abs(mCurrX - event.getX()) > mTouchSlop)
-			{
-				mScrolledHorizontally = true;
-				shouldIntercept = true;
-				getChildAt(0).setVisibility(View.VISIBLE);
-			}
-		}
-		else if (action == MotionEvent.ACTION_UP
-				|| action == MotionEvent.ACTION_CANCEL)
-		{
-			mTracker.recycle();
-			mTracker = null;
-			scrollToNavigationOrContentView((int) event.getX());
-		}
-		return shouldIntercept;
-	}
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+    	if(enabled == false) return false;
+        int action = event.getAction();
+        if (action == MotionEvent.ACTION_DOWN) {
+            return true;
+        } else if (action == MotionEvent.ACTION_MOVE) {
+            mScrolledHorizontally = true;
+            mTracker.addMovement(event);
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event)
-	{
-		if (enabled == false)
-			return false;
-		int action = event.getAction();
-		if (action == MotionEvent.ACTION_DOWN)
-		{
-			return true;
-		}
-		else if (action == MotionEvent.ACTION_MOVE)
-		{
-			mScrolledHorizontally = true;
-			mTracker.addMovement(event);
+            final float x = event.getX();
+            final float diffX = x - mCurrX;
+            final int oldOffset = mOffsetX;
 
-			final float x = event.getX();
-			final float diffX = x - mCurrX;
-			final int oldOffset = mOffsetX;
+            mOffsetX += diffX;
+            mOffsetX = Math.max(0, mOffsetX);
+            mOffsetX = Math.min(getNavigationViewWidth(), mOffsetX);
+            mCurrX = x;
+            if (oldOffset != mOffsetX) {
+                requestLayout();
+            }
+            return true;
+        } else if (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_CANCEL) {
+            mTracker.addMovement(event);
+            // We intercepted the event because the user either
+            // 1) scrolled horizontally OR
+            // 2) tapped on the content view while the navigation view is
+            // showing
+            if (mScrolledHorizontally) {
+                // If the user flinged, we should scroll in the direction of the
+                // fling. Otherwise, we scroll whichever one we're closer to.
+                mTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+                float velocity = mTracker.getXVelocity();
+                if (Math.abs(velocity) > mMinimumVelocity) {
+                    if (velocity > 0) {
+                        showNavigationView();
+                    } else {
+                        showContentView();
+                    }
+                } else {
+                    scrollToNavigationOrContentView((int) event.getX());
+                }
+            } else {
+                // We want to show the content view if the user tapped on it
+                // while the navigation is showing.
+                showContentView();
+            }
+            mTracker.recycle();
+            mTracker = null;
+        }
+        return super.onTouchEvent(event);
+    }
 
-			mOffsetX += diffX;
-			mOffsetX = Math.max(0, mOffsetX);
-			mOffsetX = Math.min(getNavigationViewWidth(), mOffsetX);
-			mCurrX = x;
-			if (oldOffset != mOffsetX)
-			{
-				requestLayout();
-			}
-			return true;
-		}
-		else if (action == MotionEvent.ACTION_UP
-				|| action == MotionEvent.ACTION_CANCEL)
-		{
-			mTracker.addMovement(event);
-			// We intercepted the event because the user either
-			// 1) scrolled horizontally OR
-			// 2) tapped on the content view while the navigation view is
-			// showing
-			if (mScrolledHorizontally)
-			{
-				// If the user flinged, we should scroll in the direction of the
-				// fling. Otherwise, we scroll whichever one we're closer to.
-				mTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-				float velocity = mTracker.getXVelocity();
-				if (Math.abs(velocity) > mMinimumVelocity)
-				{
-					if (velocity > 0)
-					{
-						showNavigationView();
-					}
-					else
-					{
-						showContentView();
-					}
-				}
-				else
-				{
-					scrollToNavigationOrContentView((int) event.getX());
-				}
-			}
-			else
-			{
-				// We want to show the content view if the user tapped on it
-				// while the navigation is showing.
-				showContentView();
-			}
-			mTracker.recycle();
-			mTracker = null;
-		}
-		return super.onTouchEvent(event);
-	}
+    /**
+     * Scroll to the navigation of content view depending on whichever one the
+     * offset is closer to.
+     */
+    private void scrollToNavigationOrContentView(int x) {
+    	if (mShowingNavigation && x > getNavigationViewWidth()) {
+    		showContentView();
+    	} else if (mOffsetX < (getNavigationViewWidth() / 2)) {
+            showContentView();
+        } else {
+            showNavigationView();
+        }
+    }
 
-	/**
-	 * Scroll to the navigation of content view depending on whichever one the
-	 * offset is closer to.
-	 */
-	private void scrollToNavigationOrContentView(int x)
-	{
-		if (mShowingNavigation && x > getNavigationViewWidth())
-		{
-			showContentView();
-		}
-		else if (mOffsetX < (getNavigationViewWidth() / 2))
-		{
-			showContentView();
-		}
-		else
-		{
-			showNavigationView();
-		}
-	}
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right,
+            int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (getChildCount() > 1) {
+            View contentView = getChildAt(1);
+            int childLeft = contentView.getLeft() + mOffsetX;
+            int childTop = contentView.getTop();
+            int childRight = contentView.getRight() + mOffsetX;
+            int childBottom = contentView.getBottom();
+            contentView.layout(childLeft, childTop, childRight, childBottom);
+        }
+    }
 
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right,
-			int bottom)
-	{
-		super.onLayout(changed, left, top, right, bottom);
-		if (getChildCount() > 1)
-		{
-			View contentView = getChildAt(1);
-			int childLeft = contentView.getLeft() + mOffsetX;
-			int childTop = contentView.getTop();
-			int childRight = contentView.getRight() + mOffsetX;
-			int childBottom = contentView.getBottom();
-			contentView.layout(childLeft, childTop, childRight, childBottom);
-		}
-	}
-
-	private int getNavigationViewWidth()
-	{
-		if (getChildCount() > 0)
-		{
-			return getChildAt(0).getWidth();
-		}
-		return 0;
-	}
+    private int getNavigationViewWidth() {
+        if (getChildCount() > 0) {
+            return getChildAt(0).getWidth();
+        }
+        return 0;
+    }
 }

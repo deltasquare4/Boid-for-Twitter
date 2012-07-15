@@ -8,41 +8,32 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class LoginHandler extends Activity
-{
+public class LoginHandler extends Activity {
 
 	@SuppressLint("SetJavaScriptEnabled")
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login_handler);
-		WebView view = (WebView) findViewById(R.id.webView);
+		WebView view = (WebView)findViewById(R.id.webView);
 		view.getSettings().setJavaScriptEnabled(true);
 		view.getSettings().setAppCacheEnabled(false);
-		view.setWebViewClient(new WebViewClient()
-		{
+		view.setWebViewClient(new WebViewClient() {
 			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url)
-			{
-				if (url.startsWith("boid://"))
-				{
+		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if(url.startsWith("boid://")) {
 					setResult(RESULT_OK, new Intent().putExtra("oauth_verifier", 
 							Uri.parse(url).getQueryParameter("oauth_verifier")));
 					finish();
 					return true;
-				}
-				else
-					return false;
-			}
+				} else return false;
+		    }
 		});
 	}
-
+	
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
-		((WebView) findViewById(R.id.webView)).loadUrl(getIntent()
-				.getStringExtra("url"));
+		((WebView)findViewById(R.id.webView)).loadUrl(getIntent().getStringExtra("url"));
 	}
 }

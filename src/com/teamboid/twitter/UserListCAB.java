@@ -18,73 +18,47 @@ import android.widget.ListView;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 
 /**
- * The contextual action bar for any lists/columns that display twitter4j.User
- * objects.
- * 
+ * The contextual action bar for any lists/columns that display twitter4j.User objects.
  * @author Aidan Follestad
  */
-public class UserListCAB
-{
+public class UserListCAB {
 
 	public static Activity context;
 
-	public static void clearSelectedItems()
-	{
-		if (context instanceof UserListActivity)
-		{
-			((UserListActivity) context).getListView().clearChoices();
-			ListView list = ((UserListActivity) context).getListView();
-			((BaseAdapter) list.getAdapter()).notifyDataSetChanged();
-		}
-		else
-		{
-			for (int i = 0; i < context.getActionBar().getTabCount(); i++)
-			{
-				Fragment frag = context.getFragmentManager().findFragmentByTag(
-						"page:" + Integer.toString(i));
-				if (frag instanceof BaseListFragment)
-				{
-					((BaseListFragment) frag).getListView().clearChoices();
-					((BaseAdapter) ((BaseListFragment) frag).getListView()
-							.getAdapter()).notifyDataSetChanged();
+	public static void clearSelectedItems() {
+		if(context instanceof UserListActivity) {
+			((UserListActivity)context).getListView().clearChoices();
+			ListView list = ((UserListActivity)context).getListView();
+			((BaseAdapter)list.getAdapter()).notifyDataSetChanged();
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					((BaseListFragment)frag).getListView().clearChoices();
+					((BaseAdapter)((BaseListFragment)frag).getListView().getAdapter()).notifyDataSetChanged();
 				}
 			}
 		}
 	}
-
-	public static User[] getSelectedUsers()
-	{
+	public static User[] getSelectedUsers() {
 		ArrayList<User> toReturn = new ArrayList<User>();
-		if (context instanceof UserListActivity)
-		{
-			UserListActivity activity = (UserListActivity) context;
-			SparseBooleanArray checkedItems = activity.getListView()
-					.getCheckedItemPositions();
-			if (checkedItems != null)
-			{
-				for (int i = 0; i < checkedItems.size(); i++)
-				{
-					if (checkedItems.valueAt(i))
-					{
-						toReturn.add((User) activity.binder
-								.getItem(checkedItems.keyAt(i)));
+		if(context instanceof UserListActivity) {
+			UserListActivity activity = (UserListActivity)context; 
+			SparseBooleanArray checkedItems = activity.getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((User)activity.binder.getItem(checkedItems.keyAt(i)));
 					}
 				}
 			}
-		}
-		else
-		{
-			for (int i = 0; i < context.getActionBar().getTabCount(); i++)
-			{
-				Fragment frag = context.getFragmentManager().findFragmentByTag(
-						"page:" + Integer.toString(i));
-				if (frag instanceof BaseListFragment)
-				{
-					User[] toAdd = ((BaseListFragment) frag).getSelectedUsers();
-					if (toAdd != null && toAdd.length > 0)
-					{
-						for (User u : toAdd)
-							toReturn.add(u);
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					User[] toAdd = ((BaseListFragment)frag).getSelectedUsers();
+					if(toAdd != null && toAdd.length > 0) {
+						for(User u : toAdd) toReturn.add(u);
 					}
 				}
 			}
@@ -92,75 +66,46 @@ public class UserListCAB
 		return toReturn.toArray(new User[0]);
 	}
 
-	public static void updateTitle()
-	{
-		User[] selUsers = UserListCAB.getSelectedUsers();
-		if (selUsers.length == 1)
-		{
+	public static void updateTitle() {
+		User[] selUsers = UserListCAB.getSelectedUsers(); 
+		if(selUsers.length == 1) {
 			UserListCAB.UserActionMode.setTitle(R.string.one_user_selected);
-		}
-		else
-		{
-			UserListCAB.UserActionMode.setTitle(context.getString(
-					R.string.x_users_selected).replace("{X}",
-					Integer.toString(selUsers.length)));
+		} else {
+			UserListCAB.UserActionMode.setTitle(context.getString(R.string.x_users_selected).replace("{X}", Integer.toString(selUsers.length)));
 		}
 	}
-
-	public static void updateMenuItems(User[] selUsers, Menu menu)
-	{
-		// TODO Update follow/unfollow action
+	public static void updateMenuItems(User[] selUsers, Menu menu) {
+		//TODO Update follow/unfollow action
 	}
 
-	public static void performLongPressAction(ListView list, BaseAdapter adapt,
-			int index)
-	{
-		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-				"cab", true))
-		{
-			if (list.isItemChecked(index))
-			{
+	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
+		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
+			if(list.isItemChecked(index)) {
 				list.setItemChecked(index, false);
-			}
-			else
-				list.setItemChecked(index, true);
-			if (UserListCAB.UserActionMode == null)
-			{
+			} else list.setItemChecked(index, true);
+			if(UserListCAB.UserActionMode == null) {
 				context.startActionMode(UserListCAB.UserActionModeCallback);
-			}
-			else
-			{
+			} else {
 				final User[] users = UserListCAB.getSelectedUsers();
-				if (users.length == 0)
-				{
+				if(users.length == 0) {
 					UserListCAB.UserActionMode.finish();
-				}
-				else
-				{
+				} else {
 					UserListCAB.updateTitle();
-					UserListCAB.updateMenuItems(users,
-							UserListCAB.UserActionMode.getMenu());
+					UserListCAB.updateMenuItems(users, UserListCAB.UserActionMode.getMenu());
 				}
 			}
-		}
-		else
-		{
+		} else {
 			context.startActivity(new Intent(context, ComposerScreen.class)
-					.putExtra(
-							"append",
-							"@" + ((User) adapt.getItem(index)).getScreenName()
-									+ " ").addFlags(
-							Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("append", "@" + ((User)adapt.getItem(index)).getScreenName() + " ")
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 	}
 
 	public static ActionMode UserActionMode;
-	public static ActionMode.Callback UserActionModeCallback = new ActionMode.Callback()
-	{
+	public static ActionMode.Callback UserActionModeCallback = new ActionMode.Callback() {
 
 		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu)
-		{
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			UserListCAB.UserActionMode = mode;
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.user_cab, menu);
@@ -170,58 +115,42 @@ public class UserListCAB
 		}
 
 		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu)
-		{
-			return false;
-		}
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
 
 		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item)
-		{
-			final User[] selUsers = getSelectedUsers();
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			final User[] selUsers = getSelectedUsers();  
 			UserListCAB.clearSelectedItems();
 			mode.finish();
-			switch (item.getItemId())
-			{
-				case R.id.mentionAction:
-					String mentionStr = "";
-					for (User user : selUsers)
-					{
-						mentionStr += "@" + user.getScreenName() + " ";
-					}
-					context.startActivity(new Intent(context,
-							ComposerScreen.class)
-							.putExtra("append", mentionStr).addFlags(
-									Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					return true;
-				case R.id.followAction:
-					// TODO
-					return true;
-				case R.id.shareAction:
-					String shareStr = "";
-					for (int i = 0; i < selUsers.length; i++)
-					{
-						String name = selUsers[i].getScreenName();
-						if (i > 0)
-							shareStr += "\n";
-						shareStr += "@" + name + " (https://twitter.com/"
-								+ name + ")";
-					}
-					context.startActivity(Intent.createChooser(
-							new Intent(Intent.ACTION_SEND)
-									.setType("text/plain").putExtra(
-											Intent.EXTRA_TEXT, shareStr),
-							context.getString(R.string.share_str)).addFlags(
-							Intent.FLAG_ACTIVITY_CLEAR_TOP));
-					return true;
-				default:
-					return false;
+			switch (item.getItemId()) {
+			case R.id.mentionAction:
+				String mentionStr = "";
+				for(User user : selUsers) {
+					mentionStr += "@" + user.getScreenName() + " ";
+				}
+				context.startActivity(new Intent(context, ComposerScreen.class)
+				.putExtra("append", mentionStr).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				return true;
+			case R.id.followAction:
+				//TODO
+				return true;
+			case R.id.shareAction:
+				String shareStr = "";
+				for(int i = 0; i < selUsers.length; i++) {
+					String name = selUsers[i].getScreenName();
+					if(i > 0) shareStr += "\n";
+					shareStr += "@" + name + " (https://twitter.com/" + name + ")";
+				}
+				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareStr), 
+						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				return true;
+			default:
+				return false;
 			}
 		}
 
 		@Override
-		public void onDestroyActionMode(ActionMode mode)
-		{
+		public void onDestroyActionMode(ActionMode mode) {
 			UserListCAB.clearSelectedItems();
 			UserListCAB.UserActionMode = null;
 		}

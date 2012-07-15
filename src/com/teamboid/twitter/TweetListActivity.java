@@ -1,5 +1,6 @@
 package com.teamboid.twitter;
 
+
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
@@ -23,8 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 /**
  * @author Aidan Follestad
  */
-public class TweetListActivity extends ListActivity
-{
+public class TweetListActivity extends ListActivity {
 
 	private int lastTheme;
 	private boolean showProgress;
@@ -32,28 +32,20 @@ public class TweetListActivity extends ListActivity
 	private boolean allowPagination = true;
 	public FeedListAdapter binder;
 	private ProgressDialog progDialog;
-
-	public void showProgress(final boolean visible)
-	{
-		if (showProgress == visible && progDialog != null)
-		{
+	
+	public void showProgress(final boolean visible) {
+		if(showProgress == visible && progDialog != null) {
 			return;
 		}
-		runOnUiThread(new Runnable()
-		{
+		runOnUiThread(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() { 
 				setProgressBarIndeterminateVisibility(visible);
-				if (showProgress)
-				{
+				if(showProgress) {
 					progDialog.dismiss();
 					showProgress = false;
-				}
-				else
-				{
-					progDialog = ProgressDialog.show(TweetListActivity.this,
-							"", getString(R.string.loading_str), true);
+				} else {
+					progDialog = ProgressDialog.show(TweetListActivity.this, "", getString(R.string.loading_str), true);
 					showProgress = true;
 				}
 			}
@@ -61,179 +53,96 @@ public class TweetListActivity extends ListActivity
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		if (savedInstanceState != null)
-		{
-			if (savedInstanceState.containsKey("lastTheme"))
-			{
+	public void onCreate(Bundle savedInstanceState) {
+		if(savedInstanceState != null) {
+			if(savedInstanceState.containsKey("lastTheme")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");
 				setTheme(lastTheme);
-			}
-			else
-				setTheme(Utilities.getTheme(getApplicationContext()));
-			if (savedInstanceState.containsKey("showProgress"))
-				showProgress(true);
-		}
-		else
-			setTheme(Utilities.getTheme(getApplicationContext()));
+			} else setTheme(Utilities.getTheme(getApplicationContext()));
+			if(savedInstanceState.containsKey("showProgress")) showProgress(true);
+		}  else setTheme(Utilities.getTheme(getApplicationContext()));
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this, null, AccountService
-				.getCurrentAccount().getId());
+		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		setListAdapter(binder);
 		refresh();
 		TimelineCAB.context = this;
-		getListView().setOnItemClickListener(new OnItemClickListener()
-		{
+		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-					long id)
-			{
-				Status tweet = (Status) binder.getItem(index);
-				if (tweet.isRetweet())
-					tweet = tweet.getRetweetedStatus();
-				startActivity(new Intent(getApplicationContext(),
-						TweetViewer.class)
-						.putExtra("tweet_id", id)
-						.putExtra("user_name", tweet.getUser().getName())
-						.putExtra("user_id", tweet.getUser().getId())
-						.putExtra("screen_name",
-								tweet.getUser().getScreenName())
-						.putExtra("content", tweet.getText())
-						.putExtra("timer", tweet.getCreatedAt().getTime())
-						.putExtra("via", tweet.getSource())
-						.putExtra("isFavorited", tweet.isFavorited())
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				Status tweet = (Status)binder.getItem(index);
+				if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+				startActivity(new Intent(getApplicationContext(), TweetViewer.class).putExtra("tweet_id", id).putExtra("user_name", tweet.getUser().getName()).putExtra("user_id", tweet.getUser().getId())
+						.putExtra("screen_name", tweet.getUser().getScreenName()).putExtra("content", tweet.getText()).putExtra("timer", tweet.getCreatedAt().getTime())
+						.putExtra("via", tweet.getSource()).putExtra("isFavorited", tweet.isFavorited()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
-		getListView().setOnScrollListener(new AbsListView.OnScrollListener()
-		{
+		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState)
-			{
-			}
-
+			public void onScrollStateChanged(AbsListView view, int scrollState) { }
 			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount)
-			{
-				if (totalItemCount > 0
-						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
-						&& totalItemCount > visibleItemCount)
-				{
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 					refresh();
 				}
 			}
 		});
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener()
-				{
-					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, int index, long id)
-					{
-						TimelineCAB.performLongPressAction(getListView(),
-								binder, index);
-						return true;
-					}
-				});
+		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				TimelineCAB.performLongPressAction(getListView(), binder, index);
+				return true;
+			}
+		});		
 		setProgressBarIndeterminateVisibility(false);
 	}
 
-	public void refresh()
-	{
-		if (!allowPagination)
-			return;
+	public void refresh() {
+		if(!allowPagination) return;
 		showProgress(true);
-		new Thread(new Runnable()
-		{
+		new Thread(new Runnable(){
 			@Override
-			public void run()
-			{
-				try
-				{
+			public void run() {
+				try {
 					Paging paging = new Paging(1, 20);
-					switch (getIntent().getIntExtra("mode", -1))
-					{
-						case USER_FAVORITES:
-							runOnUiThread(new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									setTitle(getString(R.string.user_favorites)
-											.replace(
-													"{user}",
-													getIntent().getStringExtra(
-															"username")));
-								}
-							});
-							if (binder.getCount() > 0)
-								paging.setMaxId(binder.getItemId(binder
-										.getCount() - 1));
-							tweets = AccountService
-									.getCurrentAccount()
-									.getClient()
-									.getFavorites(
-											getIntent().getStringExtra(
-													"username"), paging);
-							break;
-						case USER_LIST:
-							runOnUiThread(new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									setTitle(getIntent().getStringExtra(
-											"list_name"));
-								}
-							});
-							if (binder.getCount() > 0)
-								paging.setMaxId(binder.getItemId(binder
-										.getCount() - 1));
-							tweets = AccountService
-									.getCurrentAccount()
-									.getClient()
-									.getUserListStatuses(
-											getIntent().getIntExtra("list_ID",
-													0), paging);
-							break;
+					switch(getIntent().getIntExtra("mode", -1)) {
+					case USER_FAVORITES:
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() { setTitle(getString(R.string.user_favorites).replace("{user}", getIntent().getStringExtra("username"))); }
+						});
+						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
+						tweets = AccountService.getCurrentAccount().getClient().getFavorites(getIntent().getStringExtra("username"), paging);
+						break;
+					case USER_LIST:
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() { setTitle(getIntent().getStringExtra("list_name")); }
+						});
+						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
+						tweets = AccountService.getCurrentAccount().getClient().getUserListStatuses(getIntent().getIntExtra("list_ID", 0), paging);
+						break;
 					}
-					runOnUiThread(new Runnable()
-					{
+					runOnUiThread(new Runnable() {
 						@Override
-						public void run()
-						{
-							if (tweets == null || tweets.size() == 0)
-							{
+						public void run() {
+							if(tweets == null || tweets.size() == 0) {
 								allowPagination = false;
 								showProgress(false);
 								return;
 							}
-							int addedCount = binder.add(tweets
-									.toArray(new Status[0]));
-							;
-							if (addedCount == 0)
-								allowPagination = false;
+							int addedCount = binder.add(tweets.toArray(new Status[0]));; 
+							if(addedCount == 0) allowPagination = false;
 							showProgress(false);
 						}
 					});
-				}
-				catch (final Exception e)
-				{
+				} catch(final Exception e) { 
 					e.printStackTrace();
-					runOnUiThread(new Runnable()
-					{
+					runOnUiThread(new Runnable() {
 						@Override
-						public void run()
-						{
-							Toast.makeText(getApplicationContext(),
-									e.getLocalizedMessage(), Toast.LENGTH_LONG)
-									.show();
-						}
+						public void run() { Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show(); }
 					});
 				}
 			}
@@ -241,11 +150,9 @@ public class TweetListActivity extends ListActivity
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState)
-	{
+	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
-		if (showProgress)
-		{
+		if(showProgress) {
 			showProgress(false);
 			outState.putBoolean("showProgress", true);
 		}
@@ -256,16 +163,14 @@ public class TweetListActivity extends ListActivity
 	public static final int USER_LIST = 2;
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case android.R.id.home:
-				startActivity(new Intent(this, TimelineScreen.class));
-				finish();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			startActivity(new Intent(this, TimelineScreen.class));
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 }

@@ -29,80 +29,55 @@ import com.teamboid.twitter.services.AccountService;
 
 /**
  * The column used in the search screen to display User search results.
- * 
  * @author Aidan Follestad
  */
-public class SearchUsersFragment extends BaseListFragment
-{
+public class SearchUsersFragment extends BaseListFragment {
 
 	private SearchScreen context;
 	private String query;
 	private int page;
 
 	@Override
-	public void onAttach(Activity act)
-	{
+	public void onAttach(Activity act) {
 		super.onAttach(act);
 		context = (SearchScreen) act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id)
-	{
+	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		context.startActivity(new Intent(context, ProfileScreen.class)
-				.putExtra(
-						"screen_name",
-						((User) context.userAdapter.getItem(position))
-								.getScreenName()).addFlags(
-						Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		.putExtra("screen_name", ((User) context.userAdapter.getItem(position)).getScreenName())
+		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
-	public void onStart()
-	{
+	public void onStart() {
 		super.onStart();
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		getListView().setOnScrollListener(new AbsListView.OnScrollListener()
-		{
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState)
-			{
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount)
-			{
-				if (totalItemCount > 0
-						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
-						&& totalItemCount > visibleItemCount)
-					performRefresh(true);
-				if (context.userAdapter != null && getView() != null)
-				{
-					context.userAdapter.savedIndex = firstVisibleItem;
-					View v = getListView().getChildAt(0);
-					context.userAdapter.savedIndexTop = (v == null) ? 0 : v
-							.getTop();
-				}
-				if (firstVisibleItem == 0
-						&& context.getActionBar().getTabCount() > 0)
-				{
-					context.getActionBar()
-							.getTabAt(getArguments().getInt("tab_index"))
-							.setText(R.string.users_str);
-				}
-			}
-		});
-		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener()
-				{
+		getListView().setOnScrollListener(
+				new AbsListView.OnScrollListener() {
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, int index, long id)
-					{
-						UserListCAB.performLongPressAction(getListView(),
-								context.userAdapter, index);
+					public void onScrollStateChanged(AbsListView view, int scrollState) { }
+					@Override
+					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
+							performRefresh(true);
+						if (context.userAdapter != null && getView() != null) {
+							context.userAdapter.savedIndex = firstVisibleItem;
+							View v = getListView().getChildAt(0);
+							context.userAdapter.savedIndexTop = (v == null) ? 0 : v.getTop();
+						}
+						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+							context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.users_str);
+						}
+					}
+				});
+		getListView().setOnItemLongClickListener(
+				new AdapterView.OnItemLongClickListener() {
+					@Override
+					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+						UserListCAB.performLongPressAction(getListView(), context.userAdapter, index);
 						return true;
 					}
 				});
@@ -113,105 +88,55 @@ public class SearchUsersFragment extends BaseListFragment
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate)
-	{
-		if (context == null || isLoading || context.userAdapter == null)
-			return;
+	public void performRefresh(final boolean paginate) {
+		if(context == null || isLoading || context.userAdapter == null) return;
 		isLoading = true;
-		if (context.userAdapter.getCount() == 0 && getView() != null)
-			setListShown(false);
-		new Thread(new Runnable()
-		{
+		if(context.userAdapter.getCount() == 0 && getView() != null) setListShown(false);
+		new Thread(new Runnable() {
 			@Override
-			public void run()
-			{
-				if (paginate)
-					page++;
-				else
-					page = 1;
+			public void run() {
+				if (paginate) page++;
+				else page = 1;
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null)
-				{
-					try
-					{
-						final ResponseList<User> feed = acc.getClient()
-								.searchUsers(query, page);
-						context.runOnUiThread(new Runnable()
-						{
+				if (acc != null) {
+					try {
+						final ResponseList<User> feed = acc.getClient().searchUsers(query, page);
+						context.runOnUiThread(new Runnable() {
 							@Override
-							public void run()
-							{
-								setEmptyText(context
-										.getString(R.string.no_results));
+							public void run() {
+								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = context.userAdapter.getCount() - 1;
-								int addedCount = context.userAdapter.add(feed
-										.toArray(new User[0]));
-								if (addedCount > 0 || beforeLast > 0)
-								{
-									if (getView() != null)
-									{
-										if (paginate && addedCount > 0)
-											getListView()
-													.smoothScrollToPosition(
-															beforeLast + 1);
-										else
-											getListView()
-													.setSelectionFromTop(
-															context.userAdapter.savedIndex
-																	+ addedCount,
-															context.userAdapter.savedIndexTop);
+								int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
+								if (addedCount > 0 || beforeLast > 0) {
+									if (getView() != null) {
+										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+										else getListView().setSelectionFromTop(context.userAdapter.savedIndex+ addedCount, context.userAdapter.savedIndexTop);
 									}
-									Tab curTab = context.getActionBar()
-											.getTabAt(
-													getArguments().getInt(
-															"tab_index"));
+									Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
 									String curTitle = "";
-									if (curTab.getText() != null)
-										curTitle = curTab.getText().toString();
-									if (curTitle != null && !curTitle.isEmpty()
-											&& curTitle.contains("("))
-									{
-										curTitle = curTitle.substring(0,
-												curTitle.lastIndexOf("(") - 2);
-										curTitle += (" ("
-												+ Integer.toString(addedCount) + ")");
-									}
-									else
-										curTitle = context
-												.getString(R.string.users_str)
-												+ " ("
-												+ Integer.toString(addedCount)
-												+ ")";
-									context.getActionBar()
-											.getTabAt(
-													getArguments().getInt(
-															"tab_index"))
-											.setText(curTitle);
+									if (curTab.getText() != null) curTitle = curTab.getText().toString();
+									if (curTitle != null && !curTitle.isEmpty() && curTitle.contains("(")) {
+										curTitle = curTitle.substring(0, curTitle.lastIndexOf("(") - 2);
+										curTitle += (" (" + Integer.toString(addedCount) + ")");
+									} else curTitle = context.getString(R.string.users_str)+ " (" + Integer.toString(addedCount) + ")";
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(curTitle);
 								}
 							}
 						});
-					}
-					catch (final TwitterException e)
-					{
+					} catch (final TwitterException e) {
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable()
-						{
+						context.runOnUiThread(new Runnable() {
 							@Override
-							public void run()
-							{
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+							public void run() {
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable()
-				{
+				context.runOnUiThread(new Runnable() {
 					@Override
-					public void run()
-					{
+					public void run() {
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -222,10 +147,8 @@ public class SearchUsersFragment extends BaseListFragment
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize)
-	{
-		if (AccountService.getCurrentAccount() != null)
-		{
+	public void reloadAdapter(boolean firstInitialize) {
+		if (AccountService.getCurrentAccount() != null) {
 			if (context.userAdapter == null)
 				context.userAdapter = new SearchUsersListAdapter(context);
 			if (getView() != null)
@@ -234,8 +157,7 @@ public class SearchUsersFragment extends BaseListFragment
 			if (context.userAdapter.getCount() == 0)
 				performRefresh(false);
 			else if (context.userAdapter.savedIndex > 0
-					&& context.userAdapter.list != null)
-			{
+					&& context.userAdapter.list != null) {
 				getListView().setSelectionFromTop(
 						context.userAdapter.savedIndex,
 						context.userAdapter.savedIndexTop);
@@ -244,49 +166,35 @@ public class SearchUsersFragment extends BaseListFragment
 	}
 
 	@Override
-	public void savePosition()
-	{
+	public void savePosition() {
 	}
 
 	@Override
-	public void restorePosition()
-	{
+	public void restorePosition() {
 	}
 
 	@Override
-	public void jumpTop()
-	{
+	public void jumpTop() {
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter()
-	{
+	public void filter() {
 	}
 
 	@Override
-	public Status[] getSelectedStatuses()
-	{
-		return null;
-	}
+	public Status[] getSelectedStatuses() { return null; }
 
 	@Override
-	public User[] getSelectedUsers()
-	{
-		if (context.userAdapter == null)
-			return null;
-		ArrayList<User> toReturn = new ArrayList<User>();
-		SparseBooleanArray checkedItems = getListView()
-				.getCheckedItemPositions();
-		if (checkedItems != null)
-		{
-			for (int i = 0; i < checkedItems.size(); i++)
-			{
-				if (checkedItems.valueAt(i))
-				{
-					toReturn.add((User) context.userAdapter
-							.getItem(checkedItems.keyAt(i)));
+	public User[] getSelectedUsers() {
+		if(context.userAdapter == null) return null;
+		ArrayList<User> toReturn = new ArrayList<User>(); 
+		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+		if(checkedItems != null) {
+			for(int i = 0; i < checkedItems.size(); i++) {
+				if(checkedItems.valueAt(i)) {
+					toReturn.add((User)context.userAdapter.getItem(checkedItems.keyAt(i)));
 				}
 			}
 		}
@@ -294,14 +202,8 @@ public class SearchUsersFragment extends BaseListFragment
 	}
 
 	@Override
-	public Tweet[] getSelectedTweets()
-	{
-		return null;
-	}
+	public Tweet[] getSelectedTweets() { return null; }
 
 	@Override
-	public DMConversation[] getSelectedMessages()
-	{
-		return null;
-	}
+	public DMConversation[] getSelectedMessages() { return null; }
 }

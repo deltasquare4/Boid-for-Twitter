@@ -24,16 +24,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- * The list adapter used in the message conversation viewer, displays a list of
- * messages in a conversation.
- * 
+ * The list adapter used in the message conversation viewer, displays a list of messages in a conversation.
  * @author Aidan Follestad
  */
-public class MessageItemAdapter extends BaseAdapter
-{
+public class MessageItemAdapter extends BaseAdapter {
 
-	public MessageItemAdapter(Activity _context)
-	{
+	public MessageItemAdapter(Activity _context) {
 		context = _context;
 		items = new ArrayList<DirectMessage>();
 	}
@@ -41,104 +37,60 @@ public class MessageItemAdapter extends BaseAdapter
 	private Activity context;
 	private ArrayList<DirectMessage> items;
 
-	public void add(DirectMessage msg)
-	{
+	public void add(DirectMessage msg) {
 		items.add(msg);
 		notifyDataSetChanged();
 	}
-
-	public void add(DirectMessage[] msges)
-	{
-		for (DirectMessage msg : msges)
-			add(msg);
+	public void add(DirectMessage[] msges) {
+		for(DirectMessage msg : msges) add(msg);
 	}
-
-	public void setConversation(DMConversation convo)
-	{
+	public void setConversation(DMConversation convo) {
 		clear();
 		items.addAll(convo.getMessages());
 		notifyDataSetChanged();
 	}
-
-	public void clear()
-	{
+	public void clear() {
 		items.clear();
 		notifyDataSetChanged();
 	}
 
 	@Override
-	public int getCount()
-	{
-		return items.size();
-	}
-
+	public int getCount() { return items.size(); }
 	@Override
-	public Object getItem(int position)
-	{
-		return items.get(position);
-	}
-
+	public Object getItem(int position) { return items.get(position); }
 	@Override
-	public long getItemId(int position)
-	{
-		return items.get(position).getId();
-	}
-
+	public long getItemId(int position) { return items.get(position).getId(); }	
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
+	public View getView(int position, View convertView, ViewGroup parent) {
 		RelativeLayout toReturn = null;
 		final DirectMessage curItem = items.get(position);
 		final Account acc = AccountService.getCurrentAccount();
-		// Can't use convertView here, cause it's possible that this index was a
-		// sent item before and now it's a received item.
-		if (curItem.getSenderId() == acc.getId())
-		{
-			toReturn = (RelativeLayout) LayoutInflater.from(context).inflate(
-					R.layout.dm_item_sent, null);
-		}
-		else
-			toReturn = (RelativeLayout) LayoutInflater.from(context).inflate(
-					R.layout.dm_item, null);
-		final RemoteImageView profileImgView = (RemoteImageView) toReturn
-				.findViewById(R.id.dmItemProfileImg);
-		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-				"enable_profileimg_download", true))
-		{
-			if (curItem.getSenderId() != acc.getId())
-			{
-				profileImgView.setOnClickListener(new View.OnClickListener()
-				{
-					public void onClick(View v)
-					{
+		//Can't use convertView here, cause it's possible that this index was a sent item before and now it's a received item.
+		if(curItem.getSenderId() == acc.getId()) {
+			toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item_sent, null);
+		} else toReturn = (RelativeLayout)LayoutInflater.from(context).inflate(R.layout.dm_item, null);		
+		final RemoteImageView profileImgView = (RemoteImageView)toReturn.findViewById(R.id.dmItemProfileImg);
+		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_profileimg_download", true)) {
+			if(curItem.getSenderId() != acc.getId()) {
+				profileImgView.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) { 
 						String toOpen = curItem.getSenderScreenName();
-						if (toOpen.equals(acc.getUser().getScreenName()))
-						{
+						if(toOpen.equals(acc.getUser().getScreenName())) {
 							toOpen = curItem.getRecipientScreenName();
 						}
-						context.startActivity(new Intent(context,
-								ProfileScreen.class).putExtra("screen_name",
-								toOpen)
-								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						context.startActivity(new Intent(context, ProfileScreen.class).putExtra("screen_name", toOpen).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 					}
 				});
 			}
 			profileImgView.setImageResource(R.drawable.sillouette);
-			profileImgView.setImageURL(Utilities.getUserImage(
-					curItem.getSenderScreenName(), context));
-		}
-		else
-		{
+			profileImgView.setImageURL(Utilities.getUserImage(curItem.getSenderScreenName(), context));
+		} else{
 			profileImgView.setVisibility(View.GONE);
 		}
-		((TextView) toReturn.findViewById(R.id.dmItemTimeTxt))
-				.setText(Utilities.friendlyTimeLong(
-						context.getApplicationContext(), curItem.getCreatedAt()));
-		TextView msgTxt = (TextView) toReturn
-				.findViewById(R.id.dmItemMessageTxt);
+		((TextView)toReturn.findViewById(R.id.dmItemTimeTxt)).setText(Utilities.friendlyTimeLong(context.getApplicationContext(), curItem.getCreatedAt()));
+		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		FeedListAdapter.ApplyFontSize(msgTxt, context);
-		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(),
-				null, null, true));
+		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));
 		msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
 		return toReturn;
 	}
