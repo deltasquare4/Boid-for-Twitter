@@ -104,6 +104,8 @@ public class TrendsFragment extends BaseSpinnerFragment {
 			return;
 		}
 		isLoading = true;
+		context.invalidateOptionsMenu();
+		
 		adapt.clear();
 		if (getView() != null)
 			setListShown(false);
@@ -159,6 +161,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 					public void run() {
 						setListShown(true);
 						isLoading = false;
+						context.invalidateOptionsMenu();
 					}
 				});
 			}

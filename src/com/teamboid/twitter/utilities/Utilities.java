@@ -592,6 +592,7 @@ public class Utilities {
 		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
 		return (int)(outMetrics.density * dp); // 50dp in pixels
 	}
+	
 	public static String getUserImage(String screenname, Context mContext, twitter4j.User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache

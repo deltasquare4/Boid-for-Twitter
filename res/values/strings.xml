@@ -8,6 +8,9 @@
 	<string name="push_error">There was a problem with push. Try again in a moment</string>
 	<string name="push_updated">Your push settings have been updated</string>
 	<string name="push_registered">Push is now registered!</string>
+	<string name="messages_priv">Show Content</string>
+	<string name="message_recv">{user} sent you a Direct Message</string>
+	<string name="messages_priv_desc">Show the content of direct messages in notifications.</string>
 	<string name="none_str">None</string>
 	<string name="unknown_str">Unknown</string>
 	<string name="push_wait">Contacting push servers… Hold on!</string>

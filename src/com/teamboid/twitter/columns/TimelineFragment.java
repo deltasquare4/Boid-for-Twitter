@@ -105,6 +105,8 @@ public class TimelineFragment extends BaseListFragment {
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
+		context.invalidateOptionsMenu();
+		
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
 		adapt.setLastViewed(getListView());
@@ -185,6 +187,7 @@ public class TimelineFragment extends BaseListFragment {
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
+						context.invalidateOptionsMenu();
 					}
 				});
 			}

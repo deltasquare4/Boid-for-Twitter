@@ -147,6 +147,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	@Override
 	public void onPageSelected(int position) {
 		mActionBar.setSelectedNavigationItem(position);
+		mContext.invalidateOptionsMenu();
 	}
 
 	@Override
@@ -193,10 +194,20 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 		}
 	}
+	
+	public Fragment getCurrentFragment(){
+		return mContext.getFragmentManager().findFragmentByTag("page:" + mViewPager.getCurrentItem());
+	}
+	
+	public interface IBoidFragment{
+		public boolean isRefreshing();
+	}
 
-	public static abstract class BaseListFragment extends ListFragment {
+	public static abstract class BaseListFragment extends ListFragment implements IBoidFragment {
 
 		public boolean isLoading;
+		@Override
+		public boolean isRefreshing(){ return isLoading; }
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -231,10 +242,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-	public static abstract class BaseSpinnerFragment extends ListFragment {
+	public static abstract class BaseSpinnerFragment extends ListFragment implements IBoidFragment {
 
 		public boolean isLoading;
 		private boolean isShown;
+		@Override
+		public boolean isRefreshing(){ return isLoading; }
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -289,10 +302,13 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-	public static abstract class BaseGridFragment extends Fragment {
+	public static abstract class BaseGridFragment extends Fragment implements IBoidFragment {
 
 		public boolean isLoading;
 		private boolean isShown;
+		
+		@Override
+		public boolean isRefreshing(){ return isLoading; }
 
 		public abstract void performRefresh(boolean paginate);
 

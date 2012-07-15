@@ -8,16 +8,25 @@
 		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 		android:persistent="true" />
-	<SwitchPreference android:key="c2dm_messages"
-	    android:defaultValue="true"
-		android:enabled="true" android:layout="@layout/boid_preference"
-		android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
-		android:persistent="true" />
+	<PreferenceCategory
+	    android:title="@string/messages_str">
+		<SwitchPreference android:key="c2dm_messages"
+		    android:defaultValue="true"
+			android:enabled="true" android:layout="@layout/boid_preference"
+			android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
+			android:persistent="true" />
+		<SwitchPreference android:key="c2dm_messages_priv"
+		    android:defaultValue="false"
+		    android:enabled="true" android:layout="@layout/boid_preference"
+			android:summary="@string/messages_priv_desc" android:title="@string/messages_priv"
+			android:persistent="true" />
+	</PreferenceCategory>
 	<SwitchPreference android:key="c2dm_vibrate"
 		android:enabled="true" android:layout="@layout/boid_preference"
 		android:summary="@string/vibrate_str_desc" android:title="@string/vibrate_str"
 		android:persistent="true" />
-	<ListPreference android:key="c2dm_ringtone"
+	<RingtonePreference android:key="c2dm_ringtone"
+	    android:showSilent="true"
 		android:enabled="true" android:summary="@string/ringtone_str_desc"
 		android:title="@string/ringtone_str" android:persistent="true" />
 </PreferenceScreen>

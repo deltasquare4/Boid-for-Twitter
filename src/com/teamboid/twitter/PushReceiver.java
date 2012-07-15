@@ -108,7 +108,7 @@ public class PushReceiver extends BroadcastReceiver {
 						//TODO The account the mention is for should be passed from the server too
 						// We have this now in "account" as a string
 						//Also, we need a way of combining multiple mentions/messages into one notification.
-						Api11.displayNotification(PushWorker.this, s);
+						Api11.displayReplyNotification(PushWorker.this, s);
 						AccountService.activity.runOnUiThread(new Runnable(){
 	
 							@Override
@@ -122,7 +122,7 @@ public class PushReceiver extends BroadcastReceiver {
 						JSONObject json = new JSONObject(b.getString("tweet"));
 						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
 						
-						// TODO: Display it
+						Api11.displayDirectMessageNotification(PushWorker.this, dm);
 					}
 				} catch(Exception e) {
 					e.printStackTrace();
