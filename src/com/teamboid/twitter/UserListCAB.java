@@ -117,13 +117,6 @@ public class UserListCAB {
 				if(users.length == 0) {
 					UserListCAB.UserActionMode.finish();
 				} else {
-					if(beforeChecked == 1 && users.length > 1) {
-						UserListCAB.UserActionMode.getMenu().clear();
-						UserListCAB.UserActionMode.getMenuInflater().inflate(R.menu.multi_tweet_cab, UserListCAB.UserActionMode.getMenu());
-					} else if(beforeChecked > 1 && users.length == 1) {
-						UserListCAB.UserActionMode.getMenu().clear();
-						UserListCAB.UserActionMode.getMenuInflater().inflate(R.menu.single_tweet_cab, UserListCAB.UserActionMode.getMenu());
-					}
 					UserListCAB.updateTitle();
 					UserListCAB.updateMenuItems(users, UserListCAB.UserActionMode.getMenu());
 				}
