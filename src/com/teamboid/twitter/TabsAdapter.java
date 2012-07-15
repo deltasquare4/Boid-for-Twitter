@@ -245,6 +245,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		public abstract Status[] getSelectedStatuses();
+		
+		public abstract User[] getSelectedUsers();
+	
+		public abstract Tweet[] getSelectedTweets();
+		
+		public abstract DMConversation[] getSelectedMessages();
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -600,6 +606,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class MentionsFragment extends BaseListFragment {
@@ -815,6 +830,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class MessagesFragment extends BaseListFragment {
@@ -945,6 +969,27 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { 
+			if(adapt == null) return null;
+			ArrayList<DMConversation> toReturn = new ArrayList<DMConversation>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((DMConversation)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new DMConversation[0]);
+		}
 	}
 
 	public static class TrendsFragment extends BaseSpinnerFragment {
@@ -1356,6 +1401,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class SearchTweetsFragment extends BaseListFragment {
@@ -1535,6 +1589,27 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() {
+			if(context.tweetAdapter == null) return null;
+			ArrayList<Tweet> toReturn = new ArrayList<Tweet>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Tweet)context.tweetAdapter.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Tweet[0]);
+		}
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class SearchUsersFragment extends BaseListFragment {
@@ -1694,7 +1769,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
-	
+
+		@Override
 		public User[] getSelectedUsers() {
 			if(context.userAdapter == null) return null;
 			ArrayList<User> toReturn = new ArrayList<User>(); 
@@ -1708,6 +1784,12 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new User[0]);
 		}
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class SavedSearchFragment extends BaseListFragment {
@@ -1934,6 +2016,27 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() {
+			if(adapt == null) return null;
+			ArrayList<Tweet> toReturn = new ArrayList<Tweet>(); 
+			SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+			if(checkedItems != null) {
+				for(int i = 0; i < checkedItems.size(); i++) {
+					if(checkedItems.valueAt(i)) {
+						toReturn.add((Tweet)adapt.getItem(checkedItems.keyAt(i)));
+					}
+				}
+			}
+			return toReturn.toArray(new Tweet[0]);
+		}
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class NearbyFragment extends BaseSpinnerFragment {
@@ -2456,6 +2559,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class MediaTimelineFragment extends BaseGridFragment {
@@ -2610,8 +2722,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 				@Override
 				public void run() {
 					Paging paging = new Paging(1, 50);
-					if (paginate)
-						paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+					if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 					final Account acc = AccountService.getCurrentAccount();
 					if (acc != null) {
 						try {
@@ -2626,15 +2737,11 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 									HttpGet g = new HttpGet(url);
 									HttpResponse r = httpclient.execute(g);
 									if (r.getStatusLine().getStatusCode() == 200) {
-										JSONObject jo = new JSONObject(
-												EntityUtils.toString(r
-														.getEntity()));
-										JSONArray results = jo
-												.getJSONArray("results");
+										JSONObject jo = new JSONObject(EntityUtils.toString(r.getEntity()));
+										JSONArray results = jo.getJSONArray("results");
 										int i = 0;
 										while (i < results.length()) {
-											final JSONObject result = results
-													.getJSONObject(i);
+											final JSONObject result = results.getJSONObject(i);
 											i++;
 											context.runOnUiThread(new Runnable() {
 
@@ -2663,9 +2770,7 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 											});
 										}
-									} else
-										throw new Exception(
-												"non-200 response code");
+									} else throw new Exception("non-200 response code");
 								} catch (Exception e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
@@ -2676,13 +2781,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 										}
 									});
 								}
-								// TODO: temp =
-								// acc.getClient().getUserTimeline(screenName,
-								// paging);
-							} else { // OLD mechanism, I wish Twitter made this
-								// better
-								ResponseList<Status> temp = acc.getClient()
-										.getHomeTimeline(paging);
+							} else {
+								ResponseList<Status> temp = acc.getClient().getHomeTimeline(paging);
 								for (final Status p : temp) {
 									if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
 										context.runOnUiThread(new Runnable() {
@@ -3019,6 +3119,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
@@ -3237,6 +3346,16 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			}
 			return toReturn.toArray(new Status[0]);
 		}
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
+
 	}
 
 	public static class ProfileAboutFragment extends ProfilePaddedFragment {
@@ -3413,6 +3532,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 
 	public static class MyListsFragment extends BaseListFragment {
@@ -3552,5 +3680,14 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 
 		@Override
 		public Status[] getSelectedStatuses() { return null; }
+	
+		@Override
+		public User[] getSelectedUsers() { return null; }
+
+		@Override
+		public Tweet[] getSelectedTweets() { return null; }
+
+		@Override
+		public DMConversation[] getSelectedMessages() { return null; }
 	}
 }

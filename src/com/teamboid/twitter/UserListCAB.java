@@ -15,9 +15,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.SearchUsersFragment;
 
 /**
  * The contextual action bar for any lists/columns that display twitter4j.User objects.
@@ -43,9 +43,9 @@ public class UserListCAB {
 		}
 	}
 	public static User[] getSelectedUsers() {
+		ArrayList<User> toReturn = new ArrayList<User>();
 		if(context instanceof UserListActivity) {
-			UserListActivity activity = (UserListActivity)context;
-			ArrayList<User> toReturn = new ArrayList<User>(); 
+			UserListActivity activity = (UserListActivity)context; 
 			SparseBooleanArray checkedItems = activity.getListView().getCheckedItemPositions();
 			if(checkedItems != null) {
 				for(int i = 0; i < checkedItems.size(); i++) {
@@ -54,20 +54,18 @@ public class UserListCAB {
 					}
 				}
 			}
-			return toReturn.toArray(new User[0]);
 		} else {
-			ArrayList<User> toReturn = new ArrayList<User>();
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag instanceof SearchUsersFragment) {
-					User[] toAdd = ((SearchUsersFragment)frag).getSelectedUsers();
+				if(frag instanceof BaseListFragment) {
+					User[] toAdd = ((BaseListFragment)frag).getSelectedUsers();
 					if(toAdd != null && toAdd.length > 0) {
 						for(User u : toAdd) toReturn.add(u);
 					}
 				}
 			}
-			return toReturn.toArray(new User[0]);
 		}
+		return toReturn.toArray(new User[0]);
 	}
 
 	public static void updateTitle() {
@@ -117,6 +115,7 @@ public class UserListCAB {
 			} else {
 				final User[] users = UserListCAB.getSelectedUsers();
 				if(users.length == 0) {
+					Toast.makeText(context, "No selected users!", Toast.LENGTH_SHORT).show();
 					UserListCAB.UserActionMode.finish();
 				} else {
 					if(beforeChecked == 1 && users.length > 1) {
@@ -145,11 +144,9 @@ public class UserListCAB {
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			UserListCAB.UserActionMode = mode;
 			MenuInflater inflater = mode.getMenuInflater();
-			User[] selUsers = UserListCAB.getSelectedUsers();
-			if(selUsers.length > 1) inflater.inflate(R.menu.multi_tweet_cab, menu);
-			else inflater.inflate(R.menu.single_tweet_cab, menu);
+			inflater.inflate(R.menu.user_cab, menu);
 			updateTitle();
-			updateMenuItems(selUsers, menu);
+			updateMenuItems(UserListCAB.getSelectedUsers(), menu);
 			return true;
 		}
 

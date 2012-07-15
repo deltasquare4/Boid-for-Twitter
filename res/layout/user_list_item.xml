@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent"
-	android:paddingTop="5dp" android:paddingRight="5dp"
-	android:paddingBottom="5dp">
+	android:paddingTop="5dp" android:paddingRight="5dp" android:paddingBottom="5dp" 
+	android:background="?android:attr/activatedBackgroundIndicator">
 	<com.handlerexploit.prime.widgets.RemoteImageView
 		android:id="@+id/userItemProfilePic" android:layout_width="60dp"
 		android:layout_height="60dp" android:layout_marginRight="10dp"
 		android:src="@drawable/sillouette" />
-	<TextView android:id="@+id/userItemName" android:textColor="?usernameColor"
+	<TextView android:id="@+id/userItemName" android:textColor="?usernameColor" android:duplicateParentState="true"
 		android:singleLine="true" android:layout_width="wrap_content"
 		android:layout_marginRight="10dp" android:layout_height="wrap_content"
 		android:layout_toRightOf="@+id/userItemProfilePic" android:textStyle="bold"
 		android:textAppearance="?android:attr/textAppearanceSmall" />
-	<TextView android:id="@+id/userItemDescription"
+	<TextView android:id="@+id/userItemDescription" android:duplicateParentState="true"
 		android:layout_marginRight="5dp" android:textColor="?tweetColor"
 		android:textColorLink="?linkColor" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_below="@+id/userItemName"

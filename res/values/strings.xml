@@ -229,6 +229,7 @@
 
 	<string name="timeline_str">Timeline</string>
 	<string name="media_timeline_str">Media Timeline</string>
+	<string name="mention_str">Mention</string>
 	<string name="mentions_str">Mentions</string>
 	<string name="messages_str">Messages</string>
 	<string name="trends_str">Trends</string>
@@ -239,7 +240,6 @@
 	<string name="load_widget">Loading {widget}…</string>
 	<string name="youtube_embed">YouTube Embed</string>
 	<string name="error_in_widget">There was a problem loading {widget}</string>
-	<string name="choose_how_to_share">Choose the format</string>
 	<string name="user_followers">{user}\'s Followers</string>
 	<string name="user_following">{user} is Following</string>
 	<string name="user_favorites">{user}\'s Favorites</string>

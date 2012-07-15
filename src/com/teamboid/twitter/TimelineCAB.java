@@ -47,9 +47,9 @@ public class TimelineCAB {
 		}
 	}
 	public static Status[] getSelectedTweets() {
+		ArrayList<Status> toReturn = new ArrayList<Status>();
 		if(context instanceof TweetListActivity) {
 			TweetListActivity activity = (TweetListActivity)context;
-			ArrayList<Status> toReturn = new ArrayList<Status>(); 
 			SparseBooleanArray checkedItems = activity.getListView().getCheckedItemPositions();
 			if(checkedItems != null) {
 				for(int i = 0; i < checkedItems.size(); i++) {
@@ -58,9 +58,7 @@ public class TimelineCAB {
 					}
 				}
 			}
-			return toReturn.toArray(new Status[0]);
 		} else {
-			ArrayList<Status> toReturn = new ArrayList<Status>();
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
 				if(frag instanceof BaseListFragment) {
@@ -70,8 +68,8 @@ public class TimelineCAB {
 					}
 				}
 			}
-			return toReturn.toArray(new Status[0]);
 		}
+		return toReturn.toArray(new Status[0]);
 	}
 
 	public static void updateTitle() {
