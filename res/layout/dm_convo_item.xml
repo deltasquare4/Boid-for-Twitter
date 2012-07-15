@@ -3,7 +3,7 @@
 	android:id="@+id/convoRelativeLayout" android:layout_width="match_parent"
 	android:layout_height="match_parent" android:paddingTop="5dp"
 	android:paddingRight="5dp" android:paddingBottom="5dp">
-	<com.handlerexploit.prime.widgets.RemoteImageView
+	<com.handlerexploit.prime.RemoteImageView
 		android:id="@+id/dmConvoProfileImg" android:layout_marginRight="10dp"
 		android:layout_width="60dp" android:layout_height="60dp"
 		android:src="@drawable/sillouette" />
@@ -12,7 +12,7 @@
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:layout_toRightOf="@+id/dmConvoProfileImg"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-	<com.handlerexploit.prime.widgets.RemoteImageView
+	<com.handlerexploit.prime.RemoteImageView
 		android:id="@+id/dmConvoReplyIndicator" android:visibility="gone"
 		android:layout_toRightOf="@+id/dmConvoProfileImg"
 		android:layout_marginRight="5dp" android:layout_width="15dp"
