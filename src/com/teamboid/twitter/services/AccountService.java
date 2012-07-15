@@ -30,10 +30,13 @@ import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.utilities.NetworkUtils;
 
 /**
- * The service that stays running the background; authorizes, loads, and manages the current user's accounts.
+ * The service that stays running the background; authorizes, loads, and manages
+ * the current user's accounts.
+ * 
  * @author Aidan Follestad
  */
-public class AccountService extends Service {
+public class AccountService extends Service
+{
 
 	public static Twitter pendingClient;
 	public static Activity activity;
@@ -49,111 +52,180 @@ public class AccountService extends Service {
 	public static int charactersPerMedia;
 	public static long selectedAccount;
 
-	public static ArrayList<Account> getAccounts() {
-		if(accounts == null) accounts = new ArrayList<Account>();
+	public static ArrayList<Account> getAccounts()
+	{
+		if (accounts == null)
+			accounts = new ArrayList<Account>();
 		return accounts;
 	}
-	public static boolean existsAccount(long accId) {
+
+	public static boolean existsAccount(long accId)
+	{
 		boolean found = false;
-		for(int i = 0; i < accounts.size(); i++) {
-			if(accounts.get(i).getId() == accId) {
+		for (int i = 0; i < accounts.size(); i++)
+		{
+			if (accounts.get(i).getId() == accId)
+			{
 				found = true;
 				break;
 			}
 		}
 		return found;
 	}
-	public static void setAccount(int index, Account acc) {
-		if(accounts == null) accounts = new ArrayList<Account>();
+
+	public static void setAccount(int index, Account acc)
+	{
+		if (accounts == null)
+			accounts = new ArrayList<Account>();
 		accounts.set(index, acc);
 	}
-	public static Account getCurrentAccount() {
-		if(selectedAccount == 0) return null;
+
+	public static Account getCurrentAccount()
+	{
+		if (selectedAccount == 0)
+			return null;
 		Account toReturn = null;
-		for(Account acc : getAccounts()) {
-			if(acc.getUser().getId() == selectedAccount) {
+		for (Account acc : getAccounts())
+		{
+			if (acc.getUser().getId() == selectedAccount)
+			{
 				toReturn = acc;
 				break;
 			}
 		}
 		return toReturn;
 	}
-	public static void removeAccount(Context activity, Account acc) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+	public static void removeAccount(Context activity, Account acc)
+	{
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(activity);
 		prefs.edit().remove(Long.toString(acc.getId()) + "_columns").commit();
 		prefs.edit().remove(Long.toString(acc.getId()) + "_muting").commit();
-		activity.getSharedPreferences("accounts", 0).edit().remove(acc.getToken()).commit();
-		for(int i = 0; i < accounts.size(); i++) {
-			if(accounts.get(i).getToken().equals(acc.getToken())) {
+		activity.getSharedPreferences("accounts", 0).edit()
+				.remove(acc.getToken()).commit();
+		for (int i = 0; i < accounts.size(); i++)
+		{
+			if (accounts.get(i).getToken().equals(acc.getToken()))
+			{
 				accounts.remove(i);
 				break;
 			}
 		}
 	}
-	
-	public static ConfigurationBuilder getConfiguration(String token, String secret){
+
+	public static ConfigurationBuilder getConfiguration(String token,
+			String secret)
+	{
 		return new ConfigurationBuilder()
-			.setDebugEnabled(true)
-			.setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
-			.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
-			.setOAuthAccessToken(token)
-			.setOAuthAccessTokenSecret(secret)
-			.setUseSSL(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
+				.setDebugEnabled(true)
+				.setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
+				.setOAuthConsumerSecret(
+						"j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
+				.setOAuthAccessToken(token)
+				.setOAuthAccessTokenSecret(secret)
+				.setUseSSL(
+						PreferenceManager.getDefaultSharedPreferences(activity)
+								.getBoolean("enable_ssl", false));
 	}
-	
-	public static void verifyAccount(final String verifier) {
-		final Toast act = Toast.makeText(activity, activity.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
+
+	public static void verifyAccount(final String verifier)
+	{
+		final Toast act = Toast.makeText(activity,
+				activity.getString(R.string.authorizing_account),
+				Toast.LENGTH_LONG);
 		act.show();
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					if(pendingClient == null) {
-						activity.runOnUiThread(new Runnable() {
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (pendingClient == null)
+					{
+						activity.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() { 
+							public void run()
+							{
 								act.cancel();
-								Toast.makeText(activity, activity.getString(R.string.authorization_error), Toast.LENGTH_LONG).show();
-								activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
+								Toast.makeText(
+										activity,
+										activity.getString(R.string.authorization_error),
+										Toast.LENGTH_LONG).show();
+								activity.sendBroadcast(new Intent(
+										AccountManager.END_LOAD));
 							}
 						});
 						return;
 					}
-					final AccessToken accessToken = pendingClient.getOAuthAccessToken(verifier);
-					ConfigurationBuilder cb = getConfiguration(accessToken.getToken(), accessToken.getTokenSecret());
-					final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
+					final AccessToken accessToken = pendingClient
+							.getOAuthAccessToken(verifier);
+					ConfigurationBuilder cb = getConfiguration(
+							accessToken.getToken(),
+							accessToken.getTokenSecret());
+					final Twitter toAdd = new TwitterFactory(cb.build())
+							.getInstance();
 					final User toAddUser = toAdd.verifyCredentials();
 					ArrayList<Account> accs = getAccounts();
-					for(Account user : accs) {
-						if(user.getUser().getId() == toAddUser.getId()) {
-							activity.runOnUiThread(new Runnable() {
+					for (Account user : accs)
+					{
+						if (user.getUser().getId() == toAddUser.getId())
+						{
+							activity.runOnUiThread(new Runnable()
+							{
 								@Override
-								public void run() { 
+								public void run()
+								{
 									act.cancel();
-									Toast.makeText(activity, activity.getString(R.string.account_already_added), Toast.LENGTH_LONG).show();
-									activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
+									Toast.makeText(
+											activity,
+											activity.getString(R.string.account_already_added),
+											Toast.LENGTH_LONG).show();
+									activity.sendBroadcast(new Intent(
+											AccountManager.END_LOAD));
 								}
 							});
 							return;
 						}
 					}
-					activity.getSharedPreferences("accounts", 0).edit().putString(accessToken.getToken(), accessToken.getTokenSecret()).commit();
-					accounts.add(new Account(activity, toAdd, accessToken.getToken()).setSecret(accessToken.getTokenSecret()).setUser(toAddUser));
+					activity.getSharedPreferences("accounts", 0)
+							.edit()
+							.putString(accessToken.getToken(),
+									accessToken.getTokenSecret()).commit();
+					accounts.add(new Account(activity, toAdd, accessToken
+							.getToken())
+							.setSecret(accessToken.getTokenSecret()).setUser(
+									toAddUser));
 					pendingClient = null;
-					activity.runOnUiThread(new Runnable() {
+					activity.runOnUiThread(new Runnable()
+					{
 						@Override
-						public void run() { 
+						public void run()
+						{
 							act.cancel();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("access_token", accessToken.getToken()));
+							activity.sendBroadcast(new Intent(
+									AccountManager.END_LOAD).putExtra(
+									"access_token", accessToken.getToken()));
 						}
 					});
-				} catch (final TwitterException e) {
+				}
+				catch (final TwitterException e)
+				{
 					e.printStackTrace();
-					activity.runOnUiThread(new Runnable() {
+					activity.runOnUiThread(new Runnable()
+					{
 						@Override
-						public void run() { 
+						public void run()
+						{
 							act.cancel();
-							Toast.makeText(activity, activity.getString(R.string.authorization_error) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
+							Toast.makeText(
+									activity,
+									activity.getString(R.string.authorization_error)
+											+ " " + e.getErrorMessage(),
+									Toast.LENGTH_LONG).show();
+							activity.sendBroadcast(new Intent(
+									AccountManager.END_LOAD));
 						}
 					});
 				}
@@ -161,53 +233,93 @@ public class AccountService extends Service {
 		}).start();
 	}
 
-	public static void loadAccounts() {
-		if(activity == null) return;
-		final Map<String, ?> accountStore = activity.getSharedPreferences("accounts", 0).getAll();
-		if(accountStore.size() == 0) {
-			activity.startActivity(new Intent(activity, AccountManager.class));			
+	public static void loadAccounts()
+	{
+		if (activity == null)
 			return;
-		} else if(getAccounts().size() == accountStore.size()) return;
-		if(!NetworkUtils.haveNetworkConnection(activity)) {
-			Toast.makeText(activity, activity.getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+		final Map<String, ?> accountStore = activity.getSharedPreferences(
+				"accounts", 0).getAll();
+		if (accountStore.size() == 0)
+		{
+			activity.startActivity(new Intent(activity, AccountManager.class));
+			return;
+		}
+		else if (getAccounts().size() == accountStore.size())
+			return;
+		if (!NetworkUtils.haveNetworkConnection(activity))
+		{
+			Toast.makeText(activity, activity.getString(R.string.no_internet),
+					Toast.LENGTH_LONG).show();
 			return;
 		}
 		final int lastAccountCount = getAccounts().size();
-		final ProgressDialog dialog = ProgressDialog.show(activity, "", activity.getString(R.string.loading_accounts), true);
-		new Thread(new Runnable() {
-			public void run() {
-				for(final String token : accountStore.keySet()) {
+		final ProgressDialog dialog = ProgressDialog.show(activity, "",
+				activity.getString(R.string.loading_accounts), true);
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				for (final String token : accountStore.keySet())
+				{
 					boolean skip = false;
-					for(int i = 0; i < accounts.size(); i++) {
+					for (int i = 0; i < accounts.size(); i++)
+					{
 						Account acc = accounts.get(i);
-						if(acc.getToken().equals(token)) {
+						if (acc.getToken().equals(token))
+						{
 							skip = true;
 							break;
 						}
 					}
-					if(skip) continue;
-					ConfigurationBuilder cb = getConfiguration(token, accountStore.get(token).toString());
-					final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
-					try {
+					if (skip)
+						continue;
+					ConfigurationBuilder cb = getConfiguration(token,
+							accountStore.get(token).toString());
+					final Twitter toAdd = new TwitterFactory(cb.build())
+							.getInstance();
+					try
+					{
 						final User accountUser = toAdd.verifyCredentials();
-						accounts.add(new Account(activity, toAdd, token).setSecret(accountStore.get(token).toString()).setUser(accountUser));
-					} catch (final TwitterException e) {
+						accounts.add(new Account(activity, toAdd, token)
+								.setSecret(accountStore.get(token).toString())
+								.setUser(accountUser));
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						activity.runOnUiThread(new Runnable() {
+						activity.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() { Toast.makeText(activity, activity.getString(R.string.failed_load_account) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
+							public void run()
+							{
+								Toast.makeText(
+										activity,
+										activity.getString(R.string.failed_load_account)
+												+ " " + e.getErrorMessage(),
+										Toast.LENGTH_LONG).show();
+							}
 						});
 					}
 				}
-				activity.runOnUiThread(new Runnable() {
+				activity.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
-						if(getAccounts().size() > 0) {
-							if(getAccounts().size() != lastAccountCount) {
+					public void run()
+					{
+						if (getAccounts().size() > 0)
+						{
+							if (getAccounts().size() != lastAccountCount)
+							{
 								selectedAccount = accounts.get(0).getId();
-								activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
+								activity.sendBroadcast(new Intent(
+										AccountManager.END_LOAD).putExtra(
+										"last_account_count",
+										lastAccountCount == 0));
 							}
-						} else activity.startActivity(new Intent(activity, AccountManager.class));
+						}
+						else
+							activity.startActivity(new Intent(activity,
+									AccountManager.class));
 						activity.invalidateOptionsMenu();
 						dialog.dismiss();
 					}
@@ -216,31 +328,59 @@ public class AccountService extends Service {
 		}).start();
 	}
 
-	public static void loadTwitterConfig(final Activity context) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		long lastConfigUpdate = prefs.getLong("last_config_update", new Date().getTime() - 86400000);
+	public static void loadTwitterConfig(final Activity context)
+	{
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		long lastConfigUpdate = prefs.getLong("last_config_update",
+				new Date().getTime() - 86400000);
 		configShortURLLength = 21;
 		charactersPerMedia = 21;
-		if(lastConfigUpdate <= (new Date().getTime() - 86400000)) {
-			Log.i("BOID", "Loading Twitter config (this should only happen once every 24 hours)...");
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						final Twitter tempClient = new TwitterFactory().getInstance();
-						tempClient.setOAuthConsumer("5LvP1d0cOmkQleJlbKICtg", "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI");
-						TwitterAPIConfiguration config = tempClient.getAPIConfiguration();
+		if (lastConfigUpdate <= (new Date().getTime() - 86400000))
+		{
+			Log.i("BOID",
+					"Loading Twitter config (this should only happen once every 24 hours)...");
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						final Twitter tempClient = new TwitterFactory()
+								.getInstance();
+						tempClient.setOAuthConsumer("5LvP1d0cOmkQleJlbKICtg",
+								"j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI");
+						TwitterAPIConfiguration config = tempClient
+								.getAPIConfiguration();
 						configShortURLLength = config.getShortURLLength();
-						charactersPerMedia = config.getCharactersReservedPerMedia();
-						prefs.edit().putInt("shorturl_length", config.getShortURLLength()).putLong("last_config_update", new Date().getTime())
-							.putInt("mediachars_length", config.getCharactersReservedPerMedia()).commit();
-					} catch(final TwitterException e) {
+						charactersPerMedia = config
+								.getCharactersReservedPerMedia();
+						prefs.edit()
+								.putInt("shorturl_length",
+										config.getShortURLLength())
+								.putLong("last_config_update",
+										new Date().getTime())
+								.putInt("mediachars_length",
+										config.getCharactersReservedPerMedia())
+								.commit();
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
 						configShortURLLength = 21;
 						charactersPerMedia = 21;
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() { 
-								Toast.makeText(context, context.getString(R.string.failed_fetch_config).replace("{reason}", e.getErrorMessage()), Toast.LENGTH_LONG).show();
+							public void run()
+							{
+								Toast.makeText(
+										context,
+										context.getString(
+												R.string.failed_fetch_config)
+												.replace("{reason}",
+														e.getErrorMessage()),
+										Toast.LENGTH_LONG).show();
 							}
 						});
 					}
@@ -249,110 +389,165 @@ public class AccountService extends Service {
 		}
 	}
 
-	public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account) {
-		if(feedAdapters == null) feedAdapters = new ArrayList<FeedListAdapter>();
+	public static FeedListAdapter getFeedAdapter(Activity activity, String id,
+			long account)
+	{
+		if (feedAdapters == null)
+			feedAdapters = new ArrayList<FeedListAdapter>();
 		FeedListAdapter toReturn = null;
-		for(FeedListAdapter adapt : feedAdapters) {
-			if(id.equals(adapt.ID) && account == adapt.account) {
+		for (FeedListAdapter adapt : feedAdapters)
+		{
+			if (id.equals(adapt.ID) && account == adapt.account)
+			{
 				toReturn = adapt;
 				break;
 			}
 		}
-		if(toReturn == null) {
+		if (toReturn == null)
+		{
 			toReturn = new FeedListAdapter(activity, id, account);
 			feedAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static void clearFeedAdapter(Activity activity, String id, long account) {
-		if(feedAdapters == null) return;
-		for(int i = 0; i < feedAdapters.size(); i++) {
-			FeedListAdapter curAdapt = feedAdapters.get(i); 
-			if(curAdapt.ID.equals(id) && curAdapt.account == account) {
+
+	public static void clearFeedAdapter(Activity activity, String id,
+			long account)
+	{
+		if (feedAdapters == null)
+			return;
+		for (int i = 0; i < feedAdapters.size(); i++)
+		{
+			FeedListAdapter curAdapt = feedAdapters.get(i);
+			if (curAdapt.ID.equals(id) && curAdapt.account == account)
+			{
 				curAdapt.clear();
 				feedAdapters.set(i, curAdapt);
 				break;
 			}
 		}
 	}
-	public static MediaFeedListAdapter getMediaFeedAdapter(Activity activity, String id, long account) {
-		if(mediaAdapters == null) mediaAdapters = new ArrayList<MediaFeedListAdapter>();
+
+	public static MediaFeedListAdapter getMediaFeedAdapter(Activity activity,
+			String id, long account)
+	{
+		if (mediaAdapters == null)
+			mediaAdapters = new ArrayList<MediaFeedListAdapter>();
 		MediaFeedListAdapter toReturn = null;
-		for(MediaFeedListAdapter adapt : mediaAdapters) {
-			if(id.equals(adapt.ID) && account == adapt.account) {
+		for (MediaFeedListAdapter adapt : mediaAdapters)
+		{
+			if (id.equals(adapt.ID) && account == adapt.account)
+			{
 				toReturn = adapt;
 				break;
 			}
 		}
-		if(toReturn == null) {
+		if (toReturn == null)
+		{
 			toReturn = new MediaFeedListAdapter(activity, id, account);
 			mediaAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static MessageConvoAdapter getMessageConvoAdapter(Activity activity, long account) {
-		if(messageAdapters == null) messageAdapters = new ArrayList<MessageConvoAdapter>();
+
+	public static MessageConvoAdapter getMessageConvoAdapter(Activity activity,
+			long account)
+	{
+		if (messageAdapters == null)
+			messageAdapters = new ArrayList<MessageConvoAdapter>();
 		MessageConvoAdapter toReturn = null;
-		for(MessageConvoAdapter adapt : messageAdapters) {
-			if(account == adapt.account) {
+		for (MessageConvoAdapter adapt : messageAdapters)
+		{
+			if (account == adapt.account)
+			{
 				toReturn = adapt;
 				break;
 			}
 		}
-		if(toReturn == null) {
+		if (toReturn == null)
+		{
 			toReturn = new MessageConvoAdapter(activity, account);
 			messageAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static TrendsListAdapter getTrendsAdapter(Activity activity) {
-		if(trendsAdapter == null) trendsAdapter = new TrendsListAdapter(activity);
+
+	public static TrendsListAdapter getTrendsAdapter(Activity activity)
+	{
+		if (trendsAdapter == null)
+			trendsAdapter = new TrendsListAdapter(activity);
 		return trendsAdapter;
 	}
-	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity, String id, long account) {
-		if(searchFeedAdapters == null) searchFeedAdapters = new ArrayList<SearchFeedListAdapter>();
+
+	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity,
+			String id, long account)
+	{
+		if (searchFeedAdapters == null)
+			searchFeedAdapters = new ArrayList<SearchFeedListAdapter>();
 		SearchFeedListAdapter toReturn = null;
-		for(SearchFeedListAdapter adapt : searchFeedAdapters) {
-			if(id.equals(adapt.ID) && account == adapt.account) {
+		for (SearchFeedListAdapter adapt : searchFeedAdapters)
+		{
+			if (id.equals(adapt.ID) && account == adapt.account)
+			{
 				toReturn = adapt;
 				break;
 			}
 		}
-		if(toReturn == null) {
+		if (toReturn == null)
+		{
 			toReturn = new SearchFeedListAdapter(activity, id, account);
 			searchFeedAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
-	public static SearchFeedListAdapter getNearbyAdapter(Activity activity) {
-		if(nearbyAdapter == null) nearbyAdapter = new SearchFeedListAdapter(activity, 0);
+
+	public static SearchFeedListAdapter getNearbyAdapter(Activity activity)
+	{
+		if (nearbyAdapter == null)
+			nearbyAdapter = new SearchFeedListAdapter(activity, 0);
 		return nearbyAdapter;
 	}
-	public static UserListDisplayAdapter getMyListsAdapter(Activity activity) {
-		if(myListsAdapter == null) myListsAdapter = new UserListDisplayAdapter(activity);
+
+	public static UserListDisplayAdapter getMyListsAdapter(Activity activity)
+	{
+		if (myListsAdapter == null)
+			myListsAdapter = new UserListDisplayAdapter(activity);
 		return myListsAdapter;
 	}
-	
+
 	@Override
-	public void onCreate() {
+	public void onCreate()
+	{
 		super.onCreate();
 		accounts = new ArrayList<Account>();
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public int onStartCommand(Intent intent, int flags, int startId)
+	{
 		super.onStartCommand(intent, flags, startId);
 		return START_STICKY;
 	}
-	@Override
-	public void onDestroy() { super.onDestroy(); }
-	@Override
-	public IBinder onBind(Intent intent) { return null; }
 
-	public static Account getAccount(long accId) {
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+	}
+
+	@Override
+	public IBinder onBind(Intent intent)
+	{
+		return null;
+	}
+
+	public static Account getAccount(long accId)
+	{
 		Account result = null;
-		for(int i = 0; i < accounts.size(); i++) {
-			if(accounts.get(i).getId() == accId) {
+		for (int i = 0; i < accounts.size(); i++)
+		{
+			if (accounts.get(i).getId() == accId)
+			{
 				result = accounts.get(i);
 			}
 		}

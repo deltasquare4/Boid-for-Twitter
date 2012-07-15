@@ -29,10 +29,13 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
 /**
- * Represents the column that displays the feed of a user, this specific one is used in the timeline for profiles that have been pinned.
+ * Represents the column that displays the feed of a user, this specific one is
+ * used in the timeline for profiles that have been pinned.
+ * 
  * @author Aidan Follestad
  */
-public class ProfileTimelineFragment extends BaseListFragment {
+public class ProfileTimelineFragment extends BaseListFragment
+{
 
 	private Activity context;
 	private FeedListAdapter globalAdapter;
@@ -40,51 +43,78 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	public static final String ID = "COLUMNTYPE:PROFILE_FEED";
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
 
-	private FeedListAdapter getAdapter() {
+	private FeedListAdapter getAdapter()
+	{
 		return globalAdapter;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id)
+	{
 		super.onListItemClick(l, v, position, id);
 		Status tweet = (Status) getAdapter().getItem(position);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		if (tweet.isRetweet())
+			tweet = tweet.getRetweetedStatus();
+		context.startActivity(new Intent(context, TweetViewer.class).putExtra(
+				"sr_tweet", Utilities.serializeObject(tweet)).addFlags(
+				Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
-		getListView().setOnScrollListener(
-				new AbsListView.OnScrollListener() {
-					@Override
-					public void onScrollStateChanged(AbsListView view, int scrollState) { }
-					@Override
-					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
-							performRefresh(true);
-						}
-						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-							if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName);									
-							} else {
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
-							}
-						}
+		getListView().setOnScrollListener(new AbsListView.OnScrollListener()
+		{
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState)
+			{
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount)
+			{
+				if (totalItemCount > 0
+						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
+						&& totalItemCount > visibleItemCount)
+				{
+					performRefresh(true);
+				}
+				if (firstVisibleItem == 0
+						&& context.getActionBar().getTabCount() > 0)
+				{
+					if (!PreferenceManager.getDefaultSharedPreferences(context)
+							.getBoolean("enable_iconic_tabs", true))
+					{
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText("@" + screenName);
 					}
-				});
+					else
+					{
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText("");
+					}
+				}
+			}
+		});
 		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
+				new AdapterView.OnItemLongClickListener()
+				{
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), globalAdapter, index);
+					public boolean onItemLongClick(AdapterView<?> arg0,
+							View arg1, int index, long id)
+					{
+						TimelineCAB.performLongPressAction(getListView(),
+								globalAdapter, index);
 						return true;
 					}
 				});
@@ -95,7 +125,8 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		if (getView() == null)
 			return;
@@ -103,71 +134,108 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
 		savePosition();
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || getAdapter() == null) {
+	public void performRefresh(final boolean paginate)
+	{
+		if (context == null || isLoading || getAdapter() == null)
+		{
 			return;
 		}
 		isLoading = true;
 		if (getAdapter().getCount() == 0 && getView() != null)
 			setListShown(false);
 		getAdapter().setLastViewed(getListView());
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				Paging paging = new Paging(1, 50);
 				if (paginate)
 					paging.setMaxId(getAdapter().getItemId(
 							getAdapter().getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						final ResponseList<Status> feed = acc.getClient()
 								.getUserTimeline(screenName, paging);
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.no_tweets));
 								int beforeLast = getAdapter().getCount() - 1;
 								int addedCount = getAdapter().add(
 										feed.toArray(new Status[0]));
-								if (getView() != null) {
+								if (getView() != null)
+								{
 									if (paginate && addedCount > 0)
-										getListView()
-										.smoothScrollToPosition(
+										getListView().smoothScrollToPosition(
 												beforeLast + 1);
 									else if (getView() != null
 											&& getAdapter() != null)
 										getAdapter().restoreLastViewed(
 												getListView());
 								}
-								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName + " (" + Integer.toString(addedCount) + ")");
-								} else {
-									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
+								if (!PreferenceManager
+										.getDefaultSharedPreferences(context)
+										.getBoolean("enable_iconic_tabs", true))
+								{
+									context.getActionBar()
+											.getTabAt(
+													getArguments().getInt(
+															"tab_index"))
+											.setText(
+													"@"
+															+ screenName
+															+ " ("
+															+ Integer
+																	.toString(addedCount)
+															+ ")");
+								}
+								else
+								{
+									context.getActionBar()
+											.getTabAt(
+													getArguments().getInt(
+															"tab_index"))
+											.setText(
+													Integer.toString(addedCount));
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
-								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+							public void run()
+							{
+								setEmptyText(context
+										.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(),
+										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -178,12 +246,14 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
-		if (AccountService.getCurrentAccount() != null) {
-			if (getAdapter() != null && !firstInitialize
-					&& getView() != null)
+	public void reloadAdapter(boolean firstInitialize)
+	{
+		if (AccountService.getCurrentAccount() != null)
+		{
+			if (getAdapter() != null && !firstInitialize && getView() != null)
 				getAdapter().setLastViewed(getListView());
-			if (getAdapter() == null) {
+			if (getAdapter() == null)
+			{
 				globalAdapter = AccountService.getFeedAdapter(context,
 						ProfileTimelineFragment.ID + "@" + screenName,
 						AccountService.getCurrentAccount().getId());
@@ -197,34 +267,47 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 		if (getView() != null && getAdapter() != null)
 			getAdapter().setLastViewed(getListView());
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 		if (getView() != null && getAdapter() != null)
 			getAdapter().restoreLastViewed(getListView());
 	}
 
 	@Override
-	public void jumpTop() {
-		if(getView() != null) getListView().setSelectionFromTop(0, 0);
+	public void jumpTop()
+	{
+		if (getView() != null)
+			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() { }
+	public void filter()
+	{
+	}
 
 	@Override
-	public Status[] getSelectedStatuses() {
-		if(globalAdapter == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)globalAdapter.getItem(checkedItems.keyAt(i)));
+	public Status[] getSelectedStatuses()
+	{
+		if (globalAdapter == null)
+			return null;
+		ArrayList<Status> toReturn = new ArrayList<Status>();
+		SparseBooleanArray checkedItems = getListView()
+				.getCheckedItemPositions();
+		if (checkedItems != null)
+		{
+			for (int i = 0; i < checkedItems.size(); i++)
+			{
+				if (checkedItems.valueAt(i))
+				{
+					toReturn.add((Status) globalAdapter.getItem(checkedItems
+							.keyAt(i)));
 				}
 			}
 		}
@@ -232,11 +315,20 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public User[] getSelectedUsers()
+	{
+		return null;
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public Tweet[] getSelectedTweets()
+	{
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { return null; }
+	public DMConversation[] getSelectedMessages()
+	{
+		return null;
+	}
 }

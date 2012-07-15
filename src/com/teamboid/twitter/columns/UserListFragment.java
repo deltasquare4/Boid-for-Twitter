@@ -30,10 +30,13 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
 /**
- * Represents the user list column type, displays a stream of Status objects retrieved through the user's own or subscribed lists.
+ * Represents the user list column type, displays a stream of Status objects
+ * retrieved through the user's own or subscribed lists.
+ * 
  * @author Aidan Follestad
  */
-public class UserListFragment extends BaseListFragment {
+public class UserListFragment extends BaseListFragment
+{
 
 	private FeedListAdapter adapt;
 	private Activity context;
@@ -42,55 +45,84 @@ public class UserListFragment extends BaseListFragment {
 	private int listID;
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id)
+	{
 		super.onListItemClick(l, v, position, id);
-		if(TimelineCAB.getSelectedTweets().length > 0) {
+		if (TimelineCAB.getSelectedTweets().length > 0)
+		{
 			TimelineCAB.performLongPressAction(getListView(), adapt, position);
-		} else {
+		}
+		else
+		{
 			Status tweet = (Status) adapt.getItem(position);
-			if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			if (tweet.isRetweet())
+				tweet = tweet.getRetweetedStatus();
 			context.startActivity(new Intent(context, TweetViewer.class)
-			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		listName = getArguments().getString("list_name");
 		listID = getArguments().getInt("list_id");
-		getListView().setOnScrollListener(
-				new AbsListView.OnScrollListener() {
-					@Override
-					public void onScrollStateChanged(AbsListView view, int scrollState) { }
-					@Override
-					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
-							performRefresh(true);
-						}
-						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-							final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-							if (!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean( "textual_userlist_tabs", true)) {
-								context.getActionBar()
-								.getTabAt(getArguments().getInt("tab_index")).setText(listName);
-							} else {
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
-							}
-						}
+		getListView().setOnScrollListener(new AbsListView.OnScrollListener()
+		{
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState)
+			{
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount)
+			{
+				if (totalItemCount > 0
+						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
+						&& totalItemCount > visibleItemCount)
+				{
+					performRefresh(true);
+				}
+				if (firstVisibleItem == 0
+						&& context.getActionBar().getTabCount() > 0)
+				{
+					final SharedPreferences prefs = PreferenceManager
+							.getDefaultSharedPreferences(context);
+					if (!prefs.getBoolean("enable_iconic_tabs", true)
+							|| prefs.getBoolean("textual_userlist_tabs", true))
+					{
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText(listName);
 					}
-				});
+					else
+					{
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText("");
+					}
+				}
+			}
+		});
 		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
+				new AdapterView.OnItemLongClickListener()
+				{
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), adapt, index);
+					public boolean onItemLongClick(AdapterView<?> arg0,
+							View arg1, int index, long id)
+					{
+						TimelineCAB.performLongPressAction(getListView(),
+								adapt, index);
 						return true;
 					}
 				});
@@ -100,99 +132,117 @@ public class UserListFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		if (getView() != null && adapt != null)
 			adapt.restoreLastViewed(getListView());
 	}
 
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
 		savePosition();
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
+	public void performRefresh(final boolean paginate)
+	{
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
 		adapt.setLastViewed(getListView());
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				Paging paging = new Paging(1, 50);
 				if (paginate)
 					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						final ResponseList<Status> feed = acc.getClient()
 								.getUserListStatuses(listID, paging);
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.no_tweets));
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed
 										.toArray(new Status[0]));
-								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
+								if (addedCount > 0 || beforeLast > 0)
+								{
+									if (getView() != null)
+									{
 										if (paginate && addedCount > 0)
 											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
+													.smoothScrollToPosition(
+															beforeLast + 1);
 										else if (getView() != null
 												&& adapt != null)
 											adapt.restoreLastViewed(getListView());
 									}
 									final SharedPreferences prefs = PreferenceManager
 											.getDefaultSharedPreferences(context);
-									if (!prefs.getBoolean(
-											"enable_iconic_tabs", true)
+									if (!prefs.getBoolean("enable_iconic_tabs",
+											true)
 											|| prefs.getBoolean(
 													"textual_userlist_tabs",
-													true)) {
+													true))
+									{
 										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
 												.setText(
 														listName
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
+																+ " ("
+																+ Integer
+																		.toString(addedCount)
+																+ ")");
+									}
+									else
 										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
 												.setText(
 														Integer.toString(addedCount));
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
+								Toast.makeText(context, e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -203,17 +253,17 @@ public class UserListFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
+	public void reloadAdapter(boolean firstInitialize)
+	{
 		if (context == null && getActivity() != null)
 			context = getActivity();
-		if (AccountService.getCurrentAccount() != null) {
+		if (AccountService.getCurrentAccount() != null)
+		{
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(
-					context,
-					UserListFragment.ID + "@"
-							+ listName.replace("@", "%40") + "@"
-							+ Integer.toString(listID), AccountService
+			adapt = AccountService.getFeedAdapter(context,
+					UserListFragment.ID + "@" + listName.replace("@", "%40")
+							+ "@" + Integer.toString(listID), AccountService
 							.getCurrentAccount().getId());
 			setListAdapter(adapt);
 			if (adapt.getCount() == 0)
@@ -224,36 +274,46 @@ public class UserListFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 		if (getView() != null && adapt != null)
 			adapt.setLastViewed(getListView());
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 		if (getView() != null && adapt != null)
 			adapt.restoreLastViewed(getListView());
 	}
 
 	@Override
-	public void jumpTop() {
+	public void jumpTop()
+	{
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
+	public void filter()
+	{
 	}
 
 	@Override
-	public Status[] getSelectedStatuses() {
-		if(adapt == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+	public Status[] getSelectedStatuses()
+	{
+		if (adapt == null)
+			return null;
+		ArrayList<Status> toReturn = new ArrayList<Status>();
+		SparseBooleanArray checkedItems = getListView()
+				.getCheckedItemPositions();
+		if (checkedItems != null)
+		{
+			for (int i = 0; i < checkedItems.size(); i++)
+			{
+				if (checkedItems.valueAt(i))
+				{
+					toReturn.add((Status) adapt.getItem(checkedItems.keyAt(i)));
 				}
 			}
 		}
@@ -261,11 +321,20 @@ public class UserListFragment extends BaseListFragment {
 	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public User[] getSelectedUsers()
+	{
+		return null;
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public Tweet[] getSelectedTweets()
+	{
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { return null; }
+	public DMConversation[] getSelectedMessages()
+	{
+		return null;
+	}
 }

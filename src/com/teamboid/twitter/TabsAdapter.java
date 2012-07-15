@@ -32,7 +32,9 @@ import android.widget.TextView;
  * 
  * @author Aidan Follestad
  */
-public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
+public class TabsAdapter extends TaggedFragmentAdapter implements
+		ActionBar.TabListener, ViewPager.OnPageChangeListener
+{
 
 	private final Activity mContext;
 	private final ActionBar mActionBar;
@@ -40,18 +42,21 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 	public boolean filterDefaultColumnSelection = true;
 
-	static final class TabInfo {
+	static final class TabInfo
+	{
 		private final Class<?> clss;
 		private final Bundle args;
 		public boolean aleadySelected;
 
-		TabInfo(Class<?> _class, Bundle _args) {
+		TabInfo(Class<?> _class, Bundle _args)
+		{
 			clss = _class;
 			args = _args;
 		}
 	}
 
-	public TabsAdapter(Activity activity, ViewPager pager) {
+	public TabsAdapter(Activity activity, ViewPager pager)
+	{
 		super(activity.getFragmentManager());
 		mContext = activity;
 		mActionBar = activity.getActionBar();
@@ -61,7 +66,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		mViewPager.setOnPageChangeListener(this);
 	}
 
-	public void addTab(ActionBar.Tab tab, Class<?> clss, int index) {
+	public void addTab(ActionBar.Tab tab, Class<?> clss, int index)
+	{
 		Bundle args = new Bundle();
 		args.putInt("tab_index", index);
 		TabInfo info = new TabInfo(clss, args);
@@ -72,7 +78,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		notifyDataSetChanged();
 	}
 
-	public void addTab(ActionBar.Tab tab, Class<?> clss, int index, String query) {
+	public void addTab(ActionBar.Tab tab, Class<?> clss, int index, String query)
+	{
 		Bundle args = new Bundle();
 		args.putInt("tab_index", index);
 		if (query != null)
@@ -86,7 +93,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	}
 
 	public void addTab(ActionBar.Tab tab, Class<?> clss, int index,
-			String screenName, boolean manualRefresh) {
+			String screenName, boolean manualRefresh)
+	{
 		Bundle args = new Bundle();
 		args.putInt("tab_index", index);
 		if (screenName != null)
@@ -101,7 +109,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	}
 
 	public void addTab(ActionBar.Tab tab, Class<?> clss, int index,
-			String listName, int listId) {
+			String listName, int listId)
+	{
 		Bundle args = new Bundle();
 		args.putInt("tab_index", index);
 		if (listName != null)
@@ -116,50 +125,59 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		notifyDataSetChanged();
 	}
 
-	public void remove(int index) {
+	public void remove(int index)
+	{
 		mTabs.remove(index);
 		mActionBar.removeTabAt(index);
 		notifyDataSetChanged();
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		mTabs.clear();
 		mActionBar.removeAllTabs();
 		notifyDataSetChanged();
 	}
 
 	@Override
-	public int getCount() {
+	public int getCount()
+	{
 		return mTabs.size();
 	}
 
 	@Override
-	public Fragment getItem(int position) {
+	public Fragment getItem(int position)
+	{
 		TabInfo info = mTabs.get(position);
 		return Fragment.instantiate(mContext, info.clss.getName(), info.args);
 	}
 
 	@Override
 	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
+			int positionOffsetPixels)
+	{
 	}
 
 	@Override
-	public void onPageSelected(int position) {
+	public void onPageSelected(int position)
+	{
 		mActionBar.setSelectedNavigationItem(position);
 	}
 
 	@Override
-	public void onPageScrollStateChanged(int state) {
+	public void onPageScrollStateChanged(int state)
+	{
 	}
 
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		if (!filterDefaultColumnSelection) {
+	public void onTabSelected(Tab tab, FragmentTransaction ft)
+	{
+		if (!filterDefaultColumnSelection)
+		{
 			final String prefName = Long.toString(AccountService
 					.getCurrentAccount().getId()) + "_default_column";
 			PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-			.putInt(prefName, tab.getPosition()).apply();
+					.putInt(prefName, tab.getPosition()).apply();
 		}
 		TabInfo curInfo = mTabs.get(tab.getPosition());
 		mViewPager.setCurrentItem(tab.getPosition());
@@ -169,7 +187,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	}
 
 	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	public void onTabUnselected(Tab tab, FragmentTransaction ft)
+	{
 		if (mTabs.size() == 0 || tab.getPosition() > mTabs.size())
 			return;
 		TabInfo curInfo = mTabs.get(tab.getPosition());
@@ -178,12 +197,15 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	}
 
 	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	public void onTabReselected(Tab tab, FragmentTransaction ft)
+	{
 		boolean selected = mTabs.get(tab.getPosition()).aleadySelected;
-		if (selected) {
+		if (selected)
+		{
 			Fragment frag = mContext.getFragmentManager().findFragmentByTag(
 					"page:" + tab.getPosition());
-			if (frag != null) {
+			if (frag != null)
+			{
 				if (frag instanceof BaseListFragment)
 					((BaseListFragment) frag).jumpTop();
 				else if (frag instanceof BaseSpinnerFragment)
@@ -194,7 +216,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-	public static abstract class BaseListFragment extends ListFragment {
+	public static abstract class BaseListFragment extends ListFragment
+	{
 
 		public boolean isLoading;
 
@@ -219,19 +242,22 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract DMConversation[] getSelectedMessages();
 
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
+		public void onCreate(Bundle savedInstanceState)
+		{
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
 
 		@Override
-		public void setEmptyText(CharSequence text) {
+		public void setEmptyText(CharSequence text)
+		{
 			if (getView() != null)
 				super.setEmptyText(text);
 		}
 	}
 
-	public static abstract class BaseSpinnerFragment extends ListFragment {
+	public static abstract class BaseSpinnerFragment extends ListFragment
+	{
 
 		public boolean isLoading;
 		private boolean isShown;
@@ -249,32 +275,39 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
+		public void onCreate(Bundle savedInstanceState)
+		{
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState)
+		{
+			return inflater.inflate(R.layout.spinner_list_fragment, container,
+					false);
 		}
 
-		public Spinner getSpinner() {
+		public Spinner getSpinner()
+		{
 			if (getView() == null)
 				return null;
 			return (Spinner) getView().findViewById(R.id.fragSpinner);
 		}
 
 		@Override
-		public void setEmptyText(CharSequence text) {
+		public void setEmptyText(CharSequence text)
+		{
 			if (getView() == null)
 				return;
 			((TextView) getView().findViewById(android.R.id.empty))
-			.setText(text);
+					.setText(text);
 		}
 
 		@Override
-		public void setListShown(boolean visible) {
+		public void setListShown(boolean visible)
+		{
 			if (getView() == null)
 				return;
 			isShown = visible;
@@ -289,7 +322,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-	public static abstract class BaseGridFragment extends Fragment {
+	public static abstract class BaseGridFragment extends Fragment
+	{
 
 		public boolean isLoading;
 		private boolean isShown;
@@ -305,18 +339,21 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		public abstract void filter();
 
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
+		public void onCreate(Bundle savedInstanceState)
+		{
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+				Bundle savedInstanceState)
+		{
 			return inflater.inflate(R.layout.grid_activity, container, false);
 		}
 
-		public void setListShown(boolean shown) {
+		public void setListShown(boolean shown)
+		{
 			if (getView() == null)
 				return;
 			isShown = shown;
@@ -330,24 +367,27 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 					condition ? View.VISIBLE : View.GONE);
 		}
 
-		public GridView getGridView() {
+		public GridView getGridView()
+		{
 			if (getView() == null)
 				return null;
 			return (GridView) getView().findViewById(android.R.id.list);
 		}
 
-		public void setEmptyText(String text) {
+		public void setEmptyText(String text)
+		{
 			if (getView() == null)
 				return;
 			((TextView) getView().findViewById(android.R.id.empty))
-			.setText(text);
+					.setText(text);
 		}
 
-		public void setListAdapter(ListAdapter adapt) {
+		public void setListAdapter(ListAdapter adapt)
+		{
 			if (getView() == null)
 				return;
 			((ListView) getView().findViewById(android.R.id.list))
-			.setAdapter(adapt);
+					.setAdapter(adapt);
 		}
 	}
 

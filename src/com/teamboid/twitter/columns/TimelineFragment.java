@@ -31,54 +31,79 @@ import com.teamboid.twitter.utilities.Utilities;
 
 /**
  * Represents the column that displays the user's home timeline feed.
+ * 
  * @author Aidan Follestad
  */
-public class TimelineFragment extends BaseListFragment {
+public class TimelineFragment extends BaseListFragment
+{
 
 	private Activity context;
 	private FeedListAdapter adapt;
 	public static final String ID = "COLUMNTYPE:TIMELINE";
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int index, long id) {
+	public void onListItemClick(ListView l, View v, int index, long id)
+	{
 		super.onListItemClick(l, v, index, id);
-		Status tweet = (Status)adapt.getItem(index);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		Status tweet = (Status) adapt.getItem(index);
+		if (tweet.isRetweet())
+			tweet = tweet.getRetweetedStatus();
+		context.startActivity(new Intent(context, TweetViewer.class).putExtra(
+				"sr_tweet", Utilities.serializeObject(tweet)).addFlags(
+				Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		getListView().setOnScrollListener(
-				new AbsListView.OnScrollListener() {
-					@Override
-					public void onScrollStateChanged(AbsListView view, int scrollState) { }
-					@Override
-					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
-							performRefresh(true);
-						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-							if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true))
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.timeline_str);
-							else context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
-						}
-					}
-				});
+		getListView().setOnScrollListener(new AbsListView.OnScrollListener()
+		{
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState)
+			{
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount)
+			{
+				if (totalItemCount > 0
+						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
+						&& totalItemCount > visibleItemCount)
+					performRefresh(true);
+				if (firstVisibleItem == 0
+						&& context.getActionBar().getTabCount() > 0)
+				{
+					if (!PreferenceManager.getDefaultSharedPreferences(context)
+							.getBoolean("enable_iconic_tabs", true))
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText(R.string.timeline_str);
+					else
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText("");
+				}
+			}
+		});
 		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
+				new AdapterView.OnItemLongClickListener()
+				{
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), adapt, index);
+					public boolean onItemLongClick(AdapterView<?> arg0,
+							View arg1, int index, long id)
+					{
+						TimelineCAB.performLongPressAction(getListView(),
+								adapt, index);
 						return true;
 					}
 				});
@@ -88,54 +113,65 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		if (getView() != null && adapt != null)
 			adapt.restoreLastViewed(getListView());
 	}
 
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
 		savePosition();
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
+	public void performRefresh(final boolean paginate)
+	{
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
 		adapt.setLastViewed(getListView());
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				Paging paging = new Paging(1, 50);
 				if (paginate)
 					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						final ResponseList<Status> feed = acc.getClient()
 								.getHomeTimeline(paging);
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.no_tweets));
 								int beforeLast = adapt.getCount() - 1;
 								final SharedPreferences prefs = PreferenceManager
 										.getDefaultSharedPreferences(context);
-								int addedCount = adapt.add(feed
-										.toArray(new Status[0]), prefs
-										.getBoolean("enable_muting", true));
-								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
+								int addedCount = adapt.add(
+										feed.toArray(new Status[0]),
+										prefs.getBoolean("enable_muting", true));
+								if (addedCount > 0 || beforeLast > 0)
+								{
+									if (getView() != null)
+									{
 										if (paginate && addedCount > 0)
 											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
+													.smoothScrollToPosition(
+															beforeLast + 1);
 										else if (getView() != null
 												&& adapt != null)
 											adapt.restoreLastViewed(getListView());
@@ -143,45 +179,51 @@ public class TimelineFragment extends BaseListFragment {
 									if (!PreferenceManager
 											.getDefaultSharedPreferences(
 													context).getBoolean(
-															"enable_iconic_tabs",
-															true)) {
+													"enable_iconic_tabs", true))
+									{
 										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
 												.setText(
 														context.getString(R.string.timeline_str)
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
+																+ " ("
+																+ Integer
+																		.toString(addedCount)
+																+ ")");
+									}
+									else
 										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
 												.setText(
 														Integer.toString(addedCount));
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
+								Toast.makeText(context, e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -192,44 +234,50 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
+	public void reloadAdapter(boolean firstInitialize)
+	{
 		if (context == null && getActivity() != null)
 			context = getActivity();
-		if (AccountService.getCurrentAccount() != null) {
+		if (AccountService.getCurrentAccount() != null)
+		{
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(context,
-					TimelineFragment.ID, AccountService.getCurrentAccount()
-					.getId());
+			adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID,
+					AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
 			if (adapt.getCount() == 0)
 				performRefresh(false);
-			else if (getView() != null && adapt != null) {
+			else if (getView() != null && adapt != null)
+			{
 				adapt.restoreLastViewed(getListView());
 			}
 		}
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 		if (getView() != null && adapt != null)
 			adapt.setLastViewed(getListView());
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 		if (getView() != null && adapt != null)
 			adapt.restoreLastViewed(getListView());
 	}
 
 	@Override
-	public void jumpTop() {
+	public void jumpTop()
+	{
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
+	public void filter()
+	{
 		if (getListView() == null || adapt == null)
 			return;
 		AccountService.clearFeedAdapter(context, TimelineFragment.ID,
@@ -238,14 +286,20 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public Status[] getSelectedStatuses() {
-		if(adapt == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
+	public Status[] getSelectedStatuses()
+	{
+		if (adapt == null)
+			return null;
+		ArrayList<Status> toReturn = new ArrayList<Status>();
+		SparseBooleanArray checkedItems = getListView()
+				.getCheckedItemPositions();
+		if (checkedItems != null)
+		{
+			for (int i = 0; i < checkedItems.size(); i++)
+			{
+				if (checkedItems.valueAt(i))
+				{
+					toReturn.add((Status) adapt.getItem(checkedItems.keyAt(i)));
 				}
 			}
 		}
@@ -253,11 +307,20 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public User[] getSelectedUsers()
+	{
+		return null;
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public Tweet[] getSelectedTweets()
+	{
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { return null; }
+	public DMConversation[] getSelectedMessages()
+	{
+		return null;
+	}
 }

@@ -26,38 +26,47 @@ import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 
 /**
- * Represents the column that displays the current user's direct messaging conversations. 
+ * Represents the column that displays the current user's direct messaging
+ * conversations.
+ * 
  * @author Aidan Follestad
  */
-public class MessagesFragment extends BaseListFragment {
+public class MessagesFragment extends BaseListFragment
+{
 
 	private MessageConvoAdapter adapt;
 	private Activity context;
 	public static final String ID = "COLUMNTYPE:MESSAGES";
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id)
+	{
 		super.onListItemClick(l, v, position, id);
-		startActivity(new Intent(context, ConversationScreen.class)
-		.putExtra("screen_name", ((DMConversation) adapt.getItem(position)).getToScreenName())
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		startActivity(new Intent(context, ConversationScreen.class).putExtra(
+				"screen_name",
+				((DMConversation) adapt.getItem(position)).getToScreenName())
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
+				new AdapterView.OnItemLongClickListener()
+				{
 					@Override
 					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, final int index, long id) {
+							View arg1, final int index, long id)
+					{
 
 						return false;
 					}
@@ -68,48 +77,60 @@ public class MessagesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
+	public void performRefresh(final boolean paginate)
+	{
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						ResponseList<DirectMessage> temp = acc.getClient()
 								.getDirectMessages();
 						temp.addAll(acc.getClient().getSentDirectMessages());
 						final ResponseList<DirectMessage> messages = temp;
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.no_messages));
 								adapt.add(messages
 										.toArray(new DirectMessage[0]));
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
+								Toast.makeText(context, e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -120,10 +141,12 @@ public class MessagesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
+	public void reloadAdapter(boolean firstInitialize)
+	{
 		if (context == null && getActivity() != null)
 			context = getActivity();
-		if (AccountService.getCurrentAccount() != null) {
+		if (AccountService.getCurrentAccount() != null)
+		{
 			adapt = AccountService.getMessageConvoAdapter(context,
 					AccountService.getCurrentAccount().getId());
 			if (getView() != null)
@@ -135,41 +158,61 @@ public class MessagesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 	}
 
 	@Override
-	public void jumpTop() {
+	public void jumpTop()
+	{
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
+	public void filter()
+	{
 	}
 
 	@Override
-	public Status[] getSelectedStatuses() { return null; }
+	public Status[] getSelectedStatuses()
+	{
+		return null;
+	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public User[] getSelectedUsers()
+	{
+		return null;
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public Tweet[] getSelectedTweets()
+	{
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { 
-		if(adapt == null) return null;
-		ArrayList<DMConversation> toReturn = new ArrayList<DMConversation>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((DMConversation)adapt.getItem(checkedItems.keyAt(i)));
+	public DMConversation[] getSelectedMessages()
+	{
+		if (adapt == null)
+			return null;
+		ArrayList<DMConversation> toReturn = new ArrayList<DMConversation>();
+		SparseBooleanArray checkedItems = getListView()
+				.getCheckedItemPositions();
+		if (checkedItems != null)
+		{
+			for (int i = 0; i < checkedItems.size(); i++)
+			{
+				if (checkedItems.valueAt(i))
+				{
+					toReturn.add((DMConversation) adapt.getItem(checkedItems
+							.keyAt(i)));
 				}
 			}
 		}

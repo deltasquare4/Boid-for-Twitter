@@ -28,10 +28,12 @@ import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.services.AccountService;
 
 /**
- * Represents the column that displays current trends. 
+ * Represents the column that displays current trends.
+ * 
  * @author Aidan Follestad
  */
-public class TrendsFragment extends BaseSpinnerFragment {
+public class TrendsFragment extends BaseSpinnerFragment
+{
 
 	private TrendsListAdapter adapt;
 	private Activity context;
@@ -40,7 +42,8 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	public GeoLocation location;
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
@@ -48,15 +51,17 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	private boolean filterSelected;
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id)
+	{
 		super.onListItemClick(l, v, position, id);
-		context.startActivity(new Intent(context, SearchScreen.class)
-		.putExtra("query", (String) adapt.getItem(position))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		context.startActivity(new Intent(context, SearchScreen.class).putExtra(
+				"query", (String) adapt.getItem(position)).addFlags(
+				Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_trends));
@@ -68,38 +73,42 @@ public class TrendsFragment extends BaseSpinnerFragment {
 			spinAdapt.add(t);
 		filterSelected = true;
 		getSpinner().setOnItemSelectedListener(
-				new AdapterView.OnItemSelectedListener() {
+				new AdapterView.OnItemSelectedListener()
+				{
 					@Override
-					public void onItemSelected(AdapterView<?> arg0,
-							View arg1, int index, long arg3) {
+					public void onItemSelected(AdapterView<?> arg0, View arg1,
+							int index, long arg3)
+					{
 						if (filterSelected)
 							return;
-						PreferenceManager
-						.getDefaultSharedPreferences(context)
-						.edit().putInt("last_trend_source", index)
-						.apply();
+						PreferenceManager.getDefaultSharedPreferences(context)
+								.edit().putInt("last_trend_source", index)
+								.apply();
 						performRefresh(false);
 					}
 
 					@Override
-					public void onNothingSelected(AdapterView<?> arg0) {
+					public void onNothingSelected(AdapterView<?> arg0)
+					{
 					}
 				});
 		getSpinner().setAdapter(spinAdapt);
 		filterSelected = false;
 		getSpinner().setSelection(
-				PreferenceManager.getDefaultSharedPreferences(context)
-				.getInt("last_trend_source", 0));
+				PreferenceManager.getDefaultSharedPreferences(context).getInt(
+						"last_trend_source", 0));
 		reloadAdapter(true);
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null
-				|| getView() == null || getSpinner() == null)
+	public void performRefresh(final boolean paginate)
+	{
+		if (context == null || isLoading || adapt == null || getView() == null
+				|| getSpinner() == null)
 			return;
 		else if (location == null
-				&& getSpinner().getSelectedItemPosition() == 2) {
+				&& getSpinner().getSelectedItemPosition() == 2)
+		{
 			getLocation();
 			return;
 		}
@@ -107,56 +116,68 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		adapt.clear();
 		if (getView() != null)
 			setListShown(false);
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						ArrayList<Trends> temp = new ArrayList<Trends>();
-						switch (getSpinner().getSelectedItemPosition()) {
-						default:
-							temp.add(acc.getClient().getDailyTrends()
-									.get(0));
-							break;
-						case 1:
-							temp.add(acc.getClient().getWeeklyTrends()
-									.get(0));
-							break;
-						case 2:
-							final ResponseList<twitter4j.Location> locs = acc
-							.getClient().getAvailableTrends(
-									location);
-							temp.add(acc.getClient().getLocationTrends(
-									locs.get(0).getWoeid()));
-							break;
+						switch (getSpinner().getSelectedItemPosition())
+						{
+							default:
+								temp.add(acc.getClient().getDailyTrends()
+										.get(0));
+								break;
+							case 1:
+								temp.add(acc.getClient().getWeeklyTrends()
+										.get(0));
+								break;
+							case 2:
+								final ResponseList<twitter4j.Location> locs = acc
+										.getClient().getAvailableTrends(
+												location);
+								temp.add(acc.getClient().getLocationTrends(
+										locs.get(0).getWoeid()));
+								break;
 						}
 						final Trends[] trends = temp.toArray(new Trends[0]);
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.no_trends));
 								adapt.add(trends);
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
+								Toast.makeText(context, e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						setListShown(true);
 						isLoading = false;
 					}
@@ -166,7 +187,8 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
+	public void reloadAdapter(boolean firstInitialize)
+	{
 		if (context == null && getActivity() != null)
 			context = getActivity();
 		adapt = AccountService.getTrendsAdapter(context);
@@ -176,32 +198,39 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 	}
 
 	@Override
-	public void jumpTop() {
+	public void jumpTop()
+	{
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
+	public void filter()
+	{
 	}
 
-	private void getLocation() {
+	private void getLocation()
+	{
 		if (isGettingLocation)
 			return;
 		isGettingLocation = true;
 		final LocationManager locationManager = (LocationManager) context
 				.getSystemService(Context.LOCATION_SERVICE);
-		LocationListener locationListener = new LocationListener() {
+		LocationListener locationListener = new LocationListener()
+		{
 			@Override
-			public void onLocationChanged(Location loc) {
+			public void onLocationChanged(Location loc)
+			{
 				locationManager.removeUpdates(this);
 				isGettingLocation = false;
 				location = new GeoLocation(loc.getLatitude(),
@@ -211,15 +240,18 @@ public class TrendsFragment extends BaseSpinnerFragment {
 
 			@Override
 			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
+					Bundle extras)
+			{
 			}
 
 			@Override
-			public void onProviderEnabled(String provider) {
+			public void onProviderEnabled(String provider)
+			{
 			}
 
 			@Override
-			public void onProviderDisabled(String provider) {
+			public void onProviderDisabled(String provider)
+			{
 			}
 		};
 		locationManager.requestLocationUpdates(

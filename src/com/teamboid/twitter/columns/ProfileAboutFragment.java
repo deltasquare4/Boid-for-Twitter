@@ -27,84 +27,118 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
 /**
- * Represents the column that displays details about a profile, it's padded to compesensate for the header in the profile screen.
+ * Represents the column that displays details about a profile, it's padded to
+ * compesensate for the header in the profile screen.
+ * 
  * @author Aidan Follestad
  */
-public class ProfileAboutFragment extends ProfilePaddedFragment {
+public class ProfileAboutFragment extends ProfilePaddedFragment
+{
 
 	private Activity context;
 	private ProfileAboutAdapter adapt;
 	private String screenName;
 
-	public ProfileAboutAdapter getAdapter() {
+	public ProfileAboutAdapter getAdapter()
+	{
 		return adapt;
 	}
 
 	@Override
-	public void onAttach(Activity act) {
+	public void onAttach(Activity act)
+	{
 		super.onAttach(act);
 		context = act;
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id)
+	{
 		super.onListItemClick(l, v, position, id);
 		BasicNameValuePair pair = null;
-		if(AccountService.getCurrentAccount().getUser().getScreenName().equals(screenName)) {
+		if (AccountService.getCurrentAccount().getUser().getScreenName()
+				.equals(screenName))
+		{
 			pair = adapt.values.get(position);
-		} else {
-			if(position == 0) return;
+		}
+		else
+		{
+			if (position == 0)
+				return;
 			pair = adapt.values.get(position - 1);
 		}
-		if (pair.getName().equals(context.getString(R.string.website_str))) {
+		if (pair.getName().equals(context.getString(R.string.website_str)))
+		{
 			String url = pair.getValue();
-			try {
-				context.startActivity(new Intent(Intent.ACTION_VIEW)
-				.setData(Uri.parse(url)).addFlags(
-						Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			} catch (Exception e) {
+			try
+			{
+				context.startActivity(new Intent(Intent.ACTION_VIEW).setData(
+						Uri.parse(url))
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
-		} else if(pair.getName().equals(context.getString(R.string.tweets_str))) {
+		}
+		else if (pair.getName().equals(context.getString(R.string.tweets_str)))
+		{
 			context.getActionBar().setSelectedNavigationItem(0);
-		} else if(pair.getName().equals(context.getString(R.string.location_str))) {
+		}
+		else if (pair.getName()
+				.equals(context.getString(R.string.location_str)))
+		{
 			String loc = null;
-			try {
+			try
+			{
 				loc = URLEncoder.encode(pair.getValue(), "UTF-8");
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 			Intent geo = new Intent(Intent.ACTION_VIEW);
 			geo.setData(Uri.parse("geo:0,0?q=" + loc));
-			if (Utilities.isIntentAvailable(context, geo)) {
-				startActivity(geo);
-			} else {
-				geo.setData(Uri.parse("https://maps.google.com/maps?q="
-						+ loc));
+			if (Utilities.isIntentAvailable(context, geo))
+			{
 				startActivity(geo);
 			}
-		} else if (pair.getName().equals(context.getString(R.string.followers_str))) {
+			else
+			{
+				geo.setData(Uri.parse("https://maps.google.com/maps?q=" + loc));
+				startActivity(geo);
+			}
+		}
+		else if (pair.getName().equals(
+				context.getString(R.string.followers_str)))
+		{
 			Intent intent = new Intent(context, UserListActivity.class)
-			.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
-			.putExtra("user", adapt.user.getId())
-			.putExtra("username", adapt.user.getScreenName());
+					.putExtra("mode", UserListActivity.FOLLOWERS_LIST)
+					.putExtra("user", adapt.user.getId())
+					.putExtra("username", adapt.user.getScreenName());
 			context.startActivity(intent);
-		} else if (pair.getName().equals(context.getString(R.string.friends_str))) {
+		}
+		else if (pair.getName().equals(context.getString(R.string.friends_str)))
+		{
 			Intent intent = new Intent(context, UserListActivity.class)
-			.putExtra("mode", UserListActivity.FOLLOWING_LIST)
-			.putExtra("user", adapt.user.getId())
-			.putExtra("username", adapt.user.getScreenName());
+					.putExtra("mode", UserListActivity.FOLLOWING_LIST)
+					.putExtra("user", adapt.user.getId())
+					.putExtra("username", adapt.user.getScreenName());
 			context.startActivity(intent);
-		} else if (pair.getName().equals(context.getString(R.string.favorites_str))) {
+		}
+		else if (pair.getName().equals(
+				context.getString(R.string.favorites_str)))
+		{
 			Intent intent = new Intent(context, TweetListActivity.class)
-			.putExtra("mode", TweetListActivity.USER_FAVORITES)
-			.putExtra("username", adapt.user.getScreenName());
+					.putExtra("mode", TweetListActivity.USER_FAVORITES)
+					.putExtra("username", adapt.user.getScreenName());
 			context.startActivity(intent);
 		}
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		setRetainInstance(true);
 		screenName = getArguments().getString("query");
@@ -112,59 +146,74 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	}
 
 	@Override
-	public void performRefresh(final boolean paginate) {
+	public void performRefresh(final boolean paginate)
+	{
 		if (context == null || isLoading || adapt == null)
 			return;
 		isLoading = true;
 		if (adapt.getCount() == 0 && getView() != null)
 			setListShown(false);
-		new Thread(new Runnable() {
+		new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
+				if (acc != null)
+				{
+					try
+					{
 						User temp = null;
-						if (screenName
-								.equals(acc.getUser().getScreenName())) {
+						if (screenName.equals(acc.getUser().getScreenName()))
+						{
 							temp = acc.getClient().verifyCredentials();
 							acc.setUser(temp);
 							ArrayList<Account> accs = AccountService
 									.getAccounts();
-							for (int i = 0; i < accs.size(); i++) {
+							for (int i = 0; i < accs.size(); i++)
+							{
 								if (accs.get(i).getId() == acc.getId())
 									AccountService.setAccount(i, acc);
 							}
-						} else
+						}
+						else
 							temp = acc.getClient().showUser(screenName);
 						final User user = temp;
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
-								((ProfileScreen)context).user = user;
-								((ProfileScreen)context).setupViews();
-								((ProfileScreen)context).loadFollowingInfo();
-								((ProfileScreen)context).invalidateOptionsMenu();
+							public void run()
+							{
+								((ProfileScreen) context).user = user;
+								((ProfileScreen) context).setupViews();
+								((ProfileScreen) context).loadFollowingInfo();
+								((ProfileScreen) context)
+										.invalidateOptionsMenu();
 								adapt.setUser(user);
 							}
 						});
-					} catch (final TwitterException e) {
+					}
+					catch (final TwitterException e)
+					{
 						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
+						context.runOnUiThread(new Runnable()
+						{
 							@Override
-							public void run() {
+							public void run()
+							{
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
+								Toast.makeText(context, e.getErrorMessage(),
 										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
 				}
-				context.runOnUiThread(new Runnable() {
+				context.runOnUiThread(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
@@ -175,8 +224,10 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	}
 
 	@Override
-	public void reloadAdapter(boolean firstInitialize) {
-		if (AccountService.getCurrentAccount() != null) {
+	public void reloadAdapter(boolean firstInitialize)
+	{
+		if (AccountService.getCurrentAccount() != null)
+		{
 			adapt = new ProfileAboutAdapter(context);
 			setListAdapter(adapt);
 			if (adapt.getCount() == 0)
@@ -185,32 +236,48 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	}
 
 	@Override
-	public void savePosition() {
+	public void savePosition()
+	{
 	}
 
 	@Override
-	public void restorePosition() {
+	public void restorePosition()
+	{
 	}
 
 	@Override
-	public void jumpTop() {
+	public void jumpTop()
+	{
 		if (getView() != null)
 			getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
+	public void filter()
+	{
 	}
 
 	@Override
-	public Status[] getSelectedStatuses() { return null; }
+	public Status[] getSelectedStatuses()
+	{
+		return null;
+	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public User[] getSelectedUsers()
+	{
+		return null;
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public Tweet[] getSelectedTweets()
+	{
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { return null; }
+	public DMConversation[] getSelectedMessages()
+	{
+		return null;
+	}
 }
