@@ -28,6 +28,7 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -72,8 +73,10 @@ public class SettingsScreen extends PreferenceActivity  {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			startActivity(new Intent(this, TimelineScreen.class));
-			finish();
+			//startActivity(new Intent(this, TimelineScreen.class));
+			//finish();
+			
+			super.onBackPressed(); //Back button should go back, not restart a new activity
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
