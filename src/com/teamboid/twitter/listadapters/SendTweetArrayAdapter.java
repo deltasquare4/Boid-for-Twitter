@@ -2,7 +2,7 @@ package com.teamboid.twitter.listadapters;
 
 import java.util.List;
 
-import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SendTweetTask;

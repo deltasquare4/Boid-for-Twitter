@@ -2,7 +2,7 @@ package com.teamboid.twitter.listadapters;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.widgets.RemoteImageView;
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;

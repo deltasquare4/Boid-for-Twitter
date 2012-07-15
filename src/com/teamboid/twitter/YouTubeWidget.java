@@ -6,7 +6,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-import com.handlerexploit.prime.utils.ImageManager;
+import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.tweetwidgets.TweetWidget;
 

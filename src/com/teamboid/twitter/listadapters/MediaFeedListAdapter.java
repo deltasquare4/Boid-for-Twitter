@@ -9,7 +9,7 @@ import android.widget.*;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.utils.ImageManager;
+import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 

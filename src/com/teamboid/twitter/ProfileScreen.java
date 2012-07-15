@@ -7,8 +7,8 @@ import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.UserList;
 
-import com.handlerexploit.prime.utils.ImageManager;
-import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
+import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.columns.MediaTimelineFragment;

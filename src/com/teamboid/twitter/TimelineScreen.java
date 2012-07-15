@@ -12,8 +12,8 @@ import twitter4j.SavedSearch;
 import twitter4j.TwitterException;
 import twitter4j.UserList;
 
-import com.handlerexploit.prime.utils.ImageManager;
-import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
+import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
