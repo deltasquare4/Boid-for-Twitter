@@ -196,7 +196,9 @@ public class ProfileScreen extends Activity {
 			Toast.makeText(getApplicationContext(), "Coming soon!", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.mentionAction:
-			startActivity(new Intent(this, ComposerScreen.class).putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " "));
+			startActivity(new Intent(this, ComposerScreen.class)
+				.putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " ")
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

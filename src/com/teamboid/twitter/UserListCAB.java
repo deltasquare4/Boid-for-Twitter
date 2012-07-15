@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 
@@ -106,7 +105,6 @@ public class UserListCAB {
 
 	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
 		if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-			int beforeChecked = UserListCAB.getSelectedUsers().length;
 			if(list.isItemChecked(index)) {
 				list.setItemChecked(index, false);
 			} else list.setItemChecked(index, true);
@@ -122,9 +120,8 @@ public class UserListCAB {
 				}
 			}
 		} else {
-			Status item = (Status)adapt.getItem(index);
 			context.startActivity(new Intent(context, ComposerScreen.class)
-			.putExtra("append", "@" + item.getUser().getScreenName() + " ")
+			.putExtra("append", "@" + ((User)adapt.getItem(index)).getScreenName() + " ")
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 		}
 	}
@@ -151,6 +148,27 @@ public class UserListCAB {
 			UserListCAB.clearSelectedItems();
 			mode.finish();
 			switch (item.getItemId()) {
+			case R.id.mentionAction:
+				String mentionStr = "";
+				for(User user : selUsers) {
+					mentionStr += "@" + user.getScreenName() + " ";
+				}
+				context.startActivity(new Intent(context, ComposerScreen.class)
+				.putExtra("append", mentionStr).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				return true;
+			case R.id.followAction:
+				//TODO
+				return true;
+			case R.id.shareAction:
+				String shareStr = "";
+				for(int i = 0; i < selUsers.length; i++) {
+					String name = selUsers[i].getScreenName();
+					if(i > 0) shareStr += "\n";
+					shareStr += "@" + name + " (https://twitter.com/" + name + ")";
+				}
+				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareStr), 
+						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				return true;
 			default:
 				return false;
 			}
