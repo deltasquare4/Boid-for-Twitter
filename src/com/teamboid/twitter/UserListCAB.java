@@ -2,7 +2,6 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
-import twitter4j.Status;
 import twitter4j.User;
 import android.app.Activity;
 import android.app.Fragment;

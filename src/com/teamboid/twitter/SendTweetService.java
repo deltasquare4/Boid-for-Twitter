@@ -6,7 +6,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.SendTweetTask.Result;
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
+import com.teamboid.columns.TimelineFragment;
 
 import android.app.Service;
 import android.content.Context;

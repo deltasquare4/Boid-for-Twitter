@@ -3,9 +3,9 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
-import com.teamboid.twitter.TabsAdapter.SearchTweetsFragment;
-import com.teamboid.twitter.TabsAdapter.SearchUsersFragment;
+import com.teamboid.columns.SavedSearchFragment;
+import com.teamboid.columns.SearchTweetsFragment;
+import com.teamboid.columns.SearchUsersFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;

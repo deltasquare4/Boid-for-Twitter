@@ -17,7 +17,7 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.OverlayItem;
 import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.widgets.RemoteImageView;
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
+import com.teamboid.columns.TimelineFragment;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
 import com.teamboid.twitter.views.BetterMapView;

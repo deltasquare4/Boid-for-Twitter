@@ -21,7 +21,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
+import com.teamboid.columns.TimelineFragment;
 
 /**
  * The contextual action bar for any lists/columns that display twitter4j.Status objects.
@@ -81,6 +81,7 @@ public class TimelineCAB {
 		}
 	}
 	public static void updateMenuItems(Status[] selTweets, Menu menu) {
+		if(selTweets == null) return;
 		if(selTweets.length > 1) {
 			boolean allFavorited = true;
 			for(Status t : selTweets) {

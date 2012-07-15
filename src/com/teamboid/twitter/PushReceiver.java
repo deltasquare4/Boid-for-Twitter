@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.teamboid.twitter.TabsAdapter.MentionsFragment;
+import com.teamboid.columns.MentionsFragment;
 import com.teamboid.twitter.compat.Api11;
 
 public class PushReceiver extends BroadcastReceiver {
@@ -84,12 +84,10 @@ public class PushReceiver extends BroadcastReceiver {
 					//Also, we need a way of combining multiple mentions/messages into one notification.
 					Api11.displayNotification(PushWorker.this, s);
 					AccountService.activity.runOnUiThread(new Runnable(){
-
 						@Override
-						public void run() {
-							 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
-						}
-						
+						public void run() { 
+							AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
+						}						
 					});
 				} catch(Exception e) {
 					e.printStackTrace();

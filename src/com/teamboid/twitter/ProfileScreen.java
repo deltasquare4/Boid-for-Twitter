@@ -11,10 +11,10 @@ import com.handlerexploit.prime.utils.ImageManager;
 import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.PaddedProfileTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
-import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
+import com.teamboid.columns.MediaTimelineFragment;
+import com.teamboid.columns.PaddedProfileTimelineFragment;
+import com.teamboid.columns.ProfileAboutFragment;
+import com.teamboid.columns.ProfileTimelineFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
