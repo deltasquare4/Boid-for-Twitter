@@ -696,6 +696,16 @@ public class TimelineScreen extends Activity
 		startService(new Intent(this, SendTweetService.class)
 				.setAction(SendTweetService.LOAD_TWEETS));
 	}
+	
+	/**
+	 * Simply restarts the current activity - Added by Zach Rogers
+	 */
+	public void restartActivity()
+	{
+		Intent intent = getIntent();
+		finish();
+		startActivity(intent);
+	}
 
 	@Override
 	public void onResume()
@@ -707,6 +717,10 @@ public class TimelineScreen extends Activity
 		{
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
+			
+			//Restart activity to reload changes
+			restartActivity();
+			
 			return;
 		}
 		else if (lastIconic != PreferenceManager.getDefaultSharedPreferences(
@@ -716,6 +730,10 @@ public class TimelineScreen extends Activity
 					getApplicationContext()).getBoolean("enable_iconic_tabs",
 					true);
 			recreate();
+			
+			//Restart activity to reload changes
+			restartActivity();
+			
 			return;
 		}
 		else if (lastDisplayReal != PreferenceManager
