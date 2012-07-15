@@ -3,9 +3,13 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
-import com.teamboid.twitter.TabsAdapter.SearchTweetsFragment;
-import com.teamboid.twitter.TabsAdapter.SearchUsersFragment;
+import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.SearchTweetsFragment;
+import com.teamboid.twitter.columns.SearchUsersFragment;
+import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
+import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -52,6 +56,7 @@ public class SearchScreen extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.main);
         setProgressBarIndeterminateVisibility(false);
+        UserListCAB.context = this;
         initializeTabs(savedInstanceState);
     }
 		

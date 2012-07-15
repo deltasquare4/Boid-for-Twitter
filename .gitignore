@@ -21,3 +21,5 @@ local.properties
 /.settings/org.eclipse.jdt.core.prefs
 /.settings/org.eclipse.jdt.core.prefs.bak
 *.settings
+
+project.properties

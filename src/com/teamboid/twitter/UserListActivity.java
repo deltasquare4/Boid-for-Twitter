@@ -2,6 +2,11 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
+
+
 import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -28,7 +33,7 @@ public class UserListActivity extends ListActivity {
 	private boolean showProgress;
 	private ArrayList<Long> ids;
 	private boolean allowPagination = true;
-	private SearchUsersListAdapter binder;
+	public SearchUsersListAdapter binder;
 	private ProgressDialog progDialog;
 
 	public void showProgress(final boolean visible) {
@@ -65,6 +70,7 @@ public class UserListActivity extends ListActivity {
 		binder = new SearchUsersListAdapter(this);
 		setListAdapter(binder);
 		refresh();
+		UserListCAB.context = this;
 		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
@@ -72,6 +78,7 @@ public class UserListActivity extends ListActivity {
 					.putExtra("screen_name", ((User)binder.getItem(pos)).getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
+		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -80,6 +87,13 @@ public class UserListActivity extends ListActivity {
 				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) paginate();
 			}
 		});
+		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				UserListCAB.performLongPressAction(getListView(), binder, index);
+				return true;
+			}
+		});		
 		setProgressBarIndeterminateVisibility(false);
 	}
 

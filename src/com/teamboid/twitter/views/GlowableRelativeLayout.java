@@ -6,6 +6,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EdgeEffect;
 
+/**
+ * @author kennydude
+ */
 public class GlowableRelativeLayout extends View {
 		
 	public GlowableRelativeLayout(Context context, AttributeSet attrs) {

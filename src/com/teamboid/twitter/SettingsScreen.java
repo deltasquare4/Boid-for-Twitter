@@ -7,6 +7,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import net.robotmedia.billing.BillingController;
 
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.MediaUtilities;
+import com.teamboid.twitter.utilities.Utilities;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;

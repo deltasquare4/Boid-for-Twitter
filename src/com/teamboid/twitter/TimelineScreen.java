@@ -12,23 +12,29 @@ import twitter4j.SavedSearch;
 import twitter4j.TwitterException;
 import twitter4j.UserList;
 
-import com.handlerexploit.prime.utils.ImageManager;
-import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
+import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
-import com.teamboid.twitter.TabsAdapter.FavoritesFragment;
-import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.MentionsFragment;
-import com.teamboid.twitter.TabsAdapter.MessagesFragment;
-import com.teamboid.twitter.TabsAdapter.MyListsFragment;
-import com.teamboid.twitter.TabsAdapter.NearbyFragment;
-import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.SavedSearchFragment;
-import com.teamboid.twitter.TabsAdapter.TimelineFragment;
-import com.teamboid.twitter.TabsAdapter.TrendsFragment;
-import com.teamboid.twitter.TabsAdapter.UserListFragment;
+import com.teamboid.twitter.columns.FavoritesFragment;
+import com.teamboid.twitter.columns.MediaTimelineFragment;
+import com.teamboid.twitter.columns.MentionsFragment;
+import com.teamboid.twitter.columns.MessagesFragment;
+import com.teamboid.twitter.columns.MyListsFragment;
+import com.teamboid.twitter.columns.NearbyFragment;
+import com.teamboid.twitter.columns.ProfileTimelineFragment;
+import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.columns.TrendsFragment;
+import com.teamboid.twitter.columns.UserListFragment;
+import com.teamboid.twitter.listadapters.SendTweetArrayAdapter;
+import com.teamboid.twitter.listadapters.TrendsListAdapter;
+import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.services.SendTweetService;
+import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -452,6 +458,7 @@ public class TimelineScreen extends Activity {
 		}
 		AccountService.activity = this;
 		TimelineCAB.context = this;
+		UserListCAB.context = this;
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {

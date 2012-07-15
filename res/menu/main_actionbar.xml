@@ -2,16 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/newTweetAction" android:title="@string/new_tweet_str"
 		android:icon="?newTweetIcon" android:showAsAction="always" />
-	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
-		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/searchAction" android:title="@string/search_str"
+		android:icon="?searchIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/accountSwitcher" android:showAsAction="always"
 		android:title="@string/switch_accounts">
 		<menu />
 	</item>
 	<item android:id="@+id/myProfileAction" android:title="@string/my_profile_str" />
+	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
+		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/donateAction" android:title="@string/donate_str" />
-	<item android:id="@+id/searchAction" android:title="@string/search_str"
-		android:icon="?searchIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/addColumnAction" android:title="@string/addcolumn_str"
 		android:icon="?addIcon">
 		<menu>

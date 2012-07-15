@@ -235,6 +235,7 @@
 
 	<string name="timeline_str">Timeline</string>
 	<string name="media_timeline_str">Media Timeline</string>
+	<string name="mention_str">Mention</string>
 	<string name="mentions_str">Mentions</string>
 	<string name="messages_str">Messages</string>
 	<string name="trends_str">Trends</string>
@@ -245,7 +246,6 @@
 	<string name="load_widget">Loading {widget}…</string>
 	<string name="youtube_embed">YouTube Embed</string>
 	<string name="error_in_widget">There was a problem loading {widget}</string>
-	<string name="choose_how_to_share">Choose the format</string>
 	<string name="user_followers">{user}\'s Followers</string>
 	<string name="user_following">{user} is Following</string>
 	<string name="user_favorites">{user}\'s Favorites</string>
@@ -400,6 +400,8 @@
 	<string name="tweets_per_day">Tweets per day</string>
 	<string name="one_tweet_selected">1 Tweet Selected</string>
 	<string name="x_tweets_Selected">{X} Tweets Selected</string>
+	<string name="one_user_selected">1 User Selected</string>
+	<string name="x_users_selected">{X} Users Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!</string>

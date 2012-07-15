@@ -7,14 +7,18 @@ import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.UserList;
 
-import com.handlerexploit.prime.utils.ImageManager;
-import com.handlerexploit.prime.utils.ImageManager.OnImageReceivedListener;
+import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.TabsAdapter.MediaTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.PaddedProfileTimelineFragment;
-import com.teamboid.twitter.TabsAdapter.ProfileAboutFragment;
-import com.teamboid.twitter.TabsAdapter.ProfileTimelineFragment;
+import com.teamboid.twitter.columns.MediaTimelineFragment;
+import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
+import com.teamboid.twitter.columns.ProfileAboutFragment;
+import com.teamboid.twitter.columns.ProfileTimelineFragment;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
+import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -196,7 +200,9 @@ public class ProfileScreen extends Activity {
 			Toast.makeText(getApplicationContext(), "Coming soon!", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.mentionAction:
-			startActivity(new Intent(this, ComposerScreen.class).putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " "));
+			startActivity(new Intent(this, ComposerScreen.class)
+				.putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " ")
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

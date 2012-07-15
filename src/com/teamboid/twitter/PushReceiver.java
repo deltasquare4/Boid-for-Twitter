@@ -19,8 +19,9 @@ import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 
-import com.teamboid.twitter.TabsAdapter.MentionsFragment;
+import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.compat.Api11;
+import com.teamboid.twitter.services.AccountService;
 
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";

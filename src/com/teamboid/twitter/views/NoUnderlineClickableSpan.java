@@ -3,6 +3,9 @@ package com.teamboid.twitter.views;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 
+/**
+ * @author Aidan Follestad
+ */
 public abstract class NoUnderlineClickableSpan extends ClickableSpan {
 	
 	@Override
