@@ -41,11 +41,8 @@ public class MessagesFragment extends BaseListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		startActivity(new Intent(context, ConversationScreen.class)
-		.putExtra(
-				"screen_name",
-				((DMConversation) adapt.getItem(position))
-				.getToScreenName()).addFlags(
-						Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		.putExtra("screen_name", ((DMConversation) adapt.getItem(position)).getToScreenName())
+		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override

@@ -42,13 +42,9 @@ public class SearchUsersFragment extends BaseListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		if(UserListCAB.getSelectedUsers().length > 0) {
-			UserListCAB.performLongPressAction(getListView(), context.userAdapter, position);
-		} else {
-			context.startActivity(new Intent(context, ProfileScreen.class)
-			.putExtra("screen_name", ((User) context.userAdapter.getItem(position)).getScreenName())
-			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-		}
+		context.startActivity(new Intent(context, ProfileScreen.class)
+		.putExtra("screen_name", ((User) context.userAdapter.getItem(position)).getScreenName())
+		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override

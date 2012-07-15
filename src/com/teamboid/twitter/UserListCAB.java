@@ -75,31 +75,7 @@ public class UserListCAB {
 		}
 	}
 	public static void updateMenuItems(User[] selUsers, Menu menu) {
-		//		if(selTweets.length > 1) {
-		//			boolean allFavorited = true;
-		//			for(Status t : selTweets) {
-		//				if(!t.isFavorited()) {
-		//					allFavorited = false;
-		//					break;
-		//				}
-		//			}
-		//			MenuItem fav = menu.findItem(R.id.favoriteAction);
-		//			if(allFavorited) {
-		//				fav.setTitle(R.string.unfavorite_str);
-		//				fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
-		//			} else fav.setTitle(R.string.favorite_str);
-		//		} else {
-		//			final Status status = getSelectedTweets()[0];
-		//			if(status.getUser().getId() == AccountService.getCurrentAccount().getId()) {
-		//				menu.findItem(R.id.retweetAction).setVisible(false);
-		//				menu.findItem(R.id.deleteAction).setVisible(true);
-		//			}
-		//			MenuItem fav = menu.findItem(R.id.favoriteAction);
-		//			if(status.isFavorited()) {
-		//				fav.setTitle(R.string.unfavorite_str);
-		//				fav.setIcon(context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoriteIcon }).getDrawable(0));
-		//			} else fav.setTitle(R.string.favorite_str);
-		//		}
+		//TODO Update follow/unfollow action
 	}
 
 	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {

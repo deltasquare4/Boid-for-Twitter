@@ -46,15 +46,11 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		if(TimelineCAB.getSelectedTweets().length > 0) {
-			TimelineCAB.performLongPressAction(getListView(), context.adapter, position);
-		} else {
-			Status tweet = (Status) getAdapter().getItem(position);
-			if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-			context.startActivity(new Intent(context, TweetViewer.class)
-			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-		}
+		Status tweet = (Status) getAdapter().getItem(position);
+		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+		context.startActivity(new Intent(context, TweetViewer.class)
+		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
