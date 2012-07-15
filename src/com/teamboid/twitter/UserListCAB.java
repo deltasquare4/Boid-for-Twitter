@@ -115,7 +115,6 @@ public class UserListCAB {
 			} else {
 				final User[] users = UserListCAB.getSelectedUsers();
 				if(users.length == 0) {
-					Toast.makeText(context, "No selected users!", Toast.LENGTH_SHORT).show();
 					UserListCAB.UserActionMode.finish();
 				} else {
 					if(beforeChecked == 1 && users.length > 1) {
