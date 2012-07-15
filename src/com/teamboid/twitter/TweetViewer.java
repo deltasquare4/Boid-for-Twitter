@@ -429,7 +429,8 @@ public class TweetViewer extends MapActivity {
 		final String screenName = replyToName;
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			startActivity(new Intent(this, TimelineScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			//startActivity(new Intent(this, TimelineScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			super.onBackPressed(); //Back button should work accordingly
 			return true;
 		case R.id.replyAction:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra("reply_to", statusId).putExtra("reply_to_name", replyToName)
