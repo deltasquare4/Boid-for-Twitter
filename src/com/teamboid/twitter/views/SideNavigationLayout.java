@@ -25,6 +25,8 @@ import android.widget.Scroller;
  * A custom FrameLayout that copies the side navigation UI design pattern found
  * in the YouTube app. It expects two child views to be added to it. The first
  * one will be the navigation view and the second one will be the content view.
+ * <br/><br/>
+ * See https://github.com/johnkil/SideNavigation/blob/master/sample/src/com/devspark/sidenavigation/sample/MainActivity.java
  */
 public class SideNavigationLayout extends FrameLayout {
 

@@ -1,5 +1,10 @@
 package com.teamboid.twitter;
 
+
+import com.teamboid.twitter.listadapters.FeedListAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
+
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;

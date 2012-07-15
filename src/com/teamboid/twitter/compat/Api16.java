@@ -1,7 +1,7 @@
 package com.teamboid.twitter.compat;
 
 import com.handlerexploit.prime.utils.ImageManager;
-import com.teamboid.twitter.Utilities;
+import com.teamboid.twitter.utilities.Utilities;
 
 import twitter4j.Status;
 import android.annotation.TargetApi;

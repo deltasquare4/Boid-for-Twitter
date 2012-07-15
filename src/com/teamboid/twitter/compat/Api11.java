@@ -3,7 +3,7 @@ package com.teamboid.twitter.compat;
 import com.handlerexploit.prime.utils.ImageManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetViewer;
-import com.teamboid.twitter.Utilities;
+import com.teamboid.twitter.utilities.Utilities;
 
 import android.annotation.TargetApi;
 import android.app.Notification;

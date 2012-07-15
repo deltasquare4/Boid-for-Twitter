@@ -2,7 +2,8 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
-import com.teamboid.twitter.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.services.AccountService;
 
 import twitter4j.Status;
 import twitter4j.Tweet;
@@ -254,10 +255,8 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.spinner_list_fragment, container,
-					false);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
 		}
 
 		public Spinner getSpinner() {

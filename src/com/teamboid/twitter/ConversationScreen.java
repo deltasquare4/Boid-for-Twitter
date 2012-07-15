@@ -6,7 +6,12 @@ import twitter4j.DirectMessage;
 import twitter4j.ResponseList;
 import twitter4j.TwitterException;
 
-import com.teamboid.twitter.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.listadapters.MessageConvoAdapter;
+import com.teamboid.twitter.listadapters.MessageItemAdapter;
+import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Extractor;
+import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ListActivity;
 import android.content.Intent;

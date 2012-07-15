@@ -8,7 +8,11 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.teamboid.twitter.TwitlongerHelper.TwitlongerPostResponse;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.MediaUtilities;
+import com.teamboid.twitter.utilities.TwitlongerHelper;
+import com.teamboid.twitter.utilities.TwitlongerHelper.TwitlongerPostResponse;
+
 
 import android.content.Context;
 import android.net.Uri;

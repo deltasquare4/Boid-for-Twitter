@@ -11,15 +11,17 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 
-
+/**
+ * @author kennydude
+ */
 public class BetterMapView extends MapView {
+	
 	public BetterMapView(Context arg0, AttributeSet arg1) {
 		super(arg0, arg1);
 	}
 	
 	public static GeoPoint fromTwitter(GeoLocation point){
-		return new GeoPoint((int)(point.getLatitude() * 1E6), 
-				(int)(point.getLongitude() * 1E6));
+		return new GeoPoint((int)(point.getLatitude() * 1E6), (int)(point.getLongitude() * 1E6));
 	}
 
 	/**

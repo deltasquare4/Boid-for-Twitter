@@ -8,6 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.teamboid.twitter.listadapters.MutingListAdapter;
+import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
+
 import android.app.ListActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;

@@ -20,7 +20,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 
-import com.teamboid.twitter.MediaUtilities.MediaService;
+import com.teamboid.twitter.utilities.MediaUtilities;
+import com.teamboid.twitter.utilities.MediaUtilities.MediaService;
 
 public class SelectMediaScreen extends PreferenceActivity {
 	public class MediaPreference extends Preference {
