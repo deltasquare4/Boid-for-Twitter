@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TO BE REMOVED -->
 	<SwitchPreference android:key="c2dm" android:enabled="true"
 		android:layout="@layout/boid_preference" android:summary="@string/enable_push"
 		android:title="@string/push_title" android:persistent="false" />

@@ -64,7 +64,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
-			android:exported="false" android:launchMode="singleTask"
+			android:exported="false"
 			android:configChanges="screenSize" />
 		<service android:name=".services.AccountService" android:label="@string/account_service_name"
 			android:description="@string/account_service_desc" android:icon="@drawable/launcher_icon" />
@@ -178,8 +178,9 @@
 				<category android:name="com.teamboid.twitter" />
 			</intent-filter>
 		</receiver>
-		<activity android:name=".LoginHandler" android:theme="@android:style/Theme.Holo.Dialog"
+		<activity android:name=".LoginHandler"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
+			android:hardwareAccelerated="true"
 			android:windowSoftInputMode="adjustResize" />
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver" android:exported="false">

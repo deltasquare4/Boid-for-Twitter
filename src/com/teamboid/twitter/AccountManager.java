@@ -1,5 +1,7 @@
 package com.teamboid.twitter;
 
+import java.util.List;
+
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
@@ -19,13 +21,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceActivity.Header;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,12 +40,25 @@ import android.widget.Toast;
  * The activity that represents the account manager, allows the user to add and remove accounts.
  * @author Aidan Follestad
  */
-public class AccountManager extends ListActivity {
+public class AccountManager extends PreferenceActivity {
+	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
+	
+	
+	public static class AccountFragment extends PreferenceFragment{
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_accounts);
+			final int accountId = this.getArguments().getInt("accountId");
+			
+			// TODO: Do something here
+		}
+	}
 
 	private int lastTheme;
 	public AccountListAdapter adapter;
 
-	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
+
 	public class UpdateReceiver extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
@@ -108,6 +128,17 @@ public class AccountManager extends ListActivity {
 			}
 		}).start();
 	}
+	
+	@Override
+	public void onBuildHeaders(List<Header> target) {
+		// Tricks Android into thinking we're wanting a proper Preference View
+		Header h = new Header();
+		h.title = "Hi";
+		h.fragment = "null";
+		target.add(h);
+	}
+	
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -116,15 +147,36 @@ public class AccountManager extends ListActivity {
 			setTheme(lastTheme);
 		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setContentView(R.layout.account_manager);
-		setProgressBarIndeterminateVisibility(false);
+		
+		if(this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)){
+			Log.d("acc", "Showing frag");
+			return;
+		}
+		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// setContentView(R.layout.account_manager);
+		// setProgressBarIndeterminateVisibility(false);
 		IntentFilter ifilter = new IntentFilter();
 		ifilter.addAction(END_LOAD);
 		registerReceiver(receiver, ifilter);
 		adapter = new AccountListAdapter(this);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		final ListView listView = getListView();
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
+					long arg3) {
+				Log.d("listview", "Move to fragment");
+				// Pretend to click a header.
+				Header h = new Header();
+				h.fragment = "com.teamboid.twitter.AccountManager$AccountFragment";
+				Bundle b = new Bundle();
+				b.putInt("accountId", pos);
+				h.fragmentArguments = b;
+				onHeaderClick(h, pos);
+			}
+			
+		});
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -136,11 +188,21 @@ public class AccountManager extends ListActivity {
 				new SwipeDismissListViewTouchListener(listView,
 						new SwipeDismissListViewTouchListener.OnDismissCallback() {
 					@Override
-					public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-						for (int i : reverseSortedPositions) {
-							AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
-							adapter.notifyDataSetChanged();
-						}
+					public void onDismiss(ListView listView, final int[] reverseSortedPositions) {
+						AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this);
+						ab.setMessage("Are you sure?");
+						
+						ab.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								for (int i : reverseSortedPositions) {
+									AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
+									adapter.notifyDataSetChanged();
+								}
+							}
+						});
+						ab.show();
 					}
 				});
 		listView.setOnTouchListener(touchListener);
@@ -265,6 +327,7 @@ public class AccountManager extends ListActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		unregisterReceiver(receiver);
+		try{ unregisterReceiver(receiver); }
+		catch(Exception e){}
 	}
 }
