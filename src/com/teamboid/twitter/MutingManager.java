@@ -172,7 +172,8 @@ public class MutingManager extends ListActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			setResult(600);
-			finish();
+			//finish();
+			super.onBackPressed(); //Back button should work accordingly
 			return true;
 		case R.id.backupBtn:
 			backup();

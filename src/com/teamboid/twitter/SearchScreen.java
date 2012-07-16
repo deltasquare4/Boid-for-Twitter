@@ -101,8 +101,11 @@ public class SearchScreen extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			startActivity(new Intent(this, TimelineScreen.class));
-			finish();
+			//startActivity(new Intent(this, TimelineScreen.class));
+			//finish();
+			
+			super.onBackPressed(); //Back button should go back, not restart a new activity
+			
 			return true;
 		case R.id.newTweetAction:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra("append", getIntent().getStringExtra("query")));
