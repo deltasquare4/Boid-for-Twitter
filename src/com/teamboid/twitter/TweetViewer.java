@@ -317,7 +317,9 @@ public class TweetViewer extends MapActivity {
 		displayMedia();
 		if(tweetWidgetsLoaded == false){
 			tweetWidgetsLoaded = true;
-			for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+			if(status.getURLEntities() != null) {
+				for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+			}
 		}
 		loadConversation(tweet);
 	}
