@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;

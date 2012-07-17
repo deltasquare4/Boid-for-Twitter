@@ -3,6 +3,7 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.SearchUsersFragment;
