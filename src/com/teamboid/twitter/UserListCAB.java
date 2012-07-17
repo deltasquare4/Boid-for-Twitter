@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import twitter4j.TwitterException;
 import twitter4j.User;
+import twitter4j.internal.json.FollowingType;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -108,9 +109,13 @@ public class UserListCAB {
 		new Thread(new Runnable() {
 			public void run() {
 				for(int i = 0; i < selUsers.length; i++) {
-					if(selUsers[i].getId() == acc.getId()) continue;
-					try { selUsers[i].setIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), selUsers[i].getScreenName())); }
-					catch (final TwitterException e) { 
+					if(selUsers[i].getId() == acc.getId() || selUsers[i].isFollowing() != FollowingType.UNKNOWN) continue;
+					try { 
+						boolean isFollowing = acc.getClient().existsFriendship(acc.getUser().getScreenName(), selUsers[i].getScreenName());
+						if(isFollowing) {
+							selUsers[i].setIsFollowing(FollowingType.FOLLOWING);
+						} else selUsers[i].setIsFollowing(FollowingType.NOT_FOLLOWING);
+					} catch (final TwitterException e) { 
 						e.printStackTrace();
 						final User curUser = selUsers[i];
 						context.runOnUiThread(new Runnable() {
@@ -119,20 +124,20 @@ public class UserListCAB {
 							}
 						});
 					}
-					context.runOnUiThread(new Runnable() {
-						public void run() {
-							boolean allFollowing = true;
-							for(User u : selUsers) {
-								if(u.getId() == acc.getId()) continue;
-								UserListCAB.reinsertUser(u);
-								if(!u.isFollowing()) allFollowing = false;
-							}
-							if(allFollowing) follow.setTitle(R.string.unfollow_str);
-							else follow.setTitle(R.string.follow_str);
-							follow.setEnabled(true);
-						}
-					});
 				}
+				context.runOnUiThread(new Runnable() {
+					public void run() {
+						boolean allFollowing = true;
+						for(User u : selUsers) {
+							if(u.getId() == acc.getId()) continue;
+							UserListCAB.reinsertUser(u);
+							if(u.isFollowing() == FollowingType.NOT_FOLLOWING) allFollowing = false;
+						}
+						if(allFollowing) follow.setTitle(R.string.unfollow_str);
+						else follow.setTitle(R.string.follow_str);
+						follow.setEnabled(true);
+					}
+				});
 			}
 		}).start();
 	}
@@ -196,8 +201,11 @@ public class UserListCAB {
 					new Thread(new Runnable() {
 						public void run() {
 							for(final User user : selUsers) {
-								try { AccountService.getCurrentAccount().getClient().createFriendship(user.getId()); }
-								catch (final TwitterException e) {
+								try { 
+									AccountService.getCurrentAccount().getClient().createFriendship(user.getId());
+									user.setIsFollowing(FollowingType.FOLLOWING);
+									UserListCAB.reinsertUser(user);
+								} catch (final TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										@Override
@@ -220,8 +228,11 @@ public class UserListCAB {
 					new Thread(new Runnable() {
 						public void run() {
 							for(final User user : selUsers) {
-								try { AccountService.getCurrentAccount().getClient().destroyFriendship(user.getId()); }
-								catch (final TwitterException e) {
+								try { 
+									AccountService.getCurrentAccount().getClient().destroyFriendship(user.getId());
+									user.setIsFollowing(FollowingType.NOT_FOLLOWING);
+									UserListCAB.reinsertUser(user);
+								} catch (final TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										@Override
