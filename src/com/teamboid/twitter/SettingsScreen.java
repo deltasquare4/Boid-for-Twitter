@@ -28,7 +28,6 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.

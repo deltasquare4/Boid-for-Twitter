@@ -170,7 +170,7 @@
 		</receiver>
 		<activity android:name=".LoginHandler" android:theme="@android:style/Theme.Holo.Dialog"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize" />
+			android:windowSoftInputMode="adjustResize" android:hardwareAccelerated="true"/>
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver" android:exported="false">
 			<intent-filter>

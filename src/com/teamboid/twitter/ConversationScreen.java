@@ -14,7 +14,6 @@ import com.teamboid.twitter.utilities.Extractor;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
