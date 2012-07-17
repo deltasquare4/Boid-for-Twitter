@@ -181,6 +181,15 @@ public class UserListActivity extends ListActivity {
 	}
 	
 	@Override
+	public void onPause() {
+		super.onPause();
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+	}
+	
+	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
 		if(showProgress) {
@@ -197,11 +206,7 @@ public class UserListActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			//startActivity(new Intent(this, TimelineScreen.class));
-			//finish();
-			
-			super.onBackPressed(); //Back button should go back, not restart a new activity
-			
+			super.onBackPressed();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

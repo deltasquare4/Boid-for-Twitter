@@ -165,6 +165,15 @@ public class ProfileScreen extends Activity {
 		}
 		TimelineCAB.context = this;
 	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		TimelineCAB.clearSelectedItems();
+		if(TimelineCAB.TimelineActionMode != null) {
+			TimelineCAB.TimelineActionMode.finish();
+		}
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

@@ -483,6 +483,19 @@ public class TimelineScreen extends Activity {
 		filter.addAction(AccountManager.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		TimelineCAB.clearSelectedItems();
+		if(TimelineCAB.TimelineActionMode != null) {
+			TimelineCAB.TimelineActionMode.finish();
+		}
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+	}
 
 	@Override
 	public void onDestroy() {

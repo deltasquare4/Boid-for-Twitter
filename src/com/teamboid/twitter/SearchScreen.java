@@ -89,6 +89,15 @@ public class SearchScreen extends Activity {
 	}
 
 	@Override
+	public void onPause() {
+		super.onPause();
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.search_actionbar, menu);

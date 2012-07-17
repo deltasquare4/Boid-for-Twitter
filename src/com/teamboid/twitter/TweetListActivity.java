@@ -1,6 +1,5 @@
 package com.teamboid.twitter;
 
-
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -103,6 +102,15 @@ public class TweetListActivity extends ListActivity {
 	public void onResume() {
 		super.onResume();
 		TimelineCAB.context = this;
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		TimelineCAB.clearSelectedItems();
+		if(TimelineCAB.TimelineActionMode != null) {
+			TimelineCAB.TimelineActionMode.finish();
+		}
 	}
 
 	public void refresh() {
