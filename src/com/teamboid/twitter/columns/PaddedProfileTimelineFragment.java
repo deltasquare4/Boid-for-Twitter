@@ -130,8 +130,8 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = getAdapter().getCount() - 1;
 								int addedCount = getAdapter().add(feed.toArray(new Status[0]));
-								if (getView() != null) {
-									if (paginate && addedCount > 0) {
+								if (getView() != null && addedCount > 0) {
+									if (paginate) {
 										getListView().smoothScrollToPosition(beforeLast + 1);
 									}
 									else if (getView() != null && getAdapter() != null) {
@@ -175,8 +175,7 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 				getAdapter().setLastViewed(getListView());
 			}
 			if (getAdapter() == null) {
-				context.adapter = new FeedListAdapter(context, null,
-						AccountService.getCurrentAccount().getId());
+				context.adapter = new FeedListAdapter(context, null, AccountService.getCurrentAccount().getId());
 			}
 			setListAdapter(getAdapter());
 			if (getAdapter().getCount() == 0) {

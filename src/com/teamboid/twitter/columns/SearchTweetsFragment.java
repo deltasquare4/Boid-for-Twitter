@@ -119,8 +119,8 @@ public class SearchTweetsFragment extends BaseListFragment {
 								int beforeLast = context.tweetAdapter.getCount() - 1;
 								int addedCount = context.tweetAdapter.add(feed.getTweets().toArray(new Tweet[0]));
 								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
-										if (paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+									if (getView() != null && addedCount > 0) {
+										if (paginate) getListView().smoothScrollToPosition(beforeLast + 1);
 										else context.tweetAdapter.restoreLastViewed(getListView());
 									}
 									Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));

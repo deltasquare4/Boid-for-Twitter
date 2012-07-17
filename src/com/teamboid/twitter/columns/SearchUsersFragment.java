@@ -107,8 +107,8 @@ public class SearchUsersFragment extends BaseListFragment {
 								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = context.userAdapter.getCount() - 1;
 								int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
-								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
+								if (beforeLast > 0) {
+									if (getView() != null && addedCount > 0) {
 										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 										else getListView().setSelectionFromTop(context.userAdapter.savedIndex+ addedCount, context.userAdapter.savedIndexTop);
 									}

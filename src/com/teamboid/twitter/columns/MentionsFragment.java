@@ -119,48 +119,28 @@ public class MentionsFragment extends BaseListFragment {
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient()
-								.getMentions(paging);
+						final ResponseList<Status> feed = acc.getClient().getMentions(paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_mentions));
+								setEmptyText(context.getString(R.string.no_mentions));
 								int beforeLast = adapt.getCount() - 1;
-								int addedCount = adapt.add(feed
-										.toArray(new Status[0]));
+								int addedCount = adapt.add(feed.toArray(new Status[0]));
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
-										if (paginate && addedCount > 0)
-											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
-										else if (getView() != null
-												&& adapt != null)
+										if (paginate && addedCount > 0) {
+											getListView().smoothScrollToPosition(beforeLast + 1);
+										} else if (getView() != null && adapt != null) {
 											adapt.restoreLastViewed(getListView());
+										}
 									}
-									if (!PreferenceManager
-											.getDefaultSharedPreferences(
-													context).getBoolean(
-															"enable_iconic_tabs",
-															true)) {
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														context.getString(R.string.mentions_str)
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														Integer.toString(addedCount));
+									if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(context.getString(R.string.mentions_str) + " (" + Integer.toString(addedCount) + ")");
+									} else {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(Integer.toString(addedCount));
+									}
 								}
 							}
 						});
@@ -169,11 +149,8 @@ public class MentionsFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -181,8 +158,7 @@ public class MentionsFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -197,14 +173,10 @@ public class MentionsFragment extends BaseListFragment {
 		if (AccountService.getCurrentAccount() != null) {
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(context,
-					MentionsFragment.ID, AccountService.getCurrentAccount()
-					.getId());
+			adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID, AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-			else if (getView() != null && adapt != null)
-				adapt.restoreLastViewed(getListView());
+			if (adapt.getCount() == 0) performRefresh(false);
+			else if (getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 		}
 	}
 

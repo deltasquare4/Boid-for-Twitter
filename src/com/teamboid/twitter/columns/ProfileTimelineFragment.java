@@ -114,38 +114,31 @@ public class ProfileTimelineFragment extends BaseListFragment {
 			return;
 		}
 		isLoading = true;
-		if (getAdapter().getCount() == 0 && getView() != null)
-			setListShown(false);
+		if (getAdapter().getCount() == 0 && getView() != null) setListShown(false);
 		getAdapter().setLastViewed(getListView());
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Paging paging = new Paging(1, 50);
-				if (paginate)
-					paging.setMaxId(getAdapter().getItemId(
-							getAdapter().getCount() - 1));
+				if (paginate) {
+					paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
+				}
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient()
-								.getUserTimeline(screenName, paging);
+						final ResponseList<Status> feed = acc.getClient().getUserTimeline(screenName, paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_tweets));
+								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = getAdapter().getCount() - 1;
-								int addedCount = getAdapter().add(
-										feed.toArray(new Status[0]));
-								if (getView() != null) {
-									if (paginate && addedCount > 0)
-										getListView()
-										.smoothScrollToPosition(
-												beforeLast + 1);
-									else if (getView() != null
-											&& getAdapter() != null)
-										getAdapter().restoreLastViewed(
-												getListView());
+								int addedCount = getAdapter().add(feed.toArray(new Status[0]));
+								if (getView() != null && addedCount > 0) {
+									if (paginate) {
+										getListView().smoothScrollToPosition(beforeLast + 1);
+									} else if (getView() != null && getAdapter() != null) {
+										getAdapter().restoreLastViewed(getListView());
+									}
 								}
 								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
 									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName + " (" + Integer.toString(addedCount) + ")");
@@ -168,8 +161,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
