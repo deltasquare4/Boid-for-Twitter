@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import twitter4j.TwitterException;
 import twitter4j.User;
 import android.app.Activity;
 import android.app.Fragment;
@@ -13,9 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
+import com.teamboid.twitter.services.AccountService;
 
 /**
  * The contextual action bar for any lists/columns that display twitter4j.User objects.
@@ -65,6 +70,22 @@ public class UserListCAB {
 		}
 		return toReturn.toArray(new User[0]);
 	}
+	public static void reinsertUser(User user) {
+		if(context instanceof UserListActivity) {
+			ListAdapter adapter = ((UserListActivity)context).getListView().getAdapter();
+			((SearchUsersListAdapter)adapter).update(user);
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					ListAdapter adapter = ((BaseListFragment)frag).getListView().getAdapter();
+					if(adapter instanceof SearchUsersListAdapter) {
+						((SearchUsersListAdapter)adapter).update(user);
+					}
+				}
+			}
+		}
+	}
 
 	public static void updateTitle() {
 		User[] selUsers = UserListCAB.getSelectedUsers(); 
@@ -74,8 +95,46 @@ public class UserListCAB {
 			UserListCAB.UserActionMode.setTitle(context.getString(R.string.x_users_selected).replace("{X}", Integer.toString(selUsers.length)));
 		}
 	}
-	public static void updateMenuItems(User[] selUsers, Menu menu) {
-		//TODO Update follow/unfollow action
+
+	public static void updateMenuItems(final User[] selUsers, Menu menu) {
+		final MenuItem follow = menu.findItem(R.id.followAction);
+		follow.setEnabled(false);
+		final Account acc = AccountService.getCurrentAccount();
+		if(selUsers.length == 1 && selUsers[0].getId() == acc.getId()) {
+			follow.setTitle(R.string.this_is_you);
+			return;
+		}
+		follow.setTitle(R.string.loading_str);
+		new Thread(new Runnable() {
+			public void run() {
+				for(int i = 0; i < selUsers.length; i++) {
+					if(selUsers[i].getId() == acc.getId()) continue;
+					try { selUsers[i].setIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), selUsers[i].getScreenName())); }
+					catch (final TwitterException e) { 
+						e.printStackTrace();
+						final User curUser = selUsers[i];
+						context.runOnUiThread(new Runnable() {
+							public void run() { 
+								Toast.makeText(context, context.getString(R.string.failed_check_following).replace("{user}", curUser.getScreenName()), Toast.LENGTH_LONG).show();
+							}
+						});
+					}
+					context.runOnUiThread(new Runnable() {
+						public void run() {
+							boolean allFollowing = true;
+							for(User u : selUsers) {
+								if(u.getId() == acc.getId()) continue;
+								UserListCAB.reinsertUser(u);
+								if(!u.isFollowing()) allFollowing = false;
+							}
+							if(allFollowing) follow.setTitle(R.string.unfollow_str);
+							else follow.setTitle(R.string.follow_str);
+							follow.setEnabled(true);
+						}
+					});
+				}
+			}
+		}).start();
 	}
 
 	public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
@@ -118,7 +177,7 @@ public class UserListCAB {
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
 
 		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		public boolean onActionItemClicked(ActionMode mode, final MenuItem item) {
 			final User[] selUsers = getSelectedUsers();  
 			UserListCAB.clearSelectedItems();
 			mode.finish();
@@ -132,7 +191,56 @@ public class UserListCAB {
 				.putExtra("append", mentionStr).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			case R.id.followAction:
-				//TODO
+				item.setEnabled(false);
+				if(item.getTitle().equals(context.getString(R.string.follow_str))) {
+					new Thread(new Runnable() {
+						public void run() {
+							for(final User user : selUsers) {
+								try { AccountService.getCurrentAccount().getClient().createFriendship(user.getId()); }
+								catch (final TwitterException e) {
+									e.printStackTrace();
+									context.runOnUiThread(new Runnable() {
+										@Override
+										public void run() { 
+											Toast.makeText(context, context.getString(R.string.failed_follow_str).replace("{user}", user.getScreenName()), Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+							context.runOnUiThread(new Runnable() {
+								@Override
+								public void run() { 
+									item.setEnabled(true);
+									item.setTitle(R.string.unfollow_str);
+								}
+							});
+						}
+					}).start();
+				} else {
+					new Thread(new Runnable() {
+						public void run() {
+							for(final User user : selUsers) {
+								try { AccountService.getCurrentAccount().getClient().destroyFriendship(user.getId()); }
+								catch (final TwitterException e) {
+									e.printStackTrace();
+									context.runOnUiThread(new Runnable() {
+										@Override
+										public void run() { 
+											Toast.makeText(context, context.getString(R.string.failed_unfollow_str).replace("{user}", user.getScreenName()), Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+							context.runOnUiThread(new Runnable() {
+								@Override
+								public void run() { 
+									item.setEnabled(true);
+									item.setTitle(R.string.follow_str);
+								}
+							});
+						}
+					}).start();
+				}
 				return true;
 			case R.id.shareAction:
 				String shareStr = "";

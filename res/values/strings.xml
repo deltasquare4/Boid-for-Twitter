@@ -62,7 +62,8 @@
 	<string name="failed_expand_twtmore">Something happened while expanding this Twtmore
 		post!
 	</string>
-	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!</string>
+	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!
+	</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
 	</string>
@@ -398,5 +399,9 @@
 	<string name="x_users_selected">{X} Users Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
-		teenagers of Team Boid!</string>
+		teenagers of Team Boid!
+	</string>
+	<string name="this_is_you">This is you</string>
+	<string name="failed_check_following">Failed to check if you\'re following @{user}!
+	</string>
 </resources>
