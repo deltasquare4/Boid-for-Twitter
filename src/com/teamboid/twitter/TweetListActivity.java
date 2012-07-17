@@ -67,7 +67,6 @@ public class TweetListActivity extends ListActivity {
 		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
 		setListAdapter(binder);
 		refresh();
-		TimelineCAB.context = this;
 		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
@@ -97,6 +96,12 @@ public class TweetListActivity extends ListActivity {
 			}
 		});		
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		TimelineCAB.context = this;
 	}
 
 	public void refresh() {

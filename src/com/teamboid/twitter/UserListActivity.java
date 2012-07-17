@@ -70,7 +70,6 @@ public class UserListActivity extends ListActivity {
 		binder = new SearchUsersListAdapter(this);
 		setListAdapter(binder);
 		refresh();
-		UserListCAB.context = this;
 		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
@@ -95,6 +94,12 @@ public class UserListActivity extends ListActivity {
 			}
 		});		
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		UserListCAB.context = this;
 	}
 
 	public void paginate() {

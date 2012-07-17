@@ -167,6 +167,7 @@ public class ProfileScreen extends Activity {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
 		}
+		TimelineCAB.context = this;
 	}
 
 	@Override

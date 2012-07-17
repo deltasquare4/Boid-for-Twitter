@@ -442,8 +442,7 @@ public class TimelineScreen extends Activity {
 	/**
 	 * Simply restarts the current activity - Added by Zach Rogers
 	 */
-	public void restartActivity()
-	{
+	public void restartActivity() {
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
@@ -455,23 +454,15 @@ public class TimelineScreen extends Activity {
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
 			lastTheme = Utilities.getTheme(getApplicationContext()); 
-			recreate();
-			
-			//Restart current activity -- Seems to fix blank column issue for theme changes
-			restartActivity();
-			
+			restartActivity();			
 			return;
 		} else if(lastIconic != PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true)) {
 			lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
-			recreate();
-			
-			//Restart current activity -- Seems to fix blank column issue for iconic tab changes
 			restartActivity();
-			
 			return;
 		} else if(lastDisplayReal != PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", false)) {
 			lastDisplayReal = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", true);
-			recreate();
+			restartActivity();
 			return;
 		}
 		AccountService.activity = this;

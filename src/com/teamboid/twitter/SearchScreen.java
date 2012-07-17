@@ -56,7 +56,6 @@ public class SearchScreen extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.main);
         setProgressBarIndeterminateVisibility(false);
-        UserListCAB.context = this;
         initializeTabs(savedInstanceState);
     }
 		
@@ -85,6 +84,7 @@ public class SearchScreen extends Activity {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
 		}
+		UserListCAB.context = this;
 	}
 
 	@Override
