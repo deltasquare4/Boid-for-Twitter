@@ -142,11 +142,6 @@ public class ProfileScreen extends Activity {
 				}
 				try {
 					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
-					runOnUiThread(new Runnable() {
-						public void run() { 
-							((TextView)findViewById(R.id.profileFollowsYou)).setVisibility(getAboutFragment().getAdapter().isFollowedBy() ? View.VISIBLE : View.GONE);
-						}
-					});
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {

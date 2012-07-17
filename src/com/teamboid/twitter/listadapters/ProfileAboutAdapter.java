@@ -175,8 +175,11 @@ public class ProfileAboutAdapter extends BaseAdapter {
 				if(!isFollowing) {
 					if(isFollowedBy) followBtn.setText(R.string.follow_back_str);
 					else followBtn.setText(R.string.follow_str);
-					followBtn.setEnabled(true);
-				} else followBtn.setText(R.string.unfollow_str);
+				} else {
+					if(isFollowedBy) followBtn.setText(R.string.follows_you_unfollow_str);
+					else followBtn.setText(R.string.unfollow_str);
+				}
+				followBtn.setEnabled(true);
 			}
 			followBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
