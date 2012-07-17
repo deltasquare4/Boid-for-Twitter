@@ -17,11 +17,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -72,6 +74,22 @@ public class TimelineCAB {
 			}
 		}
 		return toReturn.toArray(new Status[0]);
+	}
+	public static void reinsertStatus(Status status) {
+		if(context instanceof TweetListActivity) {
+			ListAdapter adapter = ((TweetListActivity)context).getListView().getAdapter();
+			((FeedListAdapter)adapter).update(status);
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					ListAdapter adapter = ((BaseListFragment)frag).getListView().getAdapter();
+					if(adapter instanceof FeedListAdapter) {
+						((FeedListAdapter)adapter).update(status);
+					}
+				}
+			}
+		}
 	}
 
 	public static void updateTitle() {
@@ -181,9 +199,13 @@ public class TimelineCAB {
 					if(tweet.isFavorited()) {
 						new Thread(new Runnable() {
 							public void run() {
-								//TODO Update the favorite indicator in the corresponding column
-								try { AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId()); }
-								catch(TwitterException e) {
+								try { 
+									final Status unfavorited = AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId());
+									unfavorited.setIsFavorited(false);
+									context.runOnUiThread(new Runnable() {
+										public void run() { TimelineCAB.reinsertStatus(unfavorited); }
+									});
+								} catch(TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										public void run() { 
@@ -196,9 +218,13 @@ public class TimelineCAB {
 					} else {
 						new Thread(new Runnable() {
 							public void run() {
-								//TODO Update the favorite indicator in the corresponding column
-								try { AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId()); }
-								catch(TwitterException e) {
+								try { 
+									final Status favorited = AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId());
+									favorited.setIsFavorited(true);
+									context.runOnUiThread(new Runnable() {
+										public void run() { TimelineCAB.reinsertStatus(favorited); }
+									});
+								} catch(TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										public void run() { 

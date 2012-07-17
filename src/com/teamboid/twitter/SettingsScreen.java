@@ -230,7 +230,7 @@ public class SettingsScreen extends PreferenceActivity  {
 			});
 			picker.setMinValue(11);
 			picker.setMaxValue(26);
-			picker.setValue(Integer.parseInt(prefs.getString("font_size", "16")));
+			picker.setValue(Integer.parseInt(prefs.getString("font_size", "14")));
 			diag.show();
 		}
 	}
