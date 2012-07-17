@@ -60,6 +60,7 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
+		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
@@ -108,63 +109,41 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || getAdapter() == null)
-			return;
+		if (context == null || isLoading || getAdapter() == null) return;
 		isLoading = true;
-		if (getAdapter().getCount() == 0 && getView() != null)
-			setListShown(false);
+		if (getAdapter().getCount() == 0 && getView() != null) setListShown(false);
 		getAdapter().setLastViewed(getListView());
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Paging paging = new Paging(1, 50);
-				if (paginate)
-					paging.setMaxId(getAdapter().getItemId(
-							getAdapter().getCount() - 1));
+				if (paginate) {
+					paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
+				}
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient()
-								.getUserTimeline(screenName, paging);
+						final ResponseList<Status> feed = acc.getClient().getUserTimeline(screenName, paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_tweets));
+								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = getAdapter().getCount() - 1;
-								int addedCount = getAdapter().add(
-										feed.toArray(new Status[0]));
+								int addedCount = getAdapter().add(feed.toArray(new Status[0]));
 								if (getView() != null) {
-									if (paginate && addedCount > 0)
-										getListView()
-										.smoothScrollToPosition(
-												beforeLast + 1);
-									else if (getView() != null
-											&& getAdapter() != null)
-										getAdapter().restoreLastViewed(
-												getListView());
+									if (paginate && addedCount > 0) {
+										getListView().smoothScrollToPosition(beforeLast + 1);
+									}
+									else if (getView() != null && getAdapter() != null) {
+										getAdapter().restoreLastViewed(getListView());
+									}
 								}
-								if (!PreferenceManager
-										.getDefaultSharedPreferences(
-												context).getBoolean(
-														"enable_iconic_tabs", true)) {
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(
-															context.getString(R.string.tweets_str)
-															+ " ("
-															+ Integer
-															.toString(addedCount)
-															+ ")");
-								} else
-									context.getActionBar()
-									.getTabAt(
-											getArguments().getInt(
-													"tab_index"))
-													.setText(
-															Integer.toString(addedCount));
+								if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+									.setText(context.getString(R.string.tweets_str) + " (" + Integer.toString(addedCount) + ")");
+								} else {
+									context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));
+								}
 							}
 						});
 					} catch (final TwitterException e) {
@@ -172,11 +151,8 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -184,8 +160,7 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -196,42 +171,46 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
 		if (AccountService.getCurrentAccount() != null) {
-			if (getAdapter() != null && !firstInitialize
-					&& getView() != null)
+			if (getAdapter() != null && !firstInitialize && getView() != null) {
 				getAdapter().setLastViewed(getListView());
+			}
 			if (getAdapter() == null) {
 				context.adapter = new FeedListAdapter(context, null,
 						AccountService.getCurrentAccount().getId());
 			}
 			setListAdapter(getAdapter());
-			if (getAdapter().getCount() == 0)
+			if (getAdapter().getCount() == 0) {
 				performRefresh(false);
-			else if (getView() != null && getAdapter() != null)
+			}
+			else if (getView() != null && getAdapter() != null) {
 				getAdapter().restoreLastViewed(getListView());
+			}
 		}
 	}
 
 	@Override
 	public void savePosition() {
-		if (getView() != null && getAdapter() != null)
+		if (getView() != null && getAdapter() != null) {
 			getAdapter().setLastViewed(getListView());
+		}
 	}
 
 	@Override
 	public void restorePosition() {
-		if (getView() != null && getAdapter() != null)
+		if (getView() != null && getAdapter() != null) {
 			getAdapter().restoreLastViewed(getListView());
+		}
 	}
 
 	@Override
 	public void jumpTop() {
-		if (getView() != null)
+		if (getView() != null) {
 			getListView().setSelectionFromTop(0, 0);
+		}
 	}
 
 	@Override
-	public void filter() {
-	}
+	public void filter() { }
 
 	@Override
 	public Status[] getSelectedStatuses() {
