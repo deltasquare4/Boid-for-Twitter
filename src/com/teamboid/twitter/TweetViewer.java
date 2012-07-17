@@ -17,6 +17,7 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.OverlayItem;
 import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -429,8 +430,7 @@ public class TweetViewer extends MapActivity {
 		final String screenName = replyToName;
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			//startActivity(new Intent(this, TimelineScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			super.onBackPressed(); //Back button should work accordingly
+			super.onBackPressed();
 			return true;
 		case R.id.replyAction:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra("reply_to", statusId).putExtra("reply_to_name", replyToName)
@@ -445,9 +445,13 @@ public class TweetViewer extends MapActivity {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
-							AccountService.getCurrentAccount().getClient().destroyFavorite(statusId);
+							final Status unfavorited = AccountService.getCurrentAccount().getClient().destroyFavorite(statusId);
 							runOnUiThread(new Runnable() {
-								public void run() { isFavorited = false; }
+								public void run() { 
+									isFavorited = false;
+									unfavorited.setIsFavorited(false);
+									TimelineCAB.reinsertStatus(unfavorited);
+								}
 							});
 						} catch(TwitterException e) {
 							e.printStackTrace();
@@ -471,9 +475,13 @@ public class TweetViewer extends MapActivity {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
-							AccountService.getCurrentAccount().getClient().createFavorite(statusId);
+							final Status favorited = AccountService.getCurrentAccount().getClient().createFavorite(statusId);
 							runOnUiThread(new Runnable() {
-								public void run() { isFavorited = true; }
+								public void run() { 
+									isFavorited = true;
+									favorited.setIsFavorited(true);
+									TimelineCAB.reinsertStatus(favorited);
+								}
 							});
 						} catch(TwitterException e) {
 							e.printStackTrace();
