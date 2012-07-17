@@ -234,7 +234,7 @@ public class Utilities {
 		}
 		return false;
 	}
-	
+
 	public static Spannable twitterifyText(final Context context, String text, final URLEntity[] urls, final MediaEntity[] pics, final boolean expand) {
 		if(urls != null) {
 			for(URLEntity url : urls) {
@@ -259,9 +259,9 @@ public class Utilities {
 					@Override
 					public void onClick(View widget) {
 						context.startActivity(new Intent(context, SearchScreen.class)
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-							.putExtra("query", hashText));
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+						.putExtra("query", hashText));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.MENTION) {
@@ -270,9 +270,9 @@ public class Utilities {
 					@Override
 					public void onClick(View widget) {
 						context.startActivity(new Intent(context, ProfileScreen.class)
-							.putExtra("screen_name", screenName)
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						.putExtra("screen_name", screenName)
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.URL) {
@@ -284,9 +284,9 @@ public class Utilities {
 						else url = e.getValue();
 						if(!url.startsWith("http://") && !url.startsWith("https://")) url = ("http://" + url);
 						context.startActivity(new Intent(Intent.ACTION_VIEW)
-							.setData(Uri.parse(url))
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						.setData(Uri.parse(url))
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.SEARCH) {
@@ -295,10 +295,10 @@ public class Utilities {
 					public void onClick(View arg0) {
 						try { 
 							context.startActivity(new Intent(Intent.ACTION_VIEW)
-								.setData(Uri.parse(context.getString(R.string.google_url) +
-										URLEncoder.encode(e.getValue(), "UTF-8")))
-								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-								.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							.setData(Uri.parse(context.getString(R.string.google_url) +
+									URLEncoder.encode(e.getValue(), "UTF-8")))
+									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 						}  catch (UnsupportedEncodingException e) { e.printStackTrace(); }
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -423,7 +423,7 @@ public class Utilities {
 			return Long.toString(diff / 86400000) + " days"; 
 		} else return Long.toString(diff / 604800000) + " weeks";
 	}
-	
+
 	public static String friendlyTimeLong(Context context, Date createdAt) {
 		Calendar time = Calendar.getInstance();
 		time.setTime(createdAt);
@@ -465,7 +465,7 @@ public class Utilities {
 		fi.createNewFile();
 		return fi;
 	}
-	
+
 	public static String arrayToJson(Context context, ArrayList<String> values) {
 		JSONArray a = new JSONArray();
 		for (int i = 0; i < values.size(); i++) a.put(values.get(i));
@@ -502,19 +502,23 @@ public class Utilities {
 		String toReturn = "@" + initScreenname;
 		Extractor extract = new Extractor();
 		List<String> mentions = extract.extractMentionedScreennames(tweetText);
-		int index = 0;
-		for(String mention : mentions) {
-			if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
-			toReturn += " @" + mention;
+		if(mentions != null) {
+			int index = 0;
+			for(String mention : mentions) {
+				if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
+				toReturn += " @" + mention;
+			}
 		}
 		return toReturn;
 	}
 	public static String getAllMentions(String initScreenname, UserMentionEntity[] mentions) {
 		String toReturn = "@" + initScreenname;
-		int index = 0;
-		for(UserMentionEntity mention : mentions) {
-			if(index == 0 && mention.getScreenName().equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
-			toReturn += " @" + mention.getScreenName();
+		if(mentions != null) {
+			int index = 0;
+			for(UserMentionEntity mention : mentions) {
+				if(index == 0 && mention.getScreenName().equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
+				toReturn += " @" + mention.getScreenName();
+			}
 		}
 		return toReturn;
 	}
@@ -529,7 +533,7 @@ public class Utilities {
 		}
 		return inSampleSize;
 	}
-	
+
 	public static Bitmap getRoundedImage(Bitmap bitmap, float roundPx) {
 		if(bitmap == null) return bitmap;
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
@@ -538,18 +542,15 @@ public class Utilities {
 		final Paint paint = new Paint();
 		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 		final RectF rectF = new RectF(rect);
-		// final float roundPx = 4.0f;
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(color);
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);
-		//TODO recycling causes crash because "recycled images cannot be used" or something
-		//bitmap.recycle();
 		return output;
 	}
-	
+
 	public static boolean isIntentAvailable(Context context, String action) {
 		final Intent intent = new Intent(action);
 		return isIntentAvailable(context, intent);
@@ -559,28 +560,28 @@ public class Utilities {
 		List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
 	}
-	
+
 	public static Object deserializeObject(String input){
 		try{
 			byte [] data = Base64.decode( input, Base64.DEFAULT );
-	        ObjectInputStream ois = new ObjectInputStream( 
-	                                        new ByteArrayInputStream(  data ) );
-	        Object o  = ois.readObject();
-	        ois.close();
-	        return o;
+			ObjectInputStream ois = new ObjectInputStream( 
+					new ByteArrayInputStream(  data ) );
+			Object o  = ois.readObject();
+			ois.close();
+			return o;
 		} catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public static String serializeObject(Serializable tweet){
 		try{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	        ObjectOutputStream oos = new ObjectOutputStream( baos );
-	        oos.writeObject( tweet );
-	        oos.close();
-	        return new String( Base64.encode( baos.toByteArray(), Base64.DEFAULT ) );
+			ObjectOutputStream oos = new ObjectOutputStream( baos );
+			oos.writeObject( tweet );
+			oos.close();
+			return new String( Base64.encode( baos.toByteArray(), Base64.DEFAULT ) );
 		} catch(Exception e){
 			e.printStackTrace();
 			return "";
@@ -599,7 +600,7 @@ public class Utilities {
 		if(user != null){ // Allows us to have auto-updating cache
 			url += "&v=" + Uri.encode(user.getProfileImageURL().toString());
 		}
-		
+
 		int size = DpToPx(50, mContext);
 		if( size >= 73 ){
 			url += "&size=bigger";
@@ -608,7 +609,7 @@ public class Utilities {
 		} else{
 			url += "&size=mini";
 		}
-		
+
 		return url;
 	}
 }
