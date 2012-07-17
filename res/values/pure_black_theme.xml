@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="Boid.DarkTheme" parent="@android:style/Theme.Holo">
-		<item name="themeColor">@android:color/darker_gray</item>
+<resources>
+    <style name="Boid.PureBlackTheme" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_pure_black</item>
+        <item name="android:popupMenuStyle">@style/pure_black_PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/pure_black_DropDownListView</item>
+        <item name="android:actionBarStyle">@style/pure_black_transparent_ActionBar</item>
+        <item name="android:actionBarTabStyle">@style/pure_black_ActionBarTabStyle</item>
+        <item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+        <item name="android:actionDropDownStyle">@style/pure_black_DropDownNav</item>
+        <item name="android:panelBackground">@drawable/menu_hardkey_panel_pure_black</item>
+ 	    <item name="android:windowBackground">@drawable/ab_solid_pure_black</item>   
+ 	    
+        <item name="themeColor">@android:color/darker_gray</item>
 		<item name="usernameColor">@color/username_highlight_selector</item>
 		<item name="tweetColor">@color/white</item>
 		<item name="linkColor">@color/link_highlight_selector</item>
@@ -18,10 +28,7 @@
 		<item name="settingsIcon">@drawable/settings_light</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
 		<item name="sideNavColor">#252930</item>
-		<item name="spinnerActionBarDropDownColor">@color/white</item>
-
-		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
-    	<item name="android:actionBarTabStyle">@style/customTabStyle</item>
+		<item name="spinnerActionBarDropDownColor">@color/white</item>		
 		
 		<item name="timelineTab">@drawable/home_tab</item>
 		<item name="mentionsTab">@drawable/mentions_tab</item>
@@ -66,17 +73,40 @@
 		<item name="galleryAttachedIcon">@drawable/media_blue</item>
 		<item name="galleryDetachedIcon">@drawable/media_light</item>
 		<item name="locationAttachedIcon">@drawable/locate_blue</item>
-		<item name="locationDetachedIcon">@drawable/locate</item>
-	</style>
-	<style name="DropDownNav.Text"
-		parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem">
-		<item name="android:textColor">#FFFFFF</item>
-		<item name="android:textSize">24dip</item>
-	</style>
-	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
+		<item name="locationDetachedIcon">@drawable/locate</item>d
+    </style>
+
+    <style name="pure_black_solid_ActionBar" parent="@android:style/Widget.Holo.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_pure_black</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_pure_black</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_pure_black</item>
+        <item name="android:progressBarStyle">@style/pure_black_ProgressBar</item>
+    </style>
+    <style name="pure_black_transparent_ActionBar" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_pure_black</item>
+        <item name="android:progressBarStyle">@style/pure_black_ProgressBar</item>
+    </style>
+    <style name="pure_black_PopupMenu" parent="@android:style/Widget.Holo.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_pure_black</item>	
+    </style>
+    <style name="pure_black_DropDownListView" parent="@android:style/Widget.Holo.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_pure_black</item>
+    </style>
+    <style name="pure_black_ActionBarTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_pure_black</item>
+    </style>
+    <style name="pure_black_DropDownNav" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_pure_black</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_pure_black</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_pure_black</item>
+    </style>
+    <style name="pure_black_ProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_pure_black</item>
+    </style>
+    <style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
-		<!-- <item name="android:divider">@drawable/divider</item> -->
 		<item name="android:dividerPadding">15dp</item>
-		<!-- <item name="android:background">@drawable/tab_unselected</item> -->
+		
+		<item name="android:background">@drawable/ab_solid_pure_black</item>
 	</style>
 </resources>

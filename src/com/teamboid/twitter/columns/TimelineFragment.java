@@ -47,12 +47,14 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int index, long id) {
-		super.onListItemClick(l, v, index, id);
-		Status tweet = (Status)adapt.getItem(index);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		if(TimelineCAB.TimelineActionMode == null) {
+			super.onListItemClick(l, v, index, id);
+			Status tweet = (Status)adapt.getItem(index);
+			if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+			context.startActivity(new Intent(context, TweetViewer.class)
+			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		} else getListView().setItemChecked(index, true);
 	}
 
 	@Override
@@ -65,8 +67,9 @@ public class TimelineFragment extends BaseListFragment {
 					public void onScrollStateChanged(AbsListView view, int scrollState) { }
 					@Override
 					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount)
+						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 							performRefresh(true);
+						}
 						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 							if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true))
 								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.timeline_str);
@@ -77,7 +80,7 @@ public class TimelineFragment extends BaseListFragment {
 		getListView().setOnItemLongClickListener(
 				new AdapterView.OnItemLongClickListener() {
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) { 
 						TimelineCAB.performLongPressAction(getListView(), adapt, index);
 						return true;
 					}

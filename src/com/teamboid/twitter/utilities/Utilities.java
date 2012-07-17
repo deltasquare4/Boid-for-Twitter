@@ -132,6 +132,8 @@ public class Utilities {
 			return R.style.Boid_LightTheme;
 		case 2:
 			return R.style.Boid_DarkLightTheme;
+		case 3:
+			return R.style.Boid_PureBlackTheme;
 		}
 	}
 	public static String getTweetYFrogTwitpicMedia(final Status tweet) {
