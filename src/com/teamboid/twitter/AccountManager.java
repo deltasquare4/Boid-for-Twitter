@@ -2,6 +2,9 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
@@ -14,6 +17,8 @@ import twitter4j.auth.RequestToken;
 import twitter4j.conf.ConfigurationBuilder;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,9 +26,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.preference.PreferenceActivity.Header;
 import android.util.Log;
 import android.view.Menu;
@@ -45,13 +52,186 @@ public class AccountManager extends PreferenceActivity {
 	
 	
 	public static class AccountFragment extends PreferenceFragment{
+		ProgressDialog pd;
+		BroadcastReceiver pupdater;
+		
+		@Override
+		public void onDestroy (){
+			getActivity().unregisterReceiver(pupdater);
+		}
+		
+		boolean realChange = false;
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_accounts);
+			
+			pd = new ProgressDialog(getActivity());
+			pd.setMessage(getText(R.string.push_wait));
+			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			
+			pupdater = new BroadcastReceiver(){
+
+				@Override
+				public void onReceive(Context arg0, Intent arg1) {
+					pd.setProgress(arg1.getIntExtra("progress", 1000));
+					if(arg1.getIntExtra("progress", 0) == 1000){
+						pd.dismiss();
+						if(arg1.getBooleanExtra("error", false) == true){
+							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+						} else{
+							Toast.makeText(getActivity(), R.string.push_registered, Toast.LENGTH_SHORT).show();
+							findPreference("c2dm").getSharedPreferences().edit().putBoolean("c2dm", true).commit();
+							realChange = true;
+							((SwitchPreference)findPreference("c2dm")).setChecked(true);
+							realChange = false;
+						}
+					}
+				}
+				
+			};
+			IntentFilter i = new IntentFilter();
+			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
+			getActivity().registerReceiver(pupdater, i);
+			
 			final int accountId = this.getArguments().getInt("accountId");
 			
-			// TODO: Do something here
+			findPreference("{user}_c2dm_mentions").setOnPreferenceChangeListener( new RemotePushSettingChange( "replies" ) );
+			findPreference("{user}_c2dm_messages").setOnPreferenceChangeListener( new RemotePushSettingChange( "dm" ) );
+		
+			((SwitchPreference)findPreference("{user}_c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(final Preference preference, Object newValue) {
+					if(realChange == true) return true;
+					
+					if((Boolean)newValue == true){
+						// Register!
+						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
+						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
+						getActivity().startService(registrationIntent);
+						
+						pd.setProgress(0);
+						pd.show();
+					} else{
+						// Unregister
+						pd.setProgress(0);
+						pd.show();
+						
+						new Thread(new Runnable(){
+
+							@Override
+							public void run() {
+								try{
+									DefaultHttpClient dhc = new DefaultHttpClient();
+									HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + AccountService.getCurrentAccount().getId());
+									org.apache.http.HttpResponse r = dhc.execute(get);
+									if(r.getStatusLine().getStatusCode() == 200 ){
+										getActivity().runOnUiThread(new Runnable(){
+
+											@Override
+											public void run() {
+												pd.dismiss();
+												
+												// Update Switch
+												preference.getSharedPreferences().edit().putBoolean("c2dm", false).commit();
+												realChange = true;
+												((SwitchPreference)preference).setChecked(false);
+												realChange = false;
+												
+												Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
+											}
+											
+										});
+									} else{
+										throw new Exception("NON 200 RESPONSE ;__;");
+									}
+								} catch(Exception e){
+									e.printStackTrace();
+									getActivity().runOnUiThread( new Runnable(){
+										@Override
+										public void run(){
+											Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+										}
+									});
+								}
+							}
+							
+						});
+					}
+					return false;
+				}
+			});
+			
+			setKey("c2dm", accountId);
+			setKey("c2dm_mentions", accountId);
+			setKey("c2dm_messages", accountId);
+			setKey("c2dm_vibrate", accountId);
+			setKey("c2dm_ringtone", accountId);
+			setKey("c2dm_messages_priv", accountId);
+			
+			setKey("contactsync", accountId);
+		}
+		void setKey(String key, int accountId){
+			findPreference("{user}_" + key).setKey(accountId + "_" + key);
+		}
+		
+		public class RemotePushSettingChange implements Preference.OnPreferenceChangeListener{
+			String remote_setting;
+			
+			public RemotePushSettingChange(String remote_setting){
+				this.remote_setting = remote_setting;
+			}
+			
+			@Override
+			public boolean onPreferenceChange(final Preference preference,
+					final Object newValue) {
+				
+				pd.setProgress(0);
+				pd.show();
+				
+				new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						try{
+							DefaultHttpClient dhc = new DefaultHttpClient();
+							HttpGet get = new HttpGet(PushReceiver.SERVER +
+													"/edit/" +
+													AccountService.getCurrentAccount().getId() + "/" +
+													remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
+							org.apache.http.HttpResponse r = dhc.execute(get);
+							if(r.getStatusLine().getStatusCode() == 200 ){
+								getActivity().runOnUiThread(new Runnable(){
+
+									@Override
+									public void run() {
+										pd.dismiss();
+										
+										Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
+									}
+									
+								});
+							} else{
+								throw new Exception("NON 200 RESPONSE ;__;");
+							}
+						} catch(Exception e){
+							e.printStackTrace();
+							getActivity().runOnUiThread( new Runnable(){
+								@Override
+								public void run(){
+									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+									((SwitchPreference)preference).setChecked( !(Boolean)newValue );
+								}
+							});
+						}
+					}
+					
+				});
+				
+				return true;
+			}
 		}
 	}
 
