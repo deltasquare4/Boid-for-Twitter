@@ -186,6 +186,8 @@ public class Utilities {
 		} else return null;
 	}
 	public static boolean tweetContainsVideo(final Status tweet) {
+		if(tweet.getURLEntities() == null) return false;
+		
 		for(int i = 0; i < tweet.getURLEntities().length; i++) {
 			URLEntity urlEntity = tweet.getURLEntities()[i];
 			if(urlEntity == null || urlEntity.getURL() == null) continue;

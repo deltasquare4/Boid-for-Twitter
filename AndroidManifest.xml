@@ -205,6 +205,8 @@
 		 </intent-filter>
 		 <meta-data android:name="android.content.SyncAdapter"
 			android:resource="@xml/sync_contacts" />
+		<meta-data android:name="android.provider.CONTACTS_STRUCTURE"
+			android:resource="@xml/contact_structure" />
 		</service>
 
 	</application>

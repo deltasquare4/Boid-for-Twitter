@@ -408,4 +408,17 @@
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!</string>
+		
+	<string-array name="sync_types">
+	    <item>Following</item>
+	    <item>Followers</item>
+	    <item>Mutual</item>
+	</string-array>
+	<string-array name="sync_types_values">
+	    <item>following</item>
+	    <item>followers</item>
+	    <item>mutual</item>
+	</string-array>
+		
+	<string name="contact_sync">Contact Sync</string>
 </resources>
