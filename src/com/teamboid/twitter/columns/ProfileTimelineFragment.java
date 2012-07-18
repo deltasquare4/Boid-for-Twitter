@@ -62,6 +62,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
+		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
@@ -172,32 +173,34 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
 		if (AccountService.getCurrentAccount() != null) {
-			if (getAdapter() != null && !firstInitialize
-					&& getView() != null)
+			if (getAdapter() != null && !firstInitialize && getView() != null) {
 				getAdapter().setLastViewed(getListView());
+			}
 			if (getAdapter() == null) {
-				globalAdapter = AccountService.getFeedAdapter(context,
-						ProfileTimelineFragment.ID + "@" + screenName,
-						AccountService.getCurrentAccount().getId());
+				globalAdapter = AccountService.getFeedAdapter(context, ProfileTimelineFragment.ID + "@" + 
+						screenName, AccountService.getCurrentAccount().getId());
 			}
 			setListAdapter(getAdapter());
-			if (getAdapter().getCount() == 0)
+			if (getAdapter().getCount() == 0) {
 				performRefresh(false);
-			else if (getView() != null && getAdapter() != null)
+			} else if (getView() != null && getAdapter() != null) {
 				getAdapter().restoreLastViewed(getListView());
+			}
 		}
 	}
 
 	@Override
 	public void savePosition() {
-		if (getView() != null && getAdapter() != null)
+		if (getView() != null && getAdapter() != null) {
 			getAdapter().setLastViewed(getListView());
+		}
 	}
 
 	@Override
 	public void restorePosition() {
-		if (getView() != null && getAdapter() != null)
+		if (getView() != null && getAdapter() != null) {
 			getAdapter().restoreLastViewed(getListView());
+		}
 	}
 
 	@Override

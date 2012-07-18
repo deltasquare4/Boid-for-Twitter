@@ -7,7 +7,6 @@ import twitter4j.TwitterException;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,7 +94,6 @@ public class MessageConvoCAB {
 		@Override
 		public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
 			item.setEnabled(false);
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			item.setTitle(R.string.deleting_str);
 			final DMConversation[] selConvos = getSelectedConvos();
 			MessageConvoCAB.clearSelectedItems();

@@ -25,6 +25,7 @@ import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetListActivity;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.columns.ProfilePaddedFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -46,7 +47,7 @@ public class TimelineCAB {
 		} else {
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag instanceof BaseListFragment) {
+				if(frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
 					((BaseListFragment)frag).getListView().clearChoices();
 					((BaseAdapter)((BaseListFragment)frag).getListView().getAdapter()).notifyDataSetChanged();
 				}
@@ -68,7 +69,7 @@ public class TimelineCAB {
 		} else {
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag instanceof BaseListFragment) {
+				if(frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
 					Status[] toAdd = ((BaseListFragment)frag).getSelectedStatuses();
 					if(toAdd != null && toAdd.length > 0) {
 						for(Status s : toAdd) toReturn.add(s);
