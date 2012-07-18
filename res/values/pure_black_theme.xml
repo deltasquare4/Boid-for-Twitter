@@ -6,7 +6,7 @@
         <item name="android:dropDownListViewStyle">@style/pure_black_DropDownListView</item>
         <item name="android:actionBarStyle">@style/pure_black_transparent_ActionBar</item>
         <item name="android:actionBarTabStyle">@style/pure_black_ActionBarTabStyle</item>
-        <item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+        <item name="android:actionBarTabBarStyle">@style/pure_black_customTabBar</item>
         <item name="android:actionDropDownStyle">@style/pure_black_DropDownNav</item>
         <item name="android:panelBackground">@drawable/menu_hardkey_panel_pure_black</item>
  	    <item name="android:windowBackground">@drawable/ab_solid_pure_black</item>   
@@ -103,10 +103,9 @@
     <style name="pure_black_ProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_pure_black</item>
     </style>
-    <style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
+    <style name="pure_black_customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
 		<item name="android:dividerPadding">15dp</item>
-		
 		<item name="android:background">@drawable/ab_solid_pure_black</item>
 	</style>
 </resources>

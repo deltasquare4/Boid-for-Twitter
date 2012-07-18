@@ -19,9 +19,6 @@
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
 		<item name="sideNavColor">#252930</item>
 		<item name="spinnerActionBarDropDownColor">@color/white</item>
-
-		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
-    	<item name="android:actionBarTabStyle">@style/customTabStyle</item>
 		
 		<item name="timelineTab">@drawable/home_tab</item>
 		<item name="mentionsTab">@drawable/mentions_tab</item>
@@ -75,8 +72,6 @@
 	</style>
 	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
-		<!-- <item name="android:divider">@drawable/divider</item> -->
 		<item name="android:dividerPadding">15dp</item>
-		<!-- <item name="android:background">@drawable/tab_unselected</item> -->
 	</style>
 </resources>
