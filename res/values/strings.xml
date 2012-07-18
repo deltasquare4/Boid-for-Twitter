@@ -352,6 +352,7 @@
 	<string name="my_lists_str">My Lists</string>
 	<string name="add_to_list_str">Add to List</string>
 	<string name="deleting_list_str">Deleting list…</string>
+	<string name="deleting_str">Deleting…</string>
 	<string name="unsubscribing_list_str">Unsubscribing from list…</string>
 	<string name="deleted_list_str">Successfully deleted the list!</string>
 	<string name="unsubscribed_list_str">Unsubscribed from the list!</string>
@@ -401,11 +402,17 @@
 	<string name="x_tweets_Selected">{X} Tweets Selected</string>
 	<string name="one_user_selected">1 User Selected</string>
 	<string name="x_users_selected">{X} Users Selected</string>
+	<string name="one_convo_selected">1 Conversation Selected</string>
+	<string name="x_convos_selected">{X} Conversations Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!
 	</string>
 	<string name="this_is_you">This is you</string>
 	<string name="failed_check_following">Failed to check if you\'re following @{user}!
+	</string>
+	<string name="quick_reply_hint">Press enter to send…</string>
+	<string name="failed_delete_dm">Failed to delete a message from your conversation
+		with @{user}!
 	</string>
 </resources>

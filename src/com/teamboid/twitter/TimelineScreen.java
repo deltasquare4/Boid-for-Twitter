@@ -18,6 +18,7 @@ import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.columns.FavoritesFragment;
@@ -470,6 +471,7 @@ public class TimelineScreen extends Activity {
 		AccountService.activity = this;
 		TimelineCAB.context = this;
 		UserListCAB.context = this;
+		MessageConvoCAB.context = this;
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
@@ -495,6 +497,10 @@ public class TimelineScreen extends Activity {
 		if(UserListCAB.UserActionMode != null) {
 			UserListCAB.UserActionMode.finish();
 		}
+		MessageConvoCAB.clearSelectedItems();
+		if(MessageConvoCAB.ConvoActionMode != null) {
+			MessageConvoCAB.ConvoActionMode.finish();
+		}
 	}
 
 	@Override
@@ -503,7 +509,7 @@ public class TimelineScreen extends Activity {
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
 	}
-
+	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);

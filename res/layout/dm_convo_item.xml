@@ -2,12 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/convoRelativeLayout" android:layout_width="match_parent"
 	android:layout_height="match_parent" android:paddingTop="5dp"
-	android:paddingRight="5dp" android:paddingBottom="5dp">
+	android:paddingRight="5dp" android:paddingBottom="5dp" android:background="?android:attr/activatedBackgroundIndicator">
 	<com.handlerexploit.prime.RemoteImageView
 		android:id="@+id/dmConvoProfileImg" android:layout_marginRight="10dp"
 		android:layout_width="60dp" android:layout_height="60dp"
 		android:src="@drawable/sillouette" />
-	<TextView android:id="@+id/dmConvoScreenNameTxt"
+	<TextView android:id="@+id/dmConvoScreenNameTxt" android:duplicateParentState="true"
 		android:textColor="?usernameColor" android:textStyle="bold"
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:layout_toRightOf="@+id/dmConvoProfileImg"
@@ -18,7 +18,7 @@
 		android:layout_marginRight="5dp" android:layout_width="15dp"
 		android:layout_below="@+id/dmConvoScreenNameTxt"
 		android:layout_height="15dp" android:src="?replyIndicator" />
-	<TextView android:id="@+id/dmConvoMessageTxt"
+	<TextView android:id="@+id/dmConvoMessageTxt" android:duplicateParentState="true"
 		android:textColor="?tweetColor" android:textColorLink="?linkColor"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_toRightOf="@+id/dmConvoReplyIndicator"

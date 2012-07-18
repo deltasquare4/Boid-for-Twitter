@@ -143,6 +143,15 @@ public class MessageConvoAdapter extends BaseAdapter {
 		items.remove(index);
 		notifyDataSetChanged();
 	}
+	public void remove(DMConversation convo) {
+		for(int i = 0; i < items.size(); i++) {
+			if(items.get(i).getToId() == convo.getToId()) {
+				items.remove(i);
+				notifyDataSetChanged();
+				break;
+			}
+		}
+	}
 	public void clear() {
 		items.clear();
 		notifyDataSetChanged();
