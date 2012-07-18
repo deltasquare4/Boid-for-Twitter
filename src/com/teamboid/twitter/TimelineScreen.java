@@ -18,6 +18,9 @@ import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.cab.MessageConvoCAB;
+import com.teamboid.twitter.cab.TimelineCAB;
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.columns.FavoritesFragment;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.MentionsFragment;
@@ -443,8 +446,7 @@ public class TimelineScreen extends Activity {
 	/**
 	 * Simply restarts the current activity - Added by Zach Rogers
 	 */
-	public void restartActivity()
-	{
+	public void restartActivity() {
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
@@ -456,28 +458,21 @@ public class TimelineScreen extends Activity {
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
 			lastTheme = Utilities.getTheme(getApplicationContext()); 
-			recreate();
-			
-			//Restart current activity -- Seems to fix blank column issue for theme changes
-			restartActivity();
-			
+			restartActivity();			
 			return;
 		} else if(lastIconic != PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true)) {
 			lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
-			recreate();
-			
-			//Restart current activity -- Seems to fix blank column issue for iconic tab changes
 			restartActivity();
-			
 			return;
 		} else if(lastDisplayReal != PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", false)) {
 			lastDisplayReal = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", true);
-			recreate();
+			restartActivity();
 			return;
 		}
 		AccountService.activity = this;
 		TimelineCAB.context = this;
 		UserListCAB.context = this;
+		MessageConvoCAB.context = this;
 		if(getActionBar().getTabCount() == 0 && AccountService.getAccounts().size() > 0) loadColumns(false, false);
 		if(AccountService.selectedAccount > 0 && AccountService.getAccounts().size() > 0) {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
@@ -491,6 +486,23 @@ public class TimelineScreen extends Activity {
 		filter.addAction(AccountManager.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		TimelineCAB.clearSelectedItems();
+		if(TimelineCAB.TimelineActionMode != null) {
+			TimelineCAB.TimelineActionMode.finish();
+		}
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+		MessageConvoCAB.clearSelectedItems();
+		if(MessageConvoCAB.ConvoActionMode != null) {
+			MessageConvoCAB.ConvoActionMode.finish();
+		}
+	}
 
 	@Override
 	public void onDestroy() {
@@ -498,7 +510,7 @@ public class TimelineScreen extends Activity {
 		try { unregisterReceiver(receiver); }
 		catch(Exception e) { }
 	}
-
+	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);

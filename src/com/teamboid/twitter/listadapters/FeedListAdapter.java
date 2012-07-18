@@ -191,12 +191,13 @@ public class FeedListAdapter extends BaseAdapter {
 		return toReturn.toArray(new Status[0]);
 	}
 
-	private boolean update(Status toFind) {
+	public boolean update(Status toFind) {
 		boolean found = false;
 		for(int i = 0; i < tweets.size(); i++) {
 			if(tweets.get(i).getId() == toFind.getId()) {
 				found = true;
 				tweets.set(i, toFind);
+				notifyDataSetChanged();
 				break;
 			}
 		}

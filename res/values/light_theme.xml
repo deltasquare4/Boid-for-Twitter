@@ -20,9 +20,6 @@
 		<item name="sideNavColor">#DDDDDD</item>
 		<item name="spinnerActionBarDropDownColor">@color/black</item>
 
-		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
-		<item name="android:actionBarTabStyle">@style/customTabStyle</item>
-
 		<item name="timelineTab">@drawable/home_tab_dark</item>
 		<item name="mentionsTab">@drawable/mentions_tab_dark</item>
 		<item name="messagesTab">@drawable/messages_tab_dark</item>
@@ -74,17 +71,5 @@
 		parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem">
 		<item name="android:textColor">@color/black</item>
 		<item name="android:textSize">24dip</item>
-	</style>
-	<style name="customTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
-		<item name="android:showDividers">none</item>
-		<item name="android:measureWithLargestChild">true</item>
-		<!-- <item name="android:background">@drawable/tab_line</item> -->
-		<item name="android:gravity">center</item>
-	</style>
-	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
-		<item name="android:showDividers">middle</item>
-		<!-- <item name="android:divider">@drawable/divider</item> -->
-		<item name="android:dividerPadding">15dp</item>
-		<!-- <item name="android:background">@drawable/tab_unselected</item> -->
 	</style>
 </resources>

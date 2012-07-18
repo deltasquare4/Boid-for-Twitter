@@ -438,7 +438,7 @@ public class ComposerScreen extends Activity {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		stt.isGalleryImage = false;
 		stt.attachedImage = Utilities.generateImageFileName(this);
-		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(stt.attachedImage));
+		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(stt.attachedImage)));
 		startActivityForResult(takePictureIntent, CAMERA_SELECT_INTENT);
 	}
 	private void selectImage() {

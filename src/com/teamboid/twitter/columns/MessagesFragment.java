@@ -21,6 +21,7 @@ import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
@@ -56,10 +57,9 @@ public class MessagesFragment extends BaseListFragment {
 		getListView().setOnItemLongClickListener(
 				new AdapterView.OnItemLongClickListener() {
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, final int index, long id) {
-
-						return false;
+					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long id) {
+						MessageConvoCAB.performLongPressAction(getListView(), adapt, index);
+						return true;
 					}
 				});
 		setRetainInstance(true);

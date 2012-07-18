@@ -21,9 +21,9 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TimelineCAB;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;

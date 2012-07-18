@@ -21,8 +21,8 @@ import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SearchScreen;
-import com.teamboid.twitter.UserListCAB;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
@@ -107,8 +107,8 @@ public class SearchUsersFragment extends BaseListFragment {
 								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = context.userAdapter.getCount() - 1;
 								int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
-								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
+								if (beforeLast > 0) {
+									if (getView() != null && addedCount > 0) {
 										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
 										else getListView().setSelectionFromTop(context.userAdapter.savedIndex+ addedCount, context.userAdapter.savedIndexTop);
 									}

@@ -1,4 +1,4 @@
-package com.teamboid.twitter;
+package com.teamboid.twitter.cab;
 
 import java.util.ArrayList;
 
@@ -17,11 +17,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.teamboid.twitter.ComposerScreen;
+import com.teamboid.twitter.R;
+import com.teamboid.twitter.TweetListActivity;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.columns.ProfilePaddedFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -41,7 +47,7 @@ public class TimelineCAB {
 		} else {
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag instanceof BaseListFragment) {
+				if(frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
 					((BaseListFragment)frag).getListView().clearChoices();
 					((BaseAdapter)((BaseListFragment)frag).getListView().getAdapter()).notifyDataSetChanged();
 				}
@@ -63,7 +69,7 @@ public class TimelineCAB {
 		} else {
 			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag instanceof BaseListFragment) {
+				if(frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
 					Status[] toAdd = ((BaseListFragment)frag).getSelectedStatuses();
 					if(toAdd != null && toAdd.length > 0) {
 						for(Status s : toAdd) toReturn.add(s);
@@ -72,6 +78,22 @@ public class TimelineCAB {
 			}
 		}
 		return toReturn.toArray(new Status[0]);
+	}
+	public static void reinsertStatus(Status status) {
+		if(context instanceof TweetListActivity) {
+			ListAdapter adapter = ((TweetListActivity)context).getListView().getAdapter();
+			((FeedListAdapter)adapter).update(status);
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					ListAdapter adapter = ((BaseListFragment)frag).getListView().getAdapter();
+					if(adapter instanceof FeedListAdapter) {
+						((FeedListAdapter)adapter).update(status);
+					}
+				}
+			}
+		}
 	}
 
 	public static void updateTitle() {
@@ -177,13 +199,19 @@ public class TimelineCAB {
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			case R.id.favoriteAction:
-				for(final Status tweet : selTweets) {
+				for(Status t : selTweets) {
+					if(t.isRetweet()) t = t.getRetweetedStatus();
+					final Status tweet = t;
 					if(tweet.isFavorited()) {
 						new Thread(new Runnable() {
 							public void run() {
-								//TODO Update the favorite indicator in the corresponding column
-								try { AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId()); }
-								catch(TwitterException e) {
+								try { 
+									final Status unfavorited = AccountService.getCurrentAccount().getClient().destroyFavorite(tweet.getId());
+									unfavorited.setIsFavorited(false);
+									context.runOnUiThread(new Runnable() {
+										public void run() { TimelineCAB.reinsertStatus(unfavorited); }
+									});
+								} catch(TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										public void run() { 
@@ -196,9 +224,13 @@ public class TimelineCAB {
 					} else {
 						new Thread(new Runnable() {
 							public void run() {
-								//TODO Update the favorite indicator in the corresponding column
-								try { AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId()); }
-								catch(TwitterException e) {
+								try { 
+									final Status favorited = AccountService.getCurrentAccount().getClient().createFavorite(tweet.getId());
+									favorited.setIsFavorited(true);
+									context.runOnUiThread(new Runnable() {
+										public void run() { TimelineCAB.reinsertStatus(favorited); }
+									});
+								} catch(TwitterException e) {
 									e.printStackTrace();
 									context.runOnUiThread(new Runnable() {
 										public void run() { 
@@ -212,7 +244,9 @@ public class TimelineCAB {
 				}
 				return true;
 			case R.id.retweetAction:
-				for(final Status tweet : selTweets) {
+				for(Status t : selTweets) {
+					if(t.isRetweet()) t = t.getRetweetedStatus();
+					final Status tweet = t;
 					new Thread(new Runnable() {
 						public void run() {
 							try { 
@@ -236,14 +270,18 @@ public class TimelineCAB {
 				}
 				return true;
 			case R.id.shareAction:
-				String text = selTweets[0].getText() + "\n\n(via @" + selTweets[0].getUser().getScreenName() + ", http://twitter.com/" + selTweets[0].getUser().getScreenName() + "/status/" + Long.toString(selTweets[0].getId()) + ")";
+				Status toShare = selTweets[0];
+				if(toShare.isRetweet()) toShare = toShare.getRetweetedStatus();
+				String text = toShare.getText() + "\n\n(via @" + toShare.getUser().getScreenName() + ", http://twitter.com/" + toShare.getUser().getScreenName() + "/status/" + Long.toString(toShare.getId()) + ")";
 				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), 
 						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			case R.id.copyAction:
+				Status toCopy = selTweets[0];
+				if(toCopy.isRetweet()) toCopy = toCopy.getRetweetedStatus();
 				ClipboardManager clipboard = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", selTweets[0].getText()));
-				Toast.makeText(context, context.getString(R.string.copied_str).replace("{user}", selTweets[0].getUser().getScreenName()), Toast.LENGTH_SHORT).show();
+				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", toCopy.getText()));
+				Toast.makeText(context, context.getString(R.string.copied_str).replace("{user}", toCopy.getUser().getScreenName()), Toast.LENGTH_SHORT).show();
 				return true;
 			default:
 				return false;

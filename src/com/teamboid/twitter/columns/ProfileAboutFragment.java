@@ -60,8 +60,7 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 			String url = pair.getValue();
 			try {
 				context.startActivity(new Intent(Intent.ACTION_VIEW)
-				.setData(Uri.parse(url)).addFlags(
-						Intent.FLAG_ACTIVITY_CLEAR_TOP));
+				.setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -69,18 +68,13 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 			context.getActionBar().setSelectedNavigationItem(0);
 		} else if(pair.getName().equals(context.getString(R.string.location_str))) {
 			String loc = null;
-			try {
-				loc = URLEncoder.encode(pair.getValue(), "UTF-8");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			try { loc = URLEncoder.encode(pair.getValue(), "UTF-8"); }
+			catch (Exception e) { e.printStackTrace(); }
 			Intent geo = new Intent(Intent.ACTION_VIEW);
 			geo.setData(Uri.parse("geo:0,0?q=" + loc));
-			if (Utilities.isIntentAvailable(context, geo)) {
-				startActivity(geo);
-			} else {
-				geo.setData(Uri.parse("https://maps.google.com/maps?q="
-						+ loc));
+			if (Utilities.isIntentAvailable(context, geo)) startActivity(geo);
+			else {
+				geo.setData(Uri.parse("https://maps.google.com/maps?q=" + loc));
 				startActivity(geo);
 			}
 		} else if (pair.getName().equals(context.getString(R.string.followers_str))) {
@@ -113,11 +107,9 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null)
-			return;
+		if (context == null || isLoading || adapt == null) return;
 		isLoading = true;
-		if (adapt.getCount() == 0 && getView() != null)
-			setListShown(false);
+		if (adapt.getCount() == 0 && getView() != null) setListShown(false);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -125,18 +117,14 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 				if (acc != null) {
 					try {
 						User temp = null;
-						if (screenName
-								.equals(acc.getUser().getScreenName())) {
+						if (screenName.equals(acc.getUser().getScreenName())) {
 							temp = acc.getClient().verifyCredentials();
 							acc.setUser(temp);
-							ArrayList<Account> accs = AccountService
-									.getAccounts();
+							ArrayList<Account> accs = AccountService.getAccounts();
 							for (int i = 0; i < accs.size(); i++) {
-								if (accs.get(i).getId() == acc.getId())
-									AccountService.setAccount(i, acc);
+								if (accs.get(i).getId() == acc.getId()) AccountService.setAccount(i, acc);
 							}
-						} else
-							temp = acc.getClient().showUser(screenName);
+						} else temp = acc.getClient().showUser(screenName);
 						final User user = temp;
 						context.runOnUiThread(new Runnable() {
 							@Override
@@ -153,11 +141,8 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -165,8 +150,7 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -179,28 +163,23 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 		if (AccountService.getCurrentAccount() != null) {
 			adapt = new ProfileAboutAdapter(context);
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
+			if (adapt.getCount() == 0) performRefresh(false);
 		}
 	}
 
 	@Override
-	public void savePosition() {
-	}
+	public void savePosition() { }
 
 	@Override
-	public void restorePosition() {
-	}
+	public void restorePosition() { }
 
 	@Override
 	public void jumpTop() {
-		if (getView() != null)
-			getListView().setSelectionFromTop(0, 0);
+		if (getView() != null) getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
-	}
+	public void filter() { }
 
 	@Override
 	public Status[] getSelectedStatuses() { return null; }

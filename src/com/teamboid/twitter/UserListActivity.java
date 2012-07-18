@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
@@ -70,7 +71,6 @@ public class UserListActivity extends ListActivity {
 		binder = new SearchUsersListAdapter(this);
 		setListAdapter(binder);
 		refresh();
-		UserListCAB.context = this;
 		getListView().setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
@@ -95,6 +95,12 @@ public class UserListActivity extends ListActivity {
 			}
 		});		
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		UserListCAB.context = this;
 	}
 
 	public void paginate() {
@@ -175,6 +181,15 @@ public class UserListActivity extends ListActivity {
 	}
 	
 	@Override
+	public void onPause() {
+		super.onPause();
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+	}
+	
+	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
 		if(showProgress) {
@@ -191,11 +206,7 @@ public class UserListActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			//startActivity(new Intent(this, TimelineScreen.class));
-			//finish();
-			
-			super.onBackPressed(); //Back button should go back, not restart a new activity
-			
+			super.onBackPressed();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

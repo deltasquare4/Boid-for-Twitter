@@ -20,9 +20,9 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TimelineCAB;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
@@ -114,53 +114,32 @@ public class FavoritesFragment extends BaseListFragment {
 			@Override
 			public void run() {
 				Paging paging = new Paging(1, 50);
-				if (paginate)
-					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient()
-								.getFavorites(paging);
+						final ResponseList<Status> feed = acc.getClient().getFavorites(paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_favorites));
+								setEmptyText(context.getString(R.string.no_favorites));
 								int beforeLast = adapt.getCount() - 1;
-								int addedCount = adapt.add(feed
-										.toArray(new Status[0]));
-								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
-										if (paginate && addedCount > 0)
-											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
-										else if (getView() != null
-												&& adapt != null)
+								int addedCount = adapt.add(feed.toArray(new Status[0]));
+								if (beforeLast > 0) {
+									if (getView() != null && addedCount > 0) {
+										if (paginate && addedCount > 0) {
+											getListView().smoothScrollToPosition(beforeLast + 1);
+										} else if (getView() != null && adapt != null) {
 											adapt.restoreLastViewed(getListView());
+										}
 									}
-									if (!PreferenceManager
-											.getDefaultSharedPreferences(
-													context).getBoolean(
-															"enable_iconic_tabs",
-															true)) {
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														context.getString(R.string.favorites_str)
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														Integer.toString(addedCount));
+									if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(context.getString(R.string.favorites_str) + " (" + Integer.toString(addedCount) + ")");
+									} else {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(Integer.toString(addedCount));
+									}
 								}
 							}
 						});
@@ -169,11 +148,8 @@ public class FavoritesFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -181,8 +157,7 @@ public class FavoritesFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -197,14 +172,10 @@ public class FavoritesFragment extends BaseListFragment {
 		if (AccountService.getCurrentAccount() != null) {
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(context,
-					FavoritesFragment.ID, AccountService
-					.getCurrentAccount().getId());
+			adapt = AccountService.getFeedAdapter(context, FavoritesFragment.ID, AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-			else if (getView() != null && adapt != null)
-				adapt.restoreLastViewed(getListView());
+			if (adapt.getCount() == 0) performRefresh(false);
+			else if (getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 		}
 	}
 

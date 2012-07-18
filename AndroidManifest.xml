@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="57"
-	android:versionName="0.8.1.5 Beta">
+	package="com.teamboid.twitter" android:versionCode="60"
+	android:versionName="0.8.1.6 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -180,8 +180,7 @@
 		</receiver>
 		<activity android:name=".LoginHandler"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:hardwareAccelerated="true"
-			android:windowSoftInputMode="adjustResize" />
+			android:windowSoftInputMode="adjustResize" android:hardwareAccelerated="true"/>
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver" android:exported="false">
 			<intent-filter>

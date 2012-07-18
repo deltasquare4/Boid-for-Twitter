@@ -12,6 +12,7 @@ import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.columns.ProfileAboutFragment;
@@ -121,11 +122,6 @@ public class ProfileScreen extends Activity {
 					getAboutFragment().getAdapter().updateIsFollowedBy( x.isSourceFollowedByTarget() );
 					getAboutFragment().getAdapter().updateIsFollowing( x.isSourceFollowingTarget() );
 					
-					runOnUiThread(new Runnable() {
-						public void run() { 
-							((TextView)findViewById(R.id.profileFollowsYou)).setVisibility(getAboutFragment().getAdapter().isFollowedBy() ? View.VISIBLE : View.GONE);
-						}
-					});
 					
 				} catch (final TwitterException e) {
 					e.printStackTrace();
@@ -141,7 +137,6 @@ public class ProfileScreen extends Activity {
 					getAboutFragment().getAdapter().updateRequestSent(true);
 					return;
 				}
-				
 				runOnUiThread(new Runnable() {
 					public void run() { getAboutFragment().getAdapter().notifyDataSetChanged(); }
 				});
@@ -157,6 +152,16 @@ public class ProfileScreen extends Activity {
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
+		}
+		TimelineCAB.context = this;
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		TimelineCAB.clearSelectedItems();
+		if(TimelineCAB.TimelineActionMode != null) {
+			TimelineCAB.TimelineActionMode.finish();
 		}
 	}
 

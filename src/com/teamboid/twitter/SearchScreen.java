@@ -3,6 +3,7 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.SearchUsersFragment;
@@ -56,7 +57,6 @@ public class SearchScreen extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.main);
         setProgressBarIndeterminateVisibility(false);
-        UserListCAB.context = this;
         initializeTabs(savedInstanceState);
     }
 		
@@ -85,8 +85,18 @@ public class SearchScreen extends Activity {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
 		}
+		UserListCAB.context = this;
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		UserListCAB.clearSelectedItems();
+		if(UserListCAB.UserActionMode != null) {
+			UserListCAB.UserActionMode.finish();
+		}
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		MenuInflater inflater = getMenuInflater();

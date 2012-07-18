@@ -68,55 +68,32 @@ public class SavedSearchFragment extends BaseListFragment {
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
-					public void onScrollStateChanged(AbsListView view,
-							int scrollState) {
-					}
-
+					public void onScrollStateChanged(AbsListView view, int scrollState) { }
 					@Override
-					public void onScroll(AbsListView view,
-							int firstVisibleItem, int visibleItemCount,
-							int totalItemCount) {
-						if (totalItemCount > 0
-								&& (firstVisibleItem + visibleItemCount) >= totalItemCount
-								&& totalItemCount > visibleItemCount)
+					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 							performRefresh(true);
-						if (firstVisibleItem == 0
-								&& context.getActionBar().getTabCount() > 0) {
-							final SharedPreferences prefs = PreferenceManager
-									.getDefaultSharedPreferences(context);
-							if (!prefs.getBoolean("enable_iconic_tabs",
-									true)
-									|| prefs.getBoolean(
-											"textual_savedsearch_tabs",
-											true)) {
-								context.getActionBar()
-								.getTabAt(
-										getArguments().getInt(
-												"tab_index"))
-												.setText(query);
-							} else
-								context.getActionBar()
-								.getTabAt(
-										getArguments().getInt(
-												"tab_index"))
-												.setText("");
+						}
+						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+							final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+							if (!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean("textual_savedsearch_tabs", true)) {
+								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(query);
+							} else {
+								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+							}
 						}
 					}
 				});
 		getListView().setOnItemLongClickListener(
 				new AdapterView.OnItemLongClickListener() {
 					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, int index, long id) {
+					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
 						Tweet item = (Tweet) adapt.getItem(index);
-						context.startActivity(new Intent(context,
-								ComposerScreen.class)
+						context.startActivity(new Intent(context, ComposerScreen.class)
 						.putExtra("reply_to", item.getId())
-						.putExtra("reply_to_name",
-								item.getFromUser())
-								.putExtra("append",
-										Utilities.getAllMentions(item))
-										.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						.putExtra("reply_to_name", item.getFromUser())
+						.putExtra("append", Utilities.getAllMentions(item))
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 						return false;
 					}
 				});
@@ -127,18 +104,15 @@ public class SavedSearchFragment extends BaseListFragment {
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null)
-			return;
+		if (context == null || isLoading || adapt == null) return;
 		isLoading = true;
-		if (adapt.getCount() == 0 && getView() != null)
-			setListShown(false);
+		if (adapt.getCount() == 0 && getView() != null) setListShown(false);
 		adapt.setLastViewed(getListView());
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Query q = new Query(query);
-				if (paginate)
-					q.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				if (paginate) q.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
@@ -146,44 +120,23 @@ public class SavedSearchFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_results));
+								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = adapt.getCount() - 1;
-								int addedCount = adapt.add(feed.getTweets()
-										.toArray(new Tweet[0]));
+								int addedCount = adapt.add(feed.getTweets().toArray(new Tweet[0]));
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
-										if (paginate && addedCount > 0)
-											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
-										else
-											adapt.restoreLastViewed(getListView());
+										if (paginate && addedCount > 0) {
+											getListView().smoothScrollToPosition(beforeLast + 1);
+										} else adapt.restoreLastViewed(getListView());
 									}
-									final SharedPreferences prefs = PreferenceManager
-											.getDefaultSharedPreferences(context);
-									if (!prefs.getBoolean(
-											"enable_iconic_tabs", true)
-											|| prefs.getBoolean(
-													"textual_savedsearch_tabs",
-													true)) {
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														query
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														Integer.toString(addedCount));
+									final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+									if (!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean("textual_savedsearch_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(query + " (" + Integer.toString(addedCount) + ")");
+									} else {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
+											.setText(Integer.toString(addedCount));
+									}
 								}
 							}
 						});
@@ -192,11 +145,8 @@ public class SavedSearchFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -204,8 +154,7 @@ public class SavedSearchFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -215,40 +164,33 @@ public class SavedSearchFragment extends BaseListFragment {
 
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
-		if (context == null && getActivity() != null)
-			context = getActivity();
+		if (context == null && getActivity() != null) context = getActivity();
 		if (AccountService.getCurrentAccount() != null) {
-			if (adapt != null && !firstInitialize && getView() != null)
+			if (adapt != null && !firstInitialize && getView() != null) {
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getSearchFeedAdapter(context,
-					SavedSearchFragment.ID + "@" + query, AccountService
-					.getCurrentAccount().getId());
-			if (getView() != null)
-				adapt.list = getListView();
+			}
+			adapt = AccountService.getSearchFeedAdapter(context, SavedSearchFragment.ID + "@" + query, 
+					AccountService.getCurrentAccount().getId());
+			if (getView() != null) adapt.list = getListView();
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-			else
-				adapt.restoreLastViewed(getListView());
+			if (adapt.getCount() == 0) performRefresh(false);
+			else adapt.restoreLastViewed(getListView());
 		}
 	}
 
 	@Override
 	public void savePosition() {
-		if (getView() != null && adapt != null)
-			adapt.setLastViewed(getListView());
+		if (getView() != null && adapt != null) adapt.setLastViewed(getListView());
 	}
 
 	@Override
 	public void restorePosition() {
-		if (getView() != null && adapt != null)
-			adapt.restoreLastViewed(getListView());
+		if (getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
 	}
 
 	@Override
 	public void jumpTop() {
-		if (getView() != null)
-			getListView().setSelectionFromTop(0, 0);
+		if (getView() != null) getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override

@@ -72,6 +72,7 @@ public class SearchUsersListAdapter extends BaseAdapter {
 			if(users.get(i).getId() == toFind.getId()) {
 				found = true;
 				users.set(i, toFind);
+				notifyDataSetChanged();
 				break;
 			}
 		}

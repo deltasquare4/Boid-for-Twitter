@@ -65,25 +65,15 @@ public class SearchTweetsFragment extends BaseListFragment {
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
-					public void onScrollStateChanged(AbsListView view,
-							int scrollState) {
-					}
-
+					public void onScrollStateChanged(AbsListView view, int scrollState) { }
 					@Override
-					public void onScroll(AbsListView view,
-							int firstVisibleItem, int visibleItemCount,
-							int totalItemCount) {
-						if (totalItemCount > 0
-								&& (firstVisibleItem + visibleItemCount) >= totalItemCount
-								&& totalItemCount > visibleItemCount)
+					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 							performRefresh(true);
-						if (firstVisibleItem == 0
-								&& context.getActionBar().getTabCount() > 0)
-							context.getActionBar()
-							.getTabAt(
-									getArguments().getInt(
-											"tab_index"))
-											.setText(R.string.tweets_str);
+						}
+						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+							context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.tweets_str);
+						}
 					}
 				});
 		getListView().setOnItemLongClickListener(
@@ -107,13 +97,12 @@ public class SearchTweetsFragment extends BaseListFragment {
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || context.tweetAdapter == null)
-			return;
+		if (context == null || isLoading || context.tweetAdapter == null) return;
 		isLoading = true;
-		if (context.tweetAdapter.getCount() == 0 && getView() != null)
-			setListShown(false);
-		if (getView() != null && context.tweetAdapter != null)
+		if (context.tweetAdapter.getCount() == 0 && getView() != null) setListShown(false);
+		if (getView() != null && context.tweetAdapter != null) {
 			context.tweetAdapter.setLastViewed(getListView());
+		}
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -130,8 +119,8 @@ public class SearchTweetsFragment extends BaseListFragment {
 								int beforeLast = context.tweetAdapter.getCount() - 1;
 								int addedCount = context.tweetAdapter.add(feed.getTweets().toArray(new Tweet[0]));
 								if (addedCount > 0 || beforeLast > 0) {
-									if (getView() != null) {
-										if (paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
+									if (getView() != null && addedCount > 0) {
+										if (paginate) getListView().smoothScrollToPosition(beforeLast + 1);
 										else context.tweetAdapter.restoreLastViewed(getListView());
 									}
 									Tab curTab = context.getActionBar().getTabAt(getArguments().getInt("tab_index"));
@@ -150,11 +139,8 @@ public class SearchTweetsFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -162,8 +148,7 @@ public class SearchTweetsFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -174,34 +159,29 @@ public class SearchTweetsFragment extends BaseListFragment {
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
 		if (AccountService.getCurrentAccount() != null) {
-			if (context.tweetAdapter == null)
+			if (context.tweetAdapter == null) {
 				context.tweetAdapter = new SearchFeedListAdapter(context,
-						null, AccountService.getCurrentAccount().getId());
-			if (getView() != null)
-				context.tweetAdapter.list = getListView();
+					null, AccountService.getCurrentAccount().getId());
+			}
+			if (getView() != null) context.tweetAdapter.list = getListView();
 			setListAdapter(context.tweetAdapter);
-			if (context.tweetAdapter.getCount() == 0)
-				performRefresh(false);
+			if (context.tweetAdapter.getCount() == 0) performRefresh(false);
 		}
 	}
 
 	@Override
-	public void savePosition() {
-	}
+	public void savePosition() { }
 
 	@Override
-	public void restorePosition() {
-	}
+	public void restorePosition() { }
 
 	@Override
 	public void jumpTop() {
-		if (getView() != null)
-			getListView().setSelectionFromTop(0, 0);
+		if (getView() != null) getListView().setSelectionFromTop(0, 0);
 	}
 
 	@Override
-	public void filter() {
-	}
+	public void filter() { }
 
 	@Override
 	public Status[] getSelectedStatuses() { return null; }
