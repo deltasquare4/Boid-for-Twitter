@@ -420,10 +420,14 @@
 	</string>
 	<string name="start_time_str">Start Time</string>
 	<string name="end_time_str">End Time</string>
-	<string name="night_mode_time_desc">The time that you consider the beginning of the night.</string>
-	<string name="night_mode_endtime_desc">The time that you consider the end of the night, and the beginning of the day.</string>
-	<string name="night_mode_theme_desc">The theme that Boid will switch to when night falls.</string>
-	<string name="night_mode_switches_to">Night mode switches to the {theme} theme when the start time is reached.</string>
+	<string name="night_mode_time_desc">The time that you consider the beginning of the
+		night.</string>
+	<string name="night_mode_endtime_desc">The time that you consider the end of the night,
+		and the beginning of the day.</string>
+	<string name="night_mode_theme_desc">The theme that Boid will switch to when night
+		falls. Defaults to pure black.</string>
+	<string name="night_mode_switches_to">Night mode switches to the {theme} theme when the
+		start time is reached.</string>
 	<string name="night_mode_enabled_at">Night mode starts at {time}.</string>
 	<string name="night_mode_disabled_at">Night mode ends at {time}.</string>
 </resources>

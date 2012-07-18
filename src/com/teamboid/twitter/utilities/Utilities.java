@@ -32,6 +32,7 @@ import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.NoUnderlineClickableSpan;
+import com.teamboid.twitter.views.TimePreference;
 
 import twitter4j.MediaEntity;
 import twitter4j.Status;
@@ -121,9 +122,35 @@ public class Utilities {
 		catch (NameNotFoundException e) { return "Unknown"; }
 	}
 
+	public static Calendar getNightModeStart(Context context) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String startTime = prefs.getString("night_mode_time", "00:00");
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(startTime) + 1);
+		cal.set(Calendar.MINUTE, TimePreference.getMinute(startTime));
+		return cal;
+	}
+	public static Calendar getNightModeEnd(Context context) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String startTime = prefs.getString("night_mode_endtime", "00:00");
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(startTime) + 1);
+		cal.set(Calendar.MINUTE, TimePreference.getMinute(startTime));
+		return cal;
+	}
+	
 	public static int getTheme(Context context) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		final String curTheme = prefs.getString("boid_theme", "0");
+		String curTheme = null;
+		if(prefs.getBoolean("night_mode", false)) {
+			Calendar now = Calendar.getInstance();
+			if(now.after(getNightModeStart(context)) && now.before(getNightModeEnd(context))) {
+				curTheme = prefs.getString("night_mode_theme", "3");
+			}
+		}
+		if(curTheme == null) {
+			curTheme = prefs.getString("boid_theme", "0");
+		}
 		switch(Integer.parseInt(curTheme)) {
 		default:
 			prefs.edit().putString("boid_theme", "0").commit();
