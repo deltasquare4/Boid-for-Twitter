@@ -46,7 +46,7 @@ import android.widget.Toast;
 public class AccountManager extends PreferenceActivity {
 	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 	
-	public static class AccountFragment extends PreferenceFragment{
+	public static class AccountFragment extends PreferenceFragment {
 		ProgressDialog pd;
 		BroadcastReceiver pupdater;
 		
@@ -63,7 +63,7 @@ public class AccountManager extends PreferenceActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_accounts);
-			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 			
 			accountId = this.getArguments().getInt("accountId");
 			pd = new ProgressDialog(getActivity());
