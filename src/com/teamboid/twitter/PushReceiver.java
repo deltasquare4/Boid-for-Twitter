@@ -25,6 +25,7 @@ import com.teamboid.twitter.services.AccountService;
 
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
+	public static int pushForId = 0;
 	
 	// In release builds this should be nodester, but I might change it back to my local IP for 
 	// changes ;)
@@ -53,7 +54,7 @@ public class PushReceiver extends BroadcastReceiver {
 					@Override
 					public void run() {
 						try{
-							Account acc = AccountService.getCurrentAccount();
+							Account acc = AccountService.getAccount(pushForId);
 							
 							// Build
 							JSONObject jo = new JSONObject();
@@ -104,6 +105,10 @@ public class PushReceiver extends BroadcastReceiver {
 				Bundle b = intent.getBundleExtra("hm");
 				try {
 					String type = b.getString("type");
+					Integer accId = 0;
+					try{
+						accId = Integer.parseInt(b.getString("account"));
+					}catch(Exception e){}
 					
 					if(type.equals("reply")){
 						JSONObject status = new JSONObject(b.getString("tweet"));
@@ -111,7 +116,7 @@ public class PushReceiver extends BroadcastReceiver {
 						//TODO The account the mention is for should be passed from the server too
 						// We have this now in "account" as a string
 						//Also, we need a way of combining multiple mentions/messages into one notification.
-						Api11.displayReplyNotification(PushWorker.this, s);
+						Api11.displayReplyNotification(accId, PushWorker.this, s);
 						AccountService.activity.runOnUiThread(new Runnable(){
 	
 							@Override
@@ -125,7 +130,7 @@ public class PushReceiver extends BroadcastReceiver {
 						JSONObject json = new JSONObject(b.getString("tweet"));
 						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
 						
-						Api11.displayDirectMessageNotification(PushWorker.this, dm);
+						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);
 					}
 				} catch(Exception e) {
 					e.printStackTrace();

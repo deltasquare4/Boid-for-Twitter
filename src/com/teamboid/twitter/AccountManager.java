@@ -57,15 +57,19 @@ public class AccountManager extends PreferenceActivity {
 		
 		@Override
 		public void onDestroy (){
+			super.onDestroy();
 			getActivity().unregisterReceiver(pupdater);
 		}
 		
 		boolean realChange = false;
+		int accountId;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_accounts);
+			
+			accountId = this.getArguments().getInt("accountId");
 			
 			pd = new ProgressDialog(getActivity());
 			pd.setMessage(getText(R.string.push_wait));
@@ -82,9 +86,9 @@ public class AccountManager extends PreferenceActivity {
 							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
 						} else{
 							Toast.makeText(getActivity(), R.string.push_registered, Toast.LENGTH_SHORT).show();
-							findPreference("c2dm").getSharedPreferences().edit().putBoolean("c2dm", true).commit();
+							findPreference(accountId + "_c2dm").getSharedPreferences().edit().putBoolean(accountId + "_c2dm", true).commit();
 							realChange = true;
-							((SwitchPreference)findPreference("c2dm")).setChecked(true);
+							((SwitchPreference)findPreference(accountId + "_c2dm")).setChecked(true);
 							realChange = false;
 						}
 					}
@@ -95,8 +99,6 @@ public class AccountManager extends PreferenceActivity {
 			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
 			getActivity().registerReceiver(pupdater, i);
 			
-			final int accountId = this.getArguments().getInt("accountId");
-			
 			findPreference("{user}_c2dm_mentions").setOnPreferenceChangeListener( new RemotePushSettingChange( "replies" ) );
 			findPreference("{user}_c2dm_messages").setOnPreferenceChangeListener( new RemotePushSettingChange( "dm" ) );
 		
@@ -106,6 +108,8 @@ public class AccountManager extends PreferenceActivity {
 					if(realChange == true) return true;
 					
 					if((Boolean)newValue == true){
+						PushReceiver.pushForId = accountId;
+						
 						// Register!
 						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
 						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
@@ -125,7 +129,7 @@ public class AccountManager extends PreferenceActivity {
 							public void run() {
 								try{
 									DefaultHttpClient dhc = new DefaultHttpClient();
-									HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + AccountService.getCurrentAccount().getId());
+									HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + accountId);
 									org.apache.http.HttpResponse r = dhc.execute(get);
 									if(r.getStatusLine().getStatusCode() == 200 ){
 										getActivity().runOnUiThread(new Runnable(){
@@ -199,7 +203,7 @@ public class AccountManager extends PreferenceActivity {
 							DefaultHttpClient dhc = new DefaultHttpClient();
 							HttpGet get = new HttpGet(PushReceiver.SERVER +
 													"/edit/" +
-													AccountService.getCurrentAccount().getId() + "/" +
+													accountId + "/" +
 													remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
 							org.apache.http.HttpResponse r = dhc.execute(get);
 							if(r.getStatusLine().getStatusCode() == 200 ){
@@ -345,13 +349,15 @@ public class AccountManager extends PreferenceActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
-					long arg3) {
+					long id) {
 				Log.d("listview", "Move to fragment");
 				// Pretend to click a header.
 				Header h = new Header();
 				h.fragment = "com.teamboid.twitter.AccountManager$AccountFragment";
+				h.title = AccountService.getAccount(id).getUser().getName();
+				h.breadCrumbTitle = AccountService.getAccount(id).getUser().getName();
 				Bundle b = new Bundle();
-				b.putInt("accountId", pos);
+				b.putInt("accountId", (int)id);
 				h.fragmentArguments = b;
 				onHeaderClick(h, pos);
 			}

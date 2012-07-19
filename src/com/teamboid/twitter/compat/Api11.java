@@ -32,7 +32,7 @@ public class Api11 {
 	 * Applies settings
 	 * @param nb
 	 */
-	public static void setupNotification(Notification nb, Context c){
+	public static void setupNotification(int accId, Notification nb, Context c){
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		if(p.getBoolean("c2dm_vibrate", false) == true)
 			nb.vibrate = new long[]{ 100, 100, 100 };
@@ -47,7 +47,7 @@ public class Api11 {
 	 * @param context
 	 * @param s
 	 */
-	public static void displayReplyNotification(final Context context, final twitter4j.Status s){
+	public static void displayReplyNotification(final int accId, final Context context, final twitter4j.Status s){
 		final String imageURL = Utilities.getUserImage(s.getUser().getScreenName(), context, s.getUser());
 		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
 			
@@ -69,17 +69,18 @@ public class Api11 {
 				
 				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 					// Pass up to class. We do this, otherwise Dalvik complains. I've done this before
-					Api16.displayReplyNotification(context, profileImg, s, nb, nm);
+					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
 				} else{
-					
-					nm.notify(s.getId() + "", 100, nb.getNotification());
+					Notification n = nb.getNotification();
+					setupNotification(accId, n, context);
+					nm.notify(s.getId() + "", 100, n);
 				}
 				
 			}
 		});
 	}
 	
-	public static void displayDirectMessageNotification(final Context c, final twitter4j.DirectMessage dm){
+	public static void displayDirectMessageNotification(final int accId, final Context c, final twitter4j.DirectMessage dm){
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		
 		String x = dm.getText();
@@ -107,11 +108,15 @@ public class Api11 {
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(text);
 				
+				
+				
 				//if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 					// Pass up to class. We do this, otherwise Dalvik complains. I've done this before
 				//	Api16.displayDMNotification(c, profileImg, dm, nb, nm);
 				//} else{
-					nm.notify(dm.getId() + "", 100, nb.getNotification());
+					Notification n = nb.getNotification();
+					setupNotification(accId, n, c);
+					nm.notify(dm.getId() + "", 100, n);
 				// }
 				
 			}
