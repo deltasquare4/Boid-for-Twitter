@@ -198,50 +198,25 @@ public class MediaTimelineFragment extends BaseGridFragment {
 				if (acc != null) {
 					try {
 						if (screenName != null) {
-							// Powered by Twicsy
-							try {
-								HttpClient httpclient = new DefaultHttpClient();
-								String url = "http://api.twicsy.com/user/"
-										+ Uri.encode(screenName);
-								if (paging.getMaxId() > 0)
-									url += "/skip/" + paging.getMaxId();
-								HttpGet g = new HttpGet(url);
-								HttpResponse r = httpclient.execute(g);
-								if (r.getStatusLine().getStatusCode() == 200) {
-									JSONObject jo = new JSONObject(EntityUtils.toString(r.getEntity()));
-									JSONArray results = jo.getJSONArray("results");
-									int i = 0;
-									while (i < results.length()) {
-										final JSONObject result = results.getJSONObject(i);
-										i++;
+							try{
+								ResponseList<Status> tweets = acc.getClient().getUserMediaTimeline(screenName, paging);
+								for (final Status p : tweets) {
+									if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
 										context.runOnUiThread(new Runnable() {
-
 											@Override
 											public void run() {
 												MediaFeedItem m = new MediaFeedItem();
-												try {
-													m.imgurl = result
-															.getString("thumb");
-													m.twicsy_id = result
-															.getString("id");
-													adapt.add(
-															new MediaFeedItem[] { m },
-															MediaTimelineFragment.this);
-													// WARN: Should be
-													// safer. Persuming
-													// ProfileScreen
-													if (adapt.getCount() == 1) {
-														((ProfileScreen) context)
-														.setupMediaView();
-													}
-												} catch (JSONException e) {
-													e.printStackTrace();
-												}
+												m.imgurl = Utilities
+														.getTweetYFrogTwitpicMedia(p);
+												m.tweet_id = p.getId();
+												adapt.add(
+														new MediaFeedItem[] { m },
+														MediaTimelineFragment.this);
 											}
-
 										});
 									}
-								} else throw new Exception("non-200 response code");
+								}
+								
 							} catch (Exception e) {
 								e.printStackTrace();
 								context.runOnUiThread(new Runnable() {

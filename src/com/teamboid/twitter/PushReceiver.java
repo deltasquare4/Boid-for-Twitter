@@ -1,23 +1,22 @@
 package com.teamboid.twitter;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.URL;
+import java.security.MessageDigest;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.SSLCertificateSocketFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Base64;
 import android.util.Log;
 
 import com.teamboid.twitter.columns.MentionsFragment;
@@ -26,7 +25,13 @@ import com.teamboid.twitter.services.AccountService;
 
 public class PushReceiver extends BroadcastReceiver {
 	public static final String SENDER_EMAIL = "107821281305";
-	public static final String SERVER = "https://192.168.0.9:1337";
+	public static int pushForId = 0;
+	
+	// In release builds this should be nodester, but I might change it back to my local IP for 
+	// changes ;)
+	
+	// public static final String SERVER = "http://192.168.0.9:1337";
+	public static final String SERVER = "http://boid.nodester.com";
 	
 	public static class PushWorker extends Service{
 		
@@ -35,61 +40,98 @@ public class PushReceiver extends BroadcastReceiver {
 			return null;
 		}
 		
+		private static final String ENCRYPTION_KEY = "boidisalovelyappandijustlovehavingencrpytiontoworkwithnodester...../.khnihi";
+		
 		@Override
 		public int onStartCommand(final Intent intent, int flags, int startId) {
 			if(intent.hasExtra("reg")){
-			new Thread(new Runnable(){
-
-				@Override
-				public void run() {
-					try{
-						Account acc = AccountService.getCurrentAccount();
-						final URL url = new URL(SERVER + "/register?userid="+acc.getId()+
-								"&token=" + Uri.encode(intent.getStringExtra("reg")) +
-								"&accesstoken=" +  Uri.encode(acc.getToken()) + 
-								"&accesssecret=" +  Uri.encode(acc.getSecret()));
-						
-						HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-						urlConnection.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(3000, null) );
-						urlConnection.setHostnameVerifier(new HostnameVerifier(){
-
-							@Override
-							public boolean verify(String hostname,
-									SSLSession session) {
-								if(hostname.equals(url.getHost())) return true;
-								return false;
-							}
-							
-						});
-						urlConnection.setDoOutput(true);
-						
-						InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-						while(in.read() != -1) { };
-						
-						if(urlConnection.getResponseCode() == 200){
-							Log.d("push", "REGISTERED");
-						}
-						urlConnection.disconnect();
-						settingUp = false;
-					}catch(Exception e){ e.printStackTrace(); }
-				}
+				final Intent i = new Intent("com.teamboid.twitter.PUSH_PROGRESS");
+				i.putExtra("progress", 500);
+				sendBroadcast(i);
 				
-			}).start();
+				new Thread(new Runnable(){
+	
+					@Override
+					public void run() {
+						try{
+							Account acc = AccountService.getAccount(pushForId);
+							
+							// Build
+							JSONObject jo = new JSONObject();
+							jo.put("userid", acc.getId());
+							jo.put("accesstoken", acc.getToken());
+							jo.put("token", intent.getStringExtra("reg"));
+							jo.put("accesssecret", acc.getSecret());
+							
+							// Encrypt
+							byte[] input = jo.toString().getBytes("utf-8");
+							
+							MessageDigest md = MessageDigest.getInstance("MD5");
+							byte[] thedigest = md.digest(ENCRYPTION_KEY.getBytes("UTF-8"));
+							SecretKeySpec skc = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
+							Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+							cipher.init(Cipher.ENCRYPT_MODE, skc);
+							
+							byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
+						    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+						    ctLength += cipher.doFinal(cipherText, ctLength);
+						    
+						    String query = Base64.encodeToString(cipherText, Base64.DEFAULT);
+						    
+						    i.putExtra("progress", 700);
+							sendBroadcast(i);
+							
+							DefaultHttpClient dhc = new DefaultHttpClient();
+							HttpPost p = new HttpPost(SERVER + "/register");
+							p.setEntity( new StringEntity(query) );
+							HttpResponse r = dhc.execute(p);
+							
+							if(r.getStatusLine().getStatusCode() == 200){
+								Log.d("push", "REGISTERED");
+								i.putExtra("progress", 1000);
+								sendBroadcast(i);
+							} else{ throw new Exception("NON 200 RESPONSE"); }
+							
+						}catch(Exception e){ e.printStackTrace();
+							i.putExtra("progress", 1000);
+							i.putExtra("error", true);
+							sendBroadcast(i);
+						}
+						settingUp = false;
+					}
+					
+				}).start();
 			} else if(intent.hasExtra("hm")){
 				Bundle b = intent.getBundleExtra("hm");
 				try {
-					JSONObject status = new JSONObject(b.getString("tweet"));
-					final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
-					//TODO The account the mention is for should be passed from the server too
-					// We have this now in "account" as a string
-					//Also, we need a way of combining multiple mentions/messages into one notification.
-					Api11.displayNotification(PushWorker.this, s);
-					AccountService.activity.runOnUiThread(new Runnable(){
-						@Override
-						public void run() { 
-							AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
-						}						
-					});
+					String type = b.getString("type");
+					Integer accId = 0;
+					try{
+						accId = Integer.parseInt(b.getString("account"));
+					}catch(Exception e){}
+					
+					if(type.equals("reply")){
+						JSONObject status = new JSONObject(b.getString("tweet"));
+						final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
+						//TODO The account the mention is for should be passed from the server too
+						// We have this now in "account" as a string
+						//Also, we need a way of combining multiple mentions/messages into one notification.
+						Api11.displayReplyNotification(accId, PushWorker.this, s);
+						AccountService.activity.runOnUiThread(new Runnable(){
+	
+							@Override
+							public void run() {
+								 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
+							}
+							
+						});
+					} else if(type.equals("dm")){
+						// Yes I know it's "tweet". Deal with it
+						JSONObject json = new JSONObject(b.getString("tweet"));
+						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
+						
+						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);
+					}
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
