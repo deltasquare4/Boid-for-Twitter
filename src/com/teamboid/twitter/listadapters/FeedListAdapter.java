@@ -34,9 +34,14 @@ import com.teamboid.twitter.views.NoUnderlineClickableSpan;
  */
 public class FeedListAdapter extends BaseAdapter {
 	
-	public static void ApplyFontSize(TextView in, Context c){
+	public static void ApplyFontSize(TextView in, Context c) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
 		in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")));
+	}
+	public static void ApplyFontSize(TextView in, Context c, boolean scaleUp) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+		if(scaleUp) in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")) + 2);
+		else in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")));
 	}
 	public static void addRule(View target, int relativeToId, int rule) {
 		RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)target.getLayoutParams();
@@ -163,11 +168,11 @@ public class FeedListAdapter extends BaseAdapter {
 		for(Status t : tweets) {
 			if(t.getId() == tweetId) {
 				tweets.remove(index);
+				notifyDataSetChanged();
 				break;
 			}
 			index++;
 		}
-		notifyDataSetChanged();
 	}
 	public void clear() {
 		tweets.clear();

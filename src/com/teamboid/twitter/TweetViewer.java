@@ -538,7 +538,16 @@ public class TweetViewer extends MapActivity {
 			item.setEnabled(false);
 			new Thread(new Runnable() {
 				public void run() {
-					try { AccountService.getCurrentAccount().getClient().destroyStatus(statusId); }
+					try { 
+						final Status removed = AccountService.getCurrentAccount().getClient().destroyStatus(statusId);
+						runOnUiThread(new Runnable() {
+							public void run() {
+								TimelineCAB.removeStatus(removed);
+								Toast.makeText(getApplicationContext(), R.string.successfully_deleted_status, Toast.LENGTH_LONG).show();
+								finish();
+							}
+						});
+					}
 					catch(TwitterException e) {
 						e.printStackTrace();
 						runOnUiThread(new Runnable() {
@@ -548,14 +557,7 @@ public class TweetViewer extends MapActivity {
 								item.setEnabled(true);
 							}
 						});
-						return;
 					}
-					runOnUiThread(new Runnable() {
-						public void run() { 
-							Toast.makeText(getApplicationContext(), R.string.successfully_deleted_status, Toast.LENGTH_LONG).show();
-							finish();
-						}
-					});
 				}
 			}).start();
 			setResult(RESULT_OK);

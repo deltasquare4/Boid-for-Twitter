@@ -95,6 +95,22 @@ public class TimelineCAB {
 			}
 		}
 	}
+	public static void removeStatus(Status status) {
+		if(context instanceof TweetListActivity) {
+			ListAdapter adapter = ((TweetListActivity)context).getListView().getAdapter();
+			((FeedListAdapter)adapter).remove(status.getId());
+		} else {
+			for(int i = 0; i < context.getActionBar().getTabCount(); i++) {
+				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+				if(frag instanceof BaseListFragment) {
+					ListAdapter adapter = ((BaseListFragment)frag).getListView().getAdapter();
+					if(adapter instanceof FeedListAdapter) {
+						((FeedListAdapter)adapter).remove(status.getId());
+					}
+				}
+			}
+		}
+	}
 
 	public static void updateTitle() {
 		Status[] selTweets = TimelineCAB.getSelectedTweets();
@@ -186,7 +202,7 @@ public class TimelineCAB {
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
 
 		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		public boolean onActionItemClicked(ActionMode mode, final MenuItem item) {
 			final Status[] selTweets = getSelectedTweets();  
 			TimelineCAB.clearSelectedItems();
 			mode.finish();
@@ -282,6 +298,29 @@ public class TimelineCAB {
 				ClipboardManager clipboard = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
 				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", toCopy.getText()));
 				Toast.makeText(context, context.getString(R.string.copied_str).replace("{user}", toCopy.getUser().getScreenName()), Toast.LENGTH_SHORT).show();
+				return true;
+			case R.id.deleteAction:
+				for(final Status t : selTweets) {
+					new Thread(new Runnable() {
+						public void run() {
+							try { AccountService.getCurrentAccount().getClient().destroyStatus(t.getId()); }
+							catch(final TwitterException e) {
+								e.printStackTrace();
+								context.runOnUiThread(new Runnable() {
+									public void run() { 
+										Toast.makeText(context, R.string.failed_delete_status + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+									}
+								});
+								return;
+							}
+							context.runOnUiThread(new Runnable() {
+								public void run() { 
+									
+								}
+							});
+						}
+					}).start();
+				}
 				return true;
 			default:
 				return false;
