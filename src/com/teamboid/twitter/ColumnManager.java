@@ -59,6 +59,7 @@ public class ColumnManager extends Activity {
 			removeColumn(from);
 			adapt.remove(toMove);
 			adapt.insert(toMove, to);
+			adapt.notifyDataSetChanged();
 			addColumn(toMoveRaw, to);
 		}
 	};
