@@ -2,9 +2,6 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import net.robotmedia.billing.BillingController;
 
 import com.teamboid.twitter.services.AccountService;
@@ -15,14 +12,8 @@ import com.teamboid.twitter.views.TimePreference;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
-import twitter4j.internal.http.HttpResponse;
 import android.app.Dialog;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -36,7 +27,6 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.
