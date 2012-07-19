@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <com.teamboid.twitter.views.DragSortListView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:dslv="http://schemas.android.com/apk/res/com.teamboid.twitter"
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp"
-        dslv:collapsed_height="1dp"
-        dslv:drag_scroll_start="0.33"
-        dslv:float_background_color="@android:color/holo_blue_dark"
-        dslv:max_drag_scroll_speed="0.3"
-        dslv:remove_mode="slide"
-        dslv:track_drag_scroll="false" />
-
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical">
+	<com.teamboid.twitter.views.DragSortListView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:dslv="http://schemas.android.com/apk/res/com.teamboid.twitter"
+		android:id="@android:id/list" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" dslv:collapsed_height="1dp"
+		dslv:drag_scroll_start="0.33" dslv:float_background_color="@android:color/holo_blue_dark"
+		dslv:max_drag_scroll_speed="0.3" dslv:remove_mode="slide"
+		dslv:track_drag_scroll="false" />
 </LinearLayout>

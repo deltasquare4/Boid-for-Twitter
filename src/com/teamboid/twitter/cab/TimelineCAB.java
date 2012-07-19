@@ -130,6 +130,17 @@ public class TimelineCAB {
 					break;
 				}
 			}
+			boolean allMine = true;
+			for(Status status : selTweets) {
+				if(status.getUser().getId() != AccountService.getCurrentAccount().getId()) {
+					allMine = false;
+					break;
+				}
+			}
+			if(allMine) {
+				menu.findItem(R.id.retweetAction).setVisible(false);
+				menu.findItem(R.id.deleteAction).setVisible(true);
+			}
 			MenuItem fav = menu.findItem(R.id.favoriteAction);
 			if(allFavorited) {
 				fav.setTitle(R.string.unfavorite_str);
