@@ -40,9 +40,9 @@ public class MutingListAdapter extends BaseAdapter {
 		final String[] types = mContext.getResources().getStringArray(R.array.muting_types);
 		final String curRule = loadKeywords()[position];
 		TextView text1 = (TextView)toReturn.findViewById(android.R.id.text1);
-		FeedListAdapter.ApplyFontSize(text1, mContext);
+		FeedListAdapter.ApplyFontSize(text1, mContext, true);
 		TextView text2 = (TextView)toReturn.findViewById(android.R.id.text2);
-		FeedListAdapter.ApplyFontSize(text2, mContext);
+		FeedListAdapter.ApplyFontSize(text2, mContext, true);
 		if(curRule.contains("@")) {
 			text1.setText(curRule.substring(0, curRule.indexOf("@")).replace("%40", "@"));
 			if(curRule.endsWith("@" + types[1])) {

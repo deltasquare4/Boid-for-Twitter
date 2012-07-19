@@ -111,12 +111,11 @@ public class ColumnManager extends Activity {
 		}
 		loadColumns();
 	}
-	
+
 	@Override
-	public void onPause() {
-		super.onPause();
-		setResult(RESULT_OK, new Intent().putExtra("restart", true).putExtra("sel_index", selIndex));
-		if(!this.isFinishing()) finish();
+	public void onBackPressed() {
+		finish();
+		startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
 	}
 	
 	private void loadColumns() {
@@ -135,9 +134,12 @@ public class ColumnManager extends Activity {
 			} else if(c.equals(FavoritesFragment.ID)) {
 				adapt.add(getString(R.string.favorites_str));
 			} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
-				adapt.add(getString(R.string.savedsearch_str));
+				c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
+				adapt.add(c + " (" + getString(R.string.search_str) + ")");
 			} else if(c.startsWith(UserListFragment.ID + "@")) {
-				adapt.add(getString(R.string.userlist_str));
+				c = c.substring(UserListFragment.ID.length() + 1);
+				c = c.substring(0, c.indexOf("@")).replace("%40", "@");
+				adapt.add(c + " (" + getString(R.string.list_str) + ")");
 			} else if(c.equals(NearbyFragment.ID)) {
 				adapt.add(getString(R.string.nearby_str));
 			} else if(c.equals(MediaTimelineFragment.ID)) {
@@ -145,7 +147,8 @@ public class ColumnManager extends Activity {
 			} else if(c.equals(MyListsFragment.ID)) {
 				adapt.add(getString(R.string.my_lists_str));
 			} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
-				adapt.add(getString(R.string.user_feed_str));
+				c = c.substring(ProfileTimelineFragment.ID.length() + 1);
+				adapt.add(getString(R.string.user_feed_str).replace("{user}", c));
 			}
 		}
 		adapt.notifyDataSetChanged();
@@ -183,7 +186,8 @@ public class ColumnManager extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			super.onBackPressed();
+			finish();
+			startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
 			return true;
 		case R.id.addTimelineColAction:
 			addColumn(TimelineFragment.ID, -1);

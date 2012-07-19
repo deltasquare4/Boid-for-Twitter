@@ -6,6 +6,7 @@ import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.utilities.Utilities;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -21,7 +22,6 @@ import android.preference.PreferenceManager;
 /**
  * Methods for API Level 11 up
  * @author kennydude
- *
  */
 @TargetApi(11)
 public class Api11 {
@@ -32,14 +32,16 @@ public class Api11 {
 	 * Applies settings
 	 * @param nb
 	 */
-	public static void setupNotification(int accId, Notification nb, Context c){
+	public static void setupNotification(int accId, Notification nb, Context c) {
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
-		if(p.getBoolean("c2dm_vibrate", false) == true)
+		if(p.getBoolean("c2dm_vibrate", false) == true) {
 			nb.vibrate = new long[]{ 100, 100, 100 };
-		try{
-			if(!p.getString("c2dm_ringtone", "").equals(""))
+		}
+		try {
+			if(!p.getString("c2dm_ringtone", "").equals("")) {
 				nb.sound = Uri.parse(p.getString("c2dm_ringtone", ""));
-		}catch(Exception e){}
+			}
+		} catch(Exception e) { }
 	}
 	
 	/**
@@ -51,7 +53,7 @@ public class Api11 {
 		final String imageURL = Utilities.getUserImage(s.getUser().getScreenName(), context, s.getUser());
 		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
 			
-			@SuppressWarnings("deprecation")
+			@SuppressLint("NewApi")
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
 				
@@ -84,7 +86,7 @@ public class Api11 {
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		
 		String x = dm.getText();
-		if(p.getBoolean("c2dm_messages_priv", false) == true){
+		if(p.getBoolean("c2dm_messages_priv", false) == true) {
 			x = c.getString(R.string.message_recv).replace("{user}", dm.getSender().getName());
 		}
 		final String text = x;

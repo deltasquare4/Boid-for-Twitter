@@ -13,6 +13,7 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -139,12 +140,6 @@ public class MutingManager extends ListActivity {
 	}
 	
 	@Override
-	public void onBackPressed() {
-		setResult(600);
-		finish();
-	}
-	
-	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("lastTheme", lastTheme);
 		super.onSaveInstanceState(outState);
@@ -171,9 +166,8 @@ public class MutingManager extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			setResult(600);
-			//finish();
-			super.onBackPressed(); //Back button should work accordingly
+			finish();
+			startActivity(new Intent(this, TimelineScreen.class).putExtra("filter", true));
 			return true;
 		case R.id.backupBtn:
 			backup();
@@ -189,6 +183,12 @@ public class MutingManager extends ListActivity {
 		}
 	}
 
+	@Override
+	public void onBackPressed() {
+		finish();
+		startActivity(new Intent(this, TimelineScreen.class).putExtra("filter", true));
+	}
+	
 	public void backup() {
 		try {
 			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(

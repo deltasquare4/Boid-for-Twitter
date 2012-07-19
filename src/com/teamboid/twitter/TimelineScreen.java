@@ -183,14 +183,28 @@ public class TimelineScreen extends Activity {
 	}
 
 	@Override
-	protected void onNewIntent (Intent intent){
+	protected void onNewIntent(Intent intent){
 		if(AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
 		}
-		if(intent.getExtras() != null && intent.getExtras().containsKey("new_column")) {
-			newColumn = true;
-			recreate();
+		if(intent.getExtras() != null) {
+			if(intent.getExtras().containsKey("new_column")) {
+				newColumn = true;
+				restartActivity();
+			}
+			if(intent.getExtras().containsKey("filter")) {
+				for(int i = 0; i < getActionBar().getTabCount(); i++) {
+					Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
+					if(frag != null && frag instanceof BaseListFragment) {
+						((BaseListFragment)frag).filter();
+					}
+				}
+			}
+			if(intent.getExtras().containsKey("restart")) {
+				getActionBar().setSelectedNavigationItem(intent.getIntExtra("sel_index", 0));
+				restartActivity();
+			}
 		}
 	}
 
@@ -225,7 +239,8 @@ public class TimelineScreen extends Activity {
 		}
 		int index = 0;
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
-		for(String c : cols) {
+		for(int i = 0; i < cols.size(); i++) {
+			String c = cols.get(i);
 			if(c.equals(TimelineFragment.ID)) {
 				Tab toAdd = getActionBar().newTab();
 				if(iconic) {
@@ -267,6 +282,8 @@ public class TimelineScreen extends Activity {
 					//Convert the from:screenname saved search column to a user feed column
 					c = ProfileTimelineFragment.ID + "@" + c.substring(fromQuery.length()).replace("%40", "");
 					cols.set(index, c);
+					prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+							"_columns", Utilities.arrayToJson(this, cols)).commit();
 				} else {
 					String query = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
 					Tab toAdd = getActionBar().newTab();
@@ -412,9 +429,6 @@ public class TimelineScreen extends Activity {
 		initialize(savedInstanceState);
 	}
 
-	/**
-	 * Called when accounts are loaded on activity load (along with loadColumns(boolean, boolean))
-	 */
 	public void accountsLoaded() {
 		if(Intent.ACTION_SEND.equals(getIntent().getAction())) {
 			startActivity(getIntent().setClass(this, ComposerScreen.class));
@@ -431,15 +445,12 @@ public class TimelineScreen extends Activity {
 		startService(new Intent(this, SendTweetService.class).setAction(SendTweetService.LOAD_TWEETS));
 	}
 
-	/**
-	 * Simply restarts the current activity - Added by Zach Rogers
-	 */
 	public void restartActivity() {
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
 	}
-
+	
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -563,8 +574,7 @@ public class TimelineScreen extends Activity {
 		switch (item.getItemId()) {
 		case R.id.manageColumnsAction:
 			startActivityForResult(new Intent(this, ColumnManager.class)
-			.putExtra("tab_count", getActionBar().getTabCount())
-			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), 900);
+			.putExtra("tab_count", getActionBar().getTabCount()), 900);
 			return true;
 		case R.id.donateAction:
 			Toast.makeText(getApplicationContext(), R.string.donations_appreciated, Toast.LENGTH_SHORT).show();
@@ -605,24 +615,6 @@ public class TimelineScreen extends Activity {
 				}
 			}
 			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == 600) {
-			for(int i = 0; i < getActionBar().getTabCount(); i++) {
-				Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if(frag != null && frag instanceof BaseListFragment) {
-					((BaseListFragment)frag).filter();
-				}
-			}
-		} else if(requestCode == 900) {
-			if(data != null && data.getExtras() != null && data.getExtras().containsKey("restart")) {
-				getActionBar().setSelectedNavigationItem(data.getIntExtra("sel_index", 0));
-				restartActivity();
-			}
 		}
 	}
 }

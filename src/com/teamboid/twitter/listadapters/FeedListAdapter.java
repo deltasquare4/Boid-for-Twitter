@@ -40,7 +40,7 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 	public static void ApplyFontSize(TextView in, Context c, boolean scaleUp) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		if(scaleUp) in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")) + 2);
+		if(scaleUp) in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")) + 3);
 		else in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")));
 	}
 	public static void addRule(View target, int relativeToId, int rule) {

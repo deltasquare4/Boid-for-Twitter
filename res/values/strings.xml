@@ -11,8 +11,6 @@
 	<string name="messages_priv">Show Content</string>
 	<string name="message_recv">{user} sent you a Direct Message</string>
 	<string name="messages_priv_desc">Show the content of direct messages in notifications.</string>
-	<string name="none_str">None</string>
-	<string name="unknown_str">Unknown</string>
 	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
 	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
@@ -52,7 +50,6 @@
 	<string name="ringtone_str_desc">The optional ringtone played when a notification is
 		received.
 	</string>
-	<string name="notifications_str">Notifications</string>
 
 	<string name="muting_hint_keyword">Keyword or hashtag</string>
 	<string name="muting_hint_app">App name</string>
@@ -246,6 +243,7 @@
 	<string name="favorites_str">Favorites</string>
 	<string name="savedsearch_str">Saved Search</string>
 	<string name="userlist_str">User List</string>
+	<string name="list_str">List</string>
 
 	<string name="load_widget">Loading {widget}…</string>
 	<string name="youtube_embed">YouTube Embed</string>
@@ -393,8 +391,6 @@
 	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
 		to replying.
 	</string>
-	<string name="follows_you_str">follows you</string>
-	<string name="failed_check_follows_you">Failed to check if {user} follows you.</string>
 	<string name="description_str">Description</string>
 	<string name="unblock_str">unblock</string>
 	<string name="failed_unblock_str">Failed to unblock @{user}!</string>
@@ -402,7 +398,6 @@
 	<string name="failed_unfollow_str">Failed to unfollow @{user}!</string>
 	<string name="follow_str">follow</string>
 	<string name="follow_back_str">follow back</string>
-	<string name="follows_you_follow_back_str">follows you, follow back</string>
 	<string name="unfollow_str">unfollow</string>
 	<string name="follows_you_unfollow_str">follows you, unfollow</string>
 	<string name="request_sent_str">Request Sent</string>
@@ -458,7 +453,7 @@
 	<string name="pause_notifications">Pause Notifications</string>
 	<string name="pause_notifications_desc">When enabled, you will not receive notifications
 		while night mode is active.</string>
+		<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
-	<string name="user_feed_str">User Feed</string>
-	<string name="confirm_str">Confirm</string>
+	<string name="user_feed_str">\@{user} (Feed)</string>
 </resources>
