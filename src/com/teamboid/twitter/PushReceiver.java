@@ -24,21 +24,18 @@ import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.services.AccountService;
 
 public class PushReceiver extends BroadcastReceiver {
+	
 	public static final String SENDER_EMAIL = "107821281305";
 	public static int pushForId = 0;
-	
 	// In release builds this should be nodester, but I might change it back to my local IP for 
 	// changes ;)
-	
 	// public static final String SERVER = "http://192.168.0.9:1337";
 	public static final String SERVER = "http://boid.nodester.com";
 	
 	public static class PushWorker extends Service{
 		
 		@Override
-		public IBinder onBind(Intent arg0) {
-			return null;
-		}
+		public IBinder onBind(Intent arg0) { return null; }
 		
 		private static final String ENCRYPTION_KEY = "boidisalovelyappandijustlovehavingencrpytiontoworkwithnodester...../.khnihi";
 		
@@ -48,12 +45,10 @@ public class PushReceiver extends BroadcastReceiver {
 				final Intent i = new Intent("com.teamboid.twitter.PUSH_PROGRESS");
 				i.putExtra("progress", 500);
 				sendBroadcast(i);
-				
 				new Thread(new Runnable(){
-	
 					@Override
 					public void run() {
-						try{
+						try {
 							Account acc = AccountService.getAccount(pushForId);
 							
 							// Build
@@ -65,7 +60,6 @@ public class PushReceiver extends BroadcastReceiver {
 							
 							// Encrypt
 							byte[] input = jo.toString().getBytes("utf-8");
-							
 							MessageDigest md = MessageDigest.getInstance("MD5");
 							byte[] thedigest = md.digest(ENCRYPTION_KEY.getBytes("UTF-8"));
 							SecretKeySpec skc = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
@@ -75,9 +69,7 @@ public class PushReceiver extends BroadcastReceiver {
 							byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
 						    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
 						    ctLength += cipher.doFinal(cipherText, ctLength);
-						    
 						    String query = Base64.encodeToString(cipherText, Base64.DEFAULT);
-						    
 						    i.putExtra("progress", 700);
 							sendBroadcast(i);
 							
@@ -92,49 +84,45 @@ public class PushReceiver extends BroadcastReceiver {
 								sendBroadcast(i);
 							} else{ throw new Exception("NON 200 RESPONSE"); }
 							
-						}catch(Exception e){ e.printStackTrace();
+						} catch(Exception e) { 
+							e.printStackTrace();
 							i.putExtra("progress", 1000);
 							i.putExtra("error", true);
 							sendBroadcast(i);
 						}
 						settingUp = false;
 					}
-					
 				}).start();
-			} else if(intent.hasExtra("hm")){
-				Bundle b = intent.getBundleExtra("hm");
+			} else if(intent.hasExtra("hm")) {
+				final Bundle b = intent.getBundleExtra("hm");
 				try {
 					String type = b.getString("type");
 					Integer accId = 0;
-					try{
-						accId = Integer.parseInt(b.getString("account"));
-					}catch(Exception e){}
-					
-					if(type.equals("reply")){
+					try { accId = Integer.parseInt(b.getString("account")); }
+					catch(Exception e) { }
+					if(type.equals("reply")) {
 						JSONObject status = new JSONObject(b.getString("tweet"));
 						final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
 						//TODO The account the mention is for should be passed from the server too
 						// We have this now in "account" as a string
 						//Also, we need a way of combining multiple mentions/messages into one notification.
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
-						AccountService.activity.runOnUiThread(new Runnable(){
-	
+						AccountService.activity.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								 AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{ s });
+								// You MUST insert the mention into the adapter associated with the 
+								// account the mention is for, not the adapter for the current account.
+								AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, 
+										Long.parseLong(b.getString("account"))).add(new twitter4j.Status[] { s });
 							}
-							
 						});
 					} else if(type.equals("dm")){
-						// Yes I know it's "tweet". Deal with it
+						//Yes I know it's "tweet". Deal with it
 						JSONObject json = new JSONObject(b.getString("tweet"));
 						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
-						
 						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);
 					}
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
+				} catch(Exception e) { e.printStackTrace(); }
 			}
 			return Service.START_NOT_STICKY;
 		}
@@ -159,8 +147,7 @@ public class PushReceiver extends BroadcastReceiver {
 
 	private void handleRegistration(Context context, Intent intent) {
 		if(settingUp == true) return; // Don't double-register
-		settingUp = true;
-		
+		settingUp = true;		
 		Log.d("boidpush", "REGISTER");
 		String registration = intent.getStringExtra("registration_id"); 
 	    if (intent.getStringExtra("error") != null) {
@@ -175,5 +162,4 @@ public class PushReceiver extends BroadcastReceiver {
 	    	context.startService(new Intent(context, PushWorker.class).putExtra("reg", registration));
 	    }
 	}
-
 }

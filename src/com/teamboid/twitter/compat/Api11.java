@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.widget.RemoteViews;
 
 /**
  * Methods for API Level 11 up
@@ -35,7 +36,7 @@ public class Api11 {
 	public static void setupNotification(int accId, Notification nb, Context c) {
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		if(p.getBoolean("c2dm_vibrate", false) == true) {
-			nb.vibrate = new long[]{ 100, 100, 100 };
+			nb.vibrate = new long[] { 100, 100, 100 };
 		}
 		try {
 			if(!p.getString("c2dm_ringtone", "").equals("")) {
@@ -59,13 +60,18 @@ public class Api11 {
 				
 				final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 				
+				RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.expandable_notification);
+				contentView.setImageViewBitmap(R.id.image, profileImg);
+				contentView.setTextViewText(R.id.title, s.getUser().getScreenName());
+				contentView.setTextViewText(R.id.text, s.getText());
+				
 				final Notification.Builder nb = 
 						new Notification.Builder(context)
 						.setContentTitle(s.getUser().getScreenName())
 						.setContentText(s.getText())
 						.setLargeIcon(profileImg)
 						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), PendingIntent.FLAG_ONE_SHOT))
-						.setAutoCancel(true)
+						.setAutoCancel(true).setContent(contentView)
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(s.getText());
 				
@@ -77,7 +83,6 @@ public class Api11 {
 					setupNotification(accId, n, context);
 					nm.notify(s.getId() + "", 100, n);
 				}
-				
 			}
 		});
 	}

@@ -169,7 +169,6 @@ public class AccountManager extends PreferenceActivity {
 			setKey("c2dm_vibrate", accountId);
 			setKey("c2dm_ringtone", accountId);
 			setKey("c2dm_messages_priv", accountId);
-			
 			setKey("contactsync", accountId);
 		}
 		void setKey(String key, int accountId){
