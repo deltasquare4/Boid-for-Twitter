@@ -65,4 +65,19 @@
 	<attr name="nearbyTab" format="reference" />
 	<attr name="mediaTab" format="reference" />
 	<attr name="aboutTab" format="reference" />
+	
+	<declare-styleable name="DragSortListView">
+		<attr name="collapsed_height" format="dimension" />
+		<attr name="drag_scroll_start" format="float" />
+		<attr name="max_drag_scroll_speed" format="float" />
+		<attr name="float_background_color" format="color" />
+		<attr name="remove_mode">
+			<enum name="none" value="-1" />
+			<enum name="fling" value="0" />
+			<enum name="slide" value="1" />
+			<enum name="slideRight" value="1" />
+			<enum name="slideLeft" value="2" />
+		</attr>
+		<attr name="track_drag_scroll" format="boolean" />
+	</declare-styleable>
 </resources>
