@@ -92,8 +92,7 @@
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:uiOptions="splitActionBarWhenNarrow" />
 		<activity android:name=".ColumnManager" android:launchMode="singleTask"
-			android:configChanges="screenSize" android:label="@string/manage_columns"
-			android:uiOptions="splitActionBarWhenNarrow" />
+			android:configChanges="screenSize" android:label="@string/manage_columns" />
 		<activity android:name=".TweetListActivity"
 			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize"
 			android:uiOptions="splitActionBarWhenNarrow" />

@@ -609,7 +609,7 @@ public class TimelineScreen extends Activity {
 				}
 			}
 		} else if(requestCode == 900) {
-			if(data.getExtras() != null && data.getExtras().containsKey("restart")) {
+			if(data != null && data.getExtras() != null && data.getExtras().containsKey("restart")) {
 				getActionBar().setSelectedNavigationItem(data.getIntExtra("sel_index", 0));
 				restartActivity();
 			}

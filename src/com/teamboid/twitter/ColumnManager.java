@@ -21,6 +21,7 @@ import com.teamboid.twitter.columns.UserListFragment;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.DragSortListView;
+import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 import com.teamboid.twitter.views.DragSortListView.DropListener;
 
 import android.app.Activity;
@@ -64,7 +65,6 @@ public class ColumnManager extends Activity {
 		}
 	};
 	
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
@@ -79,6 +79,19 @@ public class ColumnManager extends Activity {
 		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
 		list.setDropListener(dropListen);
+		SwipeDismissListViewTouchListener touchListener =
+				new SwipeDismissListViewTouchListener(list,
+						new SwipeDismissListViewTouchListener.OnDismissCallback() {
+					@Override
+					public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+						for (int i : reverseSortedPositions) {
+							removeColumn(i);
+						}
+						loadColumns();
+					}
+				});
+		list.setOnTouchListener(touchListener);
+		list.setOnScrollListener(touchListener.makeScrollListener());
 		list.setAdapter(adapt);
 	}
 	
@@ -157,7 +170,7 @@ public class ColumnManager extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.main_actionbar, menu);
+		getMenuInflater().inflate(R.menu.column_manager_ab, menu);
 		return true;
 	}
 	
