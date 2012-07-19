@@ -5,6 +5,15 @@
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
 	</string>
+	<string name="push_error">There was a problem with push. Try again in a moment</string>
+	<string name="push_updated">Your push settings have been updated</string>
+	<string name="push_registered">Push is now registered!</string>
+	<string name="messages_priv">Show Content</string>
+	<string name="message_recv">{user} sent you a Direct Message</string>
+	<string name="messages_priv_desc">Show the content of direct messages in notifications.</string>
+	<string name="none_str">None</string>
+	<string name="unknown_str">Unknown</string>
+	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
 	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
@@ -406,8 +415,20 @@
 	<string name="x_convos_selected">{X} Conversations Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
-		teenagers of Team Boid!
-	</string>
+		teenagers of Team Boid!</string>
+		
+	<string-array name="sync_types">
+	    <item>Following</item>
+	    <item>Followers</item>
+	    <item>Mutual</item>
+	</string-array>
+	<string-array name="sync_types_values">
+	    <item>following</item>
+	    <item>followers</item>
+	    <item>mutual</item>
+	</string-array>
+	<string name="contact_sync">Contact Sync</string>
+		
 	<string name="this_is_you">This is you</string>
 	<string name="failed_check_following">Failed to check if you\'re following @{user}!
 	</string>

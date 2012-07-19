@@ -163,82 +163,60 @@ public class Utilities {
 			return R.style.Boid_PureBlackTheme;
 		}
 	}
+	public static String getMedia(URLEntity[] urls){
+		String found = null;
+		for(int i = 0; i < urls.length; i++) {
+			URLEntity urlEntity = urls[i];
+			if(urlEntity == null || urlEntity.getURL() == null) continue;
+			String curEntity = urlEntity.getURL().toString();
+			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+			if(curEntity.endsWith(".jpg") || curEntity.endsWith(".jpeg") || curEntity.endsWith(".png") || curEntity.endsWith(".bmp") || curEntity.endsWith(".gif") || curEntity.endsWith(".bmp")) {
+				found = curEntity;
+				break;
+			} else if(curEntity.contains("yfrog.com/")) {
+				found = curEntity + ":medium";
+				break;
+			} else if(curEntity.contains("twitpic.com/")) {
+				if(curEntity.contains("/show/")) found = curEntity;
+				else found = curEntity.replace("twitpic.com/", "twitpic.com/show/full/");
+				break;
+			} else if(curEntity.contains("instagr.am/p/")) {
+				found = "http://instagr.am/p/" + curEntity.replace("https://", "http://").substring(20);
+				if(!found.endsWith("/")) found += "/";
+				found += "media";
+				break;
+			} else if(curEntity.contains("img.ly/")) {
+				if(curEntity.contains("/show/")) found = curEntity;
+				else found = "http://img.ly/show/full/" + curEntity.replace("https://", "http://").substring(14);
+				break;
+			} else if(curEntity.contains("lockerz.com/") || curEntity.contains("plixi.com/")) {
+				found = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=" + curEntity + "&size=big";
+				break;
+			} else if(curEntity.contains("imgur.com")){
+				found = curEntity.replace("imgur.com", "i.imgur.com") + ".jpg";
+				break;
+			}
+		}
+		return found;
+	}
+	
 	public static String getTweetYFrogTwitpicMedia(final Status tweet) {
 		if(tweet.getMediaEntities() != null && tweet.getMediaEntities().length > 0) {
 			return tweet.getMediaEntities()[0].getMediaURL().toString();
 		} else if(tweet.getURLEntities() != null && tweet.getURLEntities().length > 0) {
-			String found = null;
-			for(int i = 0; i < tweet.getURLEntities().length; i++) {
-				URLEntity urlEntity = tweet.getURLEntities()[i];
-				if(urlEntity == null || urlEntity.getURL() == null) continue;
-				String curEntity = urlEntity.getURL().toString();
-				if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
-				if(curEntity.endsWith(".jpg") || curEntity.endsWith(".jpeg") || curEntity.endsWith(".png") || curEntity.endsWith(".bmp") || curEntity.endsWith(".gif") || curEntity.endsWith(".bmp")) {
-					found = curEntity;
-					break;
-				} else if(curEntity.contains("yfrog.com/")) {
-					found = curEntity + ":medium";
-					break;
-				} else if(curEntity.contains("twitpic.com/")) {
-					if(curEntity.contains("/show/")) found = curEntity;
-					else found = curEntity.replace("twitpic.com/", "twitpic.com/show/full/");
-					break;
-				} else if(curEntity.contains("instagr.am/p/")) {
-					found = "http://instagr.am/p/" + curEntity.replace("https://", "http://").substring(20);
-					if(!found.endsWith("/")) found += "/";
-					found += "media";
-					break;
-				} else if(curEntity.contains("img.ly/")) {
-					if(curEntity.contains("/show/")) found = curEntity;
-					else found = "http://img.ly/show/full/" + curEntity.replace("https://", "http://").substring(14);
-					break;
-				} else if(curEntity.contains("lockerz.com/") || curEntity.contains("plixi.com/")) {
-					found = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=" + curEntity + "&size=big";
-					break;
-				}
-			}
-			return found;
+			return getMedia( tweet.getURLEntities() );
 		} else return null;
 	}
 	public static String getTweetYFrogTwitpicMedia(final Tweet tweet) {
 		if(tweet.getMediaEntities() != null && tweet.getMediaEntities().length > 0) {
 			return tweet.getMediaEntities()[0].getMediaURL().toString();
 		} else if(tweet.getURLEntities() != null && tweet.getURLEntities().length > 0) {
-			String found = null;
-			for(int i = 0; i < tweet.getURLEntities().length; i++) {
-				URLEntity urlEntity = tweet.getURLEntities()[i];
-				if(urlEntity == null || urlEntity.getURL() == null) continue;
-				String curEntity = urlEntity.getURL().toString();
-				if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
-				if(curEntity.endsWith(".jpg") || curEntity.endsWith(".jpeg") || curEntity.endsWith(".png") || curEntity.endsWith(".bmp") || curEntity.endsWith(".gif") || curEntity.endsWith(".bmp")) {
-					found = curEntity;
-					break;
-				} else if(curEntity.contains("yfrog.com/")) {
-					found = curEntity + ":medium";
-					break;
-				} else if(curEntity.contains("twitpic.com/")) {
-					if(curEntity.contains("/show/")) found = curEntity;
-					else found = curEntity.replace("twitpic.com/", "twitpic.com/show/full/");
-					break;
-				} else if(curEntity.contains("instagr.am/p/")) {
-					found = "http://instagr.am/p/" + curEntity.replace("https://", "http://").substring(20);
-					if(!found.endsWith("/")) found += "/";
-					found += "media";
-					break;
-				} else if(curEntity.contains("img.ly/")) {
-					if(curEntity.contains("/show/")) found = curEntity;
-					else found = "http://img.ly/show/full/" + curEntity.replace("https://", "http://").substring(14);
-					break;
-				} else if(curEntity.contains("lockerz.com/") || curEntity.contains("plixi.com/")) {
-					found = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=" + curEntity + "&size=big";
-					break;
-				}
-			}
-			return found;
+			return getMedia(tweet.getURLEntities());
 		} else return null;
 	}
 	public static boolean tweetContainsVideo(final Status tweet) {
 		if(tweet.getURLEntities() == null) return false;
+		
 		for(int i = 0; i < tweet.getURLEntities().length; i++) {
 			URLEntity urlEntity = tweet.getURLEntities()[i];
 			if(urlEntity == null || urlEntity.getURL() == null) continue;
@@ -624,6 +602,7 @@ public class Utilities {
 		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
 		return (int)(outMetrics.density * dp); // 50dp in pixels
 	}
+	
 	public static String getUserImage(String screenname, Context mContext, twitter4j.User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache

@@ -2,6 +2,9 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import net.robotmedia.billing.BillingController;
 
 import com.teamboid.twitter.services.AccountService;
@@ -12,9 +15,14 @@ import com.teamboid.twitter.views.TimePreference;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.internal.http.HttpResponse;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -28,6 +36,7 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -233,29 +242,7 @@ public class SettingsScreen extends PreferenceActivity  {
 			diag.show();
 		}
 	}
-	public static class NotificationsFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.notifications_category);
-			((SwitchPreference)findPreference("c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					if((Boolean)newValue == true){
-						// Register!
-						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
-						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
-						getActivity().startService(registrationIntent);
-						// TODO: Maybe add some kind of progress?
-					} else{
-						// TODO: Deregister
-					}
-					return true;
-				}
-			});
-		}
-	}
+	
 	public static class NightModeFragment extends PreferenceFragment {
 		
 		private void displayTime(String time, String prefName, int summaryResId) {

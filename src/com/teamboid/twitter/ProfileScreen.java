@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import twitter4j.Relationship;
 import twitter4j.ResponseList;
 import twitter4j.TwitterException;
 import twitter4j.User;
@@ -104,7 +105,9 @@ public class ProfileScreen extends Activity {
 			public void run() {
 				final Account acc = AccountService.getCurrentAccount();
 				try {
-					getAboutFragment().getAdapter().updateIsBlocked(acc.getClient().existsBlock(user.getId()));
+					Relationship x = acc.getClient().showFriendship(AccountService.getCurrentAccount().getId(), user.getId());
+					
+					getAboutFragment().getAdapter().updateIsBlocked( x.isSourceBlockingTarget() );
 					if(getAboutFragment().getAdapter().isBlocked()) {
 						runOnUiThread(new Runnable() {
 							public void run() {   
@@ -115,6 +118,11 @@ public class ProfileScreen extends Activity {
 						});
 						return;
 					}
+					
+					getAboutFragment().getAdapter().updateIsFollowedBy( x.isSourceFollowedByTarget() );
+					getAboutFragment().getAdapter().updateIsFollowing( x.isSourceFollowingTarget() );
+					
+					
 				} catch (final TwitterException e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -129,28 +137,10 @@ public class ProfileScreen extends Activity {
 					getAboutFragment().getAdapter().updateRequestSent(true);
 					return;
 				}
-				try {
-					getAboutFragment().getAdapter().updateIsFollowing(acc.getClient().existsFriendship(acc.getUser().getScreenName(), user.getScreenName()));
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { 
-							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
-							getAboutFragment().getAdapter().setIsError(true);
-						}
-					});
-				}
-				try {
-					getAboutFragment().getAdapter().updateIsFollowedBy(acc.getClient().existsFriendship(user.getScreenName(), acc.getUser().getScreenName()));
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_check_follows_you).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show(); }
-					});
-				}
 				runOnUiThread(new Runnable() {
 					public void run() { getAboutFragment().getAdapter().notifyDataSetChanged(); }
 				});
+				
 			}
 		}).start();
 	}
@@ -387,6 +377,8 @@ public class ProfileScreen extends Activity {
 			@Override
 			public void onPageScrolled(int position, float offset, int offsetPixels) {
 				if(position >= 1) findViewById(R.id.profileHeader).setX(-offsetPixels);
+				if( -offsetPixels != 0)
+					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
 			}
 			@Override
 			public void onPageSelected(int position) {

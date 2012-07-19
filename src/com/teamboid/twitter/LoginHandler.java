@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 public class LoginHandler extends Activity {
 
@@ -14,8 +15,9 @@ public class LoginHandler extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login_handler);
-		WebView view = (WebView)findViewById(R.id.webView);
+		
+		WebView view = new WebView(this);
+		setContentView(view);
 		view.getSettings().setJavaScriptEnabled(true);
 		view.getSettings().setAppCacheEnabled(false);
 		view.setWebViewClient(new WebViewClient() {
@@ -28,12 +30,19 @@ public class LoginHandler extends Activity {
 					return true;
 				} else return false;
 		    }
+			
+			@Override
+			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+				Toast.makeText(LoginHandler.this, "Oh no! " + description, Toast.LENGTH_SHORT).show();
+			}
 		});
+		
+		view.loadUrl(getIntent().getStringExtra("url"));
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
-		((WebView)findViewById(R.id.webView)).loadUrl(getIntent().getStringExtra("url"));
+		//((WebView)findViewById(R.id.webView)).loadUrl(getIntent().getStringExtra("url"));
 	}
 }

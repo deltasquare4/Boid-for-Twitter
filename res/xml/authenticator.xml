@@ -1,0 +1,6 @@
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="com.teamboid.twitter.account"
+    android:icon="@drawable/launcher_icon"
+    android:smallIcon="@drawable/launcher_icon"
+    android:label="@string/app_name"
+    android:accountPreferences="@xml/account_preferences"/>

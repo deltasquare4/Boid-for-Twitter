@@ -58,6 +58,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -511,6 +512,15 @@ public class TimelineScreen extends Activity {
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.main_actionbar, menu);
 		final ArrayList<Account> accs = AccountService.getAccounts();
+		
+		// Loading
+		try{
+			if( ((TabsAdapter.IBoidFragment)mTabsAdapter.getCurrentFragment()).isRefreshing() ){ 
+				ProgressBar p = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+				menu.findItem(R.id.refreshAction).setActionView(p).setEnabled(false); // prevents double loading
+			}
+		}catch(Exception e){}
+			
 		final MenuItem switcher = menu.findItem(R.id.accountSwitcher);
 		final MenuItem myProfile = menu.findItem(R.id.myProfileAction);
 		if(accs.size() == 1) {

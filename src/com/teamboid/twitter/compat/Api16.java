@@ -26,7 +26,7 @@ public class Api16 {
 	 * @param nb
 	 * @param nm
 	 */
-	public static void displayNotification(Context context, final Bitmap profileImg, final Status s, final Builder nb, final NotificationManager nm) {
+	public static void displayReplyNotification(final int accId, final Context context, final Bitmap profileImg, final Status s, final Builder nb, final NotificationManager nm) {
 		String media = Utilities.getTweetYFrogTwitpicMedia(s);
 		if(media != null && !media.isEmpty()) {
 			ImageManager.getInstance(context).get(media, new ImageManager.OnImageReceivedListener() {
@@ -36,6 +36,7 @@ public class Api16 {
 						.bigPicture(media)
 						.bigLargeIcon(profileImg)
 						.build();
+					Api11.setupNotification(accId, noti, context);
 					nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 				}
 			});
@@ -43,6 +44,7 @@ public class Api16 {
 			Notification noti = new Notification.BigTextStyle(nb)
 				.bigText(s.getText())
 				.build();
+			Api11.setupNotification(accId, noti, context);
 			nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 		}
 	}
