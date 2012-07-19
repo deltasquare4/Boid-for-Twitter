@@ -35,8 +35,9 @@ public class Api11 {
 	 */
 	public static Notification setupNotification(int accId, Notification nb, Context c) {
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
+		nb.defaults = Notification.DEFAULT_LIGHTS;
 		if(p.getBoolean(accId + "_c2dm_vibrate", false) == true) {
-			nb.vibrate = new long[] { 100, 100, 100 };
+			nb.defaults |= Notification.DEFAULT_VIBRATE;
 		}
 		try {
 			if(!p.getString(accId + "_c2dm_ringtone", "").equals("")) {
@@ -77,7 +78,6 @@ public class Api11 {
 						.setTicker(s.getText());
 				
 				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-					// Pass up to class. We do this, otherwise Dalvik complains. I've done this before
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
 				} else{
 					Notification n = setupNotification(accId, nb.build(), context);
