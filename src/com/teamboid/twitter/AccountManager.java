@@ -46,7 +46,6 @@ import android.widget.Toast;
 public class AccountManager extends PreferenceActivity {
 	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 	
-	
 	public static class AccountFragment extends PreferenceFragment{
 		ProgressDialog pd;
 		BroadcastReceiver pupdater;
@@ -64,14 +63,14 @@ public class AccountManager extends PreferenceActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_accounts);
+			getActionBar().setDisplayHomeAsUpEnabled(true);
 			
 			accountId = this.getArguments().getInt("accountId");
-			
 			pd = new ProgressDialog(getActivity());
 			pd.setMessage(getText(R.string.push_wait));
 			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			
-			pupdater = new BroadcastReceiver(){
+			pupdater = new BroadcastReceiver() {
 
 				@Override
 				public void onReceive(Context arg0, Intent arg1) {
@@ -237,7 +236,6 @@ public class AccountManager extends PreferenceActivity {
 
 	private int lastTheme;
 	public AccountListAdapter adapter;
-
 
 	public class UpdateReceiver extends BroadcastReceiver{
 		@Override
