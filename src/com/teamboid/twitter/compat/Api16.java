@@ -21,10 +21,6 @@ public class Api16 {
 
 	/**
 	 * Please call Api11.displayNotification instead. This gets called by it if we're on JB
-	 * @param context
-	 * @param s
-	 * @param nb
-	 * @param nm
 	 */
 	public static void displayReplyNotification(final int accId, final Context context, final Bitmap profileImg, final Status s, final Builder nb, final NotificationManager nm) {
 		String media = Utilities.getTweetYFrogTwitpicMedia(s);
@@ -32,21 +28,22 @@ public class Api16 {
 			ImageManager.getInstance(context).get(media, new ImageManager.OnImageReceivedListener() {
 				@Override
 				public void onImageReceived(String arg0, Bitmap media) {
-					Notification noti = new Notification.BigPictureStyle(nb)
+					Notification noti = Api11.setupNotification(accId, 
+						new Notification.BigPictureStyle(nb)
 						.bigPicture(media)
 						.bigLargeIcon(profileImg)
-						.build();
-					Api11.setupNotification(accId, noti, context);
+						.build()
+					,context);
 					nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 				}
 			});
 		} else {
-			Notification noti = new Notification.BigTextStyle(nb)
+			Notification noti = Api11.setupNotification(accId,
+				new Notification.BigTextStyle(nb)
 				.bigText(s.getText())
-				.build();
-			Api11.setupNotification(accId, noti, context);
+				.build()
+			,context);
 			nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 		}
 	}
-
 }
