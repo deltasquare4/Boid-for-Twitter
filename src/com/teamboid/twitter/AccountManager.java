@@ -321,8 +321,6 @@ public class AccountManager extends PreferenceActivity {
 		h.fragment = "null";
 		target.add(h);
 	}
-	
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -331,7 +329,7 @@ public class AccountManager extends PreferenceActivity {
 			setTheme(lastTheme);
 		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
-		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		if(this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)){
 			Log.d("acc", "Showing frag");
 			return;
@@ -444,7 +442,7 @@ public class AccountManager extends PreferenceActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			if(AccountService.getAccounts().size() == 0) return false;
-			finish();
+			super.onBackPressed();
 			return true;
 		case R.id.addAccountAction:
 			item.setEnabled(false);
