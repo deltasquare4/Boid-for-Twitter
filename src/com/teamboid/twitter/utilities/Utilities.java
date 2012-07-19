@@ -132,10 +132,13 @@ public class Utilities {
 	}
 	public static Calendar getNightModeEnd(Context context) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String startTime = prefs.getString("night_mode_endtime", "00:00");
+		String endTime = prefs.getString("night_mode_endtime", "00:00");
 		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(startTime) + 1);
-		cal.set(Calendar.MINUTE, TimePreference.getMinute(startTime));
+		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(endTime) + 1);
+		cal.set(Calendar.MINUTE, TimePreference.getMinute(endTime));
+		if(cal.get(Calendar.HOUR_OF_DAY) < 12 && getNightModeStart(context).get(Calendar.HOUR_OF_DAY) >= 12) {
+			cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
+		}
 		return cal;
 	}
 	
@@ -148,9 +151,7 @@ public class Utilities {
 				curTheme = prefs.getString("night_mode_theme", "3");
 			}
 		}
-		if(curTheme == null) {
-			curTheme = prefs.getString("boid_theme", "0");
-		}
+		if(curTheme == null) curTheme = prefs.getString("boid_theme", "0");
 		switch(Integer.parseInt(curTheme)) {
 		default:
 			prefs.edit().putString("boid_theme", "0").commit();
