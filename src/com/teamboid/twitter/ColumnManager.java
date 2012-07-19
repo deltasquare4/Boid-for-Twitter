@@ -158,6 +158,7 @@ public class ColumnManager extends Activity {
 		else cols.add(id);
 		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
 		selIndex = getIntent().getIntExtra("tab_count", 4) - 1;
+		loadColumns();
 	}
 	
 	private void removeColumn(int index) {
