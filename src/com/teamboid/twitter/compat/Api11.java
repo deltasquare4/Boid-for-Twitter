@@ -71,7 +71,7 @@ public class Api11 {
 					// Pass up to class. We do this, otherwise Dalvik complains. I've done this before
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
 				} else{
-					Notification n = nb.getNotification();
+					Notification n = nb.build();
 					setupNotification(accId, n, context);
 					nm.notify(s.getId() + "", 100, n);
 				}
