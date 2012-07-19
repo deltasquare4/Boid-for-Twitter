@@ -3,6 +3,8 @@
 	package="com.teamboid.twitter" android:versionCode="60"
 	android:versionName="0.8.1.6 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
+	<uses-feature android:name="android.hardware.camera"
+		android:required="false" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -66,8 +68,9 @@
 		<activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
 			android:exported="false"
 			android:configChanges="screenSize" />
-		<service android:name=".services.AccountService" android:label="@string/account_service_name"
-			android:description="@string/account_service_desc" android:icon="@drawable/launcher_icon" />
+		<service android:name=".services.AccountService"
+			android:label="@string/account_service_name" android:description="@string/account_service_desc"
+			android:icon="@drawable/launcher_icon" />
 		<activity android:name=".SettingsScreen" android:label="@string/settings_str"
 			android:configChanges="screenSize" />
 		<activity android:name=".ComposerScreen" android:uiOptions="splitActionBarWhenNarrow"
@@ -75,7 +78,8 @@
 			android:label="@string/new_tweet_str" android:configChanges="keyboardHidden|orientation|screenSize"
 			android:launchMode="singleTask" />
 		<activity android:name=".SearchScreen" android:label="@string/search_str"
-			android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow">
+			android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize"
+			android:uiOptions="splitActionBarWhenNarrow">
 			<intent-filter>
 				<action android:name="android.intent.action.SEARCH" />
 			</intent-filter>
@@ -95,11 +99,16 @@
 			android:configChanges="screenSize" android:label="@string/muting_str"
 			android:windowSoftInputMode="adjustResize" />
 		<activity android:name=".UserListActivity" android:noHistory="true"
-			android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:uiOptions="splitActionBarWhenNarrow" />
+		<activity android:name=".ColumnManager" android:launchMode="singleTask"
+			android:configChanges="screenSize" android:label="@string/manage_columns"
+			android:uiOptions="splitActionBarWhenNarrow" />
 		<activity android:name=".TweetListActivity"
-			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize" android:uiOptions="splitActionBarWhenNarrow"/>
-		<service android:name=".services.SendTweetService" android:exported="false"
-			android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
+			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize"
+			android:uiOptions="splitActionBarWhenNarrow" />
+		<service android:name=".services.SendTweetService"
+			android:exported="false" android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
 		<activity android:label="@string/photo_service_title"
 			android:exported="false" android:launchMode="singleTop" android:name=".SelectMediaScreen">
 			<intent-filter>
@@ -117,7 +126,8 @@
 				<action android:name="com.teamboid.twitter.ACTION_TWEET_WIDGET" />
 			</intent-filter>
 		</service>
-		<receiver android:name=".services.SendTweetStarter" android:exported="false">
+		<receiver android:name=".services.SendTweetStarter"
+			android:exported="false">
 			<intent-filter>
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 			</intent-filter>
@@ -180,9 +190,11 @@
 		</receiver>
 		<activity android:name=".LoginHandler"
 			android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize" android:hardwareAccelerated="true"/>
+			android:windowSoftInputMode="adjustResize"
+			android:hardwareAccelerated="true" />
 		<service android:name="net.robotmedia.billing.BillingService" />
-		<receiver android:name="net.robotmedia.billing.BillingReceiver" android:exported="false">
+		<receiver android:name="net.robotmedia.billing.BillingReceiver"
+			android:exported="false">
 			<intent-filter>
 				<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
 				<action android:name="com.android.vending.billing.RESPONSE_CODE" />

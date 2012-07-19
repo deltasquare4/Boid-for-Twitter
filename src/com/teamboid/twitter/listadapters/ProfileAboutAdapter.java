@@ -193,13 +193,13 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			} else curItem = values.get(position - 1);
 			TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
 			title.setText(curItem.getName());
-			FeedListAdapter.ApplyFontSize(title, mContext);
+			FeedListAdapter.ApplyFontSize(title, mContext, true);
 			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
 			if(curItem.getName().equals(mContext.getString(R.string.description_str))) {
 				body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
 				body.setMovementMethod(LinkMovementMethod.getInstance());
 			} else body.setText(curItem.getValue());
-			FeedListAdapter.ApplyFontSize(body, mContext);
+			FeedListAdapter.ApplyFontSize(body, mContext, true);
 		}
 		return toReturn;
 	}

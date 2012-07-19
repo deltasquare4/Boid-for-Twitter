@@ -458,4 +458,7 @@
 	<string name="pause_notifications">Pause Notifications</string>
 	<string name="pause_notifications_desc">When enabled, you will not receive notifications
 		while night mode is active.</string>
+	<string name="manage_columns">Manage Columns</string>
+	<string name="user_feed_str">User Feed</string>
+	<string name="confirm_str">Confirm</string>
 </resources>

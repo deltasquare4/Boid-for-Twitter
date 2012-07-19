@@ -4,4 +4,7 @@
 		android:icon="?unfavoriteIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/retweetAction" android:title="@string/retweet_str"
 		android:icon="?retweetIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/deleteAction" android:title="@string/delete_str"
+		android:icon="?deleteIcon" android:visible="false"
+		android:showAsAction="always" />
 </menu>
