@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="Boid.PureBlackTheme" parent="@android:style/Theme.Holo">
         <item name="android:actionBarItemBackground">@drawable/selectable_background_pure_black</item>
         <item name="android:popupMenuStyle">@style/pure_black_PopupMenu</item>
@@ -11,6 +11,7 @@
         <item name="android:panelBackground">@drawable/menu_hardkey_panel_pure_black</item>
  	    <item name="android:windowBackground">@drawable/ab_solid_pure_black</item>   
  	    
+ 	    <item name="dragHandle">@drawable/reorder_light</item>
         <item name="themeColor">@android:color/darker_gray</item>
 		<item name="usernameColor">@color/username_highlight_selector</item>
 		<item name="tweetColor">@color/white</item>

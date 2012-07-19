@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="wrap_content" android:layout_width="fill_parent"
-	android:padding="5dp">
+	android:paddingLeft="5dp" android:paddingRight="10dp">
 	<ImageView android:id="@+id/drag" android:layout_width="wrap_content"
 		android:layout_alignParentRight="true" android:layout_height="60dp"
-		android:background="@drawable/drag" />
-
-	<TextView android:id="@+id/text" android:layout_width="fill_parent" android:layout_marginLeft="10dp"
-		android:textColor="?tweetColor" android:layout_height="wrap_content"
-		android:layout_centerVertical="true" android:layout_alignParentLeft="true"
-		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:background="?dragHandle" />
+	<TextView android:id="@+id/text" android:layout_width="fill_parent"
+		android:layout_marginLeft="10dp" android:textColor="?tweetColor"
+		android:layout_height="wrap_content" android:layout_centerVertical="true"
+		android:layout_alignParentLeft="true" android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_toLeftOf="@+id/drag" />
 </RelativeLayout>

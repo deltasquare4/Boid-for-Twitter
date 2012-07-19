@@ -54,14 +54,12 @@ public class ColumnManager extends Activity {
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
+			String toMove = adapt.getItem(from);
 			String toMoveRaw = cols.get(from);
 			removeColumn(from);
-			cols.remove(from);
-			cols.add(to, toMoveRaw);
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
-					"_columns", Utilities.arrayToJson(ColumnManager.this, cols)).commit();
-			loadColumns();
+			adapt.remove(toMove);
+			adapt.insert(toMove, to);
+			addColumn(toMoveRaw, to);
 		}
 	};
 	
@@ -113,6 +111,13 @@ public class ColumnManager extends Activity {
 		loadColumns();
 	}
 	
+	@Override
+	public void onPause() {
+		super.onPause();
+		setResult(RESULT_OK, new Intent().putExtra("restart", true).putExtra("sel_index", selIndex));
+		if(!this.isFinishing()) finish();
+	}
+	
 	private void loadColumns() {
 		adapt.clear();
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -145,13 +150,12 @@ public class ColumnManager extends Activity {
 		adapt.notifyDataSetChanged();
 	}
 	
-	private void addColumn(String id) {
+	private void addColumn(String id, int index) {
 		if(AccountService.getAccounts().size() == 0) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
-		cols.add(id);
+		if(index > -1) cols.add(index, id);
+		else cols.add(id);
 		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
-		loadColumns();
 		selIndex = getIntent().getIntExtra("tab_count", 4) - 1;
 	}
 	
@@ -160,7 +164,6 @@ public class ColumnManager extends Activity {
 		final String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column";
 		int beforeDefCol = prefs.getInt(prefName, 0);
 		if(beforeDefCol > 0) prefs.edit().putInt(prefName, beforeDefCol - 1).commit();
-		ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 		cols.remove(index);
 		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
 		int postIndex = index - 1;
@@ -180,27 +183,23 @@ public class ColumnManager extends Activity {
 		case android.R.id.home:
 			super.onBackPressed();
 			return true;
-		case R.id.doneAction:
-			setResult(RESULT_OK, new Intent().putExtra("restart", true).putExtra("sel_index", selIndex));
-			finish();
-			return true;
 		case R.id.addTimelineColAction:
-			addColumn(TimelineFragment.ID);
+			addColumn(TimelineFragment.ID, -1);
 			return true;
 		case R.id.addMentionsColAction:
-			addColumn(MentionsFragment.ID);
+			addColumn(MentionsFragment.ID, -1);
 			return true;
 		case R.id.addMessagesColAction:
-			addColumn(MessagesFragment.ID);
+			addColumn(MessagesFragment.ID, -1);
 			return true;
 		case R.id.addTrendsColAction:
-			addColumn(TrendsFragment.ID);
+			addColumn(TrendsFragment.ID, -1);
 			return true;
 		case R.id.addNearbyColAction:
-			addColumn(NearbyFragment.ID);
+			addColumn(NearbyFragment.ID, -1);
 			return true;
 		case R.id.addMediaColAction:
-			addColumn(MediaTimelineFragment.ID);
+			addColumn(MediaTimelineFragment.ID, -1);
 			return true;
 		case R.id.addSavedSearchColAction:		
 			Toast.makeText(getApplicationContext(), getString(R.string.loading_savedsearches), Toast.LENGTH_SHORT).show();
@@ -222,7 +221,7 @@ public class ColumnManager extends Activity {
 			}).start();
 			return true;
 		case R.id.addFavoritesColAction:
-			addColumn(FavoritesFragment.ID);
+			addColumn(FavoritesFragment.ID, -1);
 			return true;
 		case R.id.addUserListColAction:
 			Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT).show();
@@ -244,7 +243,7 @@ public class ColumnManager extends Activity {
 			}).start();
 			return true;
 		case R.id.addMyListsColAction:
-			addColumn(MyListsFragment.ID);
+			addColumn(MyListsFragment.ID, -1);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -265,7 +264,8 @@ public class ColumnManager extends Activity {
 		builder.setItems(items.toArray(new String[0]), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				UserList curList = lists[item];
-				addColumn(UserListFragment.ID + "@" + curList.getFullName().replace("@", "%40") + "@" + Integer.toString(curList.getId()));
+				addColumn(UserListFragment.ID + "@" + curList.getFullName().replace("@", "%40") +
+						"@" + Integer.toString(curList.getId()), -1);
 			}
 		});
 		builder.create().show();
@@ -284,7 +284,7 @@ public class ColumnManager extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
 				SavedSearch curList = lists[index];
-				addColumn(SavedSearchFragment.ID + "@" + curList.getQuery().replace("@", "%40"));
+				addColumn(SavedSearchFragment.ID + "@" + curList.getQuery().replace("@", "%40"), -1);
 				diag.dismiss();
 			}
 		});
@@ -302,7 +302,7 @@ public class ColumnManager extends Activity {
 				if(actionId == EditorInfo.IME_ACTION_GO) {
 					final String query = input.getText().toString().trim();
 					diag.dismiss();
-					addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"));
+					addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
 					new Thread(new Runnable() {
 						public void run() {
 							try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/doneAction" android:title="@string/confirm_str"
-		android:icon="?doneIcon" android:showAsAction="always" />
 	<item android:id="@+id/addColumnAction" android:title="@string/addcolumn_str"
 		android:icon="?addIcon" android:showAsAction="always">
 		<menu>

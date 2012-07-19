@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="dragHandle" format="reference" />
     <attr name="themeColor" format="color" />
 	<attr name="usernameColor" format="color" />
 	<attr name="selectedItemColor" format="color" />

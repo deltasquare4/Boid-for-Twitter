@@ -314,21 +314,19 @@ public class TimelineCAB {
 				for(final Status t : selTweets) {
 					new Thread(new Runnable() {
 						public void run() {
-							try { AccountService.getCurrentAccount().getClient().destroyStatus(t.getId()); }
-							catch(final TwitterException e) {
+							try { 
+								final Status deleted = AccountService.getCurrentAccount().getClient().destroyStatus(t.getId());
+								context.runOnUiThread(new Runnable() {
+									public void run() { TimelineCAB.removeStatus(deleted); }
+								});
+							} catch(final TwitterException e) {
 								e.printStackTrace();
 								context.runOnUiThread(new Runnable() {
 									public void run() { 
 										Toast.makeText(context, R.string.failed_delete_status + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
 									}
 								});
-								return;
 							}
-							context.runOnUiThread(new Runnable() {
-								public void run() { 
-									
-								}
-							});
 						}
 					}).start();
 				}

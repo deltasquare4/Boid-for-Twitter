@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="Boid.DarkTheme" parent="@android:style/Theme.Holo">
+	    <item name="dragHandle">@drawable/reorder_light</item>
 		<item name="themeColor">@android:color/darker_gray</item>
 		<item name="usernameColor">@color/username_highlight_selector</item>
 		<item name="tweetColor">@color/white</item>

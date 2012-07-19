@@ -8,6 +8,6 @@
 		android:id="@android:id/list" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" dslv:collapsed_height="1dp"
 		dslv:drag_scroll_start="0.33" dslv:float_background_color="@android:color/holo_blue_dark"
-		dslv:max_drag_scroll_speed="0.3" dslv:remove_mode="slide"
+		dslv:max_drag_scroll_speed="0.6" dslv:remove_mode="none"
 		dslv:track_drag_scroll="false" />
 </LinearLayout>
