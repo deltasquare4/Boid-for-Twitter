@@ -8,6 +8,11 @@
 		<intent android:action="android.intent.action.VIEW"
 			android:data="http://www.boidapp.com" />
 	</Preference>
+	<Preference android:key="aboutNodester" android:summary="@string/about_nodester_summary"
+		android:title="@string/about_nodester">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="http://nodester.com" />
+	</Preference>
 	<Preference android:key="send_feedback" android:summary="@string/sendfeedback_description"
 		android:title="@string/sendfeedback_title">
 		<intent android:action="android.intent.action.VIEW"
@@ -17,10 +22,4 @@
 		android:title="@string/share_boid_title" />
 	<Preference android:key="version" android:title="@string/version_title" />
 	<Preference android:key="build" android:title="@string/build_title" />
-
-	<Preference android:key="aboutImgAPI" android:summary="@string/about_twicsy_api_summary"
-		android:title="@string/about_twicsy_api">
-		<intent android:action="android.intent.action.VIEW"
-			android:data="http://twicsy.com/" />
-	</Preference>
 </PreferenceScreen>

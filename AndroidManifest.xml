@@ -201,7 +201,7 @@
 		</receiver>
 
 		<!-- Contact Sync -->
-		<service android:name=".contactsync.AccountAuthenticatorService"
+		<service android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
 			android:exported="true" android:process=":auth">
 			<intent-filter>
 				<action android:name="android.accounts.AccountAuthenticator" />
@@ -209,7 +209,7 @@
 			<meta-data android:name="android.accounts.AccountAuthenticator"
 				android:resource="@xml/authenticator" />
 		</service>
-		<service android:name=".contactsync.ContactsSyncAdapterService"
+		<service android:name="com.teamboid.twitter.contactsync.ContactsSyncAdapterService"
 			android:exported="true" android:process=":contacts">
 			<intent-filter>
 				<action android:name="android.content.SyncAdapter" />
@@ -219,6 +219,5 @@
 			<meta-data android:name="android.provider.CONTACTS_STRUCTURE"
 				android:resource="@xml/contact_structure" />
 		</service>
-
 	</application>
 </manifest>
