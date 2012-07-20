@@ -431,7 +431,6 @@ public class Utilities {
 			return Long.toString(diff / 86400000) + " days"; 
 		} else return Long.toString(diff / 604800000) + " weeks";
 	}
-
 	public static String friendlyTimeLong(Context context, Date createdAt) {
 		Calendar time = Calendar.getInstance();
 		time.setTime(createdAt);
@@ -441,21 +440,23 @@ public class Utilities {
 		String day = Integer.toString(time.get(Calendar.DAY_OF_MONTH));
 		if(day.length() == 1) day = ("0" + day);
 		String minute = Integer.toString(time.get(Calendar.MINUTE));
+		int hour = time.get(Calendar.HOUR);
+		if(hour == 0) hour = 12;
 		if(minute.length() == 1) minute = ("0" + minute);
 		if(now.get(Calendar.YEAR) == time.get(Calendar.YEAR)) {
 			if(now.get(Calendar.MONTH) == time.get(Calendar.MONTH)) {
 				if(now.get(Calendar.WEEK_OF_MONTH) == time.get(Calendar.WEEK_OF_MONTH)) {
-					return Integer.toString(time.get(Calendar.HOUR)) + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+					return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
 				} else {
-					return Integer.toString(time.get(Calendar.HOUR)) + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+					return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
 				}
 			} else {
-				return Integer.toString(time.get(Calendar.HOUR)) + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+				return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
 			}
 		} else {
 			String year = Integer.toString(time.get(Calendar.YEAR));
 			if(now.get(Calendar.YEAR) < time.get(Calendar.YEAR)) year = year.substring(1, 3);
-			return Integer.toString(time.get(Calendar.HOUR)) + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day + ", " + year;
+			return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day + ", " + year;
 		}
 	}
 

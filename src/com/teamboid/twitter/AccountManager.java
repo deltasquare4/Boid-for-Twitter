@@ -342,6 +342,7 @@ public class AccountManager extends PreferenceActivity {
 						new SwipeDismissListViewTouchListener.OnDismissCallback() {
 					@Override
 					public void onDismiss(ListView listView, final int[] pos) {
+						
 						final Account acc = (Account)adapter.getItem(pos[0]);
 						AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this)
 						.setTitle(R.string.remove_account)

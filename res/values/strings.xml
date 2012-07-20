@@ -457,4 +457,6 @@
 		<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
 	<string name="user_feed_str">\@{user} (Feed)</string>
+	<string name="mentioned_by">You were mentioned by @{user}</string>
+	<string name="messaged_by">New message from @{user}</string>
 </resources>

@@ -3,6 +3,7 @@ package com.teamboid.twitter.compat;
 import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.utilities.Utilities;
 
+import twitter4j.DirectMessage;
 import twitter4j.Status;
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -29,22 +30,31 @@ public class Api16 {
 				@Override
 				public void onImageReceived(String arg0, Bitmap media) {
 					Notification noti = Api11.setupNotification(accId, 
-						new Notification.BigPictureStyle(nb)
-						.bigPicture(media)
-						.bigLargeIcon(profileImg)
-						.setSummaryText(s.getText())
-						.build(),
+							new Notification.BigPictureStyle(nb)
+					.bigPicture(media)
+					.bigLargeIcon(profileImg)
+					.setSummaryText(s.getText())
+					.build(),
 					context);
 					nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 				}
 			});
 		} else {
 			Notification noti = Api11.setupNotification(accId,
-				new Notification.BigTextStyle(nb)
-				.bigText(s.getText())
-				.build(),
+					new Notification.BigTextStyle(nb)
+			.bigText(s.getText())
+			.build(),
 			context);
 			nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 		}
+	}
+
+	public static void displayDMNotification(final int accId, final Context context, final Bitmap profileImg, final DirectMessage msg, final Builder nb, final NotificationManager nm, final String text) {
+		Notification noti = Api11.setupNotification(accId,
+				new Notification.BigTextStyle(nb)
+		.bigText(text)
+		.build(),
+		context);
+		nm.notify(msg.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 	}
 }

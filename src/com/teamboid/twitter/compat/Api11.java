@@ -20,7 +20,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 /**
- * Methods for API Level 11 up
+ * Methods for API Level 14 up
  * @author kennydude
  */
 @TargetApi(14)
@@ -50,8 +50,7 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 	 */
 	public static void displayReplyNotification(final int accId, final Context context, final twitter4j.Status s){
 		final String imageURL = Utilities.getUserImage(s.getUser().getScreenName(), context, s.getUser());
-		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {
-			
+		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {		
 			@SuppressLint("NewApi")
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
@@ -64,11 +63,11 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), PendingIntent.FLAG_ONE_SHOT))
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
-						.setTicker(s.getText());
+						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()));
 				
 				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
-				} else{
+				} else {
 					Notification n = setupNotification(accId, nb.build(), context);
 					nm.notify(s.getId() + "", 100, n);
 				}
@@ -79,34 +78,34 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 	public static void displayDirectMessageNotification(final int accId, final Context c, final twitter4j.DirectMessage dm){
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		String x = dm.getText();
-		if(p.getBoolean(accId + "c2dm_messages_priv", false) == true) {
+		if(!p.getBoolean(accId + "_c2dm_messages_priv", false)) {
+			System.out.println("Private messages enabled!");
 			x = c.getString(R.string.message_recv).replace("{user}", dm.getSender().getName());
-		}
+		} else System.out.println("Private messages not enabled...");
 		final String text = x;
-		final String imageURL = Utilities.getUserImage(dm.getSender().getScreenName(), c, dm.getSender());
+		final String imageURL = Utilities.getUserImage(dm.getSenderScreenName(), c, dm.getSender());
 		ImageManager.getInstance(c).get(imageURL, new ImageManager.OnImageReceivedListener() {
-			
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
+				PendingIntent pi = PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class)
+					.putExtra("screen_name", dm.getSenderScreenName()), PendingIntent.FLAG_ONE_SHOT);
 				final NotificationManager nm = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
 				final Notification.Builder nb = 
 						new Notification.Builder(c)
 						.setContentTitle(dm.getSender().getScreenName())
 						.setContentText(text)
 						.setLargeIcon(profileImg)
-						.setContentIntent(PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class).putExtra("screen_name", dm.getSenderScreenName()), PendingIntent.FLAG_ONE_SHOT))
+						.setContentIntent(pi)
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
-						.setTicker(text);
-				//if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-					// Pass up to class. We do this, otherwise Dalvik complains. I've done this before
-				//	Api16.displayDMNotification(c, profileImg, dm, nb, nm);
-				//} else{
-					Notification n = nb.getNotification();
-					setupNotification(accId, n, c);
+						.setTicker(c.getString(R.string.messaged_by).replace("{user}", dm.getSenderScreenName()));
+				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+					Api16.displayDMNotification(accId, c, profileImg, dm, nb, nm, text);
+				} else {
+					Notification n = setupNotification(accId, nb.getNotification(), c);
 					nm.notify(dm.getId() + "", 100, n);
-				// }
+				}
 			}
 		});
 	}
