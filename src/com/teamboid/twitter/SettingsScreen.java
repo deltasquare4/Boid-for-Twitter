@@ -3,6 +3,9 @@ package com.teamboid.twitter;
 import java.util.List;
 
 import net.robotmedia.billing.BillingController;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
+import net.robotmedia.billing.helper.AbstractBillingObserver;
+import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.MediaUtilities;
@@ -44,6 +47,16 @@ public class SettingsScreen extends PreferenceActivity  {
 		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(this) {
+			@Override
+			public void onBillingChecked(boolean supported) { }
+			@Override
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
+			@Override
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
+		};
+		BillingController.registerObserver(mBillingObserver);
+		BillingController.checkBillingSupported(this);
 	}
 
 	@Override

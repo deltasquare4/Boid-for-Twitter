@@ -73,8 +73,7 @@ public class TimelineScreen extends Activity {
 	private boolean lastDisplayReal;
 	private boolean lastIconic;
 	private TabsAdapter mTabsAdapter;
-	private boolean newColumn;
-	private AbstractBillingObserver mBillingObserver;	
+	private boolean newColumn;	
 
 	private SendTweetArrayAdapter sentTweetBinder;
 	public class SendTweetUpdater extends BroadcastReceiver{
@@ -151,7 +150,7 @@ public class TimelineScreen extends Activity {
 
 	private void initialize(Bundle savedInstanceState) {
 		//This callback must stay here, otherwise in-app billing doesn't work for some reason.
-		mBillingObserver = new AbstractBillingObserver(this) {
+		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(this) {
 			@Override
 			public void onBillingChecked(boolean supported) { }
 			@Override
