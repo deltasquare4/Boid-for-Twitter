@@ -253,6 +253,9 @@ public class AccountService extends Service {
 	}
 
 	public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account) {
+		return getFeedAdapter(activity, id, account, true);
+	}
+	public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account, boolean createIfNull) {
 		if(feedAdapters == null) feedAdapters = new ArrayList<FeedListAdapter>();
 		FeedListAdapter toReturn = null;
 		for(FeedListAdapter adapt : feedAdapters) {
@@ -261,7 +264,7 @@ public class AccountService extends Service {
 				break;
 			}
 		}
-		if(toReturn == null) {
+		if(toReturn == null && createIfNull) {
 			toReturn = new FeedListAdapter(activity, id, account);
 			feedAdapters.add(toReturn);
 		}

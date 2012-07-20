@@ -47,8 +47,6 @@ public class AccountManager extends PreferenceActivity {
 	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 	
 	public static class AccountFragment extends PreferenceFragment {
-		ProgressDialog pd;
-		BroadcastReceiver pupdater;
 		
 		@Override
 		public void onDestroy (){
@@ -58,6 +56,8 @@ public class AccountManager extends PreferenceActivity {
 		
 		boolean realChange = false;
 		int accountId;
+		ProgressDialog pd;
+		BroadcastReceiver pupdater;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -101,51 +101,41 @@ public class AccountManager extends PreferenceActivity {
 				@Override
 				public boolean onPreferenceChange(final Preference preference, Object newValue) {
 					if(realChange == true) return true;
-					
 					if((Boolean)newValue == true){
 						PushReceiver.pushForId = accountId;
-						
 						// Register!
 						Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0)); // boilerplate
+						registrationIntent.putExtra("app", PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), PushReceiver.class), 0));
 						registrationIntent.putExtra("sender", PushReceiver.SENDER_EMAIL);
 						getActivity().startService(registrationIntent);
-						
 						pd.setProgress(0);
 						pd.show();
-					} else{
+					} else {
 						// Unregister
 						pd.setProgress(0);
 						pd.show();
-						
 						new Thread(new Runnable(){
-
 							@Override
 							public void run() {
 								try{
 									DefaultHttpClient dhc = new DefaultHttpClient();
 									HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + accountId);
 									org.apache.http.HttpResponse r = dhc.execute(get);
-									if(r.getStatusLine().getStatusCode() == 200 ){
-										getActivity().runOnUiThread(new Runnable(){
-
+									if(r.getStatusLine().getStatusCode() == 200) {
+										getActivity().runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
-												pd.dismiss();
-												
+												pd.dismiss();												
 												// Update Switch
 												preference.getSharedPreferences().edit().putBoolean("c2dm", false).commit();
 												realChange = true;
 												((SwitchPreference)preference).setChecked(false);
 												realChange = false;
-												
 												Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
 											}
 											
 										});
-									} else{
-										throw new Exception("NON 200 RESPONSE ;__;");
-									}
+									} else throw new Exception("NON 200 RESPONSE ;__;");
 								} catch(Exception e){
 									e.printStackTrace();
 									getActivity().runOnUiThread( new Runnable(){
@@ -156,7 +146,6 @@ public class AccountManager extends PreferenceActivity {
 									});
 								}
 							}
-							
 						});
 					}
 					return false;
@@ -183,51 +172,39 @@ public class AccountManager extends PreferenceActivity {
 			}
 			
 			@Override
-			public boolean onPreferenceChange(final Preference preference,
-					final Object newValue) {
-				
+			public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 				pd.setProgress(0);
 				pd.show();
-				
 				new Thread(new Runnable(){
-
 					@Override
 					public void run() {
 						try{
 							DefaultHttpClient dhc = new DefaultHttpClient();
-							HttpGet get = new HttpGet(PushReceiver.SERVER +
-													"/edit/" +
-													accountId + "/" +
-													remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
+							HttpGet get = new HttpGet(PushReceiver.SERVER + "/edit/" + accountId + "/" +
+									remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
 							org.apache.http.HttpResponse r = dhc.execute(get);
 							if(r.getStatusLine().getStatusCode() == 200 ){
 								getActivity().runOnUiThread(new Runnable(){
-
 									@Override
 									public void run() {
-										pd.dismiss();
-										
+										pd.dismiss();										
 										Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
 									}
-									
 								});
-							} else{
-								throw new Exception("NON 200 RESPONSE ;__;");
-							}
+							} else throw new Exception("NON 200 RESPONSE ;__;");
 						} catch(Exception e){
 							e.printStackTrace();
 							getActivity().runOnUiThread( new Runnable(){
 								@Override
 								public void run(){
 									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
-									((SwitchPreference)preference).setChecked( !(Boolean)newValue );
+									((SwitchPreference)preference).setChecked(!(Boolean)newValue);
 								}
 							});
 						}
 					}
-					
-				});
 				
+				});
 				return true;
 			}
 		}

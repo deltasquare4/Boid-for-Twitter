@@ -21,6 +21,7 @@ import android.util.Log;
 
 import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.compat.Api11;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 
 public class PushReceiver extends BroadcastReceiver {
@@ -112,8 +113,9 @@ public class PushReceiver extends BroadcastReceiver {
 							public void run() {
 								// You MUST insert the mention into the adapter associated with the 
 								// account the mention is for, not the adapter for the current account.
-								AccountService.getFeedAdapter(AccountService.activity, MentionsFragment.ID, 
-										Long.parseLong(b.getString("account"))).add(new twitter4j.Status[] { s });
+								FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
+										MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
+								if(adapt != null) adapt.add(new twitter4j.Status[] { s });
 							}
 						});
 					} else if(type.equals("dm")){

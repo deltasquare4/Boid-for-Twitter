@@ -32,8 +32,9 @@ public class Api16 {
 						new Notification.BigPictureStyle(nb)
 						.bigPicture(media)
 						.bigLargeIcon(profileImg)
-						.build()
-					,context);
+						.setSummaryText(s.getText())
+						.build(),
+					context);
 					nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 				}
 			});
@@ -41,8 +42,8 @@ public class Api16 {
 			Notification noti = Api11.setupNotification(accId,
 				new Notification.BigTextStyle(nb)
 				.bigText(s.getText())
-				.build()
-			,context);
+				.build(),
+			context);
 			nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 		}
 	}
