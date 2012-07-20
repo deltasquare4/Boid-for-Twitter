@@ -21,7 +21,7 @@
 		android:layout_above="@+id/messageInputFrame">
 		<ListView android:id="@android:id/list" android:layout_width="fill_parent"
 			android:smoothScrollbar="true" android:transcriptMode="alwaysScroll"
-			android:layout_height="fill_parent" />
+			android:fastScrollEnabled="true" android:layout_height="fill_parent" />
 		<TextView android:id="@android:id/empty"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:text="@string/no_messages" android:layout_centerInParent="true"
