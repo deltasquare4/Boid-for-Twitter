@@ -7,6 +7,7 @@ import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
 
+import twitter4j.TwitterException;
 import twitter4j.UserList;
 
 import com.handlerexploit.prime.ImageManager;
@@ -41,9 +42,11 @@ import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -450,6 +453,68 @@ public class TimelineScreen extends Activity {
 		startActivity(intent);
 	}
 	
+	private void showFollowDialog(final Account acc) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()) ;
+		if(prefs.getBoolean(acc.getId() + "_follows_boidapp", false)) return;
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					final boolean following = acc.getClient().existsFriendship(acc.getUser().getScreenName(), "boidapp");
+					if(!following) {
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								AlertDialog.Builder diag = new AlertDialog.Builder(TimelineScreen.this);
+								diag.setTitle("@boidapp");
+								diag.setMessage(getString(R.string.follow_boidapp_prompt).replace("{account}", acc.getUser().getScreenName()));
+								diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+										new Thread(new Runnable() {
+											public void run() {
+												try { 
+													acc.getClient().createFriendship("boidapp");
+													runOnUiThread(new Runnable() {
+														public void run() {
+															prefs.edit().putBoolean(acc.getId() + "_follows_boidapp", true).apply();
+														}
+													});
+												} catch (final TwitterException e) {
+													e.printStackTrace();
+													runOnUiThread(new Runnable() {
+														@Override
+														public void run() { Toast.makeText(getApplicationContext(), R.string.failed_follow_boidapp, Toast.LENGTH_LONG).show(); }
+													});
+												}
+											}
+										}).start();
+									}
+								});
+								diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) { 
+										dialog.dismiss();
+										prefs.edit().putBoolean(acc.getId() + "_follows_boidapp", true).apply();
+									}
+								});
+								diag.create().show();
+							}
+						});
+					}
+				} catch (final TwitterException e) { 
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						public void run() { 
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_following_boidapp)
+									.replace("{account}", acc.getUser().getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		}).start();
+	}
+	
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -476,6 +541,9 @@ public class TimelineScreen extends Activity {
 			if(!AccountService.existsAccount(AccountService.selectedAccount)) {
 				AccountService.selectedAccount = AccountService.getAccounts().get(0).getId();
 				loadColumns(false, true);
+			}
+			if(AccountService.getAccounts().size() == 1) {
+				showFollowDialog(AccountService.getAccounts().get(0));
 			}
 		}
 		invalidateOptionsMenu();
@@ -609,6 +677,7 @@ public class TimelineScreen extends Activity {
 					AccountService.selectedAccount = acc.getId();
 					PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putLong("last_sel_account", acc.getId()).commit();
 					loadColumns(false, true);
+					showFollowDialog(acc);
 					break;
 				}
 			}

@@ -32,7 +32,6 @@ import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,7 +48,7 @@ public class AccountManager extends PreferenceActivity {
 	public static class AccountFragment extends PreferenceFragment {
 		
 		@Override
-		public void onDestroy (){
+		public void onDestroy () {
 			super.onDestroy();
 			getActivity().unregisterReceiver(pupdater);
 		}
@@ -64,7 +63,6 @@ public class AccountManager extends PreferenceActivity {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_accounts);
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-			
 			accountId = this.getArguments().getInt("accountId");
 			pd = new ProgressDialog(getActivity());
 			pd.setMessage(getText(R.string.push_wait));
@@ -76,9 +74,9 @@ public class AccountManager extends PreferenceActivity {
 					pd.setProgress(arg1.getIntExtra("progress", 1000));
 					if(arg1.getIntExtra("progress", 0) == 1000){
 						pd.dismiss();
-						if(arg1.getBooleanExtra("error", false) == true){
+						if(arg1.getBooleanExtra("error", false)) {
 							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
-						} else{
+						} else {
 							Toast.makeText(getActivity(), R.string.push_registered, Toast.LENGTH_SHORT).show();
 							findPreference(accountId + "_c2dm").getSharedPreferences().edit().putBoolean(accountId + "_c2dm", true).commit();
 							realChange = true;
@@ -93,8 +91,8 @@ public class AccountManager extends PreferenceActivity {
 			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
 			getActivity().registerReceiver(pupdater, i);
 			
-			findPreference("{user}_c2dm_mentions").setOnPreferenceChangeListener( new RemotePushSettingChange( "replies" ) );
-			findPreference("{user}_c2dm_messages").setOnPreferenceChangeListener( new RemotePushSettingChange( "dm" ) );
+			findPreference("{user}_c2dm_mentions").setOnPreferenceChangeListener(new RemotePushSettingChange("replies"));
+			findPreference("{user}_c2dm_messages").setOnPreferenceChangeListener(new RemotePushSettingChange("dm"));
 		
 			((SwitchPreference)findPreference("{user}_c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
@@ -174,16 +172,16 @@ public class AccountManager extends PreferenceActivity {
 			public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 				pd.setProgress(0);
 				pd.show();
-				new Thread(new Runnable(){
+				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						try{
+						try {
 							DefaultHttpClient dhc = new DefaultHttpClient();
 							HttpGet get = new HttpGet(PushReceiver.SERVER + "/edit/" + accountId + "/" +
-									remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
+									remote_setting + "/" + ((Boolean)newValue ? "on" : "off" ) );
 							org.apache.http.HttpResponse r = dhc.execute(get);
 							if(r.getStatusLine().getStatusCode() == 200) {
-								getActivity().runOnUiThread(new Runnable(){
+								getActivity().runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
 										pd.dismiss();										
@@ -191,18 +189,17 @@ public class AccountManager extends PreferenceActivity {
 									}
 								});
 							} else throw new Exception("NON 200 RESPONSE ;__;");
-						} catch(Exception e){
+						} catch(Exception e) {
 							e.printStackTrace();
-							getActivity().runOnUiThread( new Runnable(){
+							getActivity().runOnUiThread( new Runnable() {
 								@Override
-								public void run(){
+								public void run() {
 									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
 									((SwitchPreference)preference).setChecked(!(Boolean)newValue);
 								}
 							});
 						}
 					}
-				
 				});
 				return true;
 			}
@@ -218,69 +215,10 @@ public class AccountManager extends PreferenceActivity {
 			if(intent.getAction().equals(END_LOAD)) {
 				setProgressBarIndeterminateVisibility(false);
 				adapter.notifyDataSetChanged();
-				String access = intent.getStringExtra("access_token");
-				for(int i = 0; i < adapter.getCount(); i++) {
-					Account acc = (Account)adapter.getItem(i);
-					if(acc.getToken().equals(access)) {
-						showFollowDialog(acc);
-						break;
-					}
-				}
 			}
 		}
 	}
 	UpdateReceiver receiver = new UpdateReceiver();
-
-	private void showFollowDialog(final Account acc) {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					final boolean following = acc.getClient().existsFriendship(acc.getUser().getScreenName(), "boidapp");
-					if(!following) {
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								AlertDialog.Builder diag = new AlertDialog.Builder(AccountManager.this);
-								diag.setTitle("@boidapp");
-								diag.setMessage(getString(R.string.follow_boidapp_prompt).replace("{account}", acc.getUser().getScreenName()));
-								diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										dialog.dismiss();
-										new Thread(new Runnable() {
-											public void run() {
-												try { acc.getClient().createFriendship("boidapp"); }
-												catch (final TwitterException e) {
-													e.printStackTrace();
-													runOnUiThread(new Runnable() {
-														@Override
-														public void run() { Toast.makeText(getApplicationContext(), R.string.failed_follow_boidapp, Toast.LENGTH_LONG).show(); }
-													});
-												}
-											}
-										}).start();
-									}
-								});
-								diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
-								});
-								diag.create().show();
-							}
-						});
-					}
-				} catch (final TwitterException e) { 
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() { 
-							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_following_boidapp)
-									.replace("{account}", acc.getUser().getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
-						}
-					});
-				}
-			}
-		}).start();
-	}
 	
 	@Override
 	public void onBuildHeaders(List<Header> target) {
@@ -313,11 +251,8 @@ public class AccountManager extends PreferenceActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		final ListView listView = getListView();
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
-					long id) {
-				Log.d("listview", "Move to fragment");
+			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 				// Pretend to click a header.
 				Header h = new Header();
 				h.fragment = "com.teamboid.twitter.AccountManager$AccountFragment";
@@ -328,7 +263,6 @@ public class AccountManager extends PreferenceActivity {
 				h.fragmentArguments = b;
 				onHeaderClick(h, pos);
 			}
-			
 		});
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
@@ -403,8 +337,7 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.accountmanager_actionbar, menu);
+		getMenuInflater().inflate(R.menu.accountmanager_actionbar, menu);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
 		if(prefs.getBoolean("enable_ssl", false)) {
 			menu.findItem(R.id.toggleSslAction).setTitle(R.string.disable_ssl_str);

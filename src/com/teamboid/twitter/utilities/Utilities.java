@@ -136,7 +136,10 @@ public class Utilities {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(endTime) + 1);
 		cal.set(Calendar.MINUTE, TimePreference.getMinute(endTime));
-		if(cal.get(Calendar.HOUR_OF_DAY) < 12 && getNightModeStart(context).get(Calendar.HOUR_OF_DAY) >= 12) {
+		Calendar now = Calendar.getInstance();
+		//FIGURE OUT THE ALGORITHM TO USE HERE
+		//A GOOD EXAMPLE OF TIMING WOULD BE 3AM IN THE MORNING WHEN THE START TIME WAS 8PM AND THE END TIME IS 7AM 
+		if(cal.before(now) && getNightModeStart(context).before(now)) {
 			cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
 		}
 		return cal;
