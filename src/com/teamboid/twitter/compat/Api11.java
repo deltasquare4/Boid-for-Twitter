@@ -63,7 +63,7 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), PendingIntent.FLAG_ONE_SHOT))
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
-						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()));
+						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()) + " - " + s.getText());
 				
 				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
@@ -79,9 +79,8 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		String x = dm.getText();
 		if(!p.getBoolean(accId + "_c2dm_messages_priv", false)) {
-			System.out.println("Private messages enabled!");
 			x = c.getString(R.string.message_recv).replace("{user}", dm.getSender().getName());
-		} else System.out.println("Private messages not enabled...");
+		}
 		final String text = x;
 		final String imageURL = Utilities.getUserImage(dm.getSenderScreenName(), c, dm.getSender());
 		ImageManager.getInstance(c).get(imageURL, new ImageManager.OnImageReceivedListener() {
@@ -89,7 +88,7 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
 				PendingIntent pi = PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class)
-					.putExtra("screen_name", dm.getSenderScreenName()), PendingIntent.FLAG_ONE_SHOT);
+					.putExtra("screen_name", dm.getSenderScreenName()).putExtra("notification", true), PendingIntent.FLAG_ONE_SHOT);
 				final NotificationManager nm = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
 				final Notification.Builder nb = 
 						new Notification.Builder(c)

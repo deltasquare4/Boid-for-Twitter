@@ -71,7 +71,9 @@ public class ConversationScreen extends ListActivity {
 		});
         adapt = new MessageItemAdapter(this);
         setListAdapter(adapt);
-        loadCachedMessages();
+        if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("notification")) {
+        	reloadMessages();
+        } else loadCachedMessages();
 	}
 	
 	@Override
