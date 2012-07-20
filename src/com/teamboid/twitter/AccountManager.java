@@ -341,21 +341,26 @@ public class AccountManager extends PreferenceActivity {
 				new SwipeDismissListViewTouchListener(listView,
 						new SwipeDismissListViewTouchListener.OnDismissCallback() {
 					@Override
-					public void onDismiss(ListView listView, final int[] reverseSortedPositions) {
-						AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this);
-						ab.setMessage("Are you sure?");
-						
-						ab.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-							
+					public void onDismiss(ListView listView, final int[] pos) {
+						final Account acc = (Account)adapter.getItem(pos[0]);
+						AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this)
+						.setTitle(R.string.remove_account)
+						.setMessage(getString(R.string.confirm_remove_account).replace("{account}", acc.getUser().getScreenName()))
+						.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								for (int i : reverseSortedPositions) {
-									AccountService.removeAccount(AccountManager.this, (Account)adapter.getItem(i));
-									adapter.notifyDataSetChanged();
-								}
+								dialog.dismiss();
+								AccountService.removeAccount(AccountManager.this, acc);
+								adapter.notifyDataSetChanged();
+							}
+						})
+						.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
 							}
 						});
-						ab.show();
+						ab.create().show();
 					}
 				});
 		listView.setOnTouchListener(touchListener);
