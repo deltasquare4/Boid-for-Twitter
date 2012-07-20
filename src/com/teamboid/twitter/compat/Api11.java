@@ -95,7 +95,7 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 						.setContentTitle(dm.getSender().getScreenName())
 						.setContentText(text)
 						.setLargeIcon(profileImg)
-						.setContentIntent(PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class).putExtra("username", dm.getSenderScreenName()), PendingIntent.FLAG_ONE_SHOT))
+						.setContentIntent(PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class).putExtra("screen_name", dm.getSenderScreenName()), PendingIntent.FLAG_ONE_SHOT))
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(text);
@@ -110,5 +110,4 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 			}
 		});
 	}
-	
 }
