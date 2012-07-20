@@ -71,14 +71,13 @@ public class AccountManager extends PreferenceActivity {
 			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			
 			pupdater = new BroadcastReceiver() {
-
 				@Override
 				public void onReceive(Context arg0, Intent arg1) {
 					pd.setProgress(arg1.getIntExtra("progress", 1000));
 					if(arg1.getIntExtra("progress", 0) == 1000){
 						pd.dismiss();
 						if(arg1.getBooleanExtra("error", false) == true){
-							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
 						} else{
 							Toast.makeText(getActivity(), R.string.push_registered, Toast.LENGTH_SHORT).show();
 							findPreference(accountId + "_c2dm").getSharedPreferences().edit().putBoolean(accountId + "_c2dm", true).commit();
@@ -141,7 +140,7 @@ public class AccountManager extends PreferenceActivity {
 									getActivity().runOnUiThread( new Runnable(){
 										@Override
 										public void run(){
-											Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+											Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
 										}
 									});
 								}
@@ -183,7 +182,7 @@ public class AccountManager extends PreferenceActivity {
 							HttpGet get = new HttpGet(PushReceiver.SERVER + "/edit/" + accountId + "/" +
 									remote_setting + "/" + ( (Boolean)newValue ? "on" : "off" ) );
 							org.apache.http.HttpResponse r = dhc.execute(get);
-							if(r.getStatusLine().getStatusCode() == 200 ){
+							if(r.getStatusLine().getStatusCode() == 200) {
 								getActivity().runOnUiThread(new Runnable(){
 									@Override
 									public void run() {
@@ -197,7 +196,7 @@ public class AccountManager extends PreferenceActivity {
 							getActivity().runOnUiThread( new Runnable(){
 								@Override
 								public void run(){
-									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_SHORT).show();
+									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
 									((SwitchPreference)preference).setChecked(!(Boolean)newValue);
 								}
 							});

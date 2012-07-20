@@ -5,7 +5,7 @@
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
 	</string>
-	<string name="push_error">There was a problem with push. Try again in a moment</string>
+	<string name="push_error">There was a problem with push, the servers may be down. Please try again later.</string>
 	<string name="push_updated">Your push settings have been updated</string>
 	<string name="push_registered">Push is now registered!</string>
 	<string name="messages_priv">Show Content</string>

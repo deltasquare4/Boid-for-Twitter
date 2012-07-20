@@ -456,7 +456,7 @@ public class TimelineScreen extends Activity {
 		super.onResume();
 		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
-			lastTheme = Utilities.getTheme(getApplicationContext()); 
+			lastTheme = Utilities.getTheme(getApplicationContext());
 			restartActivity();			
 			return;
 		} else if(lastIconic != PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true)) {

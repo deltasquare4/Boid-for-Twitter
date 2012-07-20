@@ -229,7 +229,6 @@ public class SettingsScreen extends PreferenceActivity  {
 			diag.show();
 		}
 	}
-	
 	public static class NightModeFragment extends PreferenceFragment {
 		
 		private void displayTime(String time, String prefName, int summaryResId) {
@@ -249,15 +248,14 @@ public class SettingsScreen extends PreferenceActivity  {
 		}
 		
 		public void displayThemeText(String theme) {
-			Preference pref = findPreference("night_mode_theme");
-			switch(Integer.parseInt(theme)) {
-			default:
+			final Preference pref = findPreference("night_mode_theme");
+			if(theme.equals("0")) {
 				pref.setSummary(getString(R.string.night_mode_switches_to).replace("{theme}", "dark"));
-			case 1:
+			} else if(theme.equals("1")) {
 				pref.setSummary(getString(R.string.night_mode_switches_to).replace("{theme}", "light"));
-			case 2:
+			} else if(theme.equals("2")) {
 				pref.setSummary(getString(R.string.night_mode_switches_to).replace("{theme}", "dark and light"));
-			case 3:
+			} else if(theme.equals("3")) {
 				pref.setSummary(getString(R.string.night_mode_switches_to).replace("{theme}", "pure black"));
 			}
 		}

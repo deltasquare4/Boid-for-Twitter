@@ -20,7 +20,6 @@ import android.widget.RemoteViews;
 /**
  * @author kennydude
  */
-
 public class YouTubeWidget extends TweetWidget {
 
 	public void onReceive(Context cntxt, Intent intent) {

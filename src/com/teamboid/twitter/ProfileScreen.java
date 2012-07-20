@@ -3,20 +3,16 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import twitter4j.Relationship;
-import twitter4j.ResponseList;
 import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.UserList;
 
 import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
-import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
-import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.columns.ProfileAboutFragment;
-import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -25,10 +21,7 @@ import com.teamboid.twitter.utilities.Utilities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -187,71 +180,6 @@ public class ProfileScreen extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			//startActivity(new Intent(this, TimelineScreen.class));
-			//finish();
-			
-			super.onBackPressed(); //Back button should go back, not restart a new activity
-			
-			return true;
-		case R.id.editAction:
-			//TODO
-			Toast.makeText(getApplicationContext(), "Coming soon!", Toast.LENGTH_SHORT).show();
-			return true;
-		case R.id.mentionAction:
-			startActivity(new Intent(this, ComposerScreen.class)
-				.putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " ")
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			return true;
-		case R.id.pinAction:		
-			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
-			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
-			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
-			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
-			finish();
-			return true;
-		case R.id.messageAction:
-			startActivity(new Intent(getApplicationContext(), ConversationScreen.class).putExtra("screen_name", getIntent().getStringExtra("screen_name")));
-			return true;
-		case R.id.blockAction:
-			if(user == null) return false;
-			block();
-			return true;
-		case R.id.reportAction:
-			if(user == null) return false;
-			report();
-			return true;
-		case R.id.refreshAction:
-			Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
-			if(frag != null) {
-				if(frag instanceof BaseListFragment) ((BaseListFragment)frag).performRefresh(false);
-				else if(frag instanceof BaseGridFragment) ((BaseGridFragment)frag).performRefresh(false); 
-			}
-			return true;
-		case R.id.addToListAction:
-			final Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT);
-			toast.show();
-			new Thread(new Runnable() {
-				public void run() {
-					Account acc = AccountService.getCurrentAccount();
-					try {
-						final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
-						runOnUiThread(new Runnable() {
-							public void run() { 
-								toast.cancel();
-								showAddToListDialog(lists.toArray(new UserList[0]));
-							}
-						});
-					} catch (TwitterException e) {
-						e.printStackTrace();
-						runOnUiThread(new Runnable() {
-							public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_load_lists), Toast.LENGTH_LONG).show(); }
-						});
-					}
-				}
-			}).start();
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
