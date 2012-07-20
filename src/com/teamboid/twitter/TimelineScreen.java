@@ -454,6 +454,7 @@ public class TimelineScreen extends Activity {
 	}
 	
 	private void showFollowDialog(final Account acc) {
+		if(acc.getUser().getScreenName().equals("boidapp")) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()) ;
 		if(prefs.getBoolean(acc.getId() + "_follows_boidapp", false)) return;
 		new Thread(new Runnable() {

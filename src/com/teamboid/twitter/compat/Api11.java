@@ -24,7 +24,7 @@ import android.preference.PreferenceManager;
  * @author kennydude
  */
 @TargetApi(14)
-public class Api11 { //We don't support API 11, we only support API 11-16
+public class Api11 { //We don't support API 11, we only support API 14-16
 	
 	public static int SINGLE_NOTIFCATION = 100;
 	
@@ -69,11 +69,11 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()) + " - " + s.getText());
 				
-				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
 				} else {
 					Notification n = setupNotification(accId, nb.getNotification(), context);
-					nm.notify(s.getId() + "", 100, n);
+					nm.notify(accId + "_MENTIONS", 100, n);
 				}
 			}
 		});
@@ -110,7 +110,7 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 					Api16.displayDMNotification(accId, c, profileImg, dm, nb, nm, text);
 				} else {
 					Notification n = setupNotification(accId, nb.getNotification(), c);
-					nm.notify(dm.getId() + "", 100, n);
+					nm.notify(accId + "_MESSAGES", 100, n);
 				}
 			}
 		});
