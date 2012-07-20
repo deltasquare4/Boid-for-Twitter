@@ -54,13 +54,17 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 			@SuppressLint("NewApi")
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
+				Intent content = new Intent(context, TweetViewer.class)
+					.putExtra("sr_tweet", Utilities.serializeObject(s))
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				PendingIntent pi = PendingIntent.getActivity(context, 0, content, PendingIntent.FLAG_ONE_SHOT);
 				final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 				final Notification.Builder nb = 
 						new Notification.Builder(context)
 						.setContentTitle(s.getUser().getScreenName())
 						.setContentText(s.getText())
 						.setLargeIcon(profileImg)
-						.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, TweetViewer.class).putExtra("sr_tweet", Utilities.serializeObject(s)), PendingIntent.FLAG_ONE_SHOT))
+						.setContentIntent(pi)
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
 						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()) + " - " + s.getText());
@@ -87,8 +91,11 @@ public class Api11 { //We don't support API 11, we only support API 11-16
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onImageReceived(String arg0, Bitmap profileImg) {
-				PendingIntent pi = PendingIntent.getActivity(c, 0, new Intent(c, ConversationScreen.class)
-					.putExtra("screen_name", dm.getSenderScreenName()).putExtra("notification", true), PendingIntent.FLAG_ONE_SHOT);
+				Intent content = new Intent(c, ConversationScreen.class)
+					.putExtra("screen_name", dm.getSenderScreenName())
+					.putExtra("notification", true)
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				PendingIntent pi = PendingIntent.getActivity(c, 0, content, PendingIntent.FLAG_ONE_SHOT);
 				final NotificationManager nm = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
 				final Notification.Builder nb = 
 						new Notification.Builder(c)

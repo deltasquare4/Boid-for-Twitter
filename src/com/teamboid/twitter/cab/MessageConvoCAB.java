@@ -9,7 +9,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.view.ActionMode;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -68,7 +67,8 @@ public class MessageConvoCAB {
 			context.startActionMode(MessageConvoCAB.ConvoActionModeCallback);
 		} else {
 			final DMConversation[] convos = MessageConvoCAB.getSelectedConvos();
-			MessageConvoCAB.ConvoActionMode.getMenuInflater().inflate(R.menu.convo_cab, TimelineCAB.TimelineActionMode.getMenu());
+			MessageConvoCAB.ConvoActionMode.getMenu().clear();
+			MessageConvoCAB.ConvoActionMode.getMenuInflater().inflate(R.menu.convo_cab, MessageConvoCAB.ConvoActionMode.getMenu());
 			if(convos.length == 0) {
 				MessageConvoCAB.ConvoActionMode.finish();
 			} else MessageConvoCAB.updateTitle();
@@ -82,8 +82,7 @@ public class MessageConvoCAB {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MessageConvoCAB.ConvoActionMode = mode;
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.convo_cab, menu);
+			mode.getMenuInflater().inflate(R.menu.convo_cab, menu);
 			updateTitle();
 			return true;
 		}
@@ -99,9 +98,10 @@ public class MessageConvoCAB {
 			MessageConvoCAB.clearSelectedItems();
 			switch (item.getItemId()) {
 			case R.id.deleteAction:
-				new Thread(new Runnable() {
-					public void run() {
-						for(final DMConversation convo : selConvos) {
+				mode.finish();
+				for(final DMConversation convo : selConvos) {
+					new Thread(new Runnable() {
+						public void run() {			
 							for(DirectMessage msg : convo.getMessages()) {
 								try { AccountService.getCurrentAccount().getClient().destroyDirectMessage(msg.getId()); }
 								catch (final TwitterException e) {
@@ -110,21 +110,19 @@ public class MessageConvoCAB {
 										@Override
 										public void run() {
 											Toast.makeText(context, context.getString(R.string.failed_delete_dm).replace("{user}", convo.getToScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+											AccountService.getMessageConvoAdapter(context, AccountService.getCurrentAccount().getId()).add(new DMConversation[] { convo });
 										}
 									});
 								}
 							}
-							context.runOnUiThread(new Runnable() {
-								public void run() {
-									AccountService.getMessageConvoAdapter(context, AccountService.getCurrentAccount().getId()).remove(convo);
-								}
-							});
 						}
-						context.runOnUiThread(new Runnable() {
-							public void run() { mode.finish(); }
-						});
-					}
-				}).start();
+					}).start();
+					context.runOnUiThread(new Runnable() {
+						public void run() {
+							AccountService.getMessageConvoAdapter(context, AccountService.getCurrentAccount().getId()).remove(convo);
+						}
+					});
+				}
 				return true;
 			default:
 				return false;

@@ -94,6 +94,8 @@ public class AccountService extends Service {
 	public static ConfigurationBuilder getConfiguration(String token, String secret){
 		return new ConfigurationBuilder()
 			.setDebugEnabled(true)
+			.setIncludeEntitiesEnabled(true)
+			.setIncludeRTsEnabled(true)
 			.setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
 			.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
 			.setOAuthAccessToken(token)
@@ -190,9 +192,6 @@ public class AccountService extends Service {
 					final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
 					try {
 						final User accountUser = toAdd.verifyCredentials();
-						
-						
-						
 						accounts.add(new Account(activity, toAdd, token).setSecret(accountStore.get(token).toString()).setUser(accountUser));
 					} catch (final TwitterException e) {
 						e.printStackTrace();
