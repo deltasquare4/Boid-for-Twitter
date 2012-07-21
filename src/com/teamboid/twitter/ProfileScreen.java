@@ -365,20 +365,29 @@ public class ProfileScreen extends Activity {
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
 		((ViewPager)findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
-
+			int lastPage = -1;
+			
 			@Override
-			public void onPageScrollStateChanged(int arg0) { }
+			public void onPageScrollStateChanged(int state) {
+				if(state != ViewPager.SCROLL_STATE_DRAGGING && lastPage == 2){
+					findViewById(R.id.profileHeader).setVisibility(View.GONE);
+				} else{
+					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
+				}
+				
+				if(state == ViewPager.SCROLL_STATE_IDLE){
+					findViewById(R.id.profileHeader).setX(0);
+				}
+			}
 
 			@Override
 			public void onPageScrolled(int position, float offset, int offsetPixels) {
+				lastPage = position;
+				if(position == 2 && offset >= 0) return;
 				if(position >= 1) findViewById(R.id.profileHeader).setX(-offsetPixels);
-				if( -offsetPixels != 0)
-					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
 			}
 			@Override
 			public void onPageSelected(int position) {
-				findViewById(R.id.profileHeader).setVisibility( position > 1 ? View.GONE : View.VISIBLE );
-				//findViewById(R.id.profileHeader).animate().alpha(position > 1 ? 0 : 1 );
 				mTabsAdapter.onPageSelected(position);
 			}
 		});
@@ -388,14 +397,21 @@ public class ProfileScreen extends Activity {
 	 * Set first media
 	 */
 	public void setupMediaView(){
-		try{
-			MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
-			setHeaderBackground(m.imgurl);
-		} catch(Exception e){
-			e.printStackTrace();
-			// Here we should divert to profile bg?
-			setHeaderBackground(user.getProfileBackgroundImageUrl());
-		}
+		runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				try{
+					MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
+					setHeaderBackground(m.imgurl);
+				} catch(Exception e){
+					e.printStackTrace();
+					// Here we should divert to profile bg?
+					setHeaderBackground(user.getProfileBackgroundImageUrl());
+				}
+			}
+			
+		});
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {

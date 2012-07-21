@@ -22,6 +22,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 	public static class MediaFeedItem{
 		public String imgurl = "";
 		public long tweet_id = -1;
+		@Deprecated
 		public String twicsy_id = "";
 	}
 
