@@ -174,6 +174,7 @@ public class MediaTimelineFragment extends BaseGridFragment {
 	}
 
 	private int pageSkips;
+	private boolean haveNotified = false;
 
 	@Override
 	public void performRefresh(final boolean paginate) {
@@ -194,53 +195,33 @@ public class MediaTimelineFragment extends BaseGridFragment {
 				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
+					ResponseList<Status> tweets;
 					try {
 						if (screenName != null) {
-							try{
-								ResponseList<Status> tweets = acc.getClient().getUserMediaTimeline(screenName, paging);
-								for (final Status p : tweets) {
-									if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
-										context.runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												MediaFeedItem m = new MediaFeedItem();
-												m.imgurl = Utilities
-														.getTweetYFrogTwitpicMedia(p);
-												m.tweet_id = p.getId();
-												adapt.add(
-														new MediaFeedItem[] { m },
-														MediaTimelineFragment.this);
-											}
-										});
-									}
-								}
-								
-							} catch (Exception e) {
-								e.printStackTrace();
+							tweets = acc.getClient().getUserMediaTimeline(screenName, paging);
+						} else {
+							tweets = acc.getClient().getHomeTimeline(paging);
+						}
+						
+						for (final Status p : tweets) {
+							if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										setEmptyText(context
-												.getString(R.string.error_str));
+										MediaFeedItem m = new MediaFeedItem();
+										m.imgurl = Utilities
+												.getTweetYFrogTwitpicMedia(p);
+										m.tweet_id = p.getId();
+										adapt.add(
+												new MediaFeedItem[] { m },
+												MediaTimelineFragment.this);
 									}
 								});
-							}
-						} else {
-							ResponseList<Status> temp = acc.getClient().getHomeTimeline(paging);
-							for (final Status p : temp) {
-								if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
-									context.runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											MediaFeedItem m = new MediaFeedItem();
-											m.imgurl = Utilities
-													.getTweetYFrogTwitpicMedia(p);
-											m.tweet_id = p.getId();
-											adapt.add(
-													new MediaFeedItem[] { m },
-													MediaTimelineFragment.this);
-										}
-									});
+								if(haveNotified == false){
+									if(context instanceof ProfileScreen){
+										((ProfileScreen)context).setupMediaView();
+										haveNotified = true;
+									}
 								}
 							}
 						}

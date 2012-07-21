@@ -91,10 +91,18 @@ public class AccountManager extends PreferenceActivity {
 			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
 			getActivity().registerReceiver(pupdater, i);
 			
-			findPreference("{user}_c2dm_mentions").setOnPreferenceChangeListener(new RemotePushSettingChange("replies"));
-			findPreference("{user}_c2dm_messages").setOnPreferenceChangeListener(new RemotePushSettingChange("dm"));
+			setKey("c2dm", accountId);
+			setKey("c2dm_mentions", accountId);
+			setKey("c2dm_messages", accountId);
+			setKey("c2dm_vibrate", accountId);
+			setKey("c2dm_ringtone", accountId);
+			setKey("c2dm_messages_priv", accountId);
+			setKey("contactsync", accountId);
+			
+			findPreference(accountId + "_c2dm_mentions").setOnPreferenceChangeListener(new RemotePushSettingChange("replies"));
+			findPreference(accountId + "_c2dm_messages").setOnPreferenceChangeListener(new RemotePushSettingChange("dm"));
 		
-			((SwitchPreference)findPreference("{user}_c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			((SwitchPreference)findPreference(accountId + "_c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(final Preference preference, Object newValue) {
 					if(realChange == true) return true;
@@ -148,14 +156,6 @@ public class AccountManager extends PreferenceActivity {
 					return false;
 				}
 			});
-			
-			setKey("c2dm", accountId);
-			setKey("c2dm_mentions", accountId);
-			setKey("c2dm_messages", accountId);
-			setKey("c2dm_vibrate", accountId);
-			setKey("c2dm_ringtone", accountId);
-			setKey("c2dm_messages_priv", accountId);
-			setKey("contactsync", accountId);
 		}
 		void setKey(String key, int accountId){
 			findPreference("{user}_" + key).setKey(accountId + "_" + key);
@@ -163,6 +163,7 @@ public class AccountManager extends PreferenceActivity {
 		
 		public class RemotePushSettingChange implements Preference.OnPreferenceChangeListener{
 			String remote_setting;
+			Boolean real_change = false;
 			
 			public RemotePushSettingChange(String remote_setting){
 				this.remote_setting = remote_setting;
@@ -170,6 +171,7 @@ public class AccountManager extends PreferenceActivity {
 			
 			@Override
 			public boolean onPreferenceChange(final Preference preference, final Object newValue) {
+				if(real_change == true) return true;
 				pd.setProgress(0);
 				pd.show();
 				new Thread(new Runnable() {
@@ -194,8 +196,11 @@ public class AccountManager extends PreferenceActivity {
 							getActivity().runOnUiThread( new Runnable() {
 								@Override
 								public void run() {
+									pd.dismiss();
 									Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
+									real_change = true;
 									((SwitchPreference)preference).setChecked(!(Boolean)newValue);
+									real_change = false;
 								}
 							});
 						}

@@ -14,8 +14,10 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -23,6 +25,7 @@ import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.NightModeUtils;
 
 public class PushReceiver extends BroadcastReceiver {
 	
@@ -96,6 +99,15 @@ public class PushReceiver extends BroadcastReceiver {
 				}).start();
 			} else if(intent.hasExtra("hm")) {
 				final Bundle b = intent.getBundleExtra("hm");
+				
+				if(NightModeUtils.isNightMode(this)){
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+					if(prefs.getBoolean("night_mode_pause_notifications", false) == true){
+						stopSelf();
+						return Service.START_NOT_STICKY;
+					}
+				}
+				
 				try {
 					String type = b.getString("type");
 					Integer accId = 0;
