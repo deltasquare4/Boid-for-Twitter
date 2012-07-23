@@ -459,4 +459,7 @@
 	<string name="user_feed_str">\@{user} (Feed)</string>
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
+	<string name="contactsync_what">What to sync</string>
+	<string name="contact_sync_on">Contact Sync is turned on</string>
+	<string name="contact_sync_off">Contact sync is turned off</string>
 </resources>

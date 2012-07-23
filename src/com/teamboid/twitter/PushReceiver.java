@@ -115,21 +115,24 @@ public class PushReceiver extends BroadcastReceiver {
 					catch(Exception e) { }
 					if(type.equals("reply")) {
 						JSONObject status = new JSONObject(b.getString("tweet"));
+						status.put("id", Long.parseLong(status.getString("id_str")));
 						final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
 						//TODO The account the mention is for should be passed from the server too
 						// We have this now in "account" as a string
 						//Also, we need a way of combining multiple mentions/messages into one notification.
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
-						AccountService.activity.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								// You MUST insert the mention into the adapter associated with the 
-								// account the mention is for, not the adapter for the current account.
-								FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
-										MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
-								if(adapt != null) adapt.add(new twitter4j.Status[] { s });
-							}
-						});
+						if(AccountService.activity != null){
+							AccountService.activity.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									// You MUST insert the mention into the adapter associated with the 
+									// account the mention is for, not the adapter for the current account.
+									FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
+											MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
+									if(adapt != null) adapt.add(new twitter4j.Status[] { s });
+								}
+							});
+						}
 					} else if(type.equals("dm")){
 						//Yes I know it's "tweet". Deal with it
 						JSONObject json = new JSONObject(b.getString("tweet"));

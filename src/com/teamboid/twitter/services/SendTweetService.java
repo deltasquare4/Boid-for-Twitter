@@ -52,10 +52,12 @@ public class SendTweetService extends Service {
 						});
 					} catch(Exception e) { e.printStackTrace(); }
 					try {
-						if(!AccountService.activity.hasWindowFocus()) {
-							Toast.makeText(getApplicationContext(), R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+						if(AccountService.activity.hasWindowFocus()) {
+							throw new Exception("Activity does not have focus");
 						}
-					} catch(Exception e) { e.printStackTrace(); }
+					} catch(Exception e) {
+						Toast.makeText(SendTweetService.this, R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+					}
 					tweets.remove(i);
 				} else tweets.set(i, stt);
 				sendBroadcast(update);
