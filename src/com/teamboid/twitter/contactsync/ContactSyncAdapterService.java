@@ -2,12 +2,16 @@ package com.teamboid.twitter.contactsync;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.teamboid.twitter.services.AccountService;
 
 import twitter4j.IDs;
 import twitter4j.Paging;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
 import twitter4j.User;
+import twitter4j.conf.ConfigurationBuilder;
 
 import android.accounts.Account;
 import android.app.Service;
@@ -68,19 +72,19 @@ public class ContactSyncAdapterService extends Service {
 			operationList.add(builder.build());
 			
 			try{
+				Log.d("sync", "Adding " + user.getScreenName() + " to Android");
 				mContext.getContentResolver().applyBatch(ContactsContract.AUTHORITY, operationList);
 			} catch(Exception e){
 				Log.d("sync", "Couldn't add " + user.getScreenName());
 			}	
 		}
 		
-		com.teamboid.twitter.Account getAccount(){
-			for(com.teamboid.twitter.Account acc : AccountService.getAccounts()){
-				if(acc.getUser().getScreenName() == account.name){
-					return acc;
-				}
-			}
-			return null;
+		Twitter getTwitter(){
+			Map<String, ?> accountStore = mContext.getSharedPreferences("accounts", 0).getAll();
+			
+			// TODO: Roadblock. Need some way of getting a twitter config w/out AccountService
+			ConfigurationBuilder cb = getConfiguration(token, accountStore.get(token).toString());
+			final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
 		}
 		
 		String getWhatToSync(){ // TODO: Actually make this return something the user wants
@@ -89,13 +93,13 @@ public class ContactSyncAdapterService extends Service {
 		
 		int getTotalNumber(){
 			try{
-				com.teamboid.twitter.Account acc = getAccount();
+				Twitter client = getAccount();
 				String type = getWhatToSync();
 				
 				if(type.equals("following")){
-					return acc.getUser().getFriendsCount();
+					return client.verifyCredentials().getFriendsCount();
 				} else if(type.equals("followers")){
-					return acc.getUser().getFollowersCount();
+					return client.verifyCredentials().getFollowersCount();
 				}
 			}catch(Exception e){ e.printStackTrace(); return -1; }
 			return -1;
@@ -131,9 +135,17 @@ public class ContactSyncAdapterService extends Service {
 			while(got > total){
 				List<User> users = getTimeline(p);
 				
+				if(users == null){
+					// Error?
+					return;
+				}
+				
 				for(User user : users){
 					addContact(user);
+					
+					// TODO: add to some fast cache for username autocompletion
 				}
+				got += users.size();
 				
 				p.setPage( p.getPage() + 1 );
 			}

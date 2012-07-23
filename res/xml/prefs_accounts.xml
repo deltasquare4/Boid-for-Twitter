@@ -29,7 +29,11 @@
 			android:title="@string/messages_priv" android:persistent="true" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/contact_sync">
-		<SwitchPreference android:key="{user}_contactsync" android:summaryOn="@string/contact_sync_on" android:defaultValue="false" android:summaryOff="@string/contact_sync_off" android:title="@string/contact_sync"/><ListPreference android:key="{user}_contactsync_what"
+		<SwitchPreference android:key="{user}_contactsync_on"
+		    android:summaryOn="@string/contact_sync_on"
+		    android:defaultValue="false" android:summaryOff="@string/contact_sync_off"
+		    android:title="@string/contact_sync"/>
+		<ListPreference android:key="{user}_contactsync_what"
 			android:defaultValue="mutual" android:entryValues="@array/sync_types_values"
 			android:entries="@array/sync_types" android:title="@string/contactsync_what"/>
 		

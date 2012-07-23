@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
@@ -19,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +32,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,6 +64,7 @@ public class AccountManager extends PreferenceActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			
 			addPreferencesFromResource(R.xml.prefs_accounts);
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 			accountId = this.getArguments().getInt("accountId");
@@ -97,11 +101,21 @@ public class AccountManager extends PreferenceActivity {
 			setKey("c2dm_vibrate", accountId);
 			setKey("c2dm_ringtone", accountId);
 			setKey("c2dm_messages_priv", accountId);
-			setKey("contactsync", accountId);
+			setKey("contactsync_on", accountId);
 			
 			findPreference(accountId + "_c2dm_mentions").setOnPreferenceChangeListener(new RemotePushSettingChange("replies"));
 			findPreference(accountId + "_c2dm_messages").setOnPreferenceChangeListener(new RemotePushSettingChange("dm"));
 		
+			SwitchPreference syncPref = ((SwitchPreference)findPreference(accountId + "_contactsync_on"));
+			syncPref.setChecked( ContentResolver.getSyncAutomatically(AndroidAccountHelper.getAccount(AccountService.getAccount(accountId)), ContactsContract.AUTHORITY) );
+			syncPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(final Preference preference, Object newValue) {
+					ContentResolver.setSyncAutomatically(AndroidAccountHelper.getAccount(AccountService.getAccount(accountId)), ContactsContract.AUTHORITY, (Boolean)newValue);
+					return true;
+				}
+			});
+			
 			((SwitchPreference)findPreference(accountId + "_c2dm")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(final Preference preference, Object newValue) {

@@ -6,9 +6,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
@@ -16,11 +18,13 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
@@ -178,12 +182,22 @@ public class AccountService extends Service {
 		final ProgressDialog dialog = ProgressDialog.show(activity, "", activity.getString(R.string.loading_accounts), true);
 		new Thread(new Runnable() {
 			public void run() {
+				android.accounts.AccountManager am = android.accounts.AccountManager.get(activity);
+				HashMap<String, android.accounts.Account> accs = new HashMap<String, android.accounts.Account>();
+				
+				android.accounts.Account temp[] = am.getAccountsByType(AndroidAccountHelper.ACCOUNT_TYPE);
+				for(android.accounts.Account acc : temp)
+					accs.put(am.getUserData(acc, "accId"), acc);
+				
 				for(final String token : accountStore.keySet()) {
 					boolean skip = false;
 					for(int i = 0; i < accounts.size(); i++) {
 						Account acc = accounts.get(i);
 						if(acc.getToken().equals(token)) {
 							skip = true;
+							if(accs.get( acc.getId() ) != null){
+								accs.remove( acc.getId() );
+							}
 							break;
 						}
 					}
@@ -192,7 +206,19 @@ public class AccountService extends Service {
 					final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
 					try {
 						final User accountUser = toAdd.verifyCredentials();
-						accounts.add(new Account(activity, toAdd, token).setSecret(accountStore.get(token).toString()).setUser(accountUser));
+						
+						// Android stuff
+						boolean exists = false;
+						if(accs.get( toAdd.getId() ) != null){
+							accs.remove( toAdd.getId() );
+							exists = true;
+						}
+						
+						Account aToAdd = new Account(activity, toAdd, token).setSecret(accountStore.get(token).toString()).setUser(accountUser);
+						if(!exists){
+							AndroidAccountHelper.addAccount(activity, aToAdd);
+						}
+						accounts.add(aToAdd);
 					} catch (final TwitterException e) {
 						e.printStackTrace();
 						activity.runOnUiThread(new Runnable() {
@@ -214,6 +240,13 @@ public class AccountService extends Service {
 						dialog.dismiss();
 					}
 				});
+				
+				// Remove all old accounts (or if username has changed/other circumastances)
+				for(android.accounts.Account acc : accs.values()){
+					if(AccountService.existsAccount( Long.parseLong(am.getUserData(acc, "accId") ))){
+						am.removeAccount(acc, null, null );
+					}
+				}
 			}
 		}).start();
 	}
