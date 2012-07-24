@@ -1,9 +1,17 @@
 package com.teamboid.twitter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
 import twitter4j.User;
+import twitter4j.conf.Configuration;
 
 /**
  * @author Aidan Follestad
@@ -15,7 +23,24 @@ public class Account {
 		_token = token;
 		prefs = context.getSharedPreferences("account_" + token, 0);
 	}
-
+	
+	public JSONObject serialize() throws JSONException{
+		JSONObject r = new JSONObject();
+		r.put("key", _token);
+		r.put("secret", getSecret());
+		r.put("user", Utilities.serializeObject( getUser()));
+		return r;
+	}
+	
+	public static Account unserialize( Context c, JSONObject i ) throws JSONException{
+		Configuration co = AccountService.getConfiguration(i.getString("key"), i.getString("secret")).build();
+		Twitter client = new TwitterFactory(co).getInstance();
+		Account r = new Account( c, client, i.getString("key") );
+		r.setUser( (User) Utilities.deserializeObject( i.getString("user") ) );
+		r.setSecret( i.getString("secret") );
+		return r;
+	}
+	
 	private Twitter _client;
 	private String _token;
 	private SharedPreferences prefs;

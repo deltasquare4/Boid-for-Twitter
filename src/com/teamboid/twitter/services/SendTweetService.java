@@ -11,6 +11,7 @@ import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.utilities.NetworkUtils;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -43,16 +44,16 @@ public class SendTweetService extends Service {
 				sendBroadcast(update);
 				if(stt.sendTweet(SendTweetService.this).sent == true) {
 					try { 
-						AccountService.activity.runOnUiThread(new Runnable() {
+						((Activity)AccountService.activity).runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								AccountService.getFeedAdapter(AccountService.activity, TimelineFragment.ID,
+								AccountService.getFeedAdapter((Activity) AccountService.activity, TimelineFragment.ID,
 										AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{stt.tweet});
 							}						
 						});
 					} catch(Exception e) { e.printStackTrace(); }
 					try {
-						if(AccountService.activity.hasWindowFocus()) {
+						if(((Activity)AccountService.activity).hasWindowFocus()) {
 							throw new Exception("Activity does not have focus");
 						}
 					} catch(Exception e) {

@@ -14,6 +14,7 @@ import twitter4j.User;
 import twitter4j.conf.ConfigurationBuilder;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
@@ -79,12 +80,21 @@ public class ContactSyncAdapterService extends Service {
 			}	
 		}
 		
-		Twitter getTwitter(){
-			Map<String, ?> accountStore = mContext.getSharedPreferences("accounts", 0).getAll();
+		long _id = -1;
+		Long getId(){
+			if(_id != -1) return _id;
 			
-			// TODO: Roadblock. Need some way of getting a twitter config w/out AccountService
-			ConfigurationBuilder cb = getConfiguration(token, accountStore.get(token).toString());
-			final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
+			AccountManager am = AccountManager.get(mContext);
+			_id = Long.parseLong( am.getUserData(account, "accId") );
+			return _id;
+		}
+		
+		Twitter getTwitter(){
+			AccountService.activity = mContext;
+			AccountService.getAccounts(); // New Array
+			AccountService.loadCachedAccounts();
+			
+			return AccountService.getAccount( getId() ).getClient();
 		}
 		
 		String getWhatToSync(){ // TODO: Actually make this return something the user wants
@@ -93,7 +103,7 @@ public class ContactSyncAdapterService extends Service {
 		
 		int getTotalNumber(){
 			try{
-				Twitter client = getAccount();
+				Twitter client = getTwitter();
 				String type = getWhatToSync();
 				
 				if(type.equals("following")){
@@ -107,15 +117,15 @@ public class ContactSyncAdapterService extends Service {
 		
 		List<User> getTimeline(Paging paging){
 			try{
-				com.teamboid.twitter.Account acc = getAccount();
+				Twitter client = getTwitter();
 				String type = getWhatToSync();
 				
 				if(type.equals("following")){
-					IDs ids = acc.getClient().getFriendsIDs(acc.getUser().getId());
-					return acc.getClient().lookupUsers( ids.getIDs() );
+					IDs ids = client.getFriendsIDs( getId());
+					return client.lookupUsers( ids.getIDs() );
 				} else if(type.equals("followers")){
-					IDs ids = acc.getClient().getFollowersIDs(acc.getUser().getId());
-					return acc.getClient().lookupUsers( ids.getIDs() );
+					IDs ids = client.getFollowersIDs( getId());
+					return client.lookupUsers( ids.getIDs() );
 				}
 			}catch(Exception e){ e.printStackTrace(); return null; }
 			return null;

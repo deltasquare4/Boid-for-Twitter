@@ -22,6 +22,7 @@ public class AndroidAccountHelper {
 		
 		android.accounts.Account toAdd = getAccount(a);
 		am.addAccountExplicitly( toAdd, "TRY.HARDER.HACKER", userdata);
+		am.setUserData(toAdd, "accId", a.getId() + "");
 		ContentResolver.setSyncAutomatically(toAdd, ContactsContract.AUTHORITY, AUTO_SYNC_CONTACTS);
 	}
 	

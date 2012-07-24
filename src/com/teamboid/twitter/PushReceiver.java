@@ -10,6 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -122,12 +123,12 @@ public class PushReceiver extends BroadcastReceiver {
 						//Also, we need a way of combining multiple mentions/messages into one notification.
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
 						if(AccountService.activity != null){
-							AccountService.activity.runOnUiThread(new Runnable() {
+							((Activity)AccountService.activity).runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
 									// You MUST insert the mention into the adapter associated with the 
 									// account the mention is for, not the adapter for the current account.
-									FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
+									FeedListAdapter adapt = AccountService.getFeedAdapter((Activity) AccountService.activity, 
 											MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
 									if(adapt != null) adapt.add(new twitter4j.Status[] { s });
 								}

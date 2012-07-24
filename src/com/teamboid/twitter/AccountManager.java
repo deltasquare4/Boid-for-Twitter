@@ -219,7 +219,7 @@ public class AccountManager extends PreferenceActivity {
 							});
 						}
 					}
-				});
+				}).start();
 				return true;
 			}
 		}

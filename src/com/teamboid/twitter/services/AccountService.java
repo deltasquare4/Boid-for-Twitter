@@ -6,8 +6,10 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -16,10 +18,19 @@ import twitter4j.*;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
@@ -40,7 +51,7 @@ import com.teamboid.twitter.utilities.NetworkUtils;
 public class AccountService extends Service {
 
 	public static Twitter pendingClient;
-	public static Activity activity;
+	public static Context activity;
 	private static ArrayList<Account> accounts;
 	public static ArrayList<FeedListAdapter> feedAdapters;
 	public static ArrayList<MediaFeedListAdapter> mediaAdapters;
@@ -114,7 +125,7 @@ public class AccountService extends Service {
 			public void run() {
 				try {
 					if(pendingClient == null) {
-						activity.runOnUiThread(new Runnable() {
+						((Activity)activity).runOnUiThread(new Runnable() {
 							@Override
 							public void run() { 
 								act.cancel();
@@ -131,7 +142,7 @@ public class AccountService extends Service {
 					ArrayList<Account> accs = getAccounts();
 					for(Account user : accs) {
 						if(user.getUser().getId() == toAddUser.getId()) {
-							activity.runOnUiThread(new Runnable() {
+							((Activity)activity).runOnUiThread(new Runnable() {
 								@Override
 								public void run() { 
 									act.cancel();
@@ -145,7 +156,7 @@ public class AccountService extends Service {
 					activity.getSharedPreferences("accounts", 0).edit().putString(accessToken.getToken(), accessToken.getTokenSecret()).commit();
 					accounts.add(new Account(activity, toAdd, accessToken.getToken()).setSecret(accessToken.getTokenSecret()).setUser(toAddUser));
 					pendingClient = null;
-					activity.runOnUiThread(new Runnable() {
+					((Activity)activity).runOnUiThread(new Runnable() {
 						@Override
 						public void run() { 
 							act.cancel();
@@ -154,7 +165,7 @@ public class AccountService extends Service {
 					});
 				} catch (final TwitterException e) {
 					e.printStackTrace();
-					activity.runOnUiThread(new Runnable() {
+					((Activity)activity).runOnUiThread(new Runnable() {
 						@Override
 						public void run() { 
 							act.cancel();
@@ -166,6 +177,26 @@ public class AccountService extends Service {
 			}
 		}).start();
 	}
+	
+	public static boolean loadCachedAccounts(){
+		File cachedFile = new File(activity.getFilesDir(), "acconuts.cache.json");
+		if(cachedFile.lastModified() > new Date().getTime() - ( 1000 * 60 * 60 * 5 ) ){
+			// 5 hour cache
+			try{
+				BufferedReader bir = new BufferedReader( new InputStreamReader( new FileInputStream(cachedFile ) ) );
+				String line = bir.readLine();
+				bir.close();
+				
+				JSONArray cache = new JSONArray(line);
+				for(int i = 0; i <= cache.length(); i++){
+					accounts.add( Account.unserialize(activity, cache.getJSONObject(i) ) );
+				}
+				
+				return true;
+			} catch(Exception e){ e.printStackTrace(); }
+		}
+		return false;
+	}
 
 	public static void loadAccounts() {
 		if(activity == null) return;
@@ -174,14 +205,22 @@ public class AccountService extends Service {
 			activity.startActivity(new Intent(activity, AccountManager.class));			
 			return;
 		} else if(getAccounts().size() == accountStore.size()) return;
+		
+		// Cache
+		if(loadCachedAccounts()) return;
+		
 		if(!NetworkUtils.haveNetworkConnection(activity)) {
 			Toast.makeText(activity, activity.getString(R.string.no_internet), Toast.LENGTH_LONG).show();
 			return;
 		}
 		final int lastAccountCount = getAccounts().size();
 		final ProgressDialog dialog = ProgressDialog.show(activity, "", activity.getString(R.string.loading_accounts), true);
-		new Thread(new Runnable() {
-			public void run() {
+		dialog.show();
+		new AsyncTask<Integer, Integer, Integer>() {
+			
+			public Integer doInBackground(Integer... in) {
+				JSONArray jAccounts = new JSONArray();
+				
 				android.accounts.AccountManager am = android.accounts.AccountManager.get(activity);
 				HashMap<String, android.accounts.Account> accs = new HashMap<String, android.accounts.Account>();
 				
@@ -195,7 +234,7 @@ public class AccountService extends Service {
 						Account acc = accounts.get(i);
 						if(acc.getToken().equals(token)) {
 							skip = true;
-							if(accs.get( acc.getId() ) != null){
+							if(accs.containsKey( acc.getId() )){
 								accs.remove( acc.getId() );
 							}
 							break;
@@ -209,7 +248,7 @@ public class AccountService extends Service {
 						
 						// Android stuff
 						boolean exists = false;
-						if(accs.get( toAdd.getId() ) != null){
+						if(accs.containsKey( toAdd.getId() ) ){
 							accs.remove( toAdd.getId() );
 							exists = true;
 						}
@@ -218,16 +257,17 @@ public class AccountService extends Service {
 						if(!exists){
 							AndroidAccountHelper.addAccount(activity, aToAdd);
 						}
+						try{ jAccounts.put(aToAdd.serialize()); } catch(Exception e){ e.printStackTrace(); }
 						accounts.add(aToAdd);
 					} catch (final TwitterException e) {
 						e.printStackTrace();
-						activity.runOnUiThread(new Runnable() {
+						((Activity)activity).runOnUiThread(new Runnable() {
 							@Override
 							public void run() { Toast.makeText(activity, activity.getString(R.string.failed_load_account) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
 						});
 					}
 				}
-				activity.runOnUiThread(new Runnable() {
+				((Activity)activity).runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						if(getAccounts().size() > 0) {
@@ -236,19 +276,30 @@ public class AccountService extends Service {
 								activity.sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
 							}
 						} else activity.startActivity(new Intent(activity, AccountManager.class));
-						activity.invalidateOptionsMenu();
+						((Activity)activity).invalidateOptionsMenu();
 						dialog.dismiss();
 					}
 				});
 				
+				try{
+					FileOutputStream fos = activity.openFileOutput("accounts.cache.json", Context.MODE_PRIVATE);
+					OutputStreamWriter bos = new OutputStreamWriter(fos);
+					bos.write(jAccounts.toString());
+					bos.close();
+					fos.close();
+				} catch(Exception e){
+					e.printStackTrace();
+				}
+					
 				// Remove all old accounts (or if username has changed/other circumastances)
 				for(android.accounts.Account acc : accs.values()){
 					if(AccountService.existsAccount( Long.parseLong(am.getUserData(acc, "accId") ))){
 						am.removeAccount(acc, null, null );
 					}
 				}
+				return 0;
 			}
-		}).start();
+		}.execute();
 	}
 
 	public static void loadTwitterConfig(final Activity context) {
