@@ -16,6 +16,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.ConfigurationBuilder;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -47,6 +48,25 @@ import android.widget.Toast;
  */
 public class AccountManager extends PreferenceActivity {
 	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
+	
+	public static void unregisterFromPush(final long accountId, final Activity a, final Runnable after, final Runnable onError){
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					DefaultHttpClient dhc = new DefaultHttpClient();
+					HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + accountId);
+					org.apache.http.HttpResponse r = dhc.execute(get);
+					if(r.getStatusLine().getStatusCode() == 200) {
+						a.runOnUiThread(after);
+					} else throw new Exception("NON 200 RESPONSE ;__;");
+				} catch(Exception e){
+					e.printStackTrace();
+					a.runOnUiThread( onError );
+				}
+			}
+		});
+	}
 	
 	public static class AccountFragment extends PreferenceFragment {
 		
@@ -133,37 +153,22 @@ public class AccountManager extends PreferenceActivity {
 						// Unregister
 						pd.setProgress(0);
 						pd.show();
-						new Thread(new Runnable(){
+						unregisterFromPush(accountId, getActivity(), new Runnable() {
 							@Override
 							public void run() {
-								try{
-									DefaultHttpClient dhc = new DefaultHttpClient();
-									HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/" + accountId);
-									org.apache.http.HttpResponse r = dhc.execute(get);
-									if(r.getStatusLine().getStatusCode() == 200) {
-										getActivity().runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												pd.dismiss();												
-												// Update Switch
-												preference.getSharedPreferences().edit().putBoolean("c2dm", false).commit();
-												realChange = true;
-												((SwitchPreference)preference).setChecked(false);
-												realChange = false;
-												Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
-											}
-											
-										});
-									} else throw new Exception("NON 200 RESPONSE ;__;");
-								} catch(Exception e){
-									e.printStackTrace();
-									getActivity().runOnUiThread( new Runnable(){
-										@Override
-										public void run(){
-											Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
-										}
-									});
-								}
+								pd.dismiss();												
+								// Update Switch
+								realChange = true;
+								((SwitchPreference)preference).setChecked(false);
+								realChange = false;
+								Toast.makeText(getActivity(), R.string.push_updated, Toast.LENGTH_SHORT).show();
+							}
+							
+						}, new Runnable(){
+							@Override
+							public void run(){
+								pd.dismiss();
+								Toast.makeText(getActivity(), R.string.push_error, Toast.LENGTH_LONG).show();
 							}
 						});
 					}

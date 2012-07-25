@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -100,6 +102,19 @@ public class AccountService extends Service {
 		activity.getSharedPreferences("accounts", 0).edit().remove(acc.getToken()).commit();
 		for(int i = 0; i < accounts.size(); i++) {
 			if(accounts.get(i).getToken().equals(acc.getToken())) {
+				AccountManager.unregisterFromPush(accounts.get(i).getId(), ((Activity)AccountService.activity), new Runnable() {
+					@Override
+					public void run() {
+						/* do nothing */
+					}
+					
+				}, new Runnable(){
+					@Override
+					public void run(){
+						Toast.makeText(AccountService.activity, R.string.push_error, Toast.LENGTH_LONG).show();
+					}
+				});
+				
 				accounts.remove(i);
 				break;
 			}
@@ -178,7 +193,8 @@ public class AccountService extends Service {
 		}).start();
 	}
 	
-	public static boolean loadCachedAccounts(){
+	public static List<Account> getCachedAccounts(Context activity){
+		List<Account> r = new ArrayList<Account>();
 		File cachedFile = new File(activity.getFilesDir(), "acconuts.cache.json");
 		if(cachedFile.lastModified() > new Date().getTime() - ( 1000 * 60 * 60 * 5 ) ){
 			// 5 hour cache
@@ -191,11 +207,26 @@ public class AccountService extends Service {
 				for(int i = 0; i <= cache.length(); i++){
 					accounts.add( Account.unserialize(activity, cache.getJSONObject(i) ) );
 				}
-				
-				return true;
 			} catch(Exception e){ e.printStackTrace(); }
 		}
-		return false;
+		return r;
+	}
+	
+	public static void initAccountServiceIfNeeded(Activity ac){
+		if(activity == null) activity = ac;
+		if(accounts == null) accounts = new ArrayList<Account>();
+		if(accounts.size() == 0){
+			loadTwitterConfig(ac);
+			loadCachedAccounts();
+		}
+	}
+	
+	public static boolean loadCachedAccounts(){
+		List<Account> cached = getCachedAccounts(activity);
+		if(cached.size() == 0) return false;
+		
+		accounts.addAll( cached );
+		return true;
 	}
 
 	public static void loadAccounts() {

@@ -56,6 +56,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
 			public void onImageReceived(String arg0, Bitmap profileImg) {
 				Intent content = new Intent(context, TweetViewer.class)
 					.putExtra("sr_tweet", Utilities.serializeObject(s))
+					.putExtra("switchAcc", accId)
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				PendingIntent pi = PendingIntent.getActivity(context, 0, content, PendingIntent.FLAG_ONE_SHOT);
 				final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -67,7 +68,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
 						.setContentIntent(pi)
 						.setAutoCancel(true)
 						.setSmallIcon(R.drawable.statusbar_icon)
-						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()) + " - " + s.getText());
+						.setTicker(context.getString(R.string.mentioned_by).replace("{user}", s.getUser().getScreenName()).replace("{text}", s.getText() ));
 				
 				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 					Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);

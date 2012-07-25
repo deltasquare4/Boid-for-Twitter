@@ -89,12 +89,19 @@ public class ContactSyncAdapterService extends Service {
 			return _id;
 		}
 		
+		List<com.teamboid.twitter.Account> realAccounts;
+		
 		Twitter getTwitter(){
-			AccountService.activity = mContext;
-			AccountService.getAccounts(); // New Array
-			AccountService.loadCachedAccounts();
+			realAccounts = new ArrayList<com.teamboid.twitter.Account>();
+			realAccounts.addAll(AccountService.getCachedAccounts( mContext ));
 			
-			return AccountService.getAccount( getId() ).getClient();
+			for(com.teamboid.twitter.Account a : realAccounts){
+				if(a.getId() == getId()){
+					return a.getClient();
+				}
+			}
+			
+			return null;
 		}
 		
 		String getWhatToSync(){ // TODO: Actually make this return something the user wants
