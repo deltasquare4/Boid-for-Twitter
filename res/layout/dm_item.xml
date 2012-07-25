@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:paddingTop="5dp" android:paddingLeft="5dp" android:paddingBottom="5dp">
+	<com.handlerexploit.prime.RemoteImageView
+		android:id="@+id/dmItemProfileImg" android:background="@android:color/transparent"
+		android:layout_alignParentRight="true" android:layout_marginLeft="10dp"
+		android:layout_width="60dp" android:layout_height="60dp"
+		android:src="@drawable/sillouette" />
+	<TextView android:id="@+id/dmItemMessageTxt"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="?tweetColor" android:textColorLink="?linkColor"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_toLeftOf="@+id/dmItemProfileImg"
+		android:layout_marginLeft="10dp" android:gravity="right" />
+	<TextView android:id="@+id/dmItemTimeTxt" android:textColor="?timerColor"
+		android:layout_below="@+id/dmItemMessageTxt"
+		android:layout_alignRight="@+id/dmItemMessageTxt"
+		android:layout_alignWithParentIfMissing="true"
+		android:layout_marginTop="5dp" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+</RelativeLayout>

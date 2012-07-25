@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:padding="5dp">
+	<com.handlerexploit.prime.RemoteImageView
+		android:id="@+id/accountItemProfilePic" android:layout_width="73dp"
+		android:layout_height="73dp" android:layout_marginRight="10dp"
+		android:src="@drawable/sillouette" />
+	<TextView android:id="@+id/accountItemName" android:textColor="?usernameColor"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignTop="@+id/accountItemProfilePic"
+		android:layout_toRightOf="@+id/accountItemProfilePic"
+		android:textAppearance="?android:attr/textAppearanceMedium" />
+	<TextView android:id="@+id/accountItemDescription"
+		android:textColor="?tweetColor" android:textColorLink="?linkColor"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_below="@+id/accountItemName" android:layout_toRightOf="@+id/accountItemProfilePic" />
+</RelativeLayout>

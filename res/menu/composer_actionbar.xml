@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/captureAction" android:icon="?cameraDetachedIcon"
+		android:showAsAction="ifRoom" android:title="@string/capture_str" />
+	<item android:id="@+id/galleryAction" android:title="@string/attach_image"
+		android:showAsAction="ifRoom" android:icon="?galleryDetachedIcon" />
+	<item android:id="@+id/locateAction" android:showAsAction="ifRoom"
+		android:title="@string/attach_location" android:icon="?locationDetachedIcon" />
+	<item android:id="@+id/sendAction" android:title="@string/tweet_str"
+		android:showAsAction="always" android:enabled="false" />
+</menu>

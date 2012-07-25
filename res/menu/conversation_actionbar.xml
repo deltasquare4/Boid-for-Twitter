@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
+		android:icon="?refreshIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/sendAction" android:title="@string/send_str"
+		android:showAsAction="always" android:enabled="false" />
+</menu>

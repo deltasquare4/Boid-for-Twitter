@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<style name="Boid.DarkLightTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+	    <item name="dragHandle">@drawable/reorder_dark</item>
+		<item name="themeColor">@color/black</item>
+		<item name="usernameColor">@color/username_highlight_selector_light</item>
+		<item name="tweetColor">@color/text_highlight_selector_light</item>
+		<item name="linkColor">@color/link_highlight_selector</item>
+		<item name="timerColor">@color/lighter_dark</item>
+		<item name="spinnerDropdownItemColor">@color/dark</item>
+		<item name="android:spinnerItemStyle">@style/DropDownNav.Text</item>
+		<item name="mediaIndicator">@drawable/media_dark</item>
+		<item name="videoIndicator">@drawable/video_dark</item>
+		<item name="replyIndicator">@drawable/reply_dark</item>
+		<item name="retweetIndicator">@drawable/retweet_dark</item>
+		<item name="timeIndicator">@drawable/time_indicator_light</item>
+		<item name="cloudIcon">@drawable/cloud_dark</item>
+		<item name="helpIcon">@drawable/help_dark</item>
+		<item name="settingsIcon">@drawable/settings_dark</item>
+		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
+		<item name="sideNavColor">#DDDDDD</item>
+		<item name="spinnerActionBarDropDownColor">@color/white</item>
+		
+		<item name="timelineTab">@drawable/home_tab</item>
+		<item name="mentionsTab">@drawable/mentions_tab</item>
+		<item name="messagesTab">@drawable/messages_tab</item>
+		<item name="trendsTab">@drawable/trends_tab</item>
+		<item name="favoritesTab">@drawable/favorites_tab</item>
+		<item name="savedSearchTab">@drawable/savedsearch_tab</item>
+		<item name="userListTab">@drawable/userlist_tab</item>
+		<item name="nearbyTab">@drawable/nearby_tab</item>
+		<item name="mediaTab">@drawable/media_tab</item>
+		<item name="aboutTab">@drawable/about_tab_light</item>
+		
+		<item name="pinIcon">@drawable/pin_light</item>
+		<item name="addAccountIcon">@drawable/add_account_light</item>
+		<item name="newTweetIcon">@drawable/new_tweet_action</item>
+		<item name="searchIcon">@drawable/search_light</item>
+		<item name="addIcon">@drawable/add_action</item>
+        <item name="removeIcon">@drawable/remove_action_light</item>
+		<item name="refreshIcon">@drawable/refresh_action</item>
+		<item name="profileIcon">@drawable/profile_light</item>
+		<item name="newMessageIcon">@drawable/new_message_action</item>
+
+		<item name="editIcon">@drawable/edit_action</item>
+		<item name="mentionIcon">@drawable/mention_action</item>
+		<item name="reportIcon">@drawable/report</item>
+		<item name="sendIcon">@drawable/send_light</item>
+		
+		<item name="replyIcon">@drawable/reply_light</item>
+		<item name="retweetIcon">@drawable/retweet_light</item>
+		<item name="unretweetIcon">@drawable/retweet_dark</item>
+		<item name="favoriteIcon">@drawable/favorited_light</item>
+		<item name="unfavoriteIcon">@drawable/unfavorited_light</item>
+		<item name="copyIcon">@drawable/copy_light</item>
+		<item name="shareIcon">@drawable/share_light</item>
+		<item name="deleteIcon">@drawable/delete_light</item>
+		<item name="doneIcon">@drawable/done_light</item>
+		
+		<item name="locationIndicator">@drawable/locate_dark</item>
+		<item name="favoritedIndicator">@drawable/favorited_dark</item>
+		<item name="cameraAttachedIcon">@drawable/capture_blue</item>
+		<item name="cameraDetachedIcon">@drawable/capture</item>
+		<item name="galleryAttachedIcon">@drawable/media_blue</item>
+		<item name="galleryDetachedIcon">@drawable/media_light</item>
+		<item name="locationAttachedIcon">@drawable/locate_blue</item>
+		<item name="locationDetachedIcon">@drawable/locate</item>
+	</style>
+</resources>

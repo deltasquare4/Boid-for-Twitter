@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/addAccountAction" android:title="@string/add_account_str"
+		android:icon="?addAccountIcon" android:showAsAction="always" />
+	<item android:id="@+id/toggleSslAction" android:title="@string/enable_ssl_str"
+		android:showAsAction="never" />
+</menu>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/refreshAction" android:title="@string/refresh_str"
+		android:icon="?refreshIcon" android:showAsAction="always" />
+	<item android:id="@+id/newTweetAction" android:title="@string/new_tweet_str"
+		android:icon="?newTweetIcon" android:showAsAction="ifRoom" />
+	<item android:id="@+id/pinAction" android:title="@string/pin_column_str"
+		android:icon="?pinIcon" android:showAsAction="ifRoom" />
+</menu>

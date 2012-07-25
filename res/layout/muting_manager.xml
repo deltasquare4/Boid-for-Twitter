@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent">
+	<EditText android:id="@+id/keywordInput" android:inputType="textNoSuggestions"
+		android:layout_toLeftOf="@+id/keywordType" android:imeOptions="actionGo"
+		android:layout_marginLeft="10dp" android:layout_marginRight="5dp"
+		android:layout_marginTop="10dp" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:singleLine="true">
+		<requestFocus />
+	</EditText>
+	<Spinner android:id="@+id/keywordType" android:layout_width="wrap_content"
+		android:layout_marginRight="10dp" android:layout_height="wrap_content"
+		android:layout_marginTop="10dp" android:layout_alignParentRight="true"
+		android:layout_alignBaseline="@+id/keywordInput" />
+	<RelativeLayout android:id="@+id/keywordListFrame"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:layout_below="@+id/keywordInput">
+		<ListView android:id="@android:id/list" android:layout_width="fill_parent"
+			android:layout_height="fill_parent" />
+		<TextView android:id="@android:id/empty"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="@string/no_muting_str" android:layout_centerInParent="true"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+	</RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<Preference android:key="boidapp" android:title="\@boidapp" />
+	<Preference android:key="donate" android:title="@string/donate_str"
+		android:summary="@string/donations_appreciated" />
+	<Preference android:key="about" android:summary="@string/about_description"
+		android:title="@string/about_title">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="http://www.boidapp.com" />
+	</Preference>
+	<Preference android:key="aboutNodester" android:summary="@string/about_nodester_summary"
+		android:title="@string/about_nodester">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="http://nodester.com" />
+	</Preference>
+	<Preference android:key="send_feedback" android:summary="@string/sendfeedback_description"
+		android:title="@string/sendfeedback_title">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="mailto:aidan@boidapp.com?subject=Boid Feedback" />
+	</Preference>
+	<Preference android:key="share_boid" android:summary="@string/share_boid_desc"
+		android:title="@string/share_boid_title" />
+	<Preference android:key="version" android:title="@string/version_title" />
+	<Preference android:key="build" android:title="@string/build_title" />
+</PreferenceScreen>

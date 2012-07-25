@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<ListPreference android:key="boid_theme"
+		android:summary="@string/theme_description" android:title="@string/theme_title"
+		android:dialogTitle="@string/theme_title" android:entries="@array/theme_names"
+		android:entryValues="@array/theme_values" />
+	<SwitchPreference android:key="enable_iconic_tabs"
+		android:layout="@layout/boid_preference" android:summary="@string/iconic_tabs_description"
+		android:title="@string/iconic_tabs_title" android:persistent="true" />
+	<SwitchPreference android:key="textual_userlist_tabs"
+		android:layout="@layout/boid_preference" android:summary="@string/enable_textual_list_desc"
+		android:title="@string/enable_textual_list_title" android:persistent="true" />
+	<SwitchPreference android:key="textual_savedsearch_tabs"
+		android:layout="@layout/boid_preference" android:summary="@string/enable_textual_search_desc"
+		android:title="@string/enable_textual_search_title"
+		android:persistent="true" />
+	<SwitchPreference android:key="show_real_names"
+		android:layout="@layout/boid_preference" android:summary="@string/display_real_name_desc"
+		android:title="@string/display_real_name" android:persistent="true" />
+	<Preference android:key="font_size" android:layout="@layout/boid_preference"
+		android:summary="@string/font_size_desc" android:title="@string/font_size"
+		android:persistent="true" />
+</PreferenceScreen>
