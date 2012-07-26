@@ -81,7 +81,7 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 				new AdapterView.OnItemLongClickListener() {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), context.adapter, index, false);
+						TimelineCAB.performLongPressAction(getListView(), context.adapter, index);
 						return true;
 					}
 				});

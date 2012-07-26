@@ -165,14 +165,12 @@ public class TimelineCAB {
         }
     }
 
-    public static boolean performLongPressAction(ListView list, BaseAdapter adapt, int index, boolean singlePress) {
+    public static boolean performLongPressAction(ListView list, BaseAdapter adapt, int index) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
             int beforeChecked = TimelineCAB.getSelectedTweets().length;
-            if(singlePress) {
-            	if (list.isItemChecked(index)) {
-            		list.setItemChecked(index, false);
-            	} else list.setItemChecked(index, true);
-            }
+            if (list.isItemChecked(index)) {
+            	list.setItemChecked(index, false);
+            } else list.setItemChecked(index, true);
             if (TimelineCAB.TimelineActionMode == null) {
                 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
             } else {
@@ -192,7 +190,6 @@ public class TimelineCAB {
                 }
             }
         } else {
-        	if(singlePress) return true;
             Status item = (Status) adapt.getItem(index);
             context.startActivity(new Intent(context, ComposerScreen.class)
                     .putExtra("reply_to", item.getId())
