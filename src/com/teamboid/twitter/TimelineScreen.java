@@ -431,12 +431,20 @@ public class TimelineScreen extends Activity {
             } else
                 lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
         } else {
-            if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("new_column")) {
-                newColumn = true;
-                Intent toSet = getIntent();
-                toSet.removeExtra("new_column");
-                setIntent(toSet);
-            }
+        	if(getIntent().getExtras() != null) {
+        		if(getIntent().getExtras().containsKey("new_column")) {
+        			newColumn = true;
+        			Intent toSet = getIntent();
+        			toSet.removeExtra("new_column");
+        			setIntent(toSet);
+        		}
+        		if(getIntent().getExtras().containsKey("isRestarted")) {
+        			recreateAdapters();
+        			Intent toSet = getIntent();
+        			toSet.removeExtra("isRestarted");
+        			setIntent(toSet);
+        		}
+        	}
             lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
             lastDisplayReal = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", false);
             setTheme(Utilities.getTheme(getApplicationContext()));
@@ -463,7 +471,7 @@ public class TimelineScreen extends Activity {
     }
 
     public void restartActivity() {
-        Intent intent = getIntent();
+        Intent intent = getIntent().putExtra("isRestarted", true);
         finish();
         startActivity(intent);
     }

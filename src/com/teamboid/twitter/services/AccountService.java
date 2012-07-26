@@ -115,6 +115,7 @@ public class AccountService extends Service {
             public void run() {
                 try {
                     final Twitter toAdd = getAuthorizer().getAuthorizedInstance(verifier);
+                    toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
                     final User toAddUser = toAdd.verifyCredentials();
                     ArrayList<Account> accs = getAccounts();
                     for (Account user : accs) {
@@ -184,6 +185,7 @@ public class AccountService extends Service {
                     if (skip) continue;
 
                     final Twitter toAdd = getAuthorizer().getAuthorizedInstance(token, (String) accountStore.get(token));
+                    toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
                     try {
                         final User accountUser = toAdd.verifyCredentials();
                         accounts.add(new Account(activity, toAdd, token)
@@ -227,6 +229,7 @@ public class AccountService extends Service {
                 public void run() {
                     try {
                         final Twitter tempClient = getAuthorizer().getUnauthorizedInstance();
+                        tempClient.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
                         TwitterAPIConfig config = tempClient.getAPIConfiguration();
                         configShortURLLength = config.getShortUrlLength();
                         charactersPerMedia = config.getCharactersReservedPerMedia();
