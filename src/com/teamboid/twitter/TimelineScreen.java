@@ -657,7 +657,10 @@ public class TimelineScreen extends Activity {
         Fragment frag = getFragmentManager().findFragmentByTag("page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
         if (frag != null) {
             if (frag instanceof NearbyFragment) ((NearbyFragment) frag).location = null;
-            else if (frag instanceof TrendsFragment) ((TrendsFragment) frag).location = null;
+            else if (frag instanceof TrendsFragment) {
+            	((TrendsFragment) frag).location = null;
+            	((TrendsFragment) frag).places = null;
+            }
             if (frag instanceof BaseListFragment) ((BaseListFragment) frag).performRefresh(false);
             else if (frag instanceof BaseGridFragment) ((BaseGridFragment) frag).performRefresh(false);
             else if (frag instanceof BaseSpinnerFragment) ((BaseSpinnerFragment) frag).performRefresh(false);

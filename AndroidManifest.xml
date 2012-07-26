@@ -188,7 +188,7 @@
 		</receiver>
 		<activity android:name=".LoginHandler" android:launchMode="singleTop"
 			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize"
+			android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
 			android:hardwareAccelerated="true" />
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver"
@@ -201,7 +201,8 @@
 		</receiver>
 
 		<!-- Contact Sync -->
-		<service android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
+		<service
+			android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
 			android:exported="true" android:process=":auth">
 			<intent-filter>
 				<action android:name="android.accounts.AccountAuthenticator" />
