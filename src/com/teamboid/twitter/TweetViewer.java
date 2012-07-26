@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.experimentalapis.RelatedResults;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
@@ -33,6 +34,7 @@ import com.teamboid.twitter.utilities.TwitlongerHelper;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.BetterMapView;
 import com.teamboid.twitter.views.GeoMapOverlay;
+import com.teamboid.twitter.views.GlowableRelativeLayout;
 import com.teamboid.twitter.views.PolygonOverlay;
 import com.teamboid.twitter.views.SideNavigationLayout;
 
@@ -247,33 +249,33 @@ public class TweetViewer extends MapActivity {
             public void run() {
                 try {
                     if (tweet.getInReplyToStatusId() > 0) {
-                        //TODO
-//                        final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
-//                        final Status[] toAdd = res.getTweetsWithConversation();
-//                        boolean found = false;
-//                        for (Status stat : toAdd) {
-//                            if (stat.getId() == tweet.getInReplyToStatusId()) {
-//                                found = true;
-//                                break;
-//                            }
-//                        }
-//                        if (!found) {
-//                            final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
-//                            toAdd.add(repliedTo);
-//                        }
-//                        toAdd.add(tweet);
-//                        toAdd.addAll(res.getTweetsWithReply());
-//                        if (toAdd.size() > 0) {
-//                            runOnUiThread(new Runnable() {
-//                                public void run() {
-//                                    hasConvo = true;
-//                                    invalidateOptionsMenu();
-//                                    binder.addInverted(toAdd.toArray(new Status[]{}));
-//                                    binder.notifyDataSetChanged();
-//                                    ((GlowableRelativeLayout) findViewById(R.id.glowstone)).glow();
-//                                }
-//                            });
-//                        }
+                        RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
+                        final ArrayList<Status> toAdd = new ArrayList<Status>();
+                        for(Status s : res.getTweetsWithConversation()) toAdd.add(s);
+                        boolean found = false;
+                        for (Status stat : toAdd) {
+                            if (stat.getId() == tweet.getInReplyToStatusId()) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
+                            toAdd.add(repliedTo);
+                        }
+                        toAdd.add(tweet);
+                        for(Status s : res.getTweetsWithReply()) toAdd.add(s);
+                        if (toAdd.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    hasConvo = true;
+                                    invalidateOptionsMenu();
+                                    binder.add(toAdd.toArray(new Status[0]));
+                                    binder.notifyDataSetChanged();
+                                    ((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
+                                }
+                            });
+                        }
                     } else {
                         final SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
                         sideNav.enabled = false;

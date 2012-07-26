@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 import com.teamboid.twitterapi.client.Authorizer;
 import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.client.Authorizer.DebugLevel;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +41,8 @@ public class AccountService extends Service {
     private static Authorizer _authorizer;
     public static Authorizer getAuthorizer() {
         if(_authorizer == null) {
-            _authorizer = Authorizer.create(CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URL);
+            _authorizer = Authorizer.create(CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URL)
+            		.setDebugMode(DebugLevel.DEEP);
         }
         return _authorizer;
     }
