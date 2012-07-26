@@ -108,7 +108,7 @@ public class SendTweetTask {
             try {
                 if(attachedImageUri != null){
                 	InputStream stream = context.getContentResolver().openAssetFileDescriptor(attachedImageUri, "r").createInputStream();
-                	update.setMedia(stream, new Date().getTime() + "_BoidImage");
+                	update.setMedia(stream, new Date().getTime() + "_BoidImage.png");
                 } else {
                 	File file = new File(attachedImage);
                 	update.setMedia(file);
