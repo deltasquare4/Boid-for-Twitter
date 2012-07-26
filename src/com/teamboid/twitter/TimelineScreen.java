@@ -431,6 +431,7 @@ public class TimelineScreen extends Activity {
             } else
                 lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
         } else {
+        	setTheme(Utilities.getTheme(getApplicationContext()));
         	if(getIntent().getExtras() != null) {
         		if(getIntent().getExtras().containsKey("new_column")) {
         			newColumn = true;
@@ -447,7 +448,6 @@ public class TimelineScreen extends Activity {
         	}
             lastIconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
             lastDisplayReal = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_real_names", false);
-            setTheme(Utilities.getTheme(getApplicationContext()));
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
