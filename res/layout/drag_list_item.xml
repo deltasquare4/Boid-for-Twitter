@@ -2,8 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="wrap_content" android:layout_width="fill_parent"
 	android:paddingLeft="5dp" android:paddingRight="10dp">
-	<ImageView android:id="@+id/drag" android:layout_width="50dp"
-		android:layout_alignParentRight="true" android:layout_height="50dp"
+	<ImageView android:id="@+id/drag" android:layout_width="40dp"
+	    android:layout_centerVertical="true"
+		android:layout_alignParentRight="true" android:layout_height="40dp"
 		android:background="?dragHandle" />
 	<TextView android:id="@+id/text" android:layout_width="fill_parent"
 		android:layout_marginLeft="10dp" android:textColor="?tweetColor"
