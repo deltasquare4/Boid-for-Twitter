@@ -1,6 +1,8 @@
 package com.teamboid.twitter;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 
 import com.teamboid.twitterapi.client.TwitterException;
@@ -104,11 +106,13 @@ public class SendTweetTask {
         StatusUpdate update = StatusUpdate.create(contents);
         if (this.hasMedia()) {
             try {
-                File input;
-                if (attachedImageUri != null) {
-                    input = new File(attachedImageUri.getPath());
-                } else input = new File(attachedImage);
-                update.setMedia(input);
+                if(attachedImageUri != null){
+                	InputStream stream = context.getContentResolver().openAssetFileDescriptor(attachedImageUri, "r").createInputStream()
+                	update.setMedia(stream, new Date().getTime() + "_BoidImage");
+                } else {
+                	File file = new File(attachedImage);
+                	update.setMedia(file);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 result.errorCode = Result.MEDIAIO_ERROR;
