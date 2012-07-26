@@ -283,6 +283,7 @@
 		<item>Within 1000mi</item>
 	</string-array>
 	<string-array name="trend_sources">
+	    <item>Global Trends</item>
 		<item>Daily Trends</item>
 		<item>Weekly Trends</item>
 		<item>Local Trends</item>
@@ -460,4 +461,5 @@
 	<string name="user_feed_str">\@{user} (Feed)</string>
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
+	<string name="boid_browser">Boid Browser</string>
 </resources>

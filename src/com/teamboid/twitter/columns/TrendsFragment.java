@@ -67,12 +67,12 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		for (String t : toAdd) spinAdapt.add(t);
 		filterSelected = true;
 		if(places != null) {
-			spinAdapt.remove(spinAdapt.getItem(2));
+			spinAdapt.remove(spinAdapt.getItem(3));
 			for(TrendLocation loc : places) {
 				spinAdapt.add(context.getString(R.string.local_trend_with_place).replace("{place}", loc.getName()));
 			}
 			getSpinner().setAdapter(spinAdapt);
-			getSpinner().setSelection(2);
+			getSpinner().setSelection(3);
 		} else {
 			int sourceIndex = PreferenceManager.getDefaultSharedPreferences(context).getInt("last_trend_source", 0);
 			getSpinner().setAdapter(spinAdapt);
@@ -92,7 +92,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 					@Override
 					public void onItemSelected(AdapterView<?> arg0, View arg1, int index, long arg3) {
 						if (filterSelected) return;
-						if(index > 2) index = 2;
+						if(index > 3) index = 3;
 						PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_trend_source", index).apply();
 						performRefresh(false);
 					}
@@ -105,7 +105,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	@Override
 	public void performRefresh(final boolean paginate) {
 		if (context == null || isLoading || adapt == null || getView() == null || getSpinner() == null) return;
-		else if (location == null && getSpinner().getSelectedItemPosition() == 2) {
+		else if (location == null && getSpinner().getSelectedItemPosition() == 3) {
 			getLocation();
 			return;
 		}
@@ -121,28 +121,38 @@ public class TrendsFragment extends BaseSpinnerFragment {
 					try {
 						switch (getSpinner().getSelectedItemPosition()) {
 						case 0:
-                            final Trends trends = acc.getClient().getTrendsDaily()[0];
+							final Trend[] trends_global = acc.getClient().getTrendsGlobal();
                             context.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     setEmptyText(context.getString(R.string.no_trends));
-                                    adapt.add(trends);
+                                    adapt.add(trends_global);
                                 }
                             });
 							break;
 						case 1:
-                            final Trends trends_2 = acc.getClient().getTrendsWeekly()[0];
+                            final Trends trends_daily = acc.getClient().getTrendsDaily()[0];
                             context.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     setEmptyText(context.getString(R.string.no_trends));
-                                    adapt.add(trends_2);
+                                    adapt.add(trends_daily);
+                                }
+                            });
+							break;
+						case 2:
+                            final Trends trends_weekly = acc.getClient().getTrendsWeekly()[0];
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setEmptyText(context.getString(R.string.no_trends));
+                                    adapt.add(trends_weekly);
                                 }
                             });
 							break;
 						default:
 							if(getSpinner().getSelectedItem().toString().equals(
-									context.getResources().getStringArray(R.array.trend_sources)[2])) {
+									context.getResources().getStringArray(R.array.trend_sources)[3])) {
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() { resetSpinner(true); }
@@ -160,13 +170,13 @@ public class TrendsFragment extends BaseSpinnerFragment {
 									public void run() { resetSpinner(false); }
 								});
 							} else {
-								final Trend[] trends_3 = acc.getClient().getLocationTrends(
-										places[getSpinner().getSelectedItemPosition() - 2].getWoeId());
+								final Trend[] trends_local = acc.getClient().getLocationTrends(
+										places[getSpinner().getSelectedItemPosition() - 3].getWoeId());
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
 										setEmptyText(context.getString(R.string.no_trends));
-										adapt.add(trends_3);
+										adapt.add(trends_local);
 									}
 								});
 								break;

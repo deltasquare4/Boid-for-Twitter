@@ -29,6 +29,7 @@ import com.teamboid.twitterapi.user.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SearchScreen;
@@ -300,9 +301,8 @@ public class Utilities {
 						else url = e.getValue();
 						if(!url.startsWith("http://") && !url.startsWith("https://")) url = ("http://" + url);
 						context.startActivity(new Intent(Intent.ACTION_VIEW)
-						.setData(Uri.parse(url))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							.setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.SEARCH) {
@@ -310,11 +310,11 @@ public class Utilities {
 					@Override
 					public void onClick(View arg0) {
 						try { 
-							context.startActivity(new Intent(Intent.ACTION_VIEW)
-							.setData(Uri.parse(context.getString(R.string.google_url) +
-									URLEncoder.encode(e.getValue(), "UTF-8")))
-									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							context.startActivity(new Intent(context, InAppBrowser.class)
+							.putExtra("url", context.getString(R.string.google_url) +
+									URLEncoder.encode(e.getValue(), "UTF-8"))
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 						}  catch (UnsupportedEncodingException e) { e.printStackTrace(); }
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

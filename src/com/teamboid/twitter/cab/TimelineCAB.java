@@ -165,12 +165,14 @@ public class TimelineCAB {
         }
     }
 
-    public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
+    public static boolean performLongPressAction(ListView list, BaseAdapter adapt, int index, boolean singlePress) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
             int beforeChecked = TimelineCAB.getSelectedTweets().length;
-            if (list.isItemChecked(index)) {
-                list.setItemChecked(index, false);
-            } else list.setItemChecked(index, true);
+            if(singlePress) {
+            	if (list.isItemChecked(index)) {
+            		list.setItemChecked(index, false);
+            	} else list.setItemChecked(index, true);
+            }
             if (TimelineCAB.TimelineActionMode == null) {
                 context.startActionMode(TimelineCAB.TimelineActionModeCallback);
             } else {
@@ -190,6 +192,7 @@ public class TimelineCAB {
                 }
             }
         } else {
+        	if(singlePress) return true;
             Status item = (Status) adapt.getItem(index);
             context.startActivity(new Intent(context, ComposerScreen.class)
                     .putExtra("reply_to", item.getId())
@@ -197,6 +200,7 @@ public class TimelineCAB {
                     .putExtra("append", Utilities.getAllMentions(item))
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }
+        return false;
     }
 
     public static ActionMode TimelineActionMode;

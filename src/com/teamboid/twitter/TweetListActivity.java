@@ -89,7 +89,7 @@ public class TweetListActivity extends ListActivity {
 		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				TimelineCAB.performLongPressAction(getListView(), binder, index);
+				TimelineCAB.performLongPressAction(getListView(), binder, index, false);
 				return true;
 			}
 		});		

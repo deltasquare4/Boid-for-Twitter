@@ -49,15 +49,11 @@ public class UserListFragment extends BaseListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        if (TimelineCAB.getSelectedTweets().length > 0) {
-            TimelineCAB.performLongPressAction(getListView(), adapt, position);
-        } else {
-            Status tweet = (Status) adapt.getItem(position);
-            if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-            context.startActivity(new Intent(context, TweetViewer.class)
-                    .putExtra("sr_tweet", Utilities.serializeObject(tweet))
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        }
+        Status tweet = (Status) adapt.getItem(position);
+        if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+        context.startActivity(new Intent(context, TweetViewer.class)
+        .putExtra("sr_tweet", Utilities.serializeObject(tweet))
+        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 
     @Override
@@ -91,7 +87,7 @@ public class UserListFragment extends BaseListFragment {
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-                        TimelineCAB.performLongPressAction(getListView(), adapt, index);
+                        TimelineCAB.performLongPressAction(getListView(), adapt, index, false);
                         return true;
                     }
                 });

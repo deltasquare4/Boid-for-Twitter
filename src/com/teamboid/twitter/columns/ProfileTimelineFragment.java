@@ -83,7 +83,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 				new AdapterView.OnItemLongClickListener() {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), globalAdapter, index);
+						TimelineCAB.performLongPressAction(getListView(), globalAdapter, index, false);
 						return true;
 					}
 				});

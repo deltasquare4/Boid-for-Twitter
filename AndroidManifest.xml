@@ -190,6 +190,10 @@
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
 			android:hardwareAccelerated="true" />
+		<activity android:name=".InAppBrowser" android:launchMode="singleTop"
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:windowSoftInputMode="adjustResize" android:label="@string/boid_browser"
+			android:hardwareAccelerated="true" />
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver"
 			android:exported="false">

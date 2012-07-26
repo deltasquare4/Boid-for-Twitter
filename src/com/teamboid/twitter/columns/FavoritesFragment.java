@@ -78,7 +78,7 @@ public class FavoritesFragment extends BaseListFragment {
 				new AdapterView.OnItemLongClickListener() {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), adapt, index);
+						TimelineCAB.performLongPressAction(getListView(), adapt, index, false);
 						return true;
 					}
 				});

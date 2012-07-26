@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -238,15 +239,14 @@ public class AccountManager extends PreferenceActivity {
             lastTheme = savedInstanceState.getInt("lastTheme");
             setTheme(lastTheme);
         } else setTheme(Utilities.getTheme(getApplicationContext()));
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) {
             Log.d("acc", "Showing frag");
             return;
         }
-        // requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        // setContentView(R.layout.account_manager);
-        // setProgressBarIndeterminateVisibility(false);
+        setProgressBarIndeterminateVisibility(false);
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(END_LOAD);
         registerReceiver(receiver, ifilter);
