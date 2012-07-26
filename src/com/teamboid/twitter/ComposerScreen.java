@@ -310,14 +310,14 @@ public class ComposerScreen extends Activity {
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
 				stt.attachedImageUri = null;
-				invalidateOptionsMenu();
+				getLengthIndicator();
 			} else captureImage();
 			return true;
 		case R.id.galleryAction:
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
 				stt.attachedImageUri = null;
-				invalidateOptionsMenu();
+				getLengthIndicator();
 			} else selectImage();
 			return true;
 		default:
