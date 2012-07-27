@@ -16,7 +16,6 @@ import com.teamboid.twitter.columns.UserListFragment;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.DragSortListView;
-import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 import com.teamboid.twitter.views.DragSortListView.DropListener;
 
 import android.app.Activity;
@@ -51,6 +50,7 @@ public class ColumnManager extends Activity {
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
+			if(to < from && to >= 1) to--;
 			String toMove = adapt.getItem(from);
 			String toMoveRaw = cols.get(from);
 			removeColumn(from);
@@ -75,19 +75,6 @@ public class ColumnManager extends Activity {
 		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
 		list.setDropListener(dropListen);
-		SwipeDismissListViewTouchListener touchListener =
-				new SwipeDismissListViewTouchListener(list,
-						new SwipeDismissListViewTouchListener.OnDismissCallback() {
-					@Override
-					public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-						for (int i : reverseSortedPositions) {
-							removeColumn(i);
-						}
-						loadColumns();
-					}
-				});
-		list.setOnTouchListener(touchListener);
-		list.setOnScrollListener(touchListener.makeScrollListener());
 		list.setAdapter(adapt);
 	}
 	

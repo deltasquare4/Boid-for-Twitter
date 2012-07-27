@@ -42,7 +42,7 @@ public class AccountService extends Service {
     public static Authorizer getAuthorizer() {
         if(_authorizer == null) {
             _authorizer = Authorizer.create(CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URL)
-            		.setDebugMode(DebugLevel.DEEP);
+            		.setDebugMode(DebugLevel.LIGHT);
         }
         return _authorizer;
     }
