@@ -2,14 +2,14 @@ package com.teamboid.twitter.views;
 
 import java.util.List;
 
-import twitter4j.GeoLocation;
-
 import android.content.Context;
 import android.util.AttributeSet;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+
+import com.teamboid.twitterapi.status.GeoLocation;
 
 /**
  * @author kennydude

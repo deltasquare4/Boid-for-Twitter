@@ -2,12 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.app.ActionBar.Tab;
 import android.content.Intent;
@@ -28,6 +22,12 @@ import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.search.SearchQuery;
+import com.teamboid.twitterapi.search.SearchResult;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column used in the search screen that displays Tweet search results.
@@ -50,7 +50,7 @@ public class SearchTweetsFragment extends BaseListFragment {
 		Tweet tweet = (Tweet) context.tweetAdapter.getItem(position);
 		context.startActivity(new Intent(context, TweetViewer.class)
 		.putExtra("tweet_id", id)
-		.putExtra("user_name", tweet.getFromUserName())
+		.putExtra("user_name", tweet.getFromUser())
 		.putExtra("user_id", tweet.getFromUserId())
 		.putExtra("screen_name", tweet.getFromUser())
 		.putExtra("content", tweet.getText())
@@ -106,18 +106,19 @@ public class SearchTweetsFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Query q = new Query(query);
-				if (paginate) q.setMaxId(context.tweetAdapter.getItemId(context.tweetAdapter.getCount() - 1));
+                Paging paging = new Paging(50);
+                if (paginate) paging.setMaxId(context.tweetAdapter.getItemId(context.tweetAdapter.getCount() - 1));
+                SearchQuery q = SearchQuery.create(query, paging);
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final QueryResult feed = acc.getClient().search(q);
+                        final SearchResult feed = acc.getClient().search(q);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = context.tweetAdapter.getCount() - 1;
-								int addedCount = context.tweetAdapter.add(feed.getTweets().toArray(new Tweet[0]));
+								int addedCount = context.tweetAdapter.add(feed.getResults());
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null && addedCount > 0) {
 										if (paginate) getListView().smoothScrollToPosition(beforeLast + 1);
@@ -134,13 +135,13 @@ public class SearchTweetsFragment extends BaseListFragment {
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

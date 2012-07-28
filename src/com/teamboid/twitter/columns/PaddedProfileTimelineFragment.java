@@ -2,12 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -27,6 +21,10 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays the feed of a user in the profile screen. 
@@ -116,20 +114,18 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(1, 50);
-				if (paginate) {
-					paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
-				}
+				Paging paging = new Paging(50);
+				if (paginate) paging.setMaxId(getAdapter().getItemId(getAdapter().getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient().getUserTimeline(screenName, paging);
+						final Status[] feed = acc.getClient().getUserTimeline(screenName, paging, true);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = getAdapter().getCount() - 1;
-								int addedCount = getAdapter().add(feed.toArray(new Status[0]));
+								int addedCount = getAdapter().add(feed);
 								if (getView() != null && addedCount > 0) {
 									if (paginate) {
 										getListView().smoothScrollToPosition(beforeLast + 1);
@@ -146,13 +142,13 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

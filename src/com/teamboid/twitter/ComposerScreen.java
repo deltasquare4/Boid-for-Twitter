@@ -6,16 +6,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.teamboid.twitterapi.status.GeoLocation;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Extractor;
-import com.teamboid.twitter.utilities.MediaUtilities;
+
 import com.teamboid.twitter.utilities.Utilities;
 
-
-import twitter4j.GeoLocation;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -36,12 +35,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -84,6 +84,7 @@ public class ComposerScreen extends Activity {
 		}
 		invalidateOptionsMenu();
 	}
+	
 	public static int SELECT_MEDIA = 2939;
 
 	@Override
@@ -135,6 +136,7 @@ public class ComposerScreen extends Activity {
 		if(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("attach_location", false)) {
 			getLocation();
 		}
+		
 		Button spinner = (Button)findViewById(R.id.upload_with);
 		spinner.setOnClickListener(new OnClickListener(){
 			@Override
@@ -148,9 +150,10 @@ public class ComposerScreen extends Activity {
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
 	}
+	
 	private void setUploadWith(String pref){
 		Button spinner = (Button)findViewById(R.id.upload_with);
-		spinner.setText(MediaUtilities.getMediaServices(false, this).get(pref).name);
+		// spinner.setText(MediaUtilities.getMediaServices(false, this).get(pref).name);
 		stt.mediaService = pref;
 	}
 	
@@ -275,8 +278,7 @@ public class ComposerScreen extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.composer_actionbar, menu);
+        getMenuInflater().inflate(R.menu.composer_actionbar, menu);
 		if(getIntent().getLongExtra("reply_to", 0l) > 0) {
 			menu.findItem(R.id.sendAction).setTitle(getString(R.string.reply_str) + " (" + Integer.toString(lengthIndic) + ")");
 		} else menu.findItem(R.id.sendAction).setTitle(getString(R.string.tweet_str) + " (" + Integer.toString(lengthIndic) + ")");
@@ -335,14 +337,14 @@ public class ComposerScreen extends Activity {
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
 				stt.attachedImageUri = null;
-				invalidateOptionsMenu();
+				getLengthIndicator();
 			} else captureImage();
 			return true;
 		case R.id.galleryAction:
 			if(stt.attachedImage != null) {
 				stt.attachedImage = null;
 				stt.attachedImageUri = null;
-				invalidateOptionsMenu();
+				getLengthIndicator();
 			} else selectImage();
 			return true;
 		default:
@@ -425,7 +427,9 @@ public class ComposerScreen extends Activity {
 			invalidateOptionsMenu();
 		} else if(resultCode == RESULT_CANCELED) {
 			File attachedCapture = new File(stt.attachedImage);
-			if(attachedCapture != null && attachedCapture.exists()) attachedCapture.delete();
+			if(attachedCapture != null && attachedCapture.exists()) {
+                attachedCapture.delete();
+            }
 			stt.attachedImage = null;
 		}
 	}

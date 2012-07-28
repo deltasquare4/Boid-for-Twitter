@@ -22,6 +22,17 @@ import android.view.WindowManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.entity.media.MediaEntity;
+import com.teamboid.twitterapi.status.entity.media.MediaSize;
+import com.teamboid.twitterapi.status.entity.mention.MentionEntity;
+import com.teamboid.twitterapi.status.entity.url.UrlEntity;
+import com.teamboid.twitterapi.user.User;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SearchScreen;
@@ -33,12 +44,6 @@ import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 import com.teamboid.twitter.views.TimePreference;
-
-import twitter4j.MediaEntity;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.URLEntity;
-import twitter4j.UserMentionEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,9 +91,13 @@ public class Utilities {
 	}
 	public static void recreateSearchAdapter(Activity context, SearchFeedListAdapter adapt) {
 		Tweet[] before = null;
-		if(adapt.getCount() > 0) before = adapt.toArray();
+		if(adapt.getCount() > 0) {
+            before = adapt.toArray();
+        }
 		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account);
-		if(before != null) adapt.add(before);
+		if(before != null) {
+            adapt.add(before);
+        }
 		int index = 0;
 		if(AccountService.searchFeedAdapters != null) {
 			for(SearchFeedListAdapter a : AccountService.searchFeedAdapters) {
@@ -167,13 +176,14 @@ public class Utilities {
 			return R.style.Boid_PureBlackTheme;
 		}
 	}
-	public static String getMedia(URLEntity[] urls){
+
+	public static String getMedia(UrlEntity[] urls){
 		String found = null;
 		for(int i = 0; i < urls.length; i++) {
-			URLEntity urlEntity = urls[i];
-			if(urlEntity == null || urlEntity.getURL() == null) continue;
-			String curEntity = urlEntity.getURL().toString();
-			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+			UrlEntity urlEntity = urls[i];
+			if(urlEntity == null || urlEntity.getUrl() == null) continue;
+			String curEntity = urlEntity.getUrl().toString();
+			if(urlEntity.getExpandedUrl() != null) curEntity = urlEntity.getExpandedUrl().toString();
 			if(curEntity.endsWith(".jpg") || curEntity.endsWith(".jpeg") || curEntity.endsWith(".png") || curEntity.endsWith(".bmp") || curEntity.endsWith(".gif") || curEntity.endsWith(".bmp")) {
 				found = curEntity;
 				break;
@@ -206,26 +216,26 @@ public class Utilities {
 	
 	public static String getTweetYFrogTwitpicMedia(final Status tweet) {
 		if(tweet.getMediaEntities() != null && tweet.getMediaEntities().length > 0) {
-			return tweet.getMediaEntities()[0].getMediaURL().toString();
-		} else if(tweet.getURLEntities() != null && tweet.getURLEntities().length > 0) {
-			return getMedia( tweet.getURLEntities() );
+			return tweet.getMediaEntities()[0].getMediaUrl(MediaSize.LARGE).toString();
+		} else if(tweet.getUrlEntities() != null && tweet.getUrlEntities().length > 0) {
+			return getMedia( tweet.getUrlEntities() );
 		} else return null;
 	}
 	public static String getTweetYFrogTwitpicMedia(final Tweet tweet) {
 		if(tweet.getMediaEntities() != null && tweet.getMediaEntities().length > 0) {
-			return tweet.getMediaEntities()[0].getMediaURL().toString();
-		} else if(tweet.getURLEntities() != null && tweet.getURLEntities().length > 0) {
-			return getMedia(tweet.getURLEntities());
+			return tweet.getMediaEntities()[0].getMediaUrl(MediaSize.LARGE).toString();
+		} else if(tweet.getUrlEntities() != null && tweet.getUrlEntities().length > 0) {
+			return getMedia(tweet.getUrlEntities());
 		} else return null;
 	}
 	public static boolean tweetContainsVideo(final Status tweet) {
-		if(tweet.getURLEntities() == null) return false;
+		if(tweet.getUrlEntities() == null) return false;
 		
-		for(int i = 0; i < tweet.getURLEntities().length; i++) {
-			URLEntity urlEntity = tweet.getURLEntities()[i];
-			if(urlEntity == null || urlEntity.getURL() == null) continue;
-			String curEntity = urlEntity.getURL().toString();
-			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+		for(int i = 0; i < tweet.getUrlEntities().length; i++) {
+			UrlEntity urlEntity = tweet.getUrlEntities()[i];
+			if(urlEntity == null || urlEntity.getUrl() == null) continue;
+			String curEntity = urlEntity.getUrl().toString();
+			if(urlEntity.getExpandedUrl() != null) curEntity = urlEntity.getExpandedUrl().toString();
 			if(curEntity.contains("youtube.com/watch?v=") || curEntity.contains("youtu.be")) {
 				return true;
 			}
@@ -233,12 +243,12 @@ public class Utilities {
 		return false;
 	}
 	public static boolean tweetContainsVideo(final Tweet tweet) {
-		if(tweet.getURLEntities() == null) return false;
-		for(int i = 0; i < tweet.getURLEntities().length; i++) {
-			URLEntity urlEntity = tweet.getURLEntities()[i];
-			if(urlEntity == null || urlEntity.getURL() == null) continue;
-			String curEntity = urlEntity.getURL().toString();
-			if(urlEntity.getExpandedURL() != null) curEntity = urlEntity.getExpandedURL().toString();
+		if(tweet.getUrlEntities() == null) return false;
+		for(int i = 0; i < tweet.getUrlEntities().length; i++) {
+			UrlEntity urlEntity = tweet.getUrlEntities()[i];
+			if(urlEntity == null || urlEntity.getUrl() == null) continue;
+			String curEntity = urlEntity.getUrl().toString();
+			if(urlEntity.getExpandedUrl() != null) curEntity = urlEntity.getExpandedUrl().toString();
 			if(curEntity.contains("youtube.com/watch?v=") || curEntity.contains("youtu.be")) {
 				return true;
 			}
@@ -246,17 +256,17 @@ public class Utilities {
 		return false;
 	}
 
-	public static Spannable twitterifyText(final Context context, String text, final URLEntity[] urls, final MediaEntity[] pics, final boolean expand) {
+	public static Spannable twitterifyText(final Context context, String text, final UrlEntity[] urls, final MediaEntity[] pics, final boolean expand) {
 		if(urls != null) {
-			for(URLEntity url : urls) {
-				if(expand && url.getExpandedURL() != null) {
-					text = text.replace(url.getURL().toString(), url.getExpandedURL().toString());
-				} else if(url.getDisplayURL() != null) text = text.replace(url.getURL().toString(), url.getDisplayURL());
+			for(UrlEntity url : urls) {
+				if(expand && url.getExpandedUrl() != null) {
+					text = text.replace(url.getUrl().toString(), url.getExpandedUrl().toString());
+				} else if(url.getDisplayUrl() != null) text = text.replace(url.getUrl().toString(), url.getDisplayUrl());
 			}
 		}
 		if(pics != null) {
 			for(MediaEntity p : pics) {
-				text = text.replace(p.getURL().toString(), p.getDisplayURL());
+				text = text.replace(p.getUrl().toString(), p.getDisplayUrl());
 			}
 		}
 		Spannable rtSpan = new SpannableString(text);
@@ -295,9 +305,8 @@ public class Utilities {
 						else url = e.getValue();
 						if(!url.startsWith("http://") && !url.startsWith("https://")) url = ("http://" + url);
 						context.startActivity(new Intent(Intent.ACTION_VIEW)
-						.setData(Uri.parse(url))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							.setData(Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.SEARCH) {
@@ -305,11 +314,11 @@ public class Utilities {
 					@Override
 					public void onClick(View arg0) {
 						try { 
-							context.startActivity(new Intent(Intent.ACTION_VIEW)
-							.setData(Uri.parse(context.getString(R.string.google_url) +
-									URLEncoder.encode(e.getValue(), "UTF-8")))
-									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							context.startActivity(new Intent(context, InAppBrowser.class)
+							.putExtra("url", context.getString(R.string.google_url) +
+									URLEncoder.encode(e.getValue(), "UTF-8"))
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 						}  catch (UnsupportedEncodingException e) { e.printStackTrace(); }
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -318,19 +327,22 @@ public class Utilities {
 		return rtSpan;
 	}
 
-	private static Hashtable<String, String> getRealLinks(List<Extractor.Entity> entities, URLEntity[] urls, MediaEntity[] pics) {
+	private static Hashtable<String, String> getRealLinks(List<Extractor.Entity> entities, UrlEntity[] urls, MediaEntity[] pics) {
 		Hashtable<String, String> toReturn = new Hashtable<String, String>();
 		for(Extractor.Entity e : entities) {
 			if(e.getType() != Extractor.Entity.Type.URL) continue;
 			e.setExpandedURL("http://" + e.getValue());
 			if(urls != null) {
-				for(URLEntity url : urls) {
-					if(url.getURL() == null) continue;
-					String text = url.getURL().toString();
-					if(url.getDisplayURL() != null) text = url.getDisplayURL();
+				for(UrlEntity url : urls) {
+					if(url.getUrl() == null) continue;
+					String text = url.getUrl().toString();
+					if(url.getDisplayUrl() != null) text = url.getDisplayUrl();
 					if(text.equals(e.getValue()) || text.equals(e.getValue() + "�")) {
-						if(url.getExpandedURL() != null) e.setExpandedURL(url.getExpandedURL().toString());
-						else e.setExpandedURL(url.getURL().toString());
+						if(url.getExpandedUrl() != null) {
+                            e.setExpandedURL(url.getExpandedUrl().toString());
+                        } else {
+                            e.setExpandedURL(url.getUrl().toString());
+                        }
 						break;
 					}
 				}
@@ -338,9 +350,12 @@ public class Utilities {
 			if(e.getExpandedURL() == null) {
 				if(pics != null) {
 					for(MediaEntity p : pics) {
-						if(p.getDisplayURL().equals(e.getValue()) || p.getDisplayURL().equals(e.getValue() + "�")) {
-							if(p.getExpandedURL() != null) e.setExpandedURL(p.getExpandedURL().toString());
-							else e.setExpandedURL(p.getURL().toString());
+						if(p.getDisplayUrl().equals(e.getValue()) || p.getDisplayUrl().equals(e.getValue() + "�")) {
+							if(p.getExpandedUrl() != null) {
+                                e.setExpandedURL(p.getExpandedUrl().toString());
+                            } else {
+                                e.setExpandedURL(p.getUrl().toString());
+                            }
 							break;
 						}
 					}
@@ -404,21 +419,27 @@ public class Utilities {
 		}
 		return toReturn;
 	}
-	public static String friendlyTimeShort(Date createdAt) {
-		Date now = new Date();
-		long diff = now.getTime() - createdAt.getTime();
-		if(diff <= 60000) {
-			long seconds = (diff / 6000);
-			if(seconds < 5) return "now";
-			return Long.toString(seconds) + "s";
-		} else if(diff <= 3600000) {
-			return Long.toString(diff / 60000) + "m";
-		} else if(diff <= 86400000) {
-			return Long.toString(diff / 3600000) + "h";
-		} else if(diff <= 604800000) {
-			return Long.toString(diff / 86400000) + "d"; 
-		} else return Long.toString(diff / 604800000) + "w";
+	public static String friendlyTimeShort(Calendar createdAt) {
+        Date now = new Date();
+        long diff = now.getTime() - createdAt.getTime().getTime();
+        if(diff <= 60000) {
+                long seconds = (diff / 6000);
+                if(seconds < 5) return "now";
+                return Long.toString(seconds) + "s";
+        } else if(diff <= 3600000) {
+                return Long.toString(diff / 60000) + "m";
+        } else if(diff <= 86400000) {
+                return Long.toString(diff / 3600000) + "h";
+        } else if(diff <= 604800000) {
+                return Long.toString(diff / 86400000) + "d"; 
+        } else return Long.toString(diff / 604800000) + "w";
 	}
+	public static String friendlyTimeLong(Date time) {
+	    Calendar timeCal = Calendar.getInstance();
+		timeCal.setTime(time);
+		return friendlyTimeLong(timeCal);
+	}
+
 	public static String friendlyTimeMedium(Date createdAt) {
 		Date now = new Date();
 		long diff = now.getTime() - createdAt.getTime();
@@ -434,34 +455,32 @@ public class Utilities {
 			return Long.toString(diff / 86400000) + " days"; 
 		} else return Long.toString(diff / 604800000) + " weeks";
 	}
-	public static String friendlyTimeLong(Context context, Date createdAt) {
-		Calendar time = Calendar.getInstance();
-		time.setTime(createdAt);
-		Calendar now = Calendar.getInstance();
-		String am_pm = "AM";
-		if(time.get(Calendar.AM_PM) == Calendar.PM) am_pm = "PM";
-		String day = Integer.toString(time.get(Calendar.DAY_OF_MONTH));
-		if(day.length() == 1) day = ("0" + day);
-		String minute = Integer.toString(time.get(Calendar.MINUTE));
-		int hour = time.get(Calendar.HOUR);
-		if(hour == 0) hour = 12;
-		if(minute.length() == 1) minute = ("0" + minute);
-		if(now.get(Calendar.YEAR) == time.get(Calendar.YEAR)) {
-			if(now.get(Calendar.MONTH) == time.get(Calendar.MONTH)) {
-				if(now.get(Calendar.WEEK_OF_MONTH) == time.get(Calendar.WEEK_OF_MONTH)) {
-					return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
-				} else {
-					return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
-				}
-			} else {
-				return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
-			}
-		} else {
-			String year = Integer.toString(time.get(Calendar.YEAR));
-			if(now.get(Calendar.YEAR) < time.get(Calendar.YEAR)) year = year.substring(1, 3);
-			return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day + ", " + year;
-		}
-	}
+	public static String friendlyTimeLong(Calendar time) {
+        Calendar now = Calendar.getInstance();
+        String am_pm = "AM";
+        if(time.get(Calendar.AM_PM) == Calendar.PM) am_pm = "PM";
+        String day = Integer.toString(time.get(Calendar.DAY_OF_MONTH));
+        if(day.length() == 1) day = ("0" + day);
+        String minute = Integer.toString(time.get(Calendar.MINUTE));
+        int hour = time.get(Calendar.HOUR);
+        if(hour == 0) hour = 12;
+        if(minute.length() == 1) minute = ("0" + minute);
+        if(now.get(Calendar.YEAR) == time.get(Calendar.YEAR)) {
+            if(now.get(Calendar.MONTH) == time.get(Calendar.MONTH)) {
+                if(now.get(Calendar.WEEK_OF_MONTH) == time.get(Calendar.WEEK_OF_MONTH)) {
+                    return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+                } else {
+                    return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+                }
+            } else {
+                return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day;
+            }
+        } else {
+            String year = Integer.toString(time.get(Calendar.YEAR));
+            if(now.get(Calendar.YEAR) < time.get(Calendar.YEAR)) year = year.substring(1, 3);
+            return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day + ", " + year;
+        }
+    }
 
 	public static String generateImageFileName(Context context) {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -478,13 +497,13 @@ public class Utilities {
 		return fi;
 	}
 
-	public static String arrayToJson(Context context, ArrayList<String> values) {
+	public static String arrayToJson(ArrayList<String> values) {
 		JSONArray a = new JSONArray();
 		for (int i = 0; i < values.size(); i++) a.put(values.get(i));
 		return a.toString();
 	}
 
-	public static ArrayList<String> jsonToArray(Context context, String json) {
+	public static ArrayList<String> jsonToArray(String json) {
 		if(json == null || json.trim().length() == 0) return new ArrayList<String>();
 		ArrayList<String> urls = new ArrayList<String>();
 		if (json != null) {
@@ -505,10 +524,10 @@ public class Utilities {
 	}
 
 	public static String getAllMentions(Tweet tweet) {
-		return getAllMentions(tweet.getFromUser(), tweet.getUserMentionEntities());
+		return getAllMentions(tweet.getFromUser(), tweet.getMentionEntities());
 	}
 	public static String getAllMentions(Status tweet) {
-		return getAllMentions(tweet.getUser().getScreenName(), tweet.getUserMentionEntities());
+		return getAllMentions(tweet.getUser().getScreenName(), tweet.getMentionEntities());
 	}
 	public static String getAllMentions(String initScreenname, String tweetText) {
 		String toReturn = "@" + initScreenname;
@@ -517,17 +536,19 @@ public class Utilities {
 		if(mentions != null) {
 			int index = 0;
 			for(String mention : mentions) {
-				if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
+				if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) {
+                    continue;
+                }
 				toReturn += " @" + mention;
 			}
 		}
 		return toReturn;
 	}
-	public static String getAllMentions(String initScreenname, UserMentionEntity[] mentions) {
+	public static String getAllMentions(String initScreenname, MentionEntity[] mentions) {
 		String toReturn = "@" + initScreenname;
 		if(mentions != null) {
 			int index = 0;
-			for(UserMentionEntity mention : mentions) {
+			for(MentionEntity mention : mentions) {
 				if(index == 0 && mention.getScreenName().equals(AccountService.getCurrentAccount().getUser().getScreenName())) continue;
 				toReturn += " @" + mention.getScreenName();
 			}
@@ -608,21 +629,18 @@ public class Utilities {
 		return (int)(outMetrics.density * dp); // 50dp in pixels
 	}
 	
-	public static String getUserImage(String screenname, Context mContext, twitter4j.User user){
+
+	public static String getUserImage(String screenname, Context mContext, User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache
-			url += "&v=" + Uri.encode(user.getProfileImageURL().toString());
+			url += "&v=" + Uri.encode(user.getProfileImageUrl().toString());
 		}
-
 		int size = DpToPx(50, mContext);
-		if( size >= 73 ){
+		if( size >= 73 ) {
 			url += "&size=bigger";
-		} else if( size >= 48 ){
+		} else if( size >= 48 ) {
 			url += "&size=normal";
-		} else{
-			url += "&size=mini";
-		}
-
+		} else url += "&size=mini";
 		return url;
 	}
 }

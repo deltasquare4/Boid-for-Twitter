@@ -12,20 +12,17 @@ import com.teamboid.twitter.utilities.MediaUtilities;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.TimePreference;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
+
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
+
 import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
@@ -96,23 +93,23 @@ public class SettingsScreen extends PreferenceActivity  {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.help_category);
-			((Preference)findPreference("version")).setSummary(Utilities.getVersionName(getActivity()));
-			((Preference)findPreference("build")).setSummary(Utilities.getVersionCode(getActivity()));
-			((Preference)findPreference("share_boid")).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			findPreference("version").setSummary(Utilities.getVersionName(getActivity()));
+			findPreference("build").setSummary(Utilities.getVersionCode(getActivity()));
+			findPreference("share_boid").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, getString(R.string.share_boid_content)), getString(R.string.share_boid_title)));
 					return false;
 				}
 			});
-			((Preference)findPreference("boidapp")).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			findPreference("boidapp").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					startActivity(new Intent(getActivity(), ProfileScreen.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("screen_name", "boidapp"));
 					return false;
 				}
 			});
-			((Preference)findPreference("donate")).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			findPreference("donate").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					BillingController.requestPurchase(getActivity(), "com.teamboid.twitter.donate", true);
@@ -122,29 +119,25 @@ public class SettingsScreen extends PreferenceActivity  {
 
 		}
 	}
-	public static class GeneralFragment extends PreferenceFragment {
+
+    public static class GeneralFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.general_category);
-			((SwitchPreference)findPreference("enable_ssl")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			findPreference("enable_ssl").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					int index = 0;
 					for(Account acc : AccountService.getAccounts()) {
-						ConfigurationBuilder cb = new ConfigurationBuilder().setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
-								.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
-								.setOAuthAccessToken(acc.getToken()).setOAuthAccessTokenSecret(acc.getSecret())
-								.setUseSSL((Boolean)newValue).setJSONStoreEnabled(true);
-						final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
-						acc.setClient(toAdd);
+						acc.setClient(acc.getClient().setSslEnabled((Boolean)newValue));
 						AccountService.setAccount(index, acc);
 						index++;
 					}
 					return true;
 				}
 			});
-			final Preference clearHistory = (Preference)findPreference("clear_search_history");
+			final Preference clearHistory = findPreference("clear_search_history");
 			clearHistory.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
@@ -157,48 +150,17 @@ public class SettingsScreen extends PreferenceActivity  {
 			});
 		}
 	}
-	public static class ComposerFragment extends PreferenceFragment {
-		private void setMediaName(){
-			final Preference uploadService = (Preference)findPreference("upload_service");
-			String pref = uploadService.getSharedPreferences().getString("upload_service", "twitter");
-			try{
-				uploadService.setSummary(MediaUtilities.getMediaServices(true, getActivity()).get(pref).name);
-			} catch(Exception e) { e.printStackTrace(); }
-		}
-		public static int SELECT_MEDIA;
 
-		@Override
-		public void onActivityResult(int requestCode, int resultCode, Intent data){
-			if(requestCode == SELECT_MEDIA && resultCode == RESULT_OK){
-				PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("upload_service", data.getStringExtra("service")).commit();
-				setMediaName();
-			}
-		}
+    public static class ComposerFragment extends PreferenceFragment {
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.composer_category);
-			final Preference uploadService = (Preference)findPreference("upload_service"); 
-			setMediaName();
-			uploadService.setOnPreferenceClickListener(new OnPreferenceClickListener(){
-				@Override
-				public boolean onPreferenceClick(final Preference arg0) {
-					Intent i = new Intent(getActivity(), SelectMediaScreen.class);
-					startActivityForResult(i, SELECT_MEDIA);
-					return true;
-				}
-			});
-			uploadService.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					uploadService.setSummary(newValue.toString());
-					return true;
-				}
-			});
 		}
 	}
-	public static class AppearanceFragment extends PreferenceFragment {
+
+    public static class AppearanceFragment extends PreferenceFragment {
 		
 		@Override		
 		public void onCreate(Bundle savedInstanceState) {
@@ -242,7 +204,8 @@ public class SettingsScreen extends PreferenceActivity  {
 			diag.show();
 		}
 	}
-	public static class NightModeFragment extends PreferenceFragment {
+
+    public static class NightModeFragment extends PreferenceFragment {
 		
 		private void displayTime(String time, String prefName, int summaryResId) {
 			TimePreference pref = (TimePreference)findPreference(prefName);

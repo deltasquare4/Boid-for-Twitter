@@ -2,12 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -27,6 +21,10 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays the current user's mentions. 
@@ -47,8 +45,8 @@ public class MentionsFragment extends BaseListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Status tweet = (Status) adapt.getItem(position);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+		Status tweet = (Status)adapt.getItem(position);
+		if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 		context.startActivity(new Intent(context, TweetViewer.class)
 		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
 		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -113,19 +111,18 @@ public class MentionsFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(1, 50);
-				if (paginate)
-					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				Paging paging = new Paging(50);
+				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient().getMentions(paging);
+						final Status[] feed = acc.getClient().getMentions(paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_mentions));
 								int beforeLast = adapt.getCount() - 1;
-								int addedCount = adapt.add(feed.toArray(new Status[0]));
+								int addedCount = adapt.add(feed);
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
@@ -144,13 +141,13 @@ public class MentionsFragment extends BaseListFragment {
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -199,8 +196,7 @@ public class MentionsFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void filter() {
-	}
+	public void filter() { }
 
 	@Override
 	public Status[] getSelectedStatuses() {

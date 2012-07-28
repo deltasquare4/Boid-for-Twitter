@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="61"
-	android:versionName="0.8.1.8 Beta">
+	package="com.teamboid.twitter" android:versionCode="63"
+	android:versionName="0.8.1.9 Beta">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 	<uses-feature android:name="android.hardware.camera"
 		android:required="false" />
@@ -188,7 +188,11 @@
 		</receiver>
 		<activity android:name=".LoginHandler" android:launchMode="singleTop"
 			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize"
+			android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
+			android:hardwareAccelerated="true" />
+		<activity android:name=".InAppBrowser" android:launchMode="singleTop"
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:windowSoftInputMode="adjustResize" android:label="@string/boid_browser"
 			android:hardwareAccelerated="true" />
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver"
@@ -201,7 +205,8 @@
 		</receiver>
 
 		<!-- Contact Sync -->
-		<service android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
+		<service
+			android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
 			android:exported="true" android:process=":auth">
 			<intent-filter>
 				<action android:name="android.accounts.AccountAuthenticator" />
@@ -209,7 +214,7 @@
 			<meta-data android:name="android.accounts.AccountAuthenticator"
 				android:resource="@xml/authenticator" />
 		</service>
-		<service android:name="com.teamboid.twitter.contactsync.ContactSyncAdapterService"
+		<service android:name="com.teamboid.twitter.contactsync.ContactsSyncAdapterService"
 			android:exported="true" android:process=":contacts">
 			<intent-filter>
 				<action android:name="android.content.SyncAdapter" />

@@ -19,13 +19,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
+import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.status.Status;
+
 /**
  * Methods for API Level 14 up
+ *
  * @author kennydude
  */
 @TargetApi(14)
 public class Api11 { //We don't support API 11, we only support API 14-16
-	
 	public static int SINGLE_NOTIFCATION = 100;
 	
 	/**
@@ -48,7 +51,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
 	/**
 	 * Display single notification
 	 */
-	public static void displayReplyNotification(final int accId, final Context context, final twitter4j.Status s){
+	public static void displayReplyNotification(final int accId, final Context context, final Status s){
 		final String imageURL = Utilities.getUserImage(s.getUser().getScreenName(), context, s.getUser());
 		ImageManager.getInstance(context).get(imageURL, new ImageManager.OnImageReceivedListener() {		
 			@SuppressLint("NewApi")
@@ -80,7 +83,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
 		});
 	}
 	
-	public static void displayDirectMessageNotification(final int accId, final Context c, final twitter4j.DirectMessage dm){
+	public static void displayDirectMessageNotification(final int accId, final Context c, final DirectMessage dm){
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
 		String x = dm.getText();
 		if(!p.getBoolean(accId + "_c2dm_messages_priv", false)) {

@@ -3,8 +3,9 @@ package com.teamboid.twitter.compat;
 import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.utilities.Utilities;
 
-import twitter4j.DirectMessage;
-import twitter4j.Status;
+import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.status.Status;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -14,8 +15,8 @@ import android.graphics.Bitmap;
 
 /**
  * Api level 16 (Jellybean) only methods!
- * @author kennydude
  *
+ * @author kennydude
  */
 @TargetApi(16)
 public class Api16 {

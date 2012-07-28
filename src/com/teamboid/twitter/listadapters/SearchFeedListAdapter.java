@@ -8,10 +8,6 @@ import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.utilities.Utilities;
 
-import twitter4j.GeoLocation;
-import twitter4j.Place;
-import twitter4j.Tweet;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +22,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.GeoLocation;
+import com.teamboid.twitterapi.status.Place;
 
 /**
  * The list adapter used in activites that search for tweets.
@@ -161,7 +160,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
-		View replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
+		View replyFrame = toReturn.findViewById(R.id.inReplyToFrame);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		View locFrame = toReturn.findViewById(R.id.locationFrame);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -169,7 +168,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		FeedListAdapter.ApplyFontSize(userNameTxt, mContext);
 		
 		if(prefs.getBoolean("show_real_names", false)) {
-			userNameTxt.setText(tweet.getFromUserName());
+			userNameTxt.setText(tweet.getFromUser());
 		} else userNameTxt.setText(tweet.getFromUser());
 		if(prefs.getBoolean("enable_profileimg_download", true)) {
 			profilePic.setImageResource(R.drawable.sillouette);
@@ -182,7 +181,8 @@ public class SearchFeedListAdapter extends BaseAdapter {
 				}
 			});
 		} else profilePic.setVisibility(View.GONE);
-		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
+		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(),
+                tweet.getUrlEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
 		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		boolean hasMedia = false;
@@ -222,7 +222,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 				locIndicator.setText(p.getFullName());
 			} else {
 				GeoLocation g = tweet.getGeoLocation();
-				locIndicator.setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
+				locIndicator.setText(g.toString());
 			}
 		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
 		return toReturn;

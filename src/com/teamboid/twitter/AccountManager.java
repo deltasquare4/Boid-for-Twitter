@@ -11,11 +11,6 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.RequestToken;
-import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -382,63 +377,56 @@ public class AccountManager extends PreferenceActivity {
 			item.setEnabled(true);
 			return true;
 		case R.id.toggleSslAction:
-			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
-			final boolean newValue = !prefs.getBoolean("enable_ssl", false);
-			if(newValue) {
-				final AlertDialog.Builder diag = new AlertDialog.Builder(AccountManager.this);
-				diag.setTitle(R.string.enable_ssl_str);
-				diag.setMessage(R.string.enable_ssl_confirm_str);
-				diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						prefs.edit().putBoolean("enable_ssl", newValue).commit();
-						invalidateOptionsMenu();
-						int index = 0;
-						for(Account acc : AccountService.getAccounts()) {
-							ConfigurationBuilder cb = new ConfigurationBuilder().setOAuthConsumerKey("5LvP1d0cOmkQleJlbKICtg")
-									.setOAuthConsumerSecret("j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI")
-									.setOAuthAccessToken(acc.getToken()).setOAuthAccessTokenSecret(acc.getSecret())
-									.setUseSSL(!newValue).setJSONStoreEnabled(true);
-							final Twitter toAdd = new TwitterFactory(cb.build()).getInstance();
-							acc.setClient(toAdd);
-							AccountService.setAccount(index, acc);
-							index++;
-						}
-					}
-				});
-				diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
-				});
-				diag.create().show();
-			} else {
-				prefs.edit().putBoolean("enable_ssl", newValue).commit();
-				invalidateOptionsMenu();
-			}
-			return true;
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            final boolean newValue = !prefs.getBoolean("enable_ssl", false);
+            final AlertDialog.Builder diag = new AlertDialog.Builder(AccountManager.this);
+            diag.setTitle(R.string.enable_ssl_str);
+            diag.setMessage(R.string.enable_ssl_confirm_str);
+            diag.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    prefs.edit().putBoolean("enable_ssl", newValue).commit();
+                    invalidateOptionsMenu();
+                    int index = 0;
+                    for (Account acc : AccountService.getAccounts()) {
+                        acc.setClient(acc.getClient().setSslEnabled(newValue));
+                        AccountService.setAccount(index, acc);
+                        index++;
+                    }
+                }
+            });
+            diag.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            diag.create().show();
+            return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	private void startAuth() {
-		AccountService.pendingClient = new TwitterFactory().getInstance();
-		AccountService.pendingClient.setOAuthConsumer("5LvP1d0cOmkQleJlbKICtg", "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI");
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					final RequestToken requestToken = AccountService.pendingClient.getOAuthRequestToken("boid://auth");
-					startActivityForResult(new Intent(AccountManager.this, LoginHandler.class).putExtra("url", requestToken.getAuthorizationURL()), 600);
-				} catch (final TwitterException e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() { Toast.makeText(getApplicationContext(), getString(R.string.authorization_error) + "; " + e.getErrorMessage(), Toast.LENGTH_LONG).show(); }
-					});
-				}
-			}
-		}).start();
-	}
+    private void startAuth() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    startActivityForResult(new Intent(AccountManager.this, LoginHandler.class)
+                            .putExtra("url", AccountService.getAuthorizer().getAuthorizeUrl()), 600);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), getString(R.string.authorization_error) +
+                                    "; " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
 
 	@Override
 	public void onDestroy() {

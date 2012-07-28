@@ -36,6 +36,5 @@
 		<ListPreference android:key="{user}_contactsync_what"
 			android:defaultValue="mutual" android:entryValues="@array/sync_types_values"
 			android:entries="@array/sync_types" android:title="@string/contactsync_what"/>
-		
 	</PreferenceCategory>
 </PreferenceScreen>

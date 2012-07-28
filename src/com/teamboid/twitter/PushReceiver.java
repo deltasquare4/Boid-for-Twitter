@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -11,6 +12,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import android.app.Activity;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +29,10 @@ import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.NightModeUtils;
+import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.dm.DirectMessageJSON;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.StatusJSON;
 
 public class PushReceiver extends BroadcastReceiver {
 	
@@ -117,27 +123,25 @@ public class PushReceiver extends BroadcastReceiver {
 					if(type.equals("reply")) {
 						JSONObject status = new JSONObject(b.getString("tweet"));
 						status.put("id", Long.parseLong(status.getString("id_str")));
-						final twitter4j.Status s = new twitter4j.internal.json.StatusJSONImpl(status);
+						final Status s = new StatusJSON(status);
 						//TODO The account the mention is for should be passed from the server too
 						// We have this now in "account" as a string
 						//Also, we need a way of combining multiple mentions/messages into one notification.
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
-						if(AccountService.activity != null){
-							((Activity)AccountService.activity).runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									// You MUST insert the mention into the adapter associated with the 
-									// account the mention is for, not the adapter for the current account.
-									FeedListAdapter adapt = AccountService.getFeedAdapter((Activity) AccountService.activity, 
-											MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
-									if(adapt != null) adapt.add(new twitter4j.Status[] { s });
-								}
-							});
-						}
+						AccountService.activity.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								// You MUST insert the mention into the adapter associated with the 
+								// account the mention is for, not the adapter for the current account.
+								FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
+										MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
+								if(adapt != null) adapt.add(new Status[] { s });
+							}
+						});
 					} else if(type.equals("dm")){
 						//Yes I know it's "tweet". Deal with it
 						JSONObject json = new JSONObject(b.getString("tweet"));
-						final twitter4j.DirectMessage dm = new twitter4j.internal.json.DirectMessageJSONImpl(json);
+						final DirectMessage dm = new DirectMessageJSON(json);
 						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);
 					}
 				} catch(Exception e) { e.printStackTrace(); }

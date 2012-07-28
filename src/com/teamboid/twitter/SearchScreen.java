@@ -122,9 +122,11 @@ public class SearchScreen extends Activity {
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    	ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
+	    	ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
+                    Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 			cols.add(SavedSearchFragment.ID + "@" + getIntent().getStringExtra("query"));
-			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
+			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount()
+                    .getId()) + "_columns", Utilities.arrayToJson(cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
 			return true;
 		case R.id.refreshAction:

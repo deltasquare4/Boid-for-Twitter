@@ -14,10 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import twitter4j.GeoLocation;
-import twitter4j.Place;
-import twitter4j.Status;
-
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.ImageManager;
@@ -27,6 +23,9 @@ import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.NoUnderlineClickableSpan;
+import com.teamboid.twitterapi.status.GeoLocation;
+import com.teamboid.twitterapi.status.Place;
+import com.teamboid.twitterapi.status.Status;
 
 /**
  * The list adapter used for the lists that contain tweets, such as the timeline column.
@@ -145,18 +144,11 @@ public class FeedListAdapter extends BaseAdapter {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
 		String[] fi = null;
-		if(filter) fi = Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
+		if(filter) fi = Utilities.jsonToArray(prefs.getString(prefName, "")).toArray(new String[0]);
 		for(Status tweet : toAdd) {
 			if(add(tweet, fi)) toReturn++;
 		}
 		notifyDataSetChanged();
-		return toReturn;
-	}
-	public int addInverted(Status[] toAdd) {
-		int toReturn = 0;
-		for(Status tweet : toAdd) {
-			if(addInverted(tweet)) toReturn++;
-		}
 		return toReturn;
 	}
 	public void remove(int index) {
@@ -250,7 +242,7 @@ public class FeedListAdapter extends BaseAdapter {
 		ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
 		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
 		final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
-		View replyFrame = (RelativeLayout)toReturn.findViewById(R.id.inReplyToFrame);
+		View replyFrame = toReturn.findViewById(R.id.inReplyToFrame);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		View locFrame = toReturn.findViewById(R.id.locationFrame);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -287,7 +279,7 @@ public class FeedListAdapter extends BaseAdapter {
 				}
 			});
 		} else profilePic.setVisibility(View.GONE);
-		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getURLEntities(), tweet.getMediaEntities(), false));
+		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getUrlEntities(), tweet.getMediaEntities(), false));
 		itemTxt.setLinksClickable(false);
 		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		boolean hasMedia = false;
@@ -327,7 +319,7 @@ public class FeedListAdapter extends BaseAdapter {
 				locIndicator.setText(p.getFullName());
 			} else {
 				GeoLocation g = tweet.getGeoLocation();
-				locIndicator.setText(Double.toString(g.getLatitude()) + ", " + Double.toString(g.getLongitude()));
+				locIndicator.setText(g.toString());
 			}
 		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
 		if(tweet.isFavorited()) favoritedIndic.setVisibility(View.VISIBLE);

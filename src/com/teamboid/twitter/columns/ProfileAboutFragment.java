@@ -3,12 +3,11 @@ package com.teamboid.twitter.columns;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 import org.apache.http.message.BasicNameValuePair;
 
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -136,13 +135,13 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 								adapt.setUser(user);
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

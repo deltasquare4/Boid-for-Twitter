@@ -2,11 +2,6 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
-import twitter4j.ResponseList;
-import twitter4j.SavedSearch;
-import twitter4j.TwitterException;
-import twitter4j.UserList;
-
 import com.teamboid.twitter.columns.FavoritesFragment;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.MentionsFragment;
@@ -21,7 +16,6 @@ import com.teamboid.twitter.columns.UserListFragment;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.DragSortListView;
-import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 import com.teamboid.twitter.views.DragSortListView.DropListener;
 
 import android.app.Activity;
@@ -44,6 +38,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.teamboid.twitterapi.list.UserList;
+import com.teamboid.twitterapi.savedsearch.SavedSearch;
+
 public class ColumnManager extends Activity {
 
 	private ArrayAdapter<String> adapt;
@@ -54,6 +51,7 @@ public class ColumnManager extends Activity {
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
+			if(to < from && to >= 1) to--;
 			String toMove = adapt.getItem(from);
 			String toMoveRaw = cols.get(from);
 			removeColumn(from);
@@ -78,19 +76,6 @@ public class ColumnManager extends Activity {
 		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
 		list.setDropListener(dropListen);
-		SwipeDismissListViewTouchListener touchListener =
-				new SwipeDismissListViewTouchListener(list,
-						new SwipeDismissListViewTouchListener.OnDismissCallback() {
-					@Override
-					public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-						for (int i : reverseSortedPositions) {
-							removeColumn(i);
-						}
-						loadColumns();
-					}
-				});
-		list.setOnTouchListener(touchListener);
-		list.setOnScrollListener(touchListener.makeScrollListener());
 		list.setAdapter(adapt);
 	}
 	
@@ -121,7 +106,9 @@ public class ColumnManager extends Activity {
 	private void loadColumns() {
 		adapt.clear();
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", "")); 
+		cols = Utilities.jsonToArray(prefs.getString(Long.toString(
+                AccountService.getCurrentAccount().getId()) + "_columns", ""));
+		
 		for(String c : cols) {
 			if(c.equals(TimelineFragment.ID)) {
 				adapt.add(getString(R.string.timeline_str));
@@ -159,18 +146,22 @@ public class ColumnManager extends Activity {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		if(index > -1) cols.add(index, id);
 		else cols.add(id);
-		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
+		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+                "_columns", Utilities.arrayToJson(cols)).commit();
+		
 		selIndex = getIntent().getIntExtra("tab_count", 4) - 1;
 		loadColumns();
 	}
 	
 	private void removeColumn(int index) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		final String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_default_column";
+		final String prefName = Long.toString(
+                AccountService.getCurrentAccount().getId()) + "_default_column";
 		int beforeDefCol = prefs.getInt(prefName, 0);
 		if(beforeDefCol > 0) prefs.edit().putInt(prefName, beforeDefCol - 1).commit();
 		cols.remove(index);
-		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
+		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+                "_columns", Utilities.arrayToJson(cols)).commit();
 		int postIndex = index - 1;
 		if(postIndex < 0) postIndex = 0;
 		selIndex = postIndex;
@@ -213,11 +204,11 @@ public class ColumnManager extends Activity {
 				public void run() {
 					Account acc = AccountService.getCurrentAccount();
 					try {
-						final ResponseList<SavedSearch> lists = acc.getClient().getSavedSearches();
+						final SavedSearch[] lists = acc.getClient().getSavedSearches();
 						runOnUiThread(new Runnable() {
-							public void run() { showSavedSearchColumnAdd(lists.toArray(new SavedSearch[0])); }
+							public void run() { showSavedSearchColumnAdd(lists); }
 						});
-					} catch (TwitterException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 						runOnUiThread(new Runnable() {
 							public void run() { showSavedSearchColumnAdd(null); }
@@ -235,11 +226,11 @@ public class ColumnManager extends Activity {
 				public void run() {
 					Account acc = AccountService.getCurrentAccount();
 					try {
-						final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
+						final UserList[] lists = acc.getClient().getLists();
 						runOnUiThread(new Runnable() {
-							public void run() { showUserListColumnAdd(lists.toArray(new UserList[0])); }
+							public void run() { showUserListColumnAdd(lists); }
 						});
-					} catch (TwitterException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 						runOnUiThread(new Runnable() {
 							public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_load_lists), Toast.LENGTH_LONG).show(); }
@@ -271,7 +262,7 @@ public class ColumnManager extends Activity {
 			public void onClick(DialogInterface dialog, int item) {
 				UserList curList = lists[item];
 				addColumn(UserListFragment.ID + "@" + curList.getFullName().replace("@", "%40") +
-						"@" + Integer.toString(curList.getId()), -1);
+						"@" + Long.toString(curList.getId()), -1);
 			}
 		});
 		builder.create().show();

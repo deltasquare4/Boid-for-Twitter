@@ -2,11 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.app.ActionBar.Tab;
 import android.content.Intent;
@@ -26,6 +21,9 @@ import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * The column used in the search screen to display User search results.
@@ -100,13 +98,13 @@ public class SearchUsersFragment extends BaseListFragment {
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<User> feed = acc.getClient().searchUsers(query, page);
+						final User[] feed = acc.getClient().searchUsers(query, page, 50);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_results));
 								int beforeLast = context.userAdapter.getCount() - 1;
-								int addedCount = context.userAdapter.add(feed.toArray(new User[0]));
+								int addedCount = context.userAdapter.add(feed);
 								if (beforeLast > 0) {
 									if (getView() != null && addedCount > 0) {
 										if(paginate && addedCount > 0) getListView().smoothScrollToPosition(beforeLast + 1);
@@ -123,13 +121,13 @@ public class SearchUsersFragment extends BaseListFragment {
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

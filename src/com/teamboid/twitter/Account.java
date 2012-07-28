@@ -1,17 +1,14 @@
 package com.teamboid.twitter;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.Utilities;
+import org.json.*;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.conf.Configuration;
+
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * @author Aidan Follestad
@@ -33,8 +30,7 @@ public class Account {
 	}
 	
 	public static Account unserialize( Context c, JSONObject i ) throws JSONException{
-		Configuration co = AccountService.getConfiguration(i.getString("key"), i.getString("secret")).build();
-		Twitter client = new TwitterFactory(co).getInstance();
+		Twitter client = AccountService.getAuthorizer().getAuthorizedInstance(i.getString("key"), i.getString("secret"));
 		Account r = new Account( c, client, i.getString("key") );
 		r.setUser( (User) Utilities.deserializeObject( i.getString("user") ) );
 		r.setSecret( i.getString("secret") );

@@ -48,7 +48,7 @@ public class SendTweetService extends Service {
 							@Override
 							public void run() {
 								AccountService.getFeedAdapter((Activity) AccountService.activity, TimelineFragment.ID,
-										AccountService.getCurrentAccount().getId()).add(new twitter4j.Status[]{stt.tweet});
+										AccountService.getCurrentAccount().getId()).add(new  com.teamboid.twitterapi.status.Status[]{stt.tweet});
 							}						
 						});
 					} catch(Exception e) { e.printStackTrace(); }

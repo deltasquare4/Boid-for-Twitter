@@ -1,28 +1,23 @@
 package com.teamboid.twitter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.HashMap;
+
+import com.teamboid.twitterapi.status.GeoLocation;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.StatusUpdate;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.MediaUtilities;
+
 import com.teamboid.twitter.utilities.TwitlongerHelper;
 import com.teamboid.twitter.utilities.TwitlongerHelper.TwitlongerPostResponse;
-
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
-import twitter4j.GeoLocation;
-import twitter4j.Status;
-import twitter4j.StatusUpdate;
-import twitter4j.TwitterException;
 
 /**
  * Defines a send tweet task.
@@ -101,8 +96,9 @@ public class SendTweetTask {
 			contents = response.getContent();
 		}
 		
-		StatusUpdate update = new StatusUpdate(contents);
+		StatusUpdate update = StatusUpdate.create(contents);
 		
+		/* TODO: Bring back 100% media support
 		if(this.hasMedia()){
 			try{
 				String prefValue = mediaService;
@@ -120,7 +116,7 @@ public class SendTweetTask {
 				result.sent = false;
 				return result;
 			}
-		}
+		}*/
 		
 		if(location != null) update.setLocation(location);
 		if(in_reply_to > 0) update.setInReplyToStatusId(in_reply_to);
@@ -132,11 +128,6 @@ public class SendTweetTask {
 			}
 			//AccountService.getFeedAdapter(context, TimelineFragment.ID).add(new Status[] { tweet });
 			result.sent = true;
-		} catch(TwitterException e){
-			e.printStackTrace();
-			Log.d("x", e.getErrorMessage());
-			result.sent = false;
-			result.errorCode = e.getStatusCode();
 		} catch(Exception e){
 			e.printStackTrace();
 			result.sent = false;

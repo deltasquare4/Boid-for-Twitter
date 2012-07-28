@@ -58,26 +58,26 @@ public class MutingListAdapter extends BaseAdapter {
 	public String[] loadKeywords() {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		return Utilities.jsonToArray(mContext, prefs.getString(prefName, "")).toArray(new String[0]);
+		return Utilities.jsonToArray(prefs.getString(prefName, "")).toArray(new String[0]);
 	}
 	public void restorePreference(String[] keywords) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		ArrayList<String> cols = Utilities.jsonToArray(mContext, prefs.getString(prefName, ""));
+		ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(prefName, ""));
 		for(String key : keywords) {
 			if(!cols.contains(key)) cols.add(key);
 		}
-		prefs.edit().putString(prefName, Utilities.arrayToJson(mContext, cols)).commit();
+		prefs.edit().putString(prefName, Utilities.arrayToJson(cols)).commit();
 		notifyDataSetChanged();
 	}
 	
 	public boolean add(String term) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		ArrayList<String> cols = Utilities.jsonToArray(mContext, prefs.getString(prefName, ""));
+		ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(prefName, ""));
 		if(!cols.contains(term)) {
 			cols.add(term);
-			prefs.edit().putString(prefName, Utilities.arrayToJson(mContext, cols)).commit();
+			prefs.edit().putString(prefName, Utilities.arrayToJson(cols)).commit();
 			notifyDataSetChanged();
 			return true;
 		}
@@ -87,9 +87,9 @@ public class MutingListAdapter extends BaseAdapter {
 	public void remove(int[] indicies) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
-		ArrayList<String> cols = Utilities.jsonToArray(mContext, prefs.getString(prefName, ""));
+		ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(prefName, ""));
 		for (int i : indicies) cols.remove(i);
-		prefs.edit().putString(prefName, Utilities.arrayToJson(mContext, cols)).commit();
+		prefs.edit().putString(prefName, Utilities.arrayToJson(cols)).commit();
 	}
 
 	public void clear() {

@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 
-import twitter4j.TwitterException;
-import twitter4j.UserList;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -17,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.teamboid.twitterapi.list.UserList;
 
 /**
  * @author Aidan Follestad
@@ -64,7 +62,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 	@Override
 	public Object getItem(int position) { return lists.get(position); }
 
-	public int getListId(int position) { return lists.get(position).getId(); }
+	public int getListId(int position) { return (int)lists.get(position).getId(); }
 
 	@Override
 	public long getItemId(int position) {
@@ -94,13 +92,13 @@ public class UserListDisplayAdapter extends BaseAdapter {
 					toast.show();
 					new Thread(new Runnable() {
 						public void run() {
-							try { AccountService.getCurrentAccount().getClient().destroyUserList(getListId(pos)); }
-							catch(final TwitterException e) {
+							try { AccountService.getCurrentAccount().getClient().destroyList(getListId(pos)); }
+							catch(final Exception e) {
 								e.printStackTrace();
 								mContext.runOnUiThread(new Runnable() {
 									public void run() {
 										toast.cancel();
-										Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+										Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_LONG).show();
 									}
 								});
 								return;
@@ -109,7 +107,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 								public void run() { 
 									toast.cancel();
 									Toast.makeText(mContext, R.string.deleted_list_str, Toast.LENGTH_SHORT).show();
-									remove(list.getId());
+									remove((int)list.getId());
 								}
 							});
 						}
@@ -132,13 +130,13 @@ public class UserListDisplayAdapter extends BaseAdapter {
 					toast.show();
 					new Thread(new Runnable() {
 						public void run() {
-							try { AccountService.getCurrentAccount().getClient().destroyUserListSubscription(getListId(pos)); }
-							catch(final TwitterException e) {
+							try { AccountService.getCurrentAccount().getClient().destroyListSubscription(getListId(pos)); }
+							catch(final Exception e) {
 								e.printStackTrace();
 								mContext.runOnUiThread(new Runnable() {
 									public void run() {
 										toast.cancel();
-										Toast.makeText(mContext, e.getErrorMessage(), Toast.LENGTH_LONG).show();
+										Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_LONG).show();
 									}
 								});
 								return;
@@ -147,7 +145,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 								public void run() { 
 									toast.cancel();
 									Toast.makeText(mContext, R.string.unsubscribed_list_str, Toast.LENGTH_SHORT).show();
-									remove(list.getId());
+									remove((int)list.getId());
 								}
 							});
 						}

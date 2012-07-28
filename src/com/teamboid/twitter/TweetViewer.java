@@ -6,6 +6,14 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.experimentalapis.RelatedResults;
+import com.teamboid.twitterapi.status.GeoLocation;
+import com.teamboid.twitterapi.status.Place;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.entity.url.UrlEntity;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -31,13 +39,6 @@ import com.teamboid.twitter.views.GlowableRelativeLayout;
 import com.teamboid.twitter.views.PolygonOverlay;
 import com.teamboid.twitter.views.SideNavigationLayout;
 
-import twitter4j.GeoLocation;
-import twitter4j.Place;
-import twitter4j.RelatedResults;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.TwitterException;
-import twitter4j.URLEntity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -205,7 +206,7 @@ public class TweetViewer extends MapActivity {
 		TextView contents = (TextView)toReturn.findViewById(R.id.tweetContents);
 		contents.setText(Utilities.twitterifyText(this, getIntent().getStringExtra("content"), null, null, true));
 		contents.setMovementMethod(LinkMovementMethod.getInstance());
-		((TextView)toReturn.findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong(this, new Date(getIntent().getLongExtra("timer", 0l))) + " via " + Html.fromHtml(getIntent().getStringExtra("via")));
+		((TextView)toReturn.findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong(new Date(getIntent().getLongExtra("timer", 0l))) + " via " + Html.fromHtml(getIntent().getStringExtra("via")));
 		isFavorited = getIntent().getBooleanExtra("isFavorited", false);
 	}
 
@@ -228,7 +229,7 @@ public class TweetViewer extends MapActivity {
 							loadConversation(tweet);
 						} 
 					});
-				} catch(TwitterException e) {
+				} catch(Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
 						public void run() {
@@ -245,55 +246,58 @@ public class TweetViewer extends MapActivity {
 		}).start();
 	}
 
-	private void loadConversation(final Status tweet) {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					if(tweet.getInReplyToStatusId() > 0) {
-						final RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
-						final ResponseList<Status> toAdd = res.getTweetsWithConversation();
-						boolean found = false;
-						for(Status stat : toAdd) {
-							if(stat.getId() == tweet.getInReplyToStatusId()) {
-								found = true;
-								break;
-							}
-						}
-						if(!found) {
-							final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
-							toAdd.add(repliedTo);
-						}
-						toAdd.add(tweet);
-						toAdd.addAll(res.getTweetsWithReply());
-						if(toAdd.size() > 0) {
-							runOnUiThread(new Runnable(){
-								public void run(){
-									hasConvo = true;
-									invalidateOptionsMenu();
-									binder.addInverted(toAdd.toArray(new Status[]{}));
-									binder.notifyDataSetChanged();
-									((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
-								}
-							});
-						}
-					} else {
-						final SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
-						sideNav.enabled = false;
-					}
-				} catch(Exception e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() {
-							Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
-						}
-					});
-				}
-				runOnUiThread(new Runnable() {
-					public void run() { showProgress(false); }
-				});
-			}
-		}).start();
-	}
+    private void loadConversation(final Status tweet) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (tweet.getInReplyToStatusId() > 0) {
+                        RelatedResults res = AccountService.getCurrentAccount().getClient().getRelatedResults(tweet.getId());
+                        final ArrayList<Status> toAdd = new ArrayList<Status>();
+                        for(Status s : res.getTweetsWithConversation()) toAdd.add(s);
+                        boolean found = false;
+                        for (Status stat : toAdd) {
+                            if (stat.getId() == tweet.getInReplyToStatusId()) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            final Status repliedTo = AccountService.getCurrentAccount().getClient().showStatus(tweet.getInReplyToStatusId());
+                            toAdd.add(repliedTo);
+                        }
+                        toAdd.add(tweet);
+                        for(Status s : res.getTweetsWithReply()) toAdd.add(s);
+                        if (toAdd.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    hasConvo = true;
+                                    invalidateOptionsMenu();
+                                    binder.add(toAdd.toArray(new Status[0]));
+                                    binder.notifyDataSetChanged();
+                                    ((GlowableRelativeLayout)findViewById(R.id.glowstone)).glow();
+                                }
+                            });
+                        }
+                    } else {
+                        final SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
+                        sideNav.enabled = false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showProgress(false);
+                    }
+                });
+            }
+        }).start();
+    }
 
 	private void displayTweet(Status tweet) {
 		status = tweet;
@@ -313,9 +317,9 @@ public class TweetViewer extends MapActivity {
 		((TextView)findViewById(R.id.tweetUserName)).setText(status.getUser().getName());
 		((TextView)findViewById(R.id.tweetScreenName)).setText("@" + status.getUser().getScreenName());
 		TextView contents = (TextView)findViewById(R.id.tweetContents);
-		contents.setText(Utilities.twitterifyText(this, status.getText(), status.getURLEntities(), status.getMediaEntities(), true));
+		contents.setText(Utilities.twitterifyText(this, status.getText(), status.getUrlEntities(), status.getMediaEntities(), true));
 		contents.setMovementMethod(LinkMovementMethod.getInstance());
-		((TextView)findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong(this, status.getCreatedAt()) + " via " + Html.fromHtml(status.getSource()));
+		((TextView)findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong( status.getCreatedAt()) + " via " + Html.fromHtml(status.getSource()));
 		invalidateOptionsMenu();
 		expandTwitlonger(contents);
 		expandTwtmore(contents);
@@ -323,8 +327,8 @@ public class TweetViewer extends MapActivity {
 		displayMedia();
 		if(tweetWidgetsLoaded == false){
 			tweetWidgetsLoaded = true;
-			if(status.getURLEntities() != null) {
-				for(URLEntity ue : status.getURLEntities()) { fetchWidgetForUrl(ue.getExpandedURL().toString()); }
+			if(status.getUrlEntities() != null) {
+				for(UrlEntity ue : status.getUrlEntities()) { fetchWidgetForUrl(ue.getExpandedUrl().toString()); }
 			}
 		}
 		loadConversation(tweet);
@@ -408,7 +412,7 @@ public class TweetViewer extends MapActivity {
 							AccountService.getFeedAdapter(TweetViewer.this, TimelineFragment.ID, AccountService.getCurrentAccount().getId()).add(new Status[] { result });
 						}
 					});
-				} catch(TwitterException e) {
+				} catch(Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
 						public void run() { Toast.makeText(getApplicationContext(), R.string.failed_retweet, Toast.LENGTH_LONG).show(); }
@@ -457,11 +461,11 @@ public class TweetViewer extends MapActivity {
 							runOnUiThread(new Runnable() {
 								public void run() { 
 									isFavorited = false;
-									unfavorited.setIsFavorited(false);
+									unfavorited.setFavorited(false);
 									TimelineCAB.reinsertStatus(unfavorited);
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(Exception e) {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { 
@@ -487,11 +491,11 @@ public class TweetViewer extends MapActivity {
 							runOnUiThread(new Runnable() {
 								public void run() { 
 									isFavorited = true;
-									favorited.setIsFavorited(true);
+									favorited.setFavorited(true);
 									TimelineCAB.reinsertStatus(favorited);
 								}
 							});
-						} catch(TwitterException e) {
+						} catch(Exception e) {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { 
@@ -554,7 +558,7 @@ public class TweetViewer extends MapActivity {
 							}
 						});
 					}
-					catch(TwitterException e) {
+					catch(Exception e) {
 						e.printStackTrace();
 						runOnUiThread(new Runnable() {
 							public void run() { 
@@ -586,12 +590,12 @@ public class TweetViewer extends MapActivity {
 	}
 
 	private void expandTwitlonger(final TextView txt) {
-		if(status.getURLEntities() == null || status.getURLEntities().length == 0) return; 
+		if(status.getUrlEntities() == null || status.getUrlEntities().length == 0) return; 
 		String url = null;
-		for(int i = 0; i < status.getURLEntities().length; i++) {
-			URLEntity e = status.getURLEntities()[i];
-			if(e.getDisplayURL().contains("tl.gd")) {
-				url = "http://" + e.getDisplayURL();
+		for(int i = 0; i < status.getUrlEntities().length; i++) {
+			UrlEntity e = status.getUrlEntities()[i];
+			if(e.getDisplayUrl().contains("tl.gd")) {
+				url = "http://" + e.getDisplayUrl();
 				break;
 			}
 		}
@@ -604,7 +608,7 @@ public class TweetViewer extends MapActivity {
 				try {
 					final String content = helper.readPost(id);
 					txt.post(new Runnable() {
-						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), content, status.getURLEntities(), status.getMediaEntities(), true)); }
+						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), content, status.getUrlEntities(), status.getMediaEntities(), true)); }
 					});
 				} catch(Exception e) {
 					e.printStackTrace();
@@ -617,11 +621,11 @@ public class TweetViewer extends MapActivity {
 	}
 
 	private void expandTwtmore(final TextView txt) {
-		if(status.getURLEntities() == null || status.getURLEntities().length == 0) return;
+		if(status.getUrlEntities() == null || status.getUrlEntities().length == 0) return;
 		String url = null;
-		for(int i = 0; i < status.getURLEntities().length; i++) {
-			URLEntity e = status.getURLEntities()[i];
-			if(e.getDisplayURL().contains("tm.to")) url = "http://" + e.getDisplayURL();
+		for(int i = 0; i < status.getUrlEntities().length; i++) {
+			UrlEntity e = status.getUrlEntities()[i];
+			if(e.getDisplayUrl().contains("tm.to")) url = "http://" + e.getDisplayUrl();
 		}
 		if(url == null) return;
 		Toast.makeText(this, R.string.expanding_twtmore, Toast.LENGTH_SHORT).show();
@@ -634,7 +638,7 @@ public class TweetViewer extends MapActivity {
 					HttpResponse response = httpclient.execute(httpget);
 					final String responseStr = EntityUtils.toString(response.getEntity(), "UTF-8");
 					txt.post(new Runnable() {
-						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), responseStr, status.getURLEntities(), status.getMediaEntities(), true)); }
+						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), responseStr, status.getUrlEntities(), status.getMediaEntities(), true)); }
 					});
 				} catch(Exception e) {
 					e.printStackTrace();
@@ -658,7 +662,7 @@ public class TweetViewer extends MapActivity {
 				@Override
 				public void run() {
 					try{
-						place = AccountService.getCurrentAccount().getClient().getGeoDetails(place.getId());
+						place = AccountService.getCurrentAccount().getClient().getPlaceDetails(place.getId());
 						runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
@@ -725,49 +729,6 @@ public class TweetViewer extends MapActivity {
 		TextView dets = (TextView)m.findViewById(R.id.miniMapDetails);
 		if(place != null) dets.setText(place.getFullName());
 		else dets.setText(point.getLatitude() + ", " + point.getLongitude());
-		/*
-		if(status.getGeoLocation() == null && status.getPlace() == null) return;
-		view.setVisibility(View.VISIBLE);
-		List<Overlay> mapOverlays = view.getOverlays();
-		GeoPoint toShow = null;
-		String toShowName = "";
-		if(status.getGeoLocation() != null) {
-			toShowName = Double.toString(status.getGeoLocation().getLatitude()) + ", " + Double.toString(status.getGeoLocation().getLongitude());
-			if(status.getPlace() != null) toShowName = getString(R.string.nearby_str) + " " + status.getPlace().getFullName();
-			toShow = new GeoPoint((int)(status.getGeoLocation().getLatitude() * 1E6), (int)(status.getGeoLocation().getLongitude() * 1E6));
-		}  else if(status.getPlace() != null) {
-			Geocoder myLocation = new Geocoder(this, Locale.getDefault());
-			List<Address> adr = null;
-			try { adr = myLocation.getFromLocationName(status.getPlace().getName(), 1); }
-			catch(Exception e) {
-				e.printStackTrace();
-				Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-				view.setVisibility(View.GONE);
-				return;
-			}
-			if(adr.size() > 0) {
-				Address curAddress = adr.get(0);
-				if(curAddress.getFeatureName() != null && !curAddress.getFeatureName().isEmpty()) { 
-					toShowName += curAddress.getFeatureName() + ", ";
-				}
-				if(curAddress.getAdminArea() != null) toShowName += curAddress.getAdminArea();
-				if(curAddress.getCountryName() != null && !curAddress.getCountryName().equals(curAddress.getAdminArea())) {
-					toShowName += ", " + curAddress.getCountryName();
-				}
-				if(toShowName.trim().isEmpty()) toShowName = (int)curAddress.getLatitude() + ", " + (int)curAddress.getLongitude();
-				toShow = new GeoPoint((int)(curAddress.getLatitude() * 1E6), (int)(curAddress.getLongitude() * 1E6));
-			}
-		}
-		if(toShow != null) {
-			Drawable drawable = getResources().getDrawable(R.drawable.locate_dark);
-			GeoMapOverlay itemizedoverlay = new GeoMapOverlay(drawable, this);
-			OverlayItem overlayitem = new OverlayItem(toShow, toShowName, null);
-			itemizedoverlay.addOverlay(overlayitem);
-			mapOverlays.add(itemizedoverlay);
-			view.getController().animateTo(toShow);
-			view.invalidate();
-		}
-		 */
 	}
 
 	private void displayMedia() {

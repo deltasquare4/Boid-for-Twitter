@@ -5,10 +5,6 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -21,6 +17,9 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.status.Status;
+
 /**
  * @author Aidan Follestad
  */
@@ -28,7 +27,8 @@ public class TweetListActivity extends ListActivity {
 
 	private int lastTheme;
 	private boolean showProgress;
-	private ResponseList<Status> tweets = null;
+	private Status[] tweets = null;
+	
 	private boolean allowPagination = true;
 	public FeedListAdapter binder;
 	private ProgressDialog progDialog;
@@ -120,7 +120,7 @@ public class TweetListActivity extends ListActivity {
 			@Override
 			public void run() {
 				try {
-					Paging paging = new Paging(1, 20);
+					Paging paging = new Paging(20);
 					switch(getIntent().getIntExtra("mode", -1)) {
 					case USER_FAVORITES:
 						runOnUiThread(new Runnable() {
@@ -128,7 +128,8 @@ public class TweetListActivity extends ListActivity {
 							public void run() { setTitle(getString(R.string.user_favorites).replace("{user}", getIntent().getStringExtra("username"))); }
 						});
 						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
-						tweets = AccountService.getCurrentAccount().getClient().getFavorites(getIntent().getStringExtra("username"), paging);
+						tweets = AccountService.getCurrentAccount().getClient()
+                                .getFavorites(paging, getIntent().getStringExtra("username"));
 						break;
 					case USER_LIST:
 						runOnUiThread(new Runnable() {
@@ -136,18 +137,19 @@ public class TweetListActivity extends ListActivity {
 							public void run() { setTitle(getIntent().getStringExtra("list_name")); }
 						});
 						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
-						tweets = AccountService.getCurrentAccount().getClient().getUserListStatuses(getIntent().getIntExtra("list_ID", 0), paging);
+						tweets = AccountService.getCurrentAccount().getClient()
+                                .getListTimeline(getIntent().getIntExtra("list_ID", 0), paging);
 						break;
 					}
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							if(tweets == null || tweets.size() == 0) {
+							if(tweets == null || tweets.length == 0) {
 								allowPagination = false;
 								showProgress(false);
 								return;
 							}
-							int addedCount = binder.add(tweets.toArray(new Status[0]));; 
+							int addedCount = binder.add(tweets);
 							if(addedCount == 0) allowPagination = false;
 							showProgress(false);
 						}

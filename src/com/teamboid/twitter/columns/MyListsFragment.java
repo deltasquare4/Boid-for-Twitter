@@ -1,12 +1,5 @@
 package com.teamboid.twitter.columns;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
-import twitter4j.UserList;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -22,6 +15,11 @@ import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.list.UserList;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that lists the user lists of the current user, these user lists are created/subscribed to on Twitter's website. 
@@ -42,7 +40,7 @@ public class MyListsFragment extends BaseListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		final UserList curList = (UserList) adapt.getItem(position);
+		final UserList curList = (UserList)adapt.getItem(position);
 		Intent intent = new Intent(context, TweetListActivity.class)
 		.putExtra("mode", TweetListActivity.USER_LIST)
 		.putExtra("list_name", curList.getName())
@@ -91,32 +89,27 @@ public class MyListsFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(1, 50);
+				Paging paging = new Paging(50);
 				if (paginate)
 					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<UserList> lists = acc
-								.getClient().getAllUserLists(acc.getId());
+						final UserList[] lists = acc.getClient().getLists();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_lists));
-								adapt.add(lists.toArray(new UserList[0]));
+								setEmptyText(context.getString(R.string.no_lists));
+								adapt.add(lists);
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context,	e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

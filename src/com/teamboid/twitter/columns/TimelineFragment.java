@@ -2,12 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +22,10 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays the user's home timeline feed.
@@ -47,14 +45,12 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int index, long id) {
-		if(TimelineCAB.TimelineActionMode == null) {
-			super.onListItemClick(l, v, index, id);
-			Status tweet = (Status)adapt.getItem(index);
-			if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-			context.startActivity(new Intent(context, TweetViewer.class)
+		super.onListItemClick(l, v, index, id);
+		Status tweet = (Status)adapt.getItem(index);
+		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+		context.startActivity(new Intent(context, TweetViewer.class)
 			.putExtra("sr_tweet", Utilities.serializeObject(tweet))
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-		} else getListView().setItemChecked(index, true);
 	}
 
 	@Override
@@ -116,70 +112,43 @@ public class TimelineFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(1, 50);
-				if (paginate)
-					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				Paging paging = new Paging(50);
+				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient()
-								.getHomeTimeline(paging);
+						final Status[] feed = acc.getClient().getHomeTimeline(paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.no_tweets));
+								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = adapt.getCount() - 1;
-								final SharedPreferences prefs = PreferenceManager
-										.getDefaultSharedPreferences(context);
-								int addedCount = adapt.add(feed
-										.toArray(new Status[0]), prefs
-										.getBoolean("enable_muting", true));
+								final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+								int addedCount = adapt.add(feed,
+                                        prefs.getBoolean("enable_muting", true));
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
-										if (paginate && addedCount > 0)
-											getListView()
-											.smoothScrollToPosition(
-													beforeLast + 1);
-										else if (getView() != null
-												&& adapt != null)
+										if (paginate && addedCount > 0) {
+											getListView().smoothScrollToPosition(beforeLast + 1);
+                                        } else if (getView() != null && adapt != null) {
 											adapt.restoreLastViewed(getListView());
+                                        }
 									}
-									if (!PreferenceManager
-											.getDefaultSharedPreferences(
-													context).getBoolean(
-															"enable_iconic_tabs",
-															true)) {
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														context.getString(R.string.timeline_str)
-														+ " ("
-														+ Integer
-														.toString(addedCount)
-														+ ")");
-									} else
-										context.getActionBar()
-										.getTabAt(
-												getArguments()
-												.getInt("tab_index"))
-												.setText(
-														Integer.toString(addedCount));
+									if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(
+											context.getString(R.string.timeline_str) + " (" + Integer.toString(addedCount) + ")");
+									} else {
+										context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(Integer.toString(addedCount));                                    }
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context
-										.getString(R.string.error_str));
-								Toast.makeText(context,
-										e.getErrorMessage(),
-										Toast.LENGTH_SHORT).show();
+								setEmptyText(context.getString(R.string.error_str));
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -187,8 +156,7 @@ public class TimelineFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null)
-							setListShown(true);
+						if (getView() != null) setListShown(true);
 						isLoading = false;
 						context.invalidateOptionsMenu();
 					}
@@ -199,17 +167,13 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
-		if (context == null && getActivity() != null)
-			context = getActivity();
+		if (context == null && getActivity() != null) context = getActivity();
 		if (AccountService.getCurrentAccount() != null) {
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(context,
-					TimelineFragment.ID, AccountService.getCurrentAccount()
-					.getId());
+			adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
+			if (adapt.getCount() == 0) performRefresh(false);
 			else if (getView() != null && adapt != null) {
 				adapt.restoreLastViewed(getListView());
 			}

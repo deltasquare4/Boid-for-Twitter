@@ -2,12 +2,6 @@ package com.teamboid.twitter.columns;
 
 import java.util.ArrayList;
 
-import twitter4j.Paging;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Tweet;
-import twitter4j.TwitterException;
-import twitter4j.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -27,6 +21,10 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays the current user's favorited Tweets. 
@@ -113,18 +111,18 @@ public class FavoritesFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(1, 50);
+				Paging paging = new Paging(50);
 				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final ResponseList<Status> feed = acc.getClient().getFavorites(paging);
+						final Status[] feed = acc.getClient().getFavorites(paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_favorites));
 								int beforeLast = adapt.getCount() - 1;
-								int addedCount = adapt.add(feed.toArray(new Status[0]));
+								int addedCount = adapt.add(feed);
 								if (beforeLast > 0) {
 									if (getView() != null && addedCount > 0) {
 										if (paginate && addedCount > 0) {
@@ -143,13 +141,13 @@ public class FavoritesFragment extends BaseListFragment {
 								}
 							}
 						});
-					} catch (final TwitterException e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						});
 					}

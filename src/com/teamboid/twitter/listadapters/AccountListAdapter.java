@@ -6,13 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import twitter4j.User;
-
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * The list adapter used in the account manager, displays the accounts currenetly added in the AccountService.

@@ -10,7 +10,7 @@ import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
-import twitter4j.DirectMessage;
+import com.teamboid.twitterapi.dm.DirectMessage;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -87,7 +87,8 @@ public class MessageItemAdapter extends BaseAdapter {
 		} else{
 			profileImgView.setVisibility(View.GONE);
 		}
-		((TextView)toReturn.findViewById(R.id.dmItemTimeTxt)).setText(Utilities.friendlyTimeLong(context.getApplicationContext(), curItem.getCreatedAt()));
+		((TextView)toReturn.findViewById(R.id.dmItemTimeTxt)).setText(
+                Utilities.friendlyTimeLong(curItem.getCreatedAt()));
 		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		FeedListAdapter.ApplyFontSize(msgTxt, context, true);
 		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));

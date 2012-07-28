@@ -6,9 +6,6 @@ import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.utilities.Utilities;
 
-import twitter4j.Tweet;
-import twitter4j.User;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * The list adapter used for activities that search for users.

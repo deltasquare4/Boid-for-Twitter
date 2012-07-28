@@ -9,7 +9,6 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.Activity;
-import twitter4j.DirectMessage;
 
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -21,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.teamboid.twitterapi.dm.DirectMessage;
 
 /**
  * The list adapter used for the messages tab, displays a list of conversations that contain messages.

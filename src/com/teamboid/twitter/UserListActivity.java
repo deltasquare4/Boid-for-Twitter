@@ -7,12 +7,6 @@ import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
-
-import twitter4j.ResponseList;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.User;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -24,6 +18,9 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * @author kennydude
@@ -75,7 +72,8 @@ public class UserListActivity extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
 				startActivity(new Intent(getApplicationContext(), ProfileScreen.class)
-					.putExtra("screen_name", ((User)binder.getItem(pos)).getScreenName()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					.putExtra("screen_name", ((User)binder.getItem(pos)).getScreenName())
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -115,7 +113,7 @@ public class UserListActivity extends ListActivity {
 			if(i >= ids.size()) break;
 			toLookup.add(ids.get(i));
 		}
-		final long[] lookup = new long[toLookup.size()];
+		final Long[] lookup = new Long[toLookup.size()];
 		for(int i = 0; i < toLookup.size(); i++) lookup[i] = toLookup.get(i);
 		for(int i = 0; i < 20; i++) {
 			if(i >= ids.size()) break; 
@@ -124,17 +122,17 @@ public class UserListActivity extends ListActivity {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					final ResponseList<User> res = cl.lookupUsers(lookup);
+					final User[] res = cl.lookupUsers(lookup);
 					runOnUiThread(new Runnable() {
 						public void run() {
-							if(res == null || res.size() == 0) allowPagination = false;
+							if(res == null || res.length == 0) allowPagination = false;
 							else {
-								int addedCount = binder.add(res.toArray(new User[0]));
+								int addedCount = binder.add(res);
 								if(addedCount == 0) allowPagination = false;
 							}
 						}
 					});	
-				} catch (TwitterException e) { e.printStackTrace(); }
+				} catch (Exception e) { e.printStackTrace(); }
 				runOnUiThread(new Runnable() {
 					public void run() { showProgress(false); }
 				});
@@ -145,7 +143,7 @@ public class UserListActivity extends ListActivity {
 	public void refresh() {
 		binder.clear();
 		new Thread(new Runnable(){
-			private ArrayList<Long> arrayToList(long[] array) {
+			private ArrayList<Long> arrayToList(Long[] array) {
 				ArrayList<Long> toReturn = new ArrayList<Long>();
 				for(long l : array) toReturn.add(l);
 				return toReturn;
@@ -158,11 +156,13 @@ public class UserListActivity extends ListActivity {
 					switch(getIntent().getIntExtra("mode", -1)){
 					case FOLLOWERS_LIST:
 						setTitle(getString(R.string.user_followers).replace("{user}", getIntent().getStringExtra("username")));
-						ids = arrayToList(AccountService.getCurrentAccount().getClient().getFollowersIDs(getIntent().getLongExtra("user", 0), -1).getIDs());
+						ids = arrayToList(AccountService.getCurrentAccount().getClient()
+                                .getFollowers(getIntent().getLongExtra("user", 0), -1l).getIds());
 						break;
 					case FOLLOWING_LIST:
 						setTitle(getString(R.string.user_following).replace("{user}", getIntent().getStringExtra("username")));
-						ids = arrayToList(AccountService.getCurrentAccount().getClient().getFriendsIDs(getIntent().getLongExtra("user", 0), -1).getIDs());
+						ids = arrayToList(AccountService.getCurrentAccount().getClient()
+                                .getFriends(getIntent().getLongExtra("user", 0), -1l).getIds());
 						break;
 					}
 					runOnUiThread(new Runnable() {

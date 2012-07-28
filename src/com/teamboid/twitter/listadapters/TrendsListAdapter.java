@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import com.teamboid.twitter.R;
 
 import android.content.Context;
-import twitter4j.Trend;
-import twitter4j.Trends;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import com.teamboid.twitterapi.trend.Trend;
+import com.teamboid.twitterapi.trend.Trends;
 
 /**
  * The list adapter used for the trends column.

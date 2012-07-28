@@ -283,10 +283,13 @@
 		<item>Within 1000mi</item>
 	</string-array>
 	<string-array name="trend_sources">
+	    <item>Global Trends</item>
 		<item>Daily Trends</item>
 		<item>Weekly Trends</item>
 		<item>Local Trends</item>
 	</string-array>
+	
+	<string name="local_trend_with_place">Local - {place}</string>
 
 	<string name="upload_twitter">Twitter (Default)</string>
 	<string name="upload_yfrog">yFrog</string>
@@ -457,8 +460,11 @@
 		<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
 	<string name="user_feed_str">\@{user} (Feed)</string>
-	<string name="mentioned_by">You were mentioned by @{user} - {text}</string>
+	
+	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
+	<string name="boid_browser">Boid Browser</string>
+	
 	<string name="contactsync_what">What to sync</string>
 	<string name="contact_sync_on">Contact Sync is turned on</string>
 	<string name="contact_sync_off">Contact sync is turned off</string>

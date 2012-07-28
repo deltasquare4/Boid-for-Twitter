@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.user.User;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -13,10 +15,6 @@ import org.joda.time.Days;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
-
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.User;
 
 import android.app.Activity;
 import android.text.method.LinkMovementMethod;
@@ -117,19 +115,19 @@ public class ProfileAboutAdapter extends BaseAdapter {
 		if(!desc.isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.description_str), desc));
 		}
-		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusesCount())));
-		double tweetsPerDay = user.getStatusesCount();
+		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusCount())));
+		double tweetsPerDay = user.getStatusCount();
 		int days = Days.daysBetween(new DateTime(user.getCreatedAt()), new DateTime(new Date())).getDays();
 		tweetsPerDay /= days;
 		tweetsPerDay = round(tweetsPerDay, 2, BigDecimal.ROUND_HALF_UP);
 		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_per_day), Double.toString(tweetsPerDay)));
-		if(_user.getURL() != null) {
-			values.add(new BasicNameValuePair(mContext.getString(R.string.website_str), _user.getURL().toString()));
+		if(_user.getUrl() != null) {
+			values.add(new BasicNameValuePair(mContext.getString(R.string.website_str), _user.getUrl().toString()));
 		}
 		if(_user.getLocation() != null && !_user.getLocation().isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.location_str), _user.getLocation()));
 		} 
-		values.add(new BasicNameValuePair(mContext.getString(R.string.favorites_str), df.format(_user.getFavouritesCount())));
+		values.add(new BasicNameValuePair(mContext.getString(R.string.favorites_str), df.format(_user.getFavoritesCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.friends_str), df.format(_user.getFriendsCount())));
 		values.add(new BasicNameValuePair(mContext.getString(R.string.followers_str), df.format(_user.getFollowersCount())));
 		notifyDataSetChanged();
@@ -211,11 +209,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			public void run() {
 				if(isBlocked) {
 					try { cl.destroyBlock(user.getId()); }
-					catch (final TwitterException e) {
+					catch (final Exception e) {
 						e.printStackTrace();
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
-								Toast.makeText(mContext, mContext.getString(R.string.failed_unblock_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+								Toast.makeText(mContext, mContext.getString(R.string.failed_unblock_str)
+                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;
@@ -228,11 +227,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 					});
 				} else if(isFollowing) {
 					try { cl.destroyFriendship(user.getId()); }
-					catch (final TwitterException e) {
+					catch (final Exception e) {
 						e.printStackTrace();
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
-								Toast.makeText(mContext, mContext.getString(R.string.failed_unfollow_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+								Toast.makeText(mContext, mContext.getString(R.string.failed_unfollow_str)
+                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;
@@ -245,11 +245,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 					});
 				} else if(!isFollowing) {
 					try { cl.createFriendship(user.getId()); }
-					catch (final TwitterException e) {
+					catch (final Exception e) {
 						e.printStackTrace();
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
-								Toast.makeText(mContext, mContext.getString(R.string.failed_follow_str).replace("{user}", user.getScreenName()) + " " + e.getErrorMessage(), Toast.LENGTH_LONG).show();
+								Toast.makeText(mContext, mContext.getString(R.string.failed_follow_str)
+                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;

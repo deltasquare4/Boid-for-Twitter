@@ -2,19 +2,16 @@ package com.teamboid.twitter.contactsync;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.services.AccountService;
 
-import twitter4j.IDs;
-import twitter4j.Paging;
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.conf.ConfigurationBuilder;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.client.Twitter;
+import com.teamboid.twitterapi.relationship.IDs;
+import com.teamboid.twitterapi.user.User;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
@@ -49,7 +46,7 @@ public class ContactSyncAdapterService extends Service {
 			mContext = context;
 		}
 		
-		public void addContact(twitter4j.User user){
+		public void addContact(User user){
 			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 			
 			ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
@@ -84,7 +81,7 @@ public class ContactSyncAdapterService extends Service {
 		Long getId(){
 			if(_id != -1) return _id;
 			
-			AccountManager am = AccountManager.get(mContext);
+			android.accounts.AccountManager am = android.accounts.AccountManager.get(mContext);
 			_id = Long.parseLong( am.getUserData(account, "accId") );
 			return _id;
 		}
@@ -114,25 +111,25 @@ public class ContactSyncAdapterService extends Service {
 				String type = getWhatToSync();
 				
 				if(type.equals("following")){
-					return client.verifyCredentials().getFriendsCount();
+					return (int) client.verifyCredentials().getFriendsCount();
 				} else if(type.equals("followers")){
-					return client.verifyCredentials().getFollowersCount();
+					return (int) client.verifyCredentials().getFollowersCount();
 				}
 			}catch(Exception e){ e.printStackTrace(); return -1; }
 			return -1;
 		}
 		
-		List<User> getTimeline(Paging paging){
+		User[] getTimeline(Paging paging){
 			try{
 				Twitter client = getTwitter();
 				String type = getWhatToSync();
 				
 				if(type.equals("following")){
-					IDs ids = client.getFriendsIDs( getId());
-					return client.lookupUsers( ids.getIDs() );
+					IDs ids = client.getFriends( getId(), paging.getMaxId() );
+					return client.lookupUsers( ids.getIds() );
 				} else if(type.equals("followers")){
-					IDs ids = client.getFollowersIDs( getId());
-					return client.lookupUsers( ids.getIDs() );
+					IDs ids = client.getFollowers( getId(), paging.getMaxId() );
+					return client.lookupUsers( ids.getIds() );
 				}
 			}catch(Exception e){ e.printStackTrace(); return null; }
 			return null;
@@ -147,10 +144,10 @@ public class ContactSyncAdapterService extends Service {
 			
 			int total = getTotalNumber();
 			int got = 0;
-			Paging p = new Paging();
+			Paging p = new Paging(0);
 			
 			while(got > total){
-				List<User> users = getTimeline(p);
+				User[] users = getTimeline(p);
 				
 				if(users == null){
 					// Error?
@@ -162,9 +159,9 @@ public class ContactSyncAdapterService extends Service {
 					
 					// TODO: add to some fast cache for username autocompletion
 				}
-				got += users.size();
+				got += users.length;
 				
-				p.setPage( p.getPage() + 1 );
+				p.setMaxId( p.getMaxId() + got );
 			}
 			
 		}
@@ -172,7 +169,4 @@ public class ContactSyncAdapterService extends Service {
 		
 		
 	}
-	
-	
-
 }

@@ -2,12 +2,6 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
-import twitter4j.Relationship;
-import twitter4j.ResponseList;
-import twitter4j.TwitterException;
-import twitter4j.User;
-import twitter4j.UserList;
-
 import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
@@ -42,6 +36,12 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.teamboid.twitterapi.list.UserList;
+import com.teamboid.twitterapi.relationship.Relationship;
+import com.teamboid.twitterapi.user.FollowingType;
+import com.teamboid.twitterapi.user.User;
+
 
 /**
  * The activity that represents the profile viewer.
@@ -105,9 +105,9 @@ public class ProfileScreen extends Activity {
 			public void run() {
 				final Account acc = AccountService.getCurrentAccount();
 				try {
-					Relationship x = acc.getClient().showFriendship(AccountService.getCurrentAccount().getId(), user.getId());
+                    Relationship x = acc.getClient().getRelationship(AccountService.getCurrentAccount().getId(), user.getId());
+					getAboutFragment().getAdapter().updateIsBlocked(x.isSourceBlockingTarget());
 					
-					getAboutFragment().getAdapter().updateIsBlocked( x.isSourceBlockingTarget() );
 					if(getAboutFragment().getAdapter().isBlocked()) {
 						runOnUiThread(new Runnable() {
 							public void run() {   
@@ -118,22 +118,22 @@ public class ProfileScreen extends Activity {
 						});
 						return;
 					}
+
+					getAboutFragment().getAdapter().updateIsFollowedBy(x.isSourceFollowedByTarget());
+					getAboutFragment().getAdapter().updateIsFollowing(x.isSourceFollowingTarget());
 					
-					getAboutFragment().getAdapter().updateIsFollowedBy( x.isSourceFollowedByTarget() );
-					getAboutFragment().getAdapter().updateIsFollowing( x.isSourceFollowingTarget() );
-					
-					
-				} catch (final TwitterException e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
 						public void run() { 
-							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked).replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked)
+                                    .replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
 							getAboutFragment().getAdapter().setIsError(true);
 						}
 					});
 					return;
 				}
-				if(user.isFollowRequestSent()) {
+				if(user.getFollowingType() == FollowingType.REQUEST_SENT) {
 					getAboutFragment().getAdapter().updateRequestSent(true);
 					return;
 				}
@@ -184,6 +184,7 @@ public class ProfileScreen extends Activity {
 		}
 		return true;
 	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -201,9 +202,11 @@ public class ProfileScreen extends Activity {
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			ArrayList<String> cols = Utilities.jsonToArray(this, prefs.getString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
+			ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
+                    Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
 			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
-			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", Utilities.arrayToJson(this, cols)).commit();
+			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+                    "_columns", Utilities.arrayToJson(cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
 			finish();
 			return true;
@@ -232,14 +235,14 @@ public class ProfileScreen extends Activity {
 				public void run() {
 					Account acc = AccountService.getCurrentAccount();
 					try {
-						final ResponseList<UserList> lists = acc.getClient().getAllUserLists(acc.getId());
+						final UserList[] lists = acc.getClient().getLists(acc.getId());
 						runOnUiThread(new Runnable() {
 							public void run() { 
 								toast.cancel();
-								showAddToListDialog(lists.toArray(new UserList[0]));
+								showAddToListDialog(lists);
 							}
 						});
-					} catch (TwitterException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 						runOnUiThread(new Runnable() {
 							public void run() { Toast.makeText(getApplicationContext(), getString(R.string.failed_load_lists), Toast.LENGTH_LONG).show(); }
@@ -252,6 +255,7 @@ public class ProfileScreen extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
 	public void block() {
 		AlertDialog.Builder diag = new AlertDialog.Builder(this);
 		diag.setTitle(R.string.block_str);
@@ -265,7 +269,7 @@ public class ProfileScreen extends Activity {
 					public void run() {
 						try {
 							AccountService.getCurrentAccount().getClient().createBlock(user.getId());
-						} catch (TwitterException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_block_str, Toast.LENGTH_LONG).show(); }
@@ -303,7 +307,7 @@ public class ProfileScreen extends Activity {
 					public void run() {
 						try {
 							AccountService.getCurrentAccount().getClient().reportSpam(user.getId());
-						} catch (TwitterException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() { Toast.makeText(getApplicationContext(), R.string.failed_report_str, Toast.LENGTH_LONG).show(); }
@@ -407,7 +411,7 @@ public class ProfileScreen extends Activity {
 				} catch(Exception e){
 					e.printStackTrace();
 					// Here we should divert to profile bg?
-					setHeaderBackground(user.getProfileBackgroundImageUrl());
+					// setHeaderBackground(user.get());
 				}
 			}
 			
@@ -431,13 +435,13 @@ public class ProfileScreen extends Activity {
 				toast.show();
 				new Thread(new Runnable() {
 					public void run() {
-						try { AccountService.getCurrentAccount().getClient().addUserListMember(curList.getId(), user.getId()); }
-						catch (final TwitterException e) {
+						try { AccountService.getCurrentAccount().getClient().createListMembers(curList.getId(), new long[] { user.getId() }); }
+						catch (final Exception e) {
 							e.printStackTrace();
 							runOnUiThread(new Runnable() {
 								public void run() {
 									toast.cancel();
-									Toast.makeText(getApplicationContext(), e.getErrorMessage(), Toast.LENGTH_SHORT).show();
+									Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 								}
 							});
 							return;
