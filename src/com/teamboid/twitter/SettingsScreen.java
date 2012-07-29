@@ -8,9 +8,9 @@ import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.MediaUtilities;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.TimePreference;
+import com.teamboid.twitterapi.media.MediaServices;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -152,12 +153,45 @@ public class SettingsScreen extends PreferenceActivity  {
 	}
 
     public static class ComposerFragment extends PreferenceFragment {
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.composer_category);
-		}
+        private void setMediaName(){
+	            final Preference uploadService = (Preference)findPreference("upload_service");
+	            String pref = uploadService.getSharedPreferences().getString("upload_service", "twitter");
+	            try{
+	                    uploadService.setSummary(MediaServices.services.get(pref).getServiceName());
+	            } catch(Exception e) { e.printStackTrace(); }
+	    }
+	    public static int SELECT_MEDIA;
+	
+	    @Override
+	    public void onActivityResult(int requestCode, int resultCode, Intent data){
+	            if(requestCode == SELECT_MEDIA && resultCode == RESULT_OK){
+	                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("upload_service", data.getStringExtra("service")).commit();
+	                    setMediaName();
+	            }
+	    }
+	
+	    @Override
+	    public void onCreate(Bundle savedInstanceState) {
+	            super.onCreate(savedInstanceState);
+	            addPreferencesFromResource(R.xml.composer_category);
+	            final Preference uploadService = (Preference)findPreference("upload_service"); 
+	            setMediaName();
+	            uploadService.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+	                    @Override
+	                    public boolean onPreferenceClick(final Preference arg0) {
+	                            Intent i = new Intent(getActivity(), SelectMediaScreen.class);
+	                            startActivityForResult(i, SELECT_MEDIA);
+	                            return true;
+	                    }
+	            });
+	            uploadService.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+	                    @Override
+	                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+	                            uploadService.setSummary(newValue.toString());
+	                            return true;
+	                    }
+	            });
+	    }
 	}
 
     public static class AppearanceFragment extends PreferenceFragment {

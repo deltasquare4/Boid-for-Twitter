@@ -1,10 +1,16 @@
 package com.teamboid.twitter;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.HashMap;
 
+import com.teamboid.twitterapi.media.ExternalMediaService;
+import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.status.StatusUpdate;
+import com.teamboid.twitterapi.status.entity.media.MediaEntity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +104,6 @@ public class SendTweetTask {
 		
 		StatusUpdate update = StatusUpdate.create(contents);
 		
-		/* TODO: Bring back 100% media support
 		if(this.hasMedia()){
 			try{
 				String prefValue = mediaService;
@@ -109,14 +114,21 @@ public class SendTweetTask {
 					input = new FileInputStream(new File(attachedImage));
 				}
 				Log.d("up", "Uploading with " + prefValue);
-				update = MediaUtilities.getMediaServices(false, context).get(prefValue).attachMedia(input, update, this);
+				
+				ExternalMediaService ems = MediaServices.services.get(prefValue);
+				MediaEntity me = ems.uploadFile(update, from.getClient(), input);
+				if(!prefValue.equals("twitter")){ // Only twitter doesn't respond the same
+					contents = contents + ( contents.charAt(contents.length()-1) == ' ' ? "" : " " ) + me.getExpandedUrl();
+					update = StatusUpdate.create(contents);
+				}
+				
 			} catch(Exception e){
 				e.printStackTrace();
 				result.errorCode = Result.MEDIAIO_ERROR;
 				result.sent = false;
 				return result;
 			}
-		}*/
+		}
 		
 		if(location != null) update.setLocation(location);
 		if(in_reply_to > 0) update.setInReplyToStatusId(in_reply_to);

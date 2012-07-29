@@ -4,7 +4,6 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -13,27 +12,28 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 
-import com.teamboid.twitter.utilities.MediaUtilities;
-import com.teamboid.twitter.utilities.MediaUtilities.MediaService;
+import com.teamboid.twitterapi.media.ExternalMediaService;
+import com.teamboid.twitterapi.media.MediaServices;
 
 public class SelectMediaScreen extends PreferenceActivity {
 	public class MediaPreference extends Preference {
 		public boolean checked;
 		public boolean needsConfig;
-		public MediaService m;
+		public ExternalMediaService m;
 		public OnPreferenceClickListener callback;
 
-		public MediaPreference(Context context, MediaService m, final String key) {
+		public MediaPreference(Context context, ExternalMediaService m, final String key) {
 			super(context);
-			try { setTitle(context.getResources().getString(m.name)); }
+			try { setTitle(m.getServiceName()); }
 			catch(Exception e) { e.printStackTrace(); }
+			/* TODO
+			
 			needsConfig = m.needs_config;
 			this.m = m;
 			m.configured = new MediaUtilities.MediaConfigured() {
@@ -54,14 +54,14 @@ public class SelectMediaScreen extends PreferenceActivity {
 					getPreferenceScreen().removeAll();
 					setupPreferences();
 				}
-			};
+			};*/
 		}
 
 		@Override
 		public View getView(View convertView, ViewGroup parent) {
 			if(convertView == null) convertView = LayoutInflater.from(getContext()).inflate(R.layout.media_service, null);
 			RadioButton r = (RadioButton)convertView.findViewById(R.id.radio);
-			r.setEnabled(m.isConfigured(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())));
+			//r.setEnabled(m.isConfigured(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())));
 			if(!needsConfig) r.setText(this.getTitle());
 			else r.setText(getContext().getResources().getString(R.string.service_needs_config).replace("{service}", this.getTitle()));
 			r.setChecked(checked);
@@ -73,10 +73,10 @@ public class SelectMediaScreen extends PreferenceActivity {
 			});
 			ImageButton c = (ImageButton)convertView.findViewById(R.id.button);
 			c.setVisibility(needsConfig ? View.VISIBLE : View.GONE);
-			c.setOnClickListener(new OnClickListener(){
+			/*c.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View arg0) { m.configure(SelectMediaScreen.this); }
-			});
+			});*/
 			return convertView;	
 		}
 	}
@@ -95,13 +95,13 @@ public class SelectMediaScreen extends PreferenceActivity {
 			Log.d("i", "new intent");
 			String key = intent.getData().getPathSegments().get(0);
 			Log.d("i", key);
-			MediaUtilities.getMediaServices(true, this).get(key).configure(this, intent);
+			// MediaUtilities.getMediaServices(true, this).get(key).configure(this, intent);
 		}
 	}
 
 	private void setupPreferences(){
 		String pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("upload_service", "twitter");
-		for(final Entry<String, MediaService> entry : MediaUtilities.getMediaServices(true, this).entrySet()){
+		for(final Entry<String, ExternalMediaService> entry : MediaServices.services.entrySet()){
 			MediaPreference m = new MediaPreference(this, entry.getValue(), entry.getKey());
 			m.setKey(entry.getKey());
 			m.setPersistent(false);
