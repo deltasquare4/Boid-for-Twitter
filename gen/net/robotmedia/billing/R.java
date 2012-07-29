@@ -803,6 +803,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int friends_str=0x7f08003e;
         public static final int general_description=0x7f08007b;
         public static final int general_title=0x7f08007a;
+        public static final int getting_location=0x7f08011a;
         public static final int google_url=0x7f08000c;
         public static final int help_description=0x7f080073;
         public static final int help_title=0x7f080072;
@@ -819,7 +820,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int loading_savedsearches=0x7f08004d;
         public static final int loading_str=0x7f0800d6;
         public static final int local_trend_with_place=0x7f0800ae;
-        public static final int location_set=0x7f08011b;
+        public static final int location_set=0x7f08011c;
         public static final int location_str=0x7f080040;
         public static final int logged_in_as=0x7f0800b7;
         public static final int login=0x7f0800bb;
@@ -863,7 +864,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int no_favorites=0x7f080035;
         public static final int no_internet=0x7f08003a;
         public static final int no_lists=0x7f080050;
-        public static final int no_location_str=0x7f08011a;
+        public static final int no_location_str=0x7f08011b;
         public static final int no_media=0x7f080037;
         public static final int no_mentions=0x7f080032;
         public static final int no_messages=0x7f080033;

@@ -272,7 +272,6 @@ public class ComposerScreen extends Activity {
 			MenuItem galAct = menu.findItem(R.id.galleryAction);
 			galAct.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
 		}
-		if(stt.location != null) menu.findItem(R.id.locateAction).setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
 		final EditText content = (EditText)findViewById(R.id.tweetContent);
 		if(stt.attachedImage == null && content.getText().toString().trim().length() == 0) {
 			menu.findItem(R.id.sendAction).setEnabled(false);
@@ -281,6 +280,7 @@ public class ComposerScreen extends Activity {
 		MenuItem locate = menu.findItem(R.id.locateAction);
 		locate.getSubMenu().clear();
 		if(stt.location != null) {
+			locate.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
 			if(places == null) {
 				new Thread(new Runnable() {
 					public void run() {
@@ -308,7 +308,11 @@ public class ComposerScreen extends Activity {
 				}
 				locate.getSubMenu().add(R.string.no_location_str).setIcon(getTheme().obtainStyledAttributes(
 						new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
+				stt.placeId = places[0].getId();
+				Toast.makeText(getApplicationContext(), places[0].getFullName(), Toast.LENGTH_SHORT).show();
 			}
+		} else {
+			locate.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
 		}
 		return true;
 	}
@@ -384,6 +388,7 @@ public class ComposerScreen extends Activity {
 		if(isGettingLocation) return;
 		isGettingLocation = true;
 		setProgressBarIndeterminateVisibility(true);
+		Toast.makeText(getApplicationContext(), R.string.getting_location, Toast.LENGTH_SHORT).show();
 		final LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
