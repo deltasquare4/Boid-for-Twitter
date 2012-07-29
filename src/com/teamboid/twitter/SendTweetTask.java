@@ -73,6 +73,7 @@ public class SendTweetTask {
     public String replyToName;
     public Account from;
     public String mediaService;
+    public String placeId;
 
     public Status tweet;
     public boolean isGalleryImage = false;
@@ -123,6 +124,7 @@ public class SendTweetTask {
 
         if (location != null) update.setLocation(location);
         if (in_reply_to > 0) update.setInReplyToStatusId(in_reply_to);
+        if(placeId != null) update.setPlaceId(placeId);
 
         try {
             tweet = from.getClient().updateStatus(update);

@@ -819,6 +819,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int loading_savedsearches=0x7f08004d;
         public static final int loading_str=0x7f0800d6;
         public static final int local_trend_with_place=0x7f0800ae;
+        public static final int location_set=0x7f08011b;
         public static final int location_str=0x7f080040;
         public static final int logged_in_as=0x7f0800b7;
         public static final int login=0x7f0800bb;

@@ -463,4 +463,5 @@
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
 	<string name="no_location_str">No Location</string>
+	<string name="location_set">Your location was set to {location}!</string>
 </resources>

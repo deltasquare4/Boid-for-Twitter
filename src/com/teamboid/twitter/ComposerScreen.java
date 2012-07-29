@@ -360,13 +360,16 @@ public class ComposerScreen extends Activity {
 		default:
 			if(item.getTitle().equals(getString(R.string.no_location_str))) {
 				stt.location = null;
+				stt.placeId = null;
 				places = null;
 				invalidateOptionsMenu();
 				return true;
 			} else {
 				for(Place loc : places) {
-					if(loc.getName().equals(item.getTitle().toString())) {
-						Toast.makeText(getApplicationContext(), loc.getName() + " (" + loc.getId() + ")", Toast.LENGTH_LONG).show();
+					if(loc.getFullName().equals(item.getTitle().toString())) {
+						Toast.makeText(getApplicationContext(), getString(R.string.location_set)
+								.replace("{location}", loc.getFullName()), Toast.LENGTH_LONG).show();
+						stt.placeId = loc.getId();
 						break;
 					}
 				}
