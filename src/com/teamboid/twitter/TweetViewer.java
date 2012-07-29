@@ -301,7 +301,9 @@ public class TweetViewer extends MapActivity {
         status = tweet;
         statusId = status.getId();
         isFavorited = status.isFavorited();
-        if (status.isRetweet()) status = status.getRetweetedStatus();
+        if (status.isRetweet()) {
+        	status = status.getRetweetedStatus();
+        }
         RemoteImageView profilePic = (RemoteImageView) findViewById(R.id.tweetProfilePic);
         profilePic.setImageResource(R.drawable.sillouette);
         profilePic.setImageURL(Utilities.getUserImage(status.getUser().getScreenName(), this));
@@ -352,7 +354,8 @@ public class TweetViewer extends MapActivity {
         if (widgetName == null) return;
         final TextView loading = new TextView(this);
         loading.setText(getString(R.string.load_widget).replace("{widget}", widgetName));
-        loading.setPadding(5, 5, 5, 5);
+        int fiveDp = Utilities.convertDpToPx(getApplicationContext(), 5);
+        loading.setPadding(fiveDp, fiveDp, fiveDp, fiveDp);
         loading.setGravity(Gravity.CENTER_HORIZONTAL);
         widgets.addView(loading, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

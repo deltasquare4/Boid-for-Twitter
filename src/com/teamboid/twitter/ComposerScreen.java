@@ -54,8 +54,12 @@ public class ComposerScreen extends Activity {
 	private SendTweetTask stt = new SendTweetTask();
 	private int lastTheme;
 	private boolean shownLinksMessage;
+	
 	private float locationAccuracy;
-
+	private Place[] places;
+	private boolean isGettingLocation;
+	private int lengthIndic;
+	
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
 	 */
@@ -200,8 +204,6 @@ public class ComposerScreen extends Activity {
 		}
 	}
 
-	private int lengthIndic;
-
 	private int getLengthIndicator() {
 		int shortLength = AccountService.configShortURLLength;
 		String text = ((EditText) findViewById(R.id.tweetContent)).getText()
@@ -306,8 +308,6 @@ public class ComposerScreen extends Activity {
 		outState.putInt("lastTheme", lastTheme);
 		super.onSaveInstanceState(outState);
 	}
-
-	private Place[] places;
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -454,11 +454,6 @@ public class ComposerScreen extends Activity {
 			} else {
 				for (Place loc : places) {
 					if (loc.getFullName().equals(item.getTitle().toString())) {
-						Toast.makeText(
-								getApplicationContext(),
-								getString(R.string.location_set).replace(
-										"{location}", loc.getFullName()),
-								Toast.LENGTH_LONG).show();
 						stt.placeId = loc.getId();
 						break;
 					}
@@ -468,15 +463,11 @@ public class ComposerScreen extends Activity {
 		}
 	}
 
-	private boolean isGettingLocation;
-
 	private void getLocation() {
 		if (isGettingLocation)
 			return;
 		isGettingLocation = true;
 		setProgressBarIndeterminateVisibility(true);
-		Toast.makeText(getApplicationContext(), R.string.getting_location,
-				Toast.LENGTH_SHORT).show();
 		final LocationManager locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new LocationListener() {
