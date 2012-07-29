@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.teamboid.twitterapi.status.GeoLocation;
+import com.teamboid.twitterapi.status.Granularity;
+import com.teamboid.twitterapi.status.Place;
+
 import org.json.JSONObject;
 
 import com.teamboid.twitter.services.AccountService;
@@ -46,11 +49,12 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class ComposerScreen extends Activity {
-	
+
 	private SendTweetTask stt = new SendTweetTask();
 	private int lastTheme;
 	private boolean shownLinksMessage;
-	
+	private float locationAccuracy;
+
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
 	 */
@@ -60,17 +64,17 @@ public class ComposerScreen extends Activity {
 		invalidateOptionsMenu();
 		initializeAccountSwitcher(false);
 	}
-	
+
 	private void loadDraft() {
 		if(!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_drafts", true)) return;
 		if(getIntent().getExtras() != null) return;
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		
+
 		if(prefs.contains(stt.from.getId() + "_stt_draft")){
 			EditText content = (EditText)findViewById(R.id.tweetContent);
 			if(content.getText().toString().trim().length() > 0)
 				return; // Don't override if user is tweeting something already!
-			
+
 			try{
 				stt = SendTweetTask.fromJSONObject(new JSONObject(prefs.getString(stt.from.getId() + "_stt_draft", "{}")));
 			} catch(Exception e){e.printStackTrace();}
@@ -132,7 +136,7 @@ public class ComposerScreen extends Activity {
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
 	}
-	
+
 	private void initializeAccountSwitcher(boolean firstLoad) {
 		ActionBar ab = getActionBar(); 
 		ab.setDisplayHomeAsUpEnabled(true);
@@ -252,13 +256,15 @@ public class ComposerScreen extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 
+	private Place[] places;
+
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.composer_actionbar, menu);
+		getMenuInflater().inflate(R.menu.composer_actionbar, menu);
 		if(getIntent().getLongExtra("reply_to", 0l) > 0) {
 			menu.findItem(R.id.sendAction).setTitle(getString(R.string.reply_str) + " (" + Integer.toString(lengthIndic) + ")");
 		} else menu.findItem(R.id.sendAction).setTitle(getString(R.string.tweet_str) + " (" + Integer.toString(lengthIndic) + ")");
-		
+
 		if(!stt.isGalleryImage && stt.hasMedia()) {
 			MenuItem capAct = menu.findItem(R.id.captureAction);
 			capAct.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.cameraAttachedIcon }).getDrawable(0));
@@ -271,9 +277,42 @@ public class ComposerScreen extends Activity {
 		if(stt.attachedImage == null && content.getText().toString().trim().length() == 0) {
 			menu.findItem(R.id.sendAction).setEnabled(false);
 		} else menu.findItem(R.id.sendAction).setEnabled(true);
-	    return true;
-	}
 
+		MenuItem locate = menu.findItem(R.id.locateAction);
+		locate.getSubMenu().clear();
+		if(stt.location != null) {
+			if(places == null) {
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							places = AccountService.getCurrentAccount().getClient()
+									.getReverseGeocode(stt.location, (int)locationAccuracy + "m", Granularity.POI, 4);
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() { invalidateOptionsMenu(); }
+							});
+						} catch(final Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() { 
+									Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+					}
+				}).start();
+			} else {
+				for(Place p : places) {
+					locate.getSubMenu().add(p.getFullName()).setIcon(R.drawable.locate_blue);
+				}
+				locate.getSubMenu().add(R.string.no_location_str).setIcon(getTheme().obtainStyledAttributes(
+						new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
+			}
+		}
+		return true;
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -281,10 +320,8 @@ public class ComposerScreen extends Activity {
 			saveDraft();
 			return true;
 		case R.id.locateAction:
-			if(stt.location == null) getLocation();
-			else {
-				stt.location = null;
-				invalidateOptionsMenu();
+			if(stt.location == null) {
+				getLocation();
 			}
 			return true;
 		case R.id.sendAction:
@@ -321,7 +358,20 @@ public class ComposerScreen extends Activity {
 			} else selectImage();
 			return true;
 		default:
-			return super.onOptionsItemSelected(item);
+			if(item.getTitle().equals(getString(R.string.no_location_str))) {
+				stt.location = null;
+				places = null;
+				invalidateOptionsMenu();
+				return true;
+			} else {
+				for(Place loc : places) {
+					if(loc.getName().equals(item.getTitle().toString())) {
+						Toast.makeText(getApplicationContext(), loc.getName() + " (" + loc.getId() + ")", Toast.LENGTH_LONG).show();
+						break;
+					}
+				}
+				return true;
+			}
 		}
 	}
 
@@ -336,6 +386,7 @@ public class ComposerScreen extends Activity {
 			public void onLocationChanged(Location location) {
 				locationManager.removeUpdates(this);
 				isGettingLocation = false;
+				locationAccuracy = location.getAccuracy();
 				stt.location = new GeoLocation(location.getLatitude(), location.getLongitude());
 				setProgressBarIndeterminateVisibility(false);
 				invalidateOptionsMenu();
@@ -346,28 +397,28 @@ public class ComposerScreen extends Activity {
 		};
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 	}
-	
+
 	private void performSend() {
 		if(getLengthIndicator() < 0) {
 			stt.twtlonger = true;
 		}
-		
+
 		stt.contents = ((EditText)findViewById(R.id.tweetContent)).getText().toString();
-		
+
 		Log.d("from", stt.from.toString() + "");
-		
+
 		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
-		
+
 		//Intent send = new Intent(this, SendTweetService.class);
 		//send.setAction(SendTweetService.ADD_TWEET);
 		//send.putExtra("send_tweet_task", stt.toBundle());
-		
+
 		//startService(send);
 		SendTweetService.addTweet(stt);
 		finish();
 	}
-	
+
 	private Integer getFileSize(File in){
 		try{
 			FileInputStream fis = new FileInputStream(in);
@@ -378,7 +429,7 @@ public class ComposerScreen extends Activity {
 			e.printStackTrace(); return 0;
 		}
 	}
-	
+
 	public static final Integer CAMERA_SELECT_INTENT = 500;
 	public static final Integer GALLERY_SELECT_INTENT = 600;
 
@@ -396,8 +447,8 @@ public class ComposerScreen extends Activity {
 		} else if(resultCode == RESULT_CANCELED) {
 			File attachedCapture = new File(stt.attachedImage);
 			if(attachedCapture != null && attachedCapture.exists()) {
-                attachedCapture.delete();
-            }
+				attachedCapture.delete();
+			}
 			stt.attachedImage = null;
 		}
 	}
@@ -426,5 +477,4 @@ public class ComposerScreen extends Activity {
 			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 		}
 	}
-	
 }

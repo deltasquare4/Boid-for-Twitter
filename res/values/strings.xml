@@ -462,4 +462,5 @@
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
+	<string name="no_location_str">No Location</string>
 </resources>
