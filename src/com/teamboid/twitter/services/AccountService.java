@@ -124,6 +124,7 @@ public class AccountService extends Service {
             public void run() {
                 try {
                     final Twitter toAdd = getAuthorizer().getAuthorizedInstance(verifier);
+                    toAdd.setConsumerKey(CONSUMER_KEY);
                     toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
                     final User toAddUser = toAdd.verifyCredentials();
                     ArrayList<Account> accs = getAccounts();
@@ -170,6 +171,7 @@ public class AccountService extends Service {
 	public static List<Account> getCachedAccounts(Context activity){
 		List<Account> r = new ArrayList<Account>();
 		File cachedFile = new File(activity.getFilesDir(), "acconuts.cache.json");
+		System.out.println(cachedFile.lastModified());
 		if(cachedFile.lastModified() > new Date().getTime() - ( 1000 * 60 * 60 * 5 ) ){
 			// 5 hour cache
 			try{
@@ -233,6 +235,7 @@ public class AccountService extends Service {
                     if (skip) continue;
 
                     final Twitter toAdd = getAuthorizer().getAuthorizedInstance(token, (String) accountStore.get(token));
+                    toAdd.setConsumerKey(CONSUMER_KEY);
                     toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
                     try {
                         final User accountUser = toAdd.verifyCredentials();

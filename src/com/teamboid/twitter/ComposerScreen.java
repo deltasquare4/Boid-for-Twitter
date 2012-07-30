@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import org.json.JSONObject;
 
@@ -153,8 +154,13 @@ public class ComposerScreen extends Activity {
 	
 	private void setUploadWith(String pref){
 		Button spinner = (Button)findViewById(R.id.upload_with);
-		// spinner.setText(MediaUtilities.getMediaServices(false, this).get(pref).name);
-		stt.mediaService = pref;
+		try{
+			MediaServices.setupServices();
+			spinner.setText(MediaServices.getService(pref).getServiceName());
+			stt.mediaService = pref;
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	private void initializeAccountSwitcher(boolean firstLoad) {
@@ -386,11 +392,6 @@ public class ComposerScreen extends Activity {
 		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
 		
-		//Intent send = new Intent(this, SendTweetService.class);
-		//send.setAction(SendTweetService.ADD_TWEET);
-		//send.putExtra("send_tweet_task", stt.toBundle());
-		
-		//startService(send);
 		SendTweetService.addTweet(stt);
 		finish();
 	}

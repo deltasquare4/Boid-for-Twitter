@@ -160,12 +160,13 @@ public class SettingsScreen extends PreferenceActivity  {
 	                    uploadService.setSummary(MediaServices.services.get(pref).getServiceName());
 	            } catch(Exception e) { e.printStackTrace(); }
 	    }
+        
 	    public static int SELECT_MEDIA;
 	
 	    @Override
 	    public void onActivityResult(int requestCode, int resultCode, Intent data){
 	            if(requestCode == SELECT_MEDIA && resultCode == RESULT_OK){
-	                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("upload_service", data.getStringExtra("service")).commit();
+	                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("upload_service", data.getStringExtra("service").toLowerCase()).commit();
 	                    setMediaName();
 	            }
 	    }

@@ -115,7 +115,9 @@ public class SendTweetTask {
 				}
 				Log.d("up", "Uploading with " + prefValue);
 				
-				ExternalMediaService ems = MediaServices.services.get(prefValue);
+				MediaServices.setupServices();
+				ExternalMediaService ems = MediaServices.services.get(prefValue.toLowerCase());
+				ems.setAPIKey( MEDIA_API_KEYS.get( prefValue.toLowerCase() ) );
 				MediaEntity me = ems.uploadFile(update, from.getClient(), input);
 				if(!prefValue.equals("twitter")){ // Only twitter doesn't respond the same
 					contents = contents + ( contents.charAt(contents.length()-1) == ' ' ? "" : " " ) + me.getExpandedUrl();

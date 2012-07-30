@@ -101,6 +101,8 @@ public class SelectMediaScreen extends PreferenceActivity {
 
 	private void setupPreferences(){
 		String pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("upload_service", "twitter");
+		
+		MediaServices.setupServices();
 		for(final Entry<String, ExternalMediaService> entry : MediaServices.services.entrySet()){
 			MediaPreference m = new MediaPreference(this, entry.getValue(), entry.getKey());
 			m.setKey(entry.getKey());
