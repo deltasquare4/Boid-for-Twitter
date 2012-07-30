@@ -50,7 +50,6 @@ public class ColumnManager extends Activity {
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
-			if(to < from && to >= 1) to--;
 			String toMove = adapt.getItem(from);
 			String toMoveRaw = cols.get(from);
 			removeColumn(from);
