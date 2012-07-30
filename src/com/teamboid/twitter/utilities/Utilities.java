@@ -519,7 +519,7 @@ public class Utilities {
 			for(String mention : mentions) {
 				if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) {
                     continue;
-                }
+                } else if(mention.equals(initScreenname)) continue;
 				toReturn += " @" + mention;
 			}
 		}

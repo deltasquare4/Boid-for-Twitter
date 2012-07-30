@@ -56,6 +56,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 
 	private void resetSpinner(boolean loading) {
 		final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(context, R.layout.spinner_item);
+		spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		if(loading) {
 			filterSelected = true;
 			spinAdapt.add(context.getString(R.string.loading_str));
