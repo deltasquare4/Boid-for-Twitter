@@ -37,6 +37,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	private boolean isGettingLocation;
 	public GeoLocation location;
 	public TrendLocation[] places;
+	private int selectedIndex;
 
 	@Override
 	public void onAttach(Activity act) {
@@ -94,6 +95,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 					public void onItemSelected(AdapterView<?> arg0, View arg1, int index, long arg3) {
 						if (filterSelected) return;
 						if(index > 3) index = 3;
+						selectedIndex = index;
 						PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_trend_source", index).apply();
 						performRefresh(false);
 					}
@@ -105,8 +107,8 @@ public class TrendsFragment extends BaseSpinnerFragment {
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null || getView() == null || getSpinner() == null) return;
-		else if (location == null && getSpinner().getSelectedItemPosition() == 3) {
+		if (context == null || isLoading || adapt == null || getSpinner() == null) return;
+		else if (location == null && selectedIndex == 3) {
 			getLocation();
 			return;
 		}
@@ -120,7 +122,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						switch (getSpinner().getSelectedItemPosition()) {
+						switch (selectedIndex) {
 						case 0:
 							final Trend[] trends_global = acc.getClient().getTrendsGlobal();
                             context.runOnUiThread(new Runnable() {
@@ -172,7 +174,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 								});
 							} else {
 								final Trend[] trends_local = acc.getClient().getLocationTrends(
-										places[getSpinner().getSelectedItemPosition() - 3].getWoeId());
+										places[selectedIndex - 3].getWoeId());
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
