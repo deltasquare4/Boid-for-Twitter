@@ -74,6 +74,14 @@ public class ColumnManager extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
+		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				removeColumn(index);
+				loadColumns();
+				return false;
+			}
+		});
 		list.setDropListener(dropListen);
 		list.setAdapter(adapt);
 	}
