@@ -42,7 +42,7 @@ public class NearbyFragment extends BaseSpinnerFragment {
     private TimelineScreen context;
     public static final String ID = "COLUMNTYPE:NEARBY";
     public GeoLocation location;
-    private String radius;
+    private int selectedIndex;
     private boolean isGettingLocation;
 
     @Override
@@ -74,85 +74,54 @@ public class NearbyFragment extends BaseSpinnerFragment {
         getListView().setOnScrollListener(
                 new AbsListView.OnScrollListener() {
                     @Override
-                    public void onScrollStateChanged(AbsListView view,
-                                                     int scrollState) {
-                    }
-
+                    public void onScrollStateChanged(AbsListView view, int scrollState) { }
                     @Override
-                    public void onScroll(AbsListView view,
-                                         int firstVisibleItem, int visibleItemCount,
-                                         int totalItemCount) {
-                        if (totalItemCount > 0
-                                && (firstVisibleItem + visibleItemCount) >= totalItemCount
+                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                        if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount
                                 && totalItemCount > visibleItemCount) {
                             performRefresh(true);
                         }
-                        if (firstVisibleItem == 0
-                                && context.getActionBar().getTabCount() > 0) {
-                            if (!PreferenceManager
-                                    .getDefaultSharedPreferences(context)
-                                    .getBoolean("enable_iconic_tabs", true))
-                                context.getActionBar()
-                                        .getTabAt(
-                                                getArguments().getInt(
-                                                        "tab_index"))
-                                        .setText(R.string.nearby_str);
-                            else
-                                context.getActionBar()
-                                        .getTabAt(
-                                                getArguments().getInt(
-                                                        "tab_index"))
-                                        .setText("");
+                        if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
+                            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true))
+                                context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.nearby_str);
+                            else {
+                            	context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
+                            }
                         }
                     }
                 });
         getListView().setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
                     @Override
-                    public boolean onItemLongClick(AdapterView<?> arg0,
-                                                   View arg1, int index, long id) {
+                    public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
                         Tweet item = (Tweet) adapt.getItem(index);
-                        context.startActivity(new Intent(context,
-                                ComposerScreen.class)
+                        context.startActivity(new Intent(context, ComposerScreen.class)
                                 .putExtra("reply_to", item.getId())
-                                .putExtra("reply_to_name",
-                                        item.getFromUser())
-                                .putExtra("append",
-                                        Utilities.getAllMentions(item))
+                                .putExtra("reply_to_name", item.getFromUser())
+                                .putExtra("append", Utilities.getAllMentions(item))
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         return false;
                     }
                 });
-        final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(
-                context, R.layout.spinner_item);
-        spinAdapt.addAll(context.getResources().getStringArray(
-                R.array.nearby_distances));
+        final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(context, R.layout.spinner_item);
+        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinAdapt.addAll(context.getResources().getStringArray(R.array.nearby_distances));
         filterSelected = true;
         getSpinner().setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> arg0,
-                                               View arg1, int index, long arg3) {
-                        if (filterSelected)
-                            return;
-                        PreferenceManager
-                                .getDefaultSharedPreferences(context)
-                                .edit().putInt("last_nearby_range", index)
-                                .apply();
-                        radius = getSpinner().getSelectedItem().toString();
-                        radius = radius.substring(radius.indexOf(" ") + 1);
+                    public void onItemSelected(AdapterView<?> arg0, View arg1, int index, long arg3) {
+                        if (filterSelected) return;
+                        selectedIndex = index;
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_nearby_range", index).apply();
                         performRefresh(false);
                     }
-
                     @Override
-                    public void onNothingSelected(AdapterView<?> arg0) {
-                    }
+                    public void onNothingSelected(AdapterView<?> arg0) { }
                 });
         getSpinner().setAdapter(spinAdapt);
         filterSelected = false;
-        getSpinner().setSelection(
-                PreferenceManager.getDefaultSharedPreferences(context)
-                        .getInt("last_nearby_range", 0));
+        getSpinner().setSelection(PreferenceManager.getDefaultSharedPreferences(context).getInt("last_nearby_range", 0));
         setRetainInstance(true);
         reloadAdapter(true);
     }
@@ -160,66 +129,52 @@ public class NearbyFragment extends BaseSpinnerFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (adapt.getCount() == 0)
-            performRefresh(false);
+        if (adapt.getCount() == 0) performRefresh(false);
     }
 
     private void getLocation() {
-        if (isGettingLocation)
-            return;
+        if (isGettingLocation) return;
         isGettingLocation = true;
-        final LocationManager locationManager = (LocationManager) context
-                .getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location loc) {
                 locationManager.removeUpdates(this);
                 isGettingLocation = false;
-                location = new GeoLocation(loc.getLatitude(),
-                        loc.getLongitude());
+                location = new GeoLocation(loc.getLatitude(), loc.getLongitude());
                 performRefresh(false);
             }
-
             @Override
-            public void onStatusChanged(String provider, int status,
-                                        Bundle extras) {
-            }
-
+            public void onStatusChanged(String provider, int status, Bundle extras) { }
             @Override
-            public void onProviderEnabled(String provider) {
-            }
-
+            public void onProviderEnabled(String provider) { }
             @Override
-            public void onProviderDisabled(String provider) {
-            }
+            public void onProviderDisabled(String provider) { }
         };
-        locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
     @Override
     public void performRefresh(final boolean paginate) {
-        if (context == null || isLoading || adapt == null
-                && getView() != null)
-            return;
+        if (context == null || isLoading || adapt == null && getSpinner() != null) return;
         else if (location == null) {
             getLocation();
             return;
         }
         isLoading = true;
-        if (!paginate)
-            adapt.clear();
-        if (getView() != null)
-            adapt.setLastViewed(getListView());
-        if (adapt.getCount() == 0)
-            setListShown(false);
+        if (!paginate) adapt.clear();
+        if (getView() != null) adapt.setLastViewed(getListView());
+        if (adapt.getCount() == 0) setListShown(false);
+        String[] radiuses = context.getResources().getStringArray(R.array.nearby_distances);
+        String[] values = context.getResources().getStringArray(R.array.nearby_distance_values);
+        final String nearbyRadius = radiuses[selectedIndex];
+        final int nearbyValue = Integer.parseInt(values[selectedIndex]);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int geoRadius = Integer.parseInt(radius.replace("km", "").replace("mi", ""));
                 GeoCode.DistanceUnit unit = GeoCode.DistanceUnit.MI;
-                if (radius.endsWith("km")) unit = GeoCode.DistanceUnit.KM;
-                GeoCode geo = GeoCode.create(location, geoRadius, unit);
+                if (nearbyRadius.endsWith("km")) unit = GeoCode.DistanceUnit.KM;
+                GeoCode geo = GeoCode.create(location, nearbyValue, unit);
                 Paging paging = new Paging(50);
                 if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
                 final SearchQuery query = SearchQuery.create(null, paging).setGeoCode(geo);
@@ -277,20 +232,17 @@ public class NearbyFragment extends BaseSpinnerFragment {
             if (adapt != null && !firstInitialize && getView() != null)
                 adapt.setLastViewed(getListView());
             adapt = AccountService.getNearbyAdapter(context);
-            if (getView() != null)
-                adapt.list = getListView();
+            if (getView() != null) adapt.list = getListView();
             setListAdapter(adapt);
-            if (adapt.getCount() == 0)
-                performRefresh(false);
-            else
-                adapt.restoreLastViewed(getListView());
+            if (adapt.getCount() == 0) performRefresh(false);
+            else adapt.restoreLastViewed(getListView());
         }
     }
 
     @Override
     public void savePosition() {
         if (getView() != null && adapt != null)
-            adapt.setLastViewed(getListView());
+        	adapt.setLastViewed(getListView());
     }
 
     @Override
@@ -306,6 +258,5 @@ public class NearbyFragment extends BaseSpinnerFragment {
     }
 
     @Override
-    public void filter() {
-    }
+    public void filter() { }
 }

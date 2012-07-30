@@ -58,7 +58,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(context, R.layout.spinner_item);
 		if(loading) {
 			filterSelected = true;
-			spinAdapt.add(getString(R.string.loading_str));
+			spinAdapt.add(context.getString(R.string.loading_str));
 			getSpinner().setAdapter(spinAdapt);
 			return;
 		} else filterSelected = false;

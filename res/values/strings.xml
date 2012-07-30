@@ -282,6 +282,17 @@
 		<item>Within 500mi</item>
 		<item>Within 1000mi</item>
 	</string-array>
+	<string-array name="nearby_distance_values">
+		<item>1</item>
+		<item>5</item>
+		<item>10</item>
+		<item>15</item>
+		<item>25</item>
+		<item>50</item>
+		<item>100</item>
+		<item>500</item>
+		<item>1000</item>
+	</string-array>
 	<string-array name="trend_sources">
 	    <item>Global Trends</item>
 		<item>Daily Trends</item>

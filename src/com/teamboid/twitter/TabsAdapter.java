@@ -272,23 +272,19 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 
 		public Spinner getSpinner() {
-			if (getView() == null)
-				return null;
-			return (Spinner) getView().findViewById(R.id.fragSpinner);
+			if (getView() == null) return null;
+			return (Spinner)getView().findViewById(R.id.fragSpinner);
 		}
 
 		@Override
 		public void setEmptyText(CharSequence text) {
-			if (getView() == null)
-				return;
-			((TextView) getView().findViewById(android.R.id.empty))
-			.setText(text);
+			if (getView() == null) return;
+			((TextView) getView().findViewById(android.R.id.empty)).setText(text);
 		}
 
 		@Override
 		public void setListShown(boolean visible) {
-			if (getView() == null)
-				return;
+			if (getView() == null) return;
 			isShown = visible;
 			getView().findViewById(android.R.id.progress).setVisibility(
 					(visible == false) ? View.VISIBLE : View.GONE);
