@@ -136,7 +136,7 @@ public class TweetListActivity extends ListActivity {
 						});
 						if(binder.getCount() > 0) paging.setMaxId(binder.getItemId(binder.getCount() - 1));
 						tweets = AccountService.getCurrentAccount().getClient()
-                                .getListTimeline(getIntent().getIntExtra("list_ID", 0), paging);
+                                .getListTimeline(getIntent().getLongExtra("list_ID", 0), paging);
 						break;
 					}
 					runOnUiThread(new Runnable() {

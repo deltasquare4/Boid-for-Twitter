@@ -74,7 +74,7 @@ public class UserListDisplayAdapter extends BaseAdapter {
 		TextView toReturn = null;
 		if(convertView != null) toReturn = (TextView)convertView;
 		else toReturn = (TextView)LayoutInflater.from(mContext).inflate(R.layout.trends_list_item, null);
-		FeedListAdapter.ApplyFontSize(toReturn, mContext);
+		FeedListAdapter.ApplyFontSize(toReturn, mContext, true);
 		toReturn.setText(lists.get(position).getFullName());
 		return toReturn;
 	}
