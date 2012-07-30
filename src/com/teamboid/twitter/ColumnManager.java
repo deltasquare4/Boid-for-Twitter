@@ -140,7 +140,7 @@ public class ColumnManager extends Activity {
 				adapt.add(getString(R.string.my_lists_str));
 			} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 				c = c.substring(ProfileTimelineFragment.ID.length() + 1);
-				adapt.add(getString(R.string.user_feed_str).replace("{user}", c));
+				adapt.add(c);
 			}
 		}
 		adapt.notifyDataSetChanged();

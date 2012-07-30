@@ -301,27 +301,11 @@
 	</string-array>
 	<string name="local_trend_with_place">Local - {place}</string>
 
-	<string name="upload_twitter">Twitter (Default)</string>
-	<string name="upload_yfrog">yFrog</string>
-	<string name="upload_twitgoo">TwitGoo</string>
-	<string name="upload_posterous">Posterous</string>
-	<string name="upload_lockerz">Lockerz</string>
-	<string name="upload_imgly">img.LY</string>
-	<string name="upload_imgur">imgur</string>
-	<string name="service_needs_config">{service} (needs setup)</string>
-	<string name="logged_in_as">Logged in as {user}</string>
-	<string name="not_logged_in">Not logged in</string>
-
 	<string name="push_title">Push Notifications</string>
 	<string name="enable_push">Enabling push notifications will push you updates
 		in near real-time
 	</string>
 
-	<string name="login">Login</string>
-	<string name="logout">Logout</string>
-	<string name="imgur_note">Images will be uploaded using the same imgur
-		account at the moment and follow the default access settings
-	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
 
 	<string name="photo_service_title">Upload Service</string>
@@ -469,7 +453,6 @@
 		while night mode is active.</string>
 		<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
-	<string name="user_feed_str">\@{user} (Feed)</string>
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
