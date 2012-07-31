@@ -38,7 +38,7 @@ public class SendTweetTask {
 	public static HashMap<String, String> MEDIA_API_KEYS = new HashMap<String, String>();
 	static {
 		MEDIA_API_KEYS.put("plixi", "10b6f8fd-c373-44cb-bd35-bbeb61a199f3");
-		MEDIA_API_KEYS.put("twitpic", "458BDELY0594bdbc2776ba73ac25e8fc96a03c27");
+		MEDIA_API_KEYS.put("twitpic", "10c80e3453f27d3b34cb0bba320a17b3");
 		MEDIA_API_KEYS.put("yfrog", "e1f3d4d1625ec410a79b573dbbfe0570");
 	}
 		
