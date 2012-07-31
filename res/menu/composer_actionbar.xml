@@ -5,7 +5,9 @@
 	<item android:id="@+id/galleryAction" android:title="@string/attach_image"
 		android:showAsAction="ifRoom" android:icon="?galleryDetachedIcon" />
 	<item android:id="@+id/locateAction" android:showAsAction="ifRoom"
-		android:title="@string/attach_location" android:icon="?locationDetachedIcon" />
+		android:title="@string/attach_location" android:icon="?locationDetachedIcon">
+	    <menu />
+	</item>
 	<item android:id="@+id/sendAction" android:title="@string/tweet_str"
 		android:showAsAction="always" android:enabled="false" />
 </menu>

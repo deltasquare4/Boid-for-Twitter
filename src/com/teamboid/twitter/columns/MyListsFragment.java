@@ -54,26 +54,11 @@ public class MyListsFragment extends BaseListFragment {
 		final ListView list = getListView();
 		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-					int index, long id) {
-				Toast.makeText(context, R.string.swipe_to_delete_items,
-						Toast.LENGTH_LONG).show();
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				adapt.destroyOrUnsubscribe(index);
 				return false;
 			}
 		});
-		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
-				list,
-				new SwipeDismissListViewTouchListener.OnDismissCallback() {
-					@Override
-					public void onDismiss(ListView listView,
-							int[] reverseSortedPositions) {
-						for (final int pos : reverseSortedPositions) {
-							adapt.destroyOrUnsubscribe(pos);
-						}
-					}
-				});
-		list.setOnTouchListener(touchListener);
-		list.setOnScrollListener(touchListener.makeScrollListener());
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_tweets));
 		reloadAdapter(true);

@@ -298,7 +298,7 @@ public class TweetViewer extends MapActivity {
             }
         }).start();
     }
-
+    
 	private void displayTweet(Status tweet) {
 		status = tweet;
 		statusId = status.getId();

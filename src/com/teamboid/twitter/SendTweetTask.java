@@ -78,6 +78,8 @@ public class SendTweetTask {
 	
 	public Status tweet;
 	public boolean isGalleryImage = false;
+
+	public String placeId;
 	public boolean hasMedia(){
 		return attachedImageUri != null || attachedImage != null;
 	}
