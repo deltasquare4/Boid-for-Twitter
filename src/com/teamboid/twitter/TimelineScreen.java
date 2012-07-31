@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.list.UserList;
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.BillingRequest.ResponseCode;
@@ -636,7 +637,7 @@ public class TimelineScreen extends Activity {
             for (int i = 0; i < accs.size(); i++) {
                 ImageManager imageManager = ImageManager.getInstance(this);
                 final int index = i;
-                imageManager.get("https://api.twitter.com/1/users/profile_image?screen_name=" + accs.get(i).getUser().getScreenName() + "&size=bigger", new OnImageReceivedListener() {
+                imageManager.get("http://api.twitter.com/1/users/profile_image?screen_name=" + accs.get(i).getUser().getScreenName() + "&size=bigger", new OnImageReceivedListener() {
                     @Override
                     public void onImageReceived(String source, Bitmap bitmap) {
                         switcher.getSubMenu().add("@" + accs.get(index).getUser().getScreenName()).setIcon(new BitmapDrawable(getResources(), bitmap));

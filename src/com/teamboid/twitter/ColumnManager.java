@@ -127,11 +127,11 @@ public class ColumnManager extends Activity {
 				adapt.add(getString(R.string.favorites_str));
 			} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
 				c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
-				adapt.add(c + " (" + getString(R.string.search_str) + ")");
+				adapt.add(c);
 			} else if(c.startsWith(UserListFragment.ID + "@")) {
 				c = c.substring(UserListFragment.ID.length() + 1);
 				c = c.substring(0, c.indexOf("@")).replace("%40", "@");
-				adapt.add(c + " (" + getString(R.string.list_str) + ")");
+				adapt.add(c);
 			} else if(c.equals(NearbyFragment.ID)) {
 				adapt.add(getString(R.string.nearby_str));
 			} else if(c.equals(MediaTimelineFragment.ID)) {
@@ -140,7 +140,7 @@ public class ColumnManager extends Activity {
 				adapt.add(getString(R.string.my_lists_str));
 			} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 				c = c.substring(ProfileTimelineFragment.ID.length() + 1);
-				adapt.add(c);
+				adapt.add("@" + c);
 			}
 		}
 		adapt.notifyDataSetChanged();

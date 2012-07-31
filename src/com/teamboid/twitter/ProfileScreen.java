@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -75,6 +76,8 @@ public class ProfileScreen extends Activity {
 		ab.setDisplayShowHomeEnabled(false);
 		setContentView(R.layout.profile_screen);
 		setProgressBarIndeterminateVisibility(false);
+		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
+		profileImg.setImageBitmap(Utilities.getRoundedImage(BitmapFactory.decodeResource(getResources(), R.drawable.sillouette), 90F));
 		initializeTabs(savedInstanceState);        
 	}
 
@@ -355,11 +358,12 @@ public class ProfileScreen extends Activity {
 	/**
 	 * Sets up our own views for this
 	 */
-	public void setupViews() {		
+	public void setupViews() {
+		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
 		ImageManager.getInstance(this).get(Utilities.getUserImage(user.getScreenName(), this), new OnImageReceivedListener(){
 			@Override
 			public void onImageReceived(String arg0, Bitmap bitmap) {
-				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
+				profileImg.setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 			}
 		});
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
@@ -369,13 +373,10 @@ public class ProfileScreen extends Activity {
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-				if(state != ViewPager.SCROLL_STATE_DRAGGING && lastPage == 2){
+				if(state != ViewPager.SCROLL_STATE_DRAGGING && lastPage == 2) {
 					findViewById(R.id.profileHeader).setVisibility(View.GONE);
-				} else{
-					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
-				}
-				
-				if(state == ViewPager.SCROLL_STATE_IDLE){
+				} else findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
+				if(state == ViewPager.SCROLL_STATE_IDLE) {
 					findViewById(R.id.profileHeader).setX(0);
 				}
 			}
@@ -398,17 +399,15 @@ public class ProfileScreen extends Activity {
 	 */
 	public void setupMediaView(){
 		runOnUiThread(new Runnable(){
-
 			@Override
 			public void run() {
 				try{
 					MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
 					setHeaderBackground(m.imgurl);
-				} catch(Exception e){
+				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
-			
 		});
 	}
 
