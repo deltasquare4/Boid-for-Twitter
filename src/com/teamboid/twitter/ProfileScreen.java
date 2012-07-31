@@ -44,6 +44,7 @@ import com.teamboid.twitterapi.user.User;
 
 /**
  * The activity that represents the profile viewer.
+ * 
  * @author Aidan Follestad
  */
 public class ProfileScreen extends Activity {
