@@ -15,7 +15,9 @@
 				android:showAsAction="withText" android:icon="?favoritesTab" />
 			<item android:id="@+id/addSavedSearchColAction" android:title="@string/savedsearch_str"
 				android:showAsAction="withText" android:icon="?savedSearchTab" />
-			<item android:id="@+id/addUserListColAction" android:title="@string/userlist_str"
+			<item android:id="@+id/addUserListColAction" android:title="@string/list_timeline_str"
+				android:showAsAction="withText" android:icon="?userListTab" />
+			<item android:id="@+id/addProfileFeedColAction" android:title="@string/user_timeline_str"
 				android:showAsAction="withText" android:icon="?userListTab" />
 			<item android:id="@+id/addNearbyColAction" android:title="@string/nearby_str"
 				android:showAsAction="withText" android:icon="?nearbyTab" />
@@ -25,4 +27,10 @@
 				android:showAsAction="withText" android:icon="?userListTab" />
 		</menu>
 	</item>
+	<item android:id="@+id/backupBtn" android:showAsAction="never"
+		android:title="@string/backup_str" />
+	<item android:id="@+id/restoreBtn" android:showAsAction="never"
+		android:title="@string/restore_str" />
+	<item android:id="@+id/resetBtn" android:showAsAction="never"
+		android:title="@string/reset_str" />
 </menu>

@@ -1,5 +1,11 @@
 package com.teamboid.twitter;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.columns.FavoritesFragment;
@@ -25,6 +31,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -170,6 +177,20 @@ public class ColumnManager extends Activity {
 		if(postIndex < 0) postIndex = 0;
 		selIndex = postIndex;
 	}
+
+	private void resetColumns() {
+		if(AccountService.getAccounts().size() == 0) return;
+		cols.clear();
+		cols.add(TimelineFragment.ID);
+        cols.add(MentionsFragment.ID);
+        cols.add(MessagesFragment.ID);
+        cols.add(TrendsFragment.ID);
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+                "_columns", Utilities.arrayToJson(cols)).commit();
+		selIndex = 0;
+		loadColumns();
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -183,6 +204,15 @@ public class ColumnManager extends Activity {
 		case android.R.id.home:
 			finish();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
+			return true;
+		case R.id.backupBtn:
+			backup();
+			return true;
+		case R.id.restoreBtn:
+			restore();
+			return true;
+		case R.id.resetBtn:
+			resetColumns();
 			return true;
 		case R.id.addTimelineColAction:
 			addColumn(TimelineFragment.ID, -1);
@@ -245,6 +275,9 @@ public class ColumnManager extends Activity {
 			return true;
 		case R.id.addMyListsColAction:
 			addColumn(MyListsFragment.ID, -1);
+			return true;
+		case R.id.addProfileFeedColAction:
+			showProfileFeedColumnAdd();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -325,4 +358,75 @@ public class ColumnManager extends Activity {
 		});
 		diag.show();
 	}
+	
+	private void showProfileFeedColumnAdd() {
+		final Dialog diag = new Dialog(this);
+		diag.setTitle(R.string.user_timeline_str);
+		diag.setCancelable(true);
+		diag.setContentView(R.layout.savedsearch_dialog);
+		diag.findViewById(android.R.id.list).setVisibility(View.GONE); 
+		final EditText input = (EditText)diag.findViewById(android.R.id.input);
+		input.setHint(R.string.screen_name_str);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_GO) {
+					final String query = input.getText().toString().trim();
+					diag.dismiss();
+					addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
+				}
+				return false;
+			}
+		});
+		diag.show();
+	}
+
+	public void backup() {
+		try {
+			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
+					Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt").getAbsolutePath()));
+			for(String key : cols) {
+				buf.write(key);
+				buf.newLine();
+			}
+			buf.flush();
+			buf.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.backed_up_columns, Toast.LENGTH_SHORT).show();
+	}
+	public void restore() {
+		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt");
+		if(!fi.exists()) {
+			Toast.makeText(getApplicationContext(), R.string.no_column_backup, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		try {
+			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));
+			cols.clear();
+			while(true) {
+				String line = buf.readLine();
+				if(line == null) break;
+				else if(line.isEmpty()) break;
+				cols.add(line);
+			}
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+	                "_columns", Utilities.arrayToJson(cols)).commit();
+			buf.close();
+			selIndex = 0;
+			loadColumns();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.restored_columns, Toast.LENGTH_SHORT).show();
+	}
+
 }
