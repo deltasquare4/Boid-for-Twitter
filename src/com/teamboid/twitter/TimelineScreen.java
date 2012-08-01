@@ -2,7 +2,6 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
-import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.list.UserList;
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.BillingRequest.ResponseCode;
@@ -178,7 +177,6 @@ public class TimelineScreen extends Activity {
             prefs.edit().putBoolean("enable_profileimg_download", true).commit();
         if (!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
         if (!prefs.contains("enable_drafts")) prefs.edit().putBoolean("enable_drafts", true).commit();
-        if (!prefs.contains("enable_iconic_tabs")) prefs.edit().putBoolean("enable_iconic_tabs", true).commit();
         if (!prefs.contains("textual_userlist_tabs")) prefs.edit().putBoolean("textual_userlist_tabs", true).commit();
         if (!prefs.contains("textual_savedsearch_tabs"))
             prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();

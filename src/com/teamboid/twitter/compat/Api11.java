@@ -60,6 +60,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
             public void onImageReceived(String arg0, Bitmap profileImg) {
                 Intent content = new Intent(context, TweetViewer.class)
                         .putExtra("sr_tweet", Utilities.serializeObject(s))
+                        .putExtra("account", accId)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 PendingIntent pi = PendingIntent.getActivity(context, 0, content, PendingIntent.FLAG_ONE_SHOT);
                 final NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -98,6 +99,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
             public void onImageReceived(String arg0, Bitmap profileImg) {
                 Intent content = new Intent(c, ConversationScreen.class)
                         .putExtra("screen_name", dm.getSenderScreenName())
+                        .putExtra("account", accId)
                         .putExtra("notification", true)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 PendingIntent pi = PendingIntent.getActivity(c, 0, content, PendingIntent.FLAG_ONE_SHOT);

@@ -101,6 +101,12 @@ public class TweetViewer extends MapActivity {
         } else setTheme(Utilities.getTheme(getApplicationContext()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tweet_view);
+        if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("account")) {
+        	long accId = getIntent().getIntExtra("account", 0);
+        	AccountService.selectedAccount = (long)accId;
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+            	.putLong("last_sel_account", (long)accId).commit();
+        }
         getActionBar().setDisplayHomeAsUpEnabled(true);
         binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
         ListView list = ((ListView) findViewById(android.R.id.list));

@@ -87,11 +87,11 @@ public class PushReceiver extends BroadcastReceiver {
 							p.setEntity( new StringEntity(query) );
 							HttpResponse r = dhc.execute(p);
 							
-							if(r.getStatusLine().getStatusCode() == 200){
+							if(r.getStatusLine().getStatusCode() == 200) {
 								Log.d("push", "REGISTERED");
 								i.putExtra("progress", 1000);
 								sendBroadcast(i);
-							} else{ throw new Exception("NON 200 RESPONSE"); }
+							} else throw new Exception("NON 200 RESPONSE");							
 							
 						} catch(Exception e) { 
 							e.printStackTrace();
