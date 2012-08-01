@@ -126,7 +126,7 @@ public class ProfileScreen extends Activity {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
 						public void run() { 
-							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked)
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_relationship)
                                     .replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
 							getAboutFragment().getAdapter().setIsError(true);
 						}

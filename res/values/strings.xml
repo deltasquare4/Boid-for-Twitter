@@ -13,7 +13,7 @@
 	<string name="messages_priv_desc">Show the content of direct messages in notifications.</string>
 	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
-	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
+	<string name="failed_check_relationship">Failed to get your relationship to {user}!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
 	<string name="nearby_str">Nearby</string>
 	<string name="no_camera_app">Uh oh! You don\'t have any camera apps!</string>
