@@ -96,9 +96,8 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (getView() == null)
-			return;
-		getAdapter().restoreLastViewed(getListView());
+		if (getView() == null) return;
+		else if(getAdapter() != null) getAdapter().restoreLastViewed(getListView());
 	}
 
 	@Override
