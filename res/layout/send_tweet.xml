@@ -9,15 +9,19 @@
 	<ProgressBar android:id="@+id/progressBar"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_alignParentRight="true" />
-	<ImageButton android:id="@+id/edit" android:src="?editIcon"
-		android:layout_below="@+id/feed_item" android:visibility="gone"
-		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-	<ImageButton android:id="@+id/resend" android:src="@drawable/refresh_action"
-		android:layout_below="@+id/feed_item" android:layout_toRightOf="@+id/edit"
-		android:visibility="gone" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
-	<ImageButton android:id="@+id/delete" android:src="?deleteIcon"
-		android:layout_toRightOf="@+id/resend" android:layout_below="@+id/feed_item"
-		android:visibility="gone" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+
+	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:orientation="horizontal" android:layout_centerHorizontal="true"
+		android:layout_below="@+id/feed_item">
+		<ImageButton android:id="@+id/edit" android:src="?sendQueueEdit"
+			android:visibility="gone" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+		<ImageButton android:id="@+id/resend" android:src="?sendQueueRefresh"
+			android:layout_toRightOf="@+id/edit" android:visibility="gone"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<ImageButton android:id="@+id/delete" android:src="?sendQueueDelete"
+			android:layout_toRightOf="@+id/resend" android:visibility="gone"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	</RelativeLayout>
 </RelativeLayout>

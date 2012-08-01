@@ -239,7 +239,7 @@
 	</string>
 	<string name="sent_tweet">Sent your Tweet!</string>
 
-	<string name="timeline_str">Home Timeline</string>
+	<string name="timeline_str">Timeline</string>
 	<string name="media_timeline_str">Media Timeline</string>
 	<string name="mention_str">Mention</string>
 	<string name="mentions_str">Mentions</string>

@@ -20,6 +20,10 @@
 		<item name="accountSwitchIcon">@drawable/account_switch_dark</item>
 		<item name="sideNavColor">#DDDDDD</item>
 		<item name="spinnerActionBarDropDownColor">@color/black</item>
+		
+		<item name="sendQueueEdit">@drawable/edit_action_dark</item>
+		<item name="sendQueueRefresh">@drawable/refresh_action_dark</item>
+		<item name="sendQueueDelete">@drawable/delete_dark</item>
 
 		<item name="timelineTab">@drawable/home_tab_dark</item>
 		<item name="mentionsTab">@drawable/mentions_tab_dark</item>
