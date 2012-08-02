@@ -20,6 +20,7 @@
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
 		<item name="sideNavColor">#DDDDDD</item>
 		<item name="spinnerActionBarDropDownColor">@color/white</item>
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
 		
 		<item name="sendQueueEdit">@drawable/edit_action_dark</item>
 		<item name="sendQueueRefresh">@drawable/refresh_action_dark</item>

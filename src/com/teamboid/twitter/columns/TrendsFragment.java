@@ -56,6 +56,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 	}
 
 	private void resetSpinner(boolean loading) {
+		if(getSpinner() == null) return;
 		final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(context, R.layout.spinner_item);
 		spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		if(loading) {
@@ -155,7 +156,7 @@ public class TrendsFragment extends BaseSpinnerFragment {
 							break;
 						default:
 							if(getSpinner().getSelectedItem().toString().equals(
-									context.getResources().getStringArray(R.array.trend_sources)[3])) {
+									context.getResources().getStringArray(R.array.trend_sources)[3]) || places == null) {
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() { resetSpinner(true); }

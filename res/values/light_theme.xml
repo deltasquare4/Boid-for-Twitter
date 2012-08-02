@@ -20,6 +20,7 @@
 		<item name="accountSwitchIcon">@drawable/account_switch_dark</item>
 		<item name="sideNavColor">#DDDDDD</item>
 		<item name="spinnerActionBarDropDownColor">@color/black</item>
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
 		
 		<item name="sendQueueEdit">@drawable/edit_action_dark</item>
 		<item name="sendQueueRefresh">@drawable/refresh_action_dark</item>
@@ -72,7 +73,7 @@
 		<item name="locationAttachedIcon">@drawable/locate_blue</item>
 		<item name="locationDetachedIcon">@drawable/locate_dark</item>
 	</style>
-
+	
 	<style name="DropDownNav.Light.Text"
 		parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem">
 		<item name="android:textColor">@color/black</item>

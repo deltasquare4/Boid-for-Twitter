@@ -4,7 +4,6 @@
         <item name="android:actionBarItemBackground">@android:color/black</item>
         <item name="android:dropDownListViewStyle">@style/pure_black_DropDownListView</item>
         <item name="android:actionBarStyle">@style/pure_black_solid_ActionBar</item>
-        <item name="android:actionBarTabStyle">@style/pure_black_ActionBarTabStyle</item>
         <item name="android:actionBarTabBarStyle">@style/pure_black_customTabBar</item>
         <item name="android:actionDropDownStyle">@style/pure_black_DropDownNav</item>
         
@@ -24,9 +23,6 @@
     <style name="pure_black_DropDownListView" parent="@android:style/Widget.Holo.ListView.DropDown">
         <item name="android:listSelector">@android:color/black</item>
     </style>
-    <style name="pure_black_ActionBarTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
-        <!-- <item name="android:background">@android:color/black</item> -->
-    </style>
     <style name="pure_black_DropDownNav" parent="@android:style/Widget.Holo.Spinner">
         <item name="android:background">@android:color/black</item>
         <item name="android:popupBackground">@android:color/black</item>
@@ -36,110 +32,4 @@
 		<item name="android:showDividers">middle</item>
 		<item name="android:background">@android:color/black</item>
 	</style>
-	
-        <!-- 
-                <item name="android:actionBarItemBackground">@drawable/selectable_background_pure_black</item>
-        <item name="android:popupMenuStyle">@style/pure_black_PopupMenu</item>
-        
-        <item name="android:panelBackground">@drawable/menu_hardkey_panel_pure_black</item>
- 	     
- 	    
- 	    <item name="dragHandle">@drawable/reorder_light</item>
-        <item name="themeColor">@android:color/darker_gray</item>
-		<item name="usernameColor">@color/username_highlight_selector</item>
-		<item name="tweetColor">@color/white</item>
-		<item name="linkColor">@color/link_highlight_selector</item>
-		<item name="timerColor">@android:color/darker_gray</item>
-		<item name="spinnerDropdownItemColor">@color/white</item>
-		<item name="android:spinnerItemStyle">@style/DropDownNav.Text</item>
-		<item name="mediaIndicator">@drawable/media_light</item>
-		<item name="replyIndicator">@drawable/reply_light</item>
-		<item name="videoIndicator">@drawable/video_light</item>
-		<item name="retweetIndicator">@drawable/retweet_light</item>
-		<item name="timeIndicator">@drawable/time_indicator_dark</item>
-		<item name="cloudIcon">@drawable/cloud_light</item>
-		<item name="helpIcon">@drawable/help_light</item>
-		<item name="settingsIcon">@drawable/settings_light</item>
-		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
-		<item name="sideNavColor">#252930</item>
-		<item name="spinnerActionBarDropDownColor">@color/white</item>		
-		
-		<item name="timelineTab">@drawable/home_tab</item>
-		<item name="mentionsTab">@drawable/mentions_tab</item>
-		<item name="messagesTab">@drawable/messages_tab</item>
-		<item name="trendsTab">@drawable/trends_tab</item>
-		<item name="favoritesTab">@drawable/favorites_tab</item>
-		<item name="savedSearchTab">@drawable/savedsearch_tab</item>
-		<item name="userListTab">@drawable/userlist_tab</item>
-		<item name="nearbyTab">@drawable/nearby_tab</item>
-		<item name="mediaTab">@drawable/media_tab</item>
-		<item name="aboutTab">@drawable/about_tab_light</item>
-
-		<item name="pinIcon">@drawable/pin_light</item>
-		<item name="addAccountIcon">@drawable/add_account_light</item>
-		<item name="newTweetIcon">@drawable/new_tweet_action</item>
-		<item name="searchIcon">@drawable/search_light</item>
-		<item name="addIcon">@drawable/add_action</item>
-		<item name="removeIcon">@drawable/remove_action_light</item>
-		<item name="refreshIcon">@drawable/refresh_action</item>
-		<item name="profileIcon">@drawable/profile_light</item>
-		<item name="newMessageIcon">@drawable/new_message_action</item>
-
-		<item name="editIcon">@drawable/edit_action</item>
-		<item name="mentionIcon">@drawable/mention_action</item>
-		<item name="reportIcon">@drawable/report</item>
-		<item name="sendIcon">@drawable/send_light</item>
-
-		<item name="replyIcon">@drawable/reply_light</item>
-		<item name="retweetIcon">@drawable/retweet_light</item>
-		<item name="unretweetIcon">@drawable/retweet_dark</item>
-		<item name="favoriteIcon">@drawable/favorited_light</item>
-		<item name="unfavoriteIcon">@drawable/unfavorited_light</item>
-		<item name="copyIcon">@drawable/copy_light</item>
-		<item name="shareIcon">@drawable/share_light</item>
-		<item name="deleteIcon">@drawable/delete_light</item>
-		<item name="doneIcon">@drawable/done_light</item>
-
-		<item name="locationIndicator">@drawable/locate</item>
-		<item name="favoritedIndicator">@drawable/favorited_light</item>
-		<item name="cameraAttachedIcon">@drawable/capture_blue</item>
-		<item name="cameraDetachedIcon">@drawable/capture</item>
-		<item name="galleryAttachedIcon">@drawable/media_blue</item>
-		<item name="galleryDetachedIcon">@drawable/media_light</item>
-		<item name="locationAttachedIcon">@drawable/locate_blue</item>
-		<item name="locationDetachedIcon">@drawable/locate</item>d
-    </style>
-
-    <style name="pure_black_solid_ActionBar" parent="@android:style/Widget.Holo.ActionBar.Solid">
-        <item name="android:background">@drawable/ab_solid_pure_black</item>
-        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_pure_black</item>
-        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_pure_black</item>
-        <item name="android:progressBarStyle">@style/pure_black_ProgressBar</item>
-    </style>
-    <style name="pure_black_transparent_ActionBar" parent="@android:style/Widget.Holo.ActionBar">
-        <item name="android:background">@drawable/ab_transparent_pure_black</item>
-        <item name="android:progressBarStyle">@style/pure_black_ProgressBar</item>
-    </style>
-    <style name="pure_black_PopupMenu" parent="@android:style/Widget.Holo.ListPopupWindow">
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_pure_black</item>	
-    </style>
-    <style name="pure_black_DropDownListView" parent="@android:style/Widget.Holo.ListView.DropDown">
-        <item name="android:listSelector">@drawable/selectable_background_pure_black</item>
-    </style>
-    <style name="pure_black_ActionBarTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator_ab_pure_black</item>
-    </style>
-    <style name="pure_black_DropDownNav" parent="@android:style/Widget.Holo.Spinner">
-        <item name="android:background">@drawable/spinner_background_ab_pure_black</item>
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_pure_black</item>
-        <item name="android:dropDownSelector">@drawable/selectable_background_pure_black</item>
-    </style>
-    <style name="pure_black_ProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_horizontal_pure_black</item>
-    </style>
-    <style name="pure_black_customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
-		<item name="android:showDividers">middle</item>
-		<item name="android:dividerPadding">15dp</item>
-		<item name="android:background">@drawable/ab_solid_pure_black</item>
-	</style> -->
 </resources>

@@ -614,7 +614,7 @@ public class TimelineScreen extends Activity {
         super.onSaveInstanceState(outState);
     }
 
-    @SuppressLint("AlwaysShowAction")
+    @SuppressLint({ "AlwaysShowAction" })
 	@Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main_actionbar, menu);

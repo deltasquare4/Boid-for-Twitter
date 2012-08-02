@@ -33,16 +33,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.teamboid.twitterapi.list.UserList;
 import com.teamboid.twitterapi.savedsearch.SavedSearch;
@@ -312,50 +310,43 @@ public class ColumnManager extends Activity {
 		diag.setContentView(R.layout.savedsearch_dialog);
 		ArrayList<String> items = new ArrayList<String>();
 		for(SavedSearch l : lists) items.add(l.getName());
-		final ListView list = (ListView)diag.findViewById(android.R.id.list); 
+		
+		final ListView list = (ListView)diag.findViewById(android.R.id.list);
+		final EditText input = (EditText)diag.findViewById(android.R.id.input);
+		final Button addBtn = (Button)diag.findViewById(R.id.addBtn);
+		
 		list.setAdapter(new ArrayAdapter<String>(this, R.layout.trends_list_item, items));
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				SavedSearch curList = lists[index];
-				addColumn(SavedSearchFragment.ID + "@" + curList.getQuery().replace("@", "%40"), -1);
+				input.setText(lists[index].getName());
+			}
+		});
+		
+		addBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				final String query = input.getText().toString().trim();
+				new Thread(new Runnable() {
+					public void run() {
+						try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }
+						catch(Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_upload_error, Toast.LENGTH_SHORT).show(); }
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_uploaded, Toast.LENGTH_SHORT).show(); }
+						});
+					}
+				}).start();
+				addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
 				diag.dismiss();
 			}
 		});
-		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				Toast.makeText(ColumnManager.this, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
-				return false;
-			}
-		});
-		final EditText input = (EditText)diag.findViewById(android.R.id.input);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_GO) {
-					final String query = input.getText().toString().trim();
-					diag.dismiss();
-					addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
-					new Thread(new Runnable() {
-						public void run() {
-							try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }
-							catch(Exception e) {
-								e.printStackTrace();
-								runOnUiThread(new Runnable() {
-									public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_upload_error, Toast.LENGTH_SHORT).show(); }
-								});
-								return;
-							}
-							runOnUiThread(new Runnable() {
-								public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_uploaded, Toast.LENGTH_SHORT).show(); }
-							});
-						}
-					}).start();
-				}
-				return false;
-			}
-		});
+		
 		diag.show();
 	}
 	
@@ -366,16 +357,14 @@ public class ColumnManager extends Activity {
 		diag.setContentView(R.layout.savedsearch_dialog);
 		diag.findViewById(android.R.id.list).setVisibility(View.GONE); 
 		final EditText input = (EditText)diag.findViewById(android.R.id.input);
+		final Button addBtn = (Button)diag.findViewById(R.id.addBtn);
 		input.setHint(R.string.screen_name_str);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		addBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_GO) {
-					final String query = input.getText().toString().trim();
-					diag.dismiss();
-					addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
-				}
-				return false;
+			public void onClick(View v) {
+				final String query = input.getText().toString().trim();
+				diag.dismiss();
+				addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
 			}
 		});
 		diag.show();

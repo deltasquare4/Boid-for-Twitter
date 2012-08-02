@@ -20,6 +20,7 @@
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
 		<item name="sideNavColor">#252930</item>
 		<item name="spinnerActionBarDropDownColor">@color/white</item>
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
 		
 		<item name="sendQueueEdit">@drawable/edit_action</item>
 		<item name="sendQueueRefresh">@drawable/refresh_action</item>
@@ -76,6 +77,7 @@
 		<item name="android:textColor">#FFFFFF</item>
 		<item name="android:textSize">24dip</item>
 	</style>
+	
 	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
 		<item name="android:dividerPadding">15dp</item>
