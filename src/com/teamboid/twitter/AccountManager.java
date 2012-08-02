@@ -40,6 +40,7 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class AccountManager extends PreferenceActivity {
+	
     public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 
     public static class AccountFragment extends PreferenceFragment {

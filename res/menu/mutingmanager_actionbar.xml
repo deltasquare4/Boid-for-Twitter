@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/toggleBtn" android:showAsAction="always" />
+	<item android:id="@+id/toggleBtn" android:showAsAction="ifRoom" />
 	<item android:id="@+id/clearBtn" android:showAsAction="never" android:title="@string/clear_str" />
 	<item android:id="@+id/backupBtn" android:showAsAction="never" android:title="@string/backup_str" />
 	<item android:id="@+id/restoreBtn" android:showAsAction="never" android:title="@string/restore_str" />

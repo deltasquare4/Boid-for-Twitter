@@ -37,6 +37,7 @@ import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -613,7 +614,8 @@ public class TimelineScreen extends Activity {
         super.onSaveInstanceState(outState);
     }
 
-    @Override
+    @SuppressLint("AlwaysShowAction")
+	@Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main_actionbar, menu);
         final ArrayList<Account> accs = AccountService.getAccounts();

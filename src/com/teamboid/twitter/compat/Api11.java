@@ -78,7 +78,8 @@ public class Api11 { //We don't support API 11, we only support API 14-16
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     Api16.displayReplyNotification(accId, context, profileImg, s, nb, nm);
                 } else {
-                    Notification n = setupNotification(accId, nb.getNotification(), context);
+                    @SuppressWarnings("deprecation")
+					Notification n = setupNotification(accId, nb.getNotification(), context);
                     nm.notify(accId + "_MENTIONS", 100, n);
                 }
             }

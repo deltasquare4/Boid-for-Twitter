@@ -86,7 +86,6 @@
 	<string name="no_favorites">No favorites</string>
 	<string name="no_results">No results</string>
 	<string name="no_media">No media</string>
-	<string name="no_accounts">No accounts. Please add one</string>
 	<string name="nodescription_str">(No description)</string>
 	<string name="no_internet">Please connect to the internet.</string>
 	<string name="error_str">Error</string>
@@ -157,7 +156,6 @@
 	<string name="my_profile_str">My Profile</string>
 	<string name="settings_str">Settings</string>
 	<string name="addcolumn_str">Add Column</string>
-	<string name="removecolumn_str">Remove Column</string>
 	<string name="add_account_str">Add Account</string>
 	<string name="muting_str">Muting</string>
 	<string name="muting_str_desc">Add or remove timeline muting rules to filter
@@ -247,7 +245,6 @@
 	<string name="trends_str">Trends</string>
 	<string name="favorites_str">Favorites</string>
 	<string name="savedsearch_str">Saved Search</string>
-	<string name="list_str">List</string>
 	<string name="list_timeline_str">List Timeline</string>
 	<string name="user_timeline_str">User Timeline</string>
 
@@ -431,7 +428,6 @@
 	<string name="this_is_you">This is you</string>
 	<string name="failed_check_following">Failed to check if you\'re following @{user}!
 	</string>
-	<string name="quick_reply_hint">Press enter to send…</string>
 	<string name="failed_delete_dm">Failed to delete a message from your conversation
 		with @{user}!
 	</string>
