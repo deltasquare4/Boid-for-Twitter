@@ -25,6 +25,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -346,13 +348,18 @@ public class ProfileScreen extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 
-	void setHeaderBackground(String url){
-		ImageManager.getInstance(this).get(url, new OnImageReceivedListener(){
-			@Override
-			public void onImageReceived(String arg0, Bitmap bitmap) {
-				((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
-			}
-		});
+	void setHeaderBackground(String url) {
+		if(url.startsWith("http")) {
+			ImageManager.getInstance(this).get(url, new OnImageReceivedListener() {
+				@Override
+				public void onImageReceived(String arg0, Bitmap bitmap) {
+					((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
+				}
+			});
+		} else if(user.getProfileBackgroundColor() != null) {
+			((ImageView)findViewById(R.id.img)).setImageDrawable(new ColorDrawable(
+					Color.parseColor("#" + user.getProfileBackgroundColor())));
+		}
 	}
 
 	public ProfileAboutFragment getAboutFragment() {
@@ -396,23 +403,11 @@ public class ProfileScreen extends Activity {
 				mTabsAdapter.onPageSelected(position);
 			}
 		});
-	}
-
-	/**
-	 * Set first media
-	 */
-	public void setupMediaView(){
-		runOnUiThread(new Runnable(){
-			@Override
-			public void run() {
-				try{
-					MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
-					setHeaderBackground(m.imgurl);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		if(user.getProfileBackgroundImageUrl() != null) {
+			setHeaderBackground(user.getProfileBackgroundImageUrl());
+		} else if(user.getProfileBackgroundColor() != null) {
+			setHeaderBackground(user.getProfileBackgroundColor());
+		}
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {

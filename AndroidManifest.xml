@@ -87,7 +87,7 @@
 		</activity>
 		<activity android:name=".ProfileScreen"
 			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow" android:launchMode="singleTask" />
+			android:uiOptions="splitActionBarWhenNarrow" />
 		<activity android:name=".TweetViewer" android:noHistory="true"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />
