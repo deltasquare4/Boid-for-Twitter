@@ -352,7 +352,7 @@ public class TimelineScreen extends Activity {
                 Tab toAdd = getActionBar().newTab();
                 String screenName = c.substring(ProfileTimelineFragment.ID.length() + 1);
                 if (iconic) {
-                    Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userListTab}).getDrawable(0);
+                    Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userFeedTab}).getDrawable(0);
                     toAdd.setIcon(icon);
                 } else toAdd.setText("@" + screenName);
                 mTabsAdapter.addTab(toAdd, ProfileTimelineFragment.class, index, screenName);

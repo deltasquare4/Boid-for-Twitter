@@ -70,6 +70,7 @@
 	<attr name="nearbyTab" format="reference" />
 	<attr name="mediaTab" format="reference" />
 	<attr name="aboutTab" format="reference" />
+	<attr name="userFeedTab" format="reference" />
 	
 	<declare-styleable name="DragSortListView">
 		<attr name="collapsed_height" format="dimension" />

@@ -35,6 +35,7 @@
 		<item name="nearbyTab">@drawable/nearby_tab</item>
 		<item name="mediaTab">@drawable/media_tab</item>
 		<item name="aboutTab">@drawable/about_tab_light</item>
+		<item name="userFeedTab">@drawable/userfeed_light</item>
 		
 		<item name="pinIcon">@drawable/pin_light</item>
 		<item name="addAccountIcon">@drawable/add_account_light</item>

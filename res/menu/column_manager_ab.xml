@@ -18,7 +18,7 @@
 			<item android:id="@+id/addUserListColAction" android:title="@string/list_timeline_str"
 				android:showAsAction="withText" android:icon="?userListTab" />
 			<item android:id="@+id/addProfileFeedColAction" android:title="@string/user_timeline_str"
-				android:showAsAction="withText" android:icon="?userListTab" />
+				android:showAsAction="withText" android:icon="?userFeedTab" />
 			<item android:id="@+id/addNearbyColAction" android:title="@string/nearby_str"
 				android:showAsAction="withText" android:icon="?nearbyTab" />
 			<item android:id="@+id/addMediaColAction" android:title="@string/media_timeline_str"
