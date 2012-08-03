@@ -30,7 +30,7 @@
 		android:layout_height="60dp" android:layout_marginRight="10dp"
 		android:src="@drawable/sillouette" />
 	<ImageView android:id="@+id/feedItemRetweetIndicatorImg"
-		android:layout_width="17dp" android:layout_height="17dp"
+		android:layout_width="20dp" android:layout_height="20dp"
 		android:layout_marginRight="5dp" android:layout_toRightOf="@+id/feedItemProfilePic"
 		android:src="?retweetIndicator" android:visibility="gone" />
 	<TextView android:id="@+id/feedItemRetweetIndicatorTxt"

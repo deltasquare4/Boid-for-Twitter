@@ -2,7 +2,6 @@ package com.teamboid.twitter.views;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -12,12 +11,8 @@ import com.teamboid.twitterapi.status.Status;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -58,7 +53,7 @@ public class WidgetRemoteViewService extends RemoteViewsService {
     			status = status.getRetweetedStatus();
     			rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
     			rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
-    			rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "RT by @" + status.getUser().getScreenName());
+    			rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "@" + status.getUser().getScreenName());
     		}
             
             if(PreferenceManager.getDefaultSharedPreferences(_context).getBoolean("show_real_names", false)) {

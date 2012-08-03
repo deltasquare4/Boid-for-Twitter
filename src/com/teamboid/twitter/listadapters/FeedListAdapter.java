@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,6 @@ import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
-import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
@@ -248,15 +245,10 @@ public class FeedListAdapter extends BaseAdapter {
 		ApplyFontSize(userNameTxt, mContext);
 		
 		if(tweet.isRetweet()) {
-			Spannable rtSpan = new SpannableString("RT by @" + tweet.getUser().getScreenName());
-			rtSpan.setSpan(new NoUnderlineClickableSpan() {
-				@Override
-				public void onClick(View arg0) { }
-			}, 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			indicatorTxt.setText("@" + tweet.getUser().getScreenName());
 			tweet = tweet.getRetweetedStatus();
 			rtIndic.setVisibility(View.VISIBLE);
 			addRule(userNameTxt, R.id.feedItemRetweetIndicatorTxt, RelativeLayout.BELOW);
-			indicatorTxt.setText(rtSpan);
 			indicatorTxt.setVisibility(View.VISIBLE);
 		} else {
 			rtIndic.setVisibility(View.GONE);
