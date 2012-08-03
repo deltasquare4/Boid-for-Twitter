@@ -9,20 +9,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ResizableWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		
 		ComponentName thisWidget = new ComponentName(context, ResizableWidgetProvider.class);
 		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 		
 		for(int widgetId : allWidgetIds) {
-			
-			Log.d("WIDGET", "onUpdate(" + widgetId + ")");
 			RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.resizable_widget);
 
 			Intent intent = new Intent(context, WidgetRemoteViewService.class);
@@ -36,11 +32,10 @@ public class ResizableWidgetProvider extends AppWidgetProvider {
 			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
 					0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			
 			remoteViews.setOnClickPendingIntent(R.id.header, pendingIntent);
+			
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
 		}
-		
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 	}
 } 

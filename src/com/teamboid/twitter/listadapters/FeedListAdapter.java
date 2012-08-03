@@ -222,12 +222,10 @@ public class FeedListAdapter extends BaseAdapter {
 		return tweets.get(position).getId();
 	}
 
-	@Override
-	public View getView(final int position, View convertView, ViewGroup parent) {
+	public static RelativeLayout createStatusView(Status tweet, final Context mContext, View convertView) {
 		RelativeLayout toReturn = null;
 		if(convertView != null) toReturn = (RelativeLayout)convertView;
 		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
-		Status tweet = tweets.get(position);
 		
 		TextView indicatorTxt = (TextView)toReturn.findViewById(R.id.feedItemRetweetIndicatorTxt);
 		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
@@ -334,7 +332,12 @@ public class FeedListAdapter extends BaseAdapter {
 		return toReturn;
 	}
 	
-	private void hideInlineMedia(View toReturn) {
+	@Override
+	public View getView(final int position, View convertView, ViewGroup parent) {
+		return createStatusView(tweets.get(position), mContext, convertView);
+	}
+	
+	private static void hideInlineMedia(View toReturn) {
 		ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);

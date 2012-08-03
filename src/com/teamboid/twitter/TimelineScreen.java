@@ -43,7 +43,9 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -77,6 +79,12 @@ public class TimelineScreen extends Activity {
     private boolean lastIconic;
     private TabsAdapter mTabsAdapter;
     private boolean newColumn;
+    
+    private void notifyWidget() {
+    	final AppWidgetManager mgr = AppWidgetManager.getInstance(this);
+        final ComponentName cn = new ComponentName(this, ResizableWidgetProvider.class);
+        mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widgetList);
+    }
 
     private SendTweetArrayAdapter sentTweetBinder;
 
@@ -577,6 +585,7 @@ public class TimelineScreen extends Activity {
         filter.addAction(SendTweetService.UPDATE_STATUS);
         filter.addAction(AccountManager.END_LOAD);
         registerReceiver(receiver, filter);
+        notifyWidget();
     }
 
     @Override
@@ -594,6 +603,7 @@ public class TimelineScreen extends Activity {
         if (MessageConvoCAB.ConvoActionMode != null) {
             MessageConvoCAB.ConvoActionMode.finish();
         }
+        notifyWidget();
     }
 
     @Override

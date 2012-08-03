@@ -2,22 +2,29 @@ package com.teamboid.twitter.views;
 
 import java.util.ArrayList;
 
+import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.status.Status;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 public class WidgetRemoteViewService extends RemoteViewsService {
 
 	@Override
-	public RemoteViewsFactory onGetViewFactory(Intent intent) {
+	public RemoteViewsFactory onGetViewFactory(Intent intent) {		
 		return new WidgetRemoteViewFactory(getApplicationContext(), intent);
 	}
 
@@ -27,7 +34,6 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 			_context = context;
 			_items = new ArrayList<Status>();
 			mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-			Log.d("WIDGET VIEW FACTORY", "Constructor");
 		}
 		
 		private Context _context;
@@ -35,60 +41,46 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 		private int mAppWidgetId;
 		
 		@Override
-		public int getCount() {
-			Log.d("WIDGET VIEW FACTORY", "getCount() - " + _items.size());
-			return _items.size();
-		}
+		public int getCount() { return _items.size(); }
 
 		@Override
-		public long getItemId(int position) { return _items.get(position).getId(); }
+		public long getItemId(int position) { return position; }
 
 		@Override
-		public RemoteViews getLoadingView() {
-			Log.d("WIDGET VIEW FACTORY", "getLoadingView()");
-			return null;
-		}
+		public RemoteViews getLoadingView() { return null; }
 
 		@Override
 		public RemoteViews getViewAt(int position) {
-			Log.d("WIDGET VIEW FACTORY", "getViewAt(" + position + ")");
 			Status status = _items.get(position);
-			RemoteViews rv = new RemoteViews(_context.getPackageName(), R.layout.widget_feed_item);
-            rv.setTextViewText(R.id.feedItemUserName, status.getUser().getScreenName());
+			final RemoteViews rv = new RemoteViews(_context.getPackageName(), R.layout.widget_feed_item);
+            
+            if(status.isRetweet()) {
+    			status = status.getRetweetedStatus();
+    			rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
+    			rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
+    			rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "RT by @" + status.getUser().getScreenName());
+    		}
+            
+            if(PreferenceManager.getDefaultSharedPreferences(_context).getBoolean("show_real_names", false)) {
+				rv.setTextViewText(R.id.feedItemUserName, status.getUser().getName());
+			} else rv.setTextViewText(R.id.feedItemUserName, status.getUser().getScreenName());
             rv.setTextViewText(R.id.feedItemText, status.getText());
-
-//            Bundle extras = new Bundle();
-//            extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-//            extras.putInt("numberToToast", position);
-//            Intent fillInIntent = new Intent();
-//            fillInIntent.putExtras(extras);
-            //rv.setOnClickFillInIntent(R.id.widget_item, fillInIntent);
+            rv.setTextViewText(R.id.feedItemTimerTxt, Utilities.friendlyTimeShort(status.getCreatedAt()));
             
             return rv;
 		}
 
 		@Override
-		public int getViewTypeCount() {
-			Log.d("WIDGET VIEW FACTORY", "getViewTypeCount()");
-			return 1;
-		}
+		public int getViewTypeCount() { return 1; }
 
 		@Override
 		public boolean hasStableIds() { return true; }
 
 		@Override
-		public void onCreate() {
-			Log.d("WIDGET VIEW FACTORY", "onCreate");
-			if(AccountService.getCurrentAccount() == null) return;
-			FeedListAdapter adapt = AccountService.getTimelineFeedAdapter(AccountService.getCurrentAccount().getId());
-			if(adapt == null) return;
-			Status[] feed = adapt.toArray();
-			for(Status item : feed) _items.add(item);
-		}
+		public void onCreate() { }
 
 		@Override
 		public void onDataSetChanged() {
-			Log.d("WIDGET VIEW FACTORY", "onDataSetChanged()");
 			if(AccountService.getCurrentAccount() == null) return;
 			FeedListAdapter adapt = AccountService.getTimelineFeedAdapter(AccountService.getCurrentAccount().getId());
 			if(adapt == null) return;

@@ -40,7 +40,7 @@
 		<provider android:name="SearchSuggestionsProvider"
 			android:exported="false" android:authorities="com.teamboid.twitter.SearchSuggestionsProvider" />
 
-		<receiver android:name="ResizableWidgetProvider">
+		<receiver android:name="ResizableWidgetProvider" android:exported="false">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>
