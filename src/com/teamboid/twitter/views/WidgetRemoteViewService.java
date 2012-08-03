@@ -50,10 +50,10 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 			final RemoteViews rv = new RemoteViews(_context.getPackageName(), R.layout.widget_feed_item);
             
             if(status.isRetweet()) {
-    			status = status.getRetweetedStatus();
-    			rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
+            	rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
     			rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
     			rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "@" + status.getUser().getScreenName());
+    			status = status.getRetweetedStatus();
     		}
             
             if(PreferenceManager.getDefaultSharedPreferences(_context).getBoolean("show_real_names", false)) {
