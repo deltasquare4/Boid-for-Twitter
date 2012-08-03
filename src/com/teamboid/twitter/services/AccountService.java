@@ -21,6 +21,7 @@ import java.util.Map;
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
@@ -256,6 +257,20 @@ public class AccountService extends Service {
         }
     }
 
+    /**
+     * Used from the WidgetRemoteViewService
+     */
+    public static FeedListAdapter getTimelineFeedAdapter(long account) {
+    	FeedListAdapter toReturn = null;
+        for (FeedListAdapter adapt : feedAdapters) {
+            if (TimelineFragment.ID.equals(adapt.ID) && account == adapt.account) {
+                toReturn = adapt;
+                break;
+            }
+        }
+        return toReturn;
+    }
+    
     public static FeedListAdapter getFeedAdapter(Activity activity, String id, long account) {
         return getFeedAdapter(activity, id, account, true);
     }

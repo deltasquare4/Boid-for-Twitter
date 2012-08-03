@@ -179,8 +179,8 @@ public class TimelineScreen extends Activity {
         if (!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
         if (!prefs.contains("enable_drafts")) prefs.edit().putBoolean("enable_drafts", true).commit();
         if (!prefs.contains("textual_userlist_tabs")) prefs.edit().putBoolean("textual_userlist_tabs", true).commit();
-        if (!prefs.contains("textual_savedsearch_tabs"))
-            prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();
+        if (!prefs.contains("textual_savedsearch_tabs")) prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();
+        if (!prefs.contains("enable_iconic_tabs")) prefs.edit().putBoolean("enable_iconic_tabs", true).commit();
         if (!prefs.contains("boid_theme")) prefs.edit().putString("boid_theme", "0").commit();
         if (!prefs.contains("upload_service")) prefs.edit().putString("upload_service", "twitter").commit();
         if (!prefs.contains("enable_inline_previewing"))

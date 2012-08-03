@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:id="@+id/feedItemRelativeLayout"
+	android:layout_height="match_parent" android:paddingTop="5dp" android:paddingBottom="5dp"
+	android:background="?android:attr/activatedBackgroundIndicator">
+	<TextView android:id="@+id/feedItemTimerTxt" android:layout_marginRight="5dp"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" android:textColor="@color/dark"
+		android:textSize="12dp" />
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_marginRight="3dp" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_toLeftOf="@+id/feedItemTimerTxt">
+		<ImageView android:id="@+id/feedItemVideoIndicator"
+			android:layout_weight="1" android:layout_width="16dp"
+			android:layout_height="17dp" android:src="@drawable/video_light"
+			android:visibility="gone" />
+		<ImageView android:id="@+id/feedItemMediaIndicator"
+			android:layout_weight="1" android:layout_width="17dp"
+			android:layout_height="17dp" android:src="@drawable/media_light"
+			android:visibility="gone" />
+		<ImageView android:id="@+id/feedItemFavoritedIndicator"
+			android:layout_weight="1" android:layout_width="16dp"
+			android:layout_height="16dp" android:src="@drawable/favorited_light"
+			android:visibility="gone" />
+	</LinearLayout>
+
+	<com.handlerexploit.prime.RemoteImageView
+		android:id="@+id/feedItemProfilePic" android:layout_width="60dp"
+		android:layout_height="60dp" android:layout_marginRight="10dp"
+		android:src="@drawable/sillouette" />
+	<ImageView android:id="@+id/feedItemRetweetIndicatorImg"
+		android:layout_width="17dp" android:layout_height="17dp"
+		android:layout_marginRight="5dp" android:layout_toRightOf="@+id/feedItemProfilePic"
+		android:src="@drawable/retweet_light" android:visibility="gone" />
+	<TextView android:id="@+id/feedItemRetweetIndicatorTxt"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignBaseline="@+id/feedItemRetweetIndicatorImg"
+		android:layout_toRightOf="@+id/feedItemRetweetIndicatorImg"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:textColor="@color/dark" android:textColorLink="@color/blue_secondary"
+		android:visibility="gone" />
+	<TextView android:id="@+id/feedItemUserName"
+		android:duplicateParentState="true" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_toRightOf="@+id/feedItemProfilePic"
+		android:singleLine="true" android:layout_alignWithParentIfMissing="true"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:textColor="@color/username_highlight_selector" android:textStyle="bold" />
+	<TextView android:id="@+id/feedItemText" android:layout_width="wrap_content"
+		android:duplicateParentState="true" android:layout_height="wrap_content"
+		android:layout_toRightOf="@+id/feedItemProfilePic" android:layout_marginRight="5dp"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:layout_below="@+id/feedItemUserName" android:textColor="@color/white"
+		android:textColorLink="@color/blue_secondary" />
+	<RelativeLayout android:id="@+id/feedItemMediaFrame"
+		android:layout_marginTop="5dp" android:paddingBottom="5dp"
+		android:layout_width="fill_parent" android:layout_height="120dp"
+		android:layout_below="@+id/feedItemText" android:visibility="gone">
+		<ImageView android:id="@+id/feedItemMediaPreview"
+			android:visibility="gone" android:scaleType="centerCrop"
+			android:layout_width="fill_parent" android:layout_height="match_parent" />
+		<ProgressBar android:id="@+id/feedItemMediaProgress"
+			android:visibility="gone" android:padding="5dp"
+			android:layout_centerInParent="true" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</RelativeLayout>
+	<RelativeLayout android:id="@+id/locationFrame"
+		android:layout_marginTop="5dp" android:layout_width="fill_parent"
+		android:layout_marginRight="5dp" android:visibility="gone"
+		android:layout_height="wrap_content" android:layout_alignLeft="@+id/feedItemText"
+		android:layout_below="@+id/feedItemText">
+		<ImageView android:id="@+id/locationIndicImg"
+			android:layout_width="17dp" android:layout_height="17dp"
+			android:src="@drawable/locate" />
+		<TextView android:id="@+id/locationIndicTxt"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_alignTop="@+id/locationIndicImg"
+			android:layout_toRightOf="@+id/locationIndicImg"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:textColor="@color/dark" android:textColorLink="@color/blue_secondary" />
+	</RelativeLayout>
+	<RelativeLayout android:id="@+id/inReplyToFrame"
+		android:layout_marginTop="5dp" android:layout_width="fill_parent"
+		android:layout_marginRight="5dp" android:visibility="gone"
+		android:layout_height="wrap_content" android:layout_alignLeft="@+id/feedItemText"
+		android:layout_below="@+id/feedItemText">
+		<ImageView android:id="@+id/inReplyIndicImg"
+			android:layout_width="17dp" android:layout_height="17dp" android:src="@drawable/reply_light" />
+		<TextView android:id="@+id/inReplyIndicTxt"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_alignTop="@+id/inReplyIndicImg"
+			android:layout_toRightOf="@+id/inReplyIndicImg"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:textColor="@color/dark" android:textColorLink="@color/blue_secondary" />
+	</RelativeLayout>
+</RelativeLayout>
