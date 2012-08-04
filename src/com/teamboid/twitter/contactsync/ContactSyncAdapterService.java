@@ -10,6 +10,7 @@ import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.relationship.IDs;
 import com.teamboid.twitterapi.user.User;
+import com.teamboid.twitterapi.utilities.Utils;
 
 import android.accounts.Account;
 import android.app.Service;
@@ -18,6 +19,7 @@ import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -86,19 +88,12 @@ public class ContactSyncAdapterService extends Service {
 			return _id;
 		}
 		
-		List<com.teamboid.twitter.Account> realAccounts;
-		
 		Twitter getTwitter(){
-			realAccounts = new ArrayList<com.teamboid.twitter.Account>();
-			realAccounts.addAll(AccountService.getAccounts( mContext )); // TODO: Fixme
+			SharedPreferences sp = mContext.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE);
+			String s = sp.getString(getId() + "", null);
+			if(s == null) return null;
 			
-			for(com.teamboid.twitter.Account a : realAccounts){
-				if(a.getId() == getId()){
-					return a.getClient();
-				}
-			}
-			
-			return null;
+			return (Twitter) Utils.deserializeObject( s );
 		}
 		
 		String getWhatToSync(){ // TODO: Actually make this return something the user wants

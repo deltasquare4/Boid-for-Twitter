@@ -484,5 +484,8 @@
 	
 	<string name="not_logged_in">You are not logged in</string>
 	<string name="logged_in_as">You are logged in as {user}</string>
-	<string name="service_needs_config">(needs logging in)</string>
+	<string name="service_needs_config">{service} (needs logging in)</string>
+	<string name="login_to_service">Login to {service}</string>
+	<string name="email">Email Address</string>
+	<string name="password">Password</string>
 </resources>

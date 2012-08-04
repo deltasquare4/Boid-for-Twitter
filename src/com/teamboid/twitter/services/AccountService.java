@@ -140,8 +140,8 @@ public class AccountService extends Service {
 					}
 					Account profile = new Account(activity, toAdd).setUser(toAddUser);
 					accounts.add(profile);
-					activity.getSharedPreferences("profiles", 0).edit()
-						.putString(toAdd.getAccessToken(), Utils.serializeObject(profile)).commit();
+					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
+						.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -170,7 +170,7 @@ public class AccountService extends Service {
 			getApplicationContext().getSharedPreferences("accounts", 0).edit().clear().commit();
 			Toast.makeText(getApplicationContext(), R.string.please_readd_accounts, Toast.LENGTH_LONG).show();
 		}
-		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles", 0).getAll();
+		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles-v2", 0).getAll();
 		if (accountStore.size() == 0) {
 			getApplicationContext().startActivity(new Intent(getApplicationContext(), AccountManager.class)
 				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

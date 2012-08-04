@@ -91,7 +91,7 @@ public class SendTweetService extends Service {
 				}
 				sendBroadcast(update);
 			}
-			saveTweets();
+			handler.post(new Runnable(){ public void run(){ saveTweets(); } });
 			return null;
 		}
 	}

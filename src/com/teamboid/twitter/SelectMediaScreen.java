@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.utilities.MediaUtilities;
 import com.teamboid.twitterapi.media.ExternalMediaService;
+import com.teamboid.twitterapi.media.ExternalMediaService.AuthorizationNeeded;
 import com.teamboid.twitterapi.media.MediaServices;
 
 public class SelectMediaScreen extends PreferenceActivity {
@@ -46,17 +48,28 @@ public class SelectMediaScreen extends PreferenceActivity {
 			super(context);
 			try { setTitle(m.getServiceName()); }
 			catch(Exception e) { e.printStackTrace(); }
-			needsConfig = ! (m.getOAuthService() == null );
+			needsConfig = (m.getNeededAuthorization() != AuthorizationNeeded.NONE );
 			this.m = m;
 			
 			Uri.parse("boid://finishconfig/" + key);
+		}
+		
+		boolean isLoggedIn(){
+			SharedPreferences sp = getSharedPreferences();
+			switch(m.getNeededAuthorization()){
+			case MAIL_AND_PASSWORD:
+				return !sp.getString(getKey() + "-username", "").equals("");
+			case OAUTH:
+				return !sp.getString(getKey() + "-token", "").equals("");
+			}
+			return false;
 		}
 
 		@Override
 		public View getView(View convertView, ViewGroup parent) {
 			if(convertView == null) convertView = LayoutInflater.from(getContext()).inflate(R.layout.media_service, null);
 			RadioButton r = (RadioButton)convertView.findViewById(R.id.radio);
-			boolean configured = !getSharedPreferences().getString(getKey() + "-token", "").equals("");
+			boolean configured = isLoggedIn();
 			if(needsConfig)
 				r.setEnabled( configured );
 			if(!needsConfig || ( needsConfig && configured) ) r.setText(this.getTitle());
@@ -87,24 +100,27 @@ public class SelectMediaScreen extends PreferenceActivity {
                                     dialog.dismiss();
                             }
                     });
-                    configureView(v);
-                    ab.show();
+                    AlertDialog dlg = ab.create();
+                    configureView(dlg, v);
+                    dlg.show();
 				}
-				public void configureView(final View v){
+				
+				public void configureView(final DialogInterface dlg, final View v){
 					final SharedPreferences sp = getSharedPreferences();
-					String auth_token = sp.getString(getKey() + "-token", "");
+					boolean isLoggedIn = isLoggedIn();
 					String user = sp.getString(getKey() + "-url", "");
 					
                     TextView t = (TextView)v.findViewById(R.id.summary);
-                    if(auth_token.equals("")) t.setText(R.string.not_logged_in);
+                    if(!isLoggedIn) t.setText(R.string.not_logged_in);
                     else t.setText(getString(R.string.logged_in_as).replace("{user}", user));
                     Button b = (Button)v.findViewById(R.id.action);
-                    if(auth_token.equals("")){
+                    
+                    if(!isLoggedIn){
                             b.setText(R.string.login);
                             b.setOnClickListener(new OnClickListener(){
                                     @Override
                                     public void onClick(View button) {
-                                            requestAuth();
+                                            requestAuth(dlg);
                                     }
                             });
                     } else{
@@ -112,14 +128,86 @@ public class SelectMediaScreen extends PreferenceActivity {
                             b.setOnClickListener(new OnClickListener(){
                                     @Override
                                     public void onClick(View w) {
-                                        sp.edit().remove(getKey() + "-token").remove(getKey() + "-secret").remove(getKey() + "-url").commit();
-                                    	configureView(v);
+                                        sp.edit().remove(getKey() + "-token").remove(getKey() + "-secret").remove(getKey() + "-username").remove(getKey() + "-password").remove(getKey() + "-url").commit();
+                                    	configureView(dlg, v);
                                     }
                             });
                     }
                     
 				}
-				public void requestAuth(){
+				public void requestAuth(final DialogInterface parent){
+					switch(m.getNeededAuthorization()){
+					case OAUTH:
+						startOAuth();
+						break;
+					case MAIL_AND_PASSWORD:
+						AlertDialog.Builder ab = new AlertDialog.Builder(SelectMediaScreen.this);
+						
+						ab.setTitle(getString(R.string.login_to_service).replace("{service}", m.getServiceName()));
+						LayoutInflater lf = LayoutInflater.from(SelectMediaScreen.this);
+						final View v = lf.inflate(R.layout.user_and_pwd_login_panel, null);
+						ab.setView(v);
+						
+						ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+						ab.setPositiveButton(R.string.login, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(final DialogInterface dialog, int which) {
+								// Let's now save the data if we can
+								final String email = ((EditText)v.findViewById(R.id.email)).getText().toString().trim();
+								final String password = ((EditText)v.findViewById(R.id.password)).getText().toString();
+								
+								final ProgressDialog pd = new ProgressDialog(SelectMediaScreen.this);
+								pd.setMessage(getText(R.string.please_wait));
+								pd.show();
+								
+								new Thread(new Runnable(){
+
+									@Override
+									public void run() {
+										try{
+											m.setMailAndPassword(email, password);
+											String username = m.getUserName();
+											if(username == null) throw new Exception("Username is null. This is illegal. Call the cops");
+											
+											SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(SelectMediaScreen.this);
+											sp.edit().putString(getKey() + "-username", email).putString(getKey() + "-password", password).putString(getKey() + "-url", username).commit();
+											
+											pd.dismiss();
+											setupPreferences();
+											dialog.dismiss();
+											parent.dismiss();
+										} catch(Exception e){
+											e.printStackTrace();
+											runOnUiThread(new Runnable(){
+
+												@Override
+												public void run() {
+													pd.dismiss();
+													Toast.makeText(SelectMediaScreen.this, getText(R.string.error_str), Toast.LENGTH_SHORT).show();
+												}
+												
+											});
+										}
+									}
+									
+								}).start();
+							}
+							
+						});
+						
+						ab.show();
+						break;
+					}
+				}
+				
+				void startOAuth(){
 					final ProgressDialog pd = new ProgressDialog(SelectMediaScreen.this);
 					pd.setMessage(getText(R.string.please_wait));
 					pd.show();

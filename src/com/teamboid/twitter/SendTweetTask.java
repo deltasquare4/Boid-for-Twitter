@@ -126,9 +126,17 @@ public class SendTweetTask {
 				ems.setAPIKey( MEDIA_API_KEYS.get( prefValue.toLowerCase() ) );
 				ems.setAttribution("Uploaded via Boid for Android. Download for free -- http://boidapp.com");
 				
-				// Authed
-				if(ems.getOAuthService() != null){
-					SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences sp;
+				switch(ems.getNeededAuthorization()){ // We need to send whatever auth it requires
+				case MAIL_AND_PASSWORD:
+					sp = PreferenceManager.getDefaultSharedPreferences(context);
+					ems.setMailAndPassword(
+							sp.getString(prefValue + "-username", ""),
+							sp.getString(prefValue + "-password", "")
+					);
+					break;
+				case OAUTH:
+					sp = PreferenceManager.getDefaultSharedPreferences(context);
 					Token token = new Token(sp.getString(prefValue + "-token", ""), sp.getString(prefValue + "-secret", ""));
 					ems.setAuthorized(MediaUtilities.buildAuthService(prefValue), token);
 				}
