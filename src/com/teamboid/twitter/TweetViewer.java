@@ -13,6 +13,8 @@ import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
+import com.teamboid.twitterapi.utilities.Utils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -115,7 +117,7 @@ public class TweetViewer extends MapActivity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
                 startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-                        .putExtra("sr_tweet", Utilities.serializeObject(binder.getTweet(pos)))
+                        .putExtra("sr_tweet", Utils.serializeObject(binder.getTweet(pos)))
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
@@ -129,7 +131,7 @@ public class TweetViewer extends MapActivity {
                 finish();
             }
         } else if (getIntent().hasExtra("sr_tweet")) {
-            displayTweet((Status) Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")));
+            displayTweet((Status) Utils.deserializeObject(getIntent().getStringExtra("sr_tweet")));
         } else {
             preloadTweet();
             loadTweet();

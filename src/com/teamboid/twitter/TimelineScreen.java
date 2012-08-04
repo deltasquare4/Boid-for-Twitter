@@ -94,6 +94,7 @@ public class TimelineScreen extends Activity {
             if (intent.getAction().equals(AccountManager.END_LOAD)) {
                 loadColumns(intent.getBooleanExtra("last_account_count", false));
                 accountsLoaded();
+                invalidateOptionsMenu();
                 return;
             }
             try {
@@ -199,9 +200,6 @@ public class TimelineScreen extends Activity {
         ab.setDisplayShowHomeEnabled(false);
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         startService(new Intent(this, AccountService.class));
-        AccountService.activity = this;
-        AccountService.loadTwitterConfig(this);
-        AccountService.loadAccounts();
     }
 
     @Override
@@ -566,7 +564,6 @@ public class TimelineScreen extends Activity {
             restartActivity();
             return;
         }
-        AccountService.activity = this;
         TimelineCAB.context = this;
         UserListCAB.context = this;
         MessageConvoCAB.context = this;
@@ -624,7 +621,7 @@ public class TimelineScreen extends Activity {
         super.onSaveInstanceState(outState);
     }
 
-    @SuppressLint({ "AlwaysShowAction" })
+	@SuppressLint("AlwaysShowAction")
 	@Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main_actionbar, menu);

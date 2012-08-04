@@ -2,6 +2,6 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/resizable_widget"
     android:minHeight="110dp"
-    android:minWidth="250dp"
+    android:minWidth="100dp"
     android:updatePeriodMillis="600000" 
     android:resizeMode="horizontal|vertical" />

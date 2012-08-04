@@ -60,7 +60,7 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 				rv.setTextViewText(R.id.feedItemUserName, status.getUser().getName());
 			} else rv.setTextViewText(R.id.feedItemUserName, status.getUser().getScreenName());
             rv.setTextViewText(R.id.feedItemText, status.getText());
-            rv.setTextViewText(R.id.feedItemTimerTxt, Utilities.friendlyTimeShort(status.getCreatedAt()));
+            rv.setTextViewText(R.id.feedItemTimerTxt, Utilities.friendlyTimeHourMinute(status.getCreatedAt()));
             
             return rv;
 		}

@@ -335,7 +335,7 @@ public class AccountManager extends PreferenceActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             setProgressBarIndeterminateVisibility(true);
-            AccountService.verifyAccount(data.getStringExtra("oauth_verifier"));
+            AccountService.verifyAccount(this, data.getStringExtra("oauth_verifier"));
         }
     }
 

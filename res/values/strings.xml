@@ -133,7 +133,7 @@
 	<string name="authorizing_account">Authorizing your account…</string>
 	<string name="failed_load_account">Failed to load an account!</string>
 	<string name="failed_fetch_config">Failed to fetch Twitter\'s current configuration;
-		defaults will be used. Reason: {reason}
+		defaults will be used. {reason}
 	</string>
 	<string name="failed_load_tweet">Something happened while loading this Tweet!
 	</string>
@@ -467,4 +467,5 @@
 	<string name="restored_columns">Your columns were successfully restored!
 	</string>
 	<string name="screen_name_str">Screen name</string>
+	<string name="please_readd_accounts">Please re-add your accounts!</string>
 </resources>
