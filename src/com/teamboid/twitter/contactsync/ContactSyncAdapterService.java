@@ -90,7 +90,7 @@ public class ContactSyncAdapterService extends Service {
 		
 		Twitter getTwitter(){
 			realAccounts = new ArrayList<com.teamboid.twitter.Account>();
-			realAccounts.addAll(AccountService.getCachedAccounts( mContext ));
+			realAccounts.addAll(AccountService.getAccounts( mContext )); // TODO: Fixme
 			
 			for(com.teamboid.twitter.Account a : realAccounts){
 				if(a.getId() == getId()){

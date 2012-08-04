@@ -22,6 +22,10 @@
 	<attr name="sideNavColor" format="color" />
 	<attr name="spinnerActionBarDropDownColor" format="color" />
 	
+	<attr name="sendQueueEdit" format="reference" />
+	<attr name="sendQueueRefresh" format="reference" />
+	<attr name="sendQueueDelete" format="reference" />
+	
 	<attr name="pinIcon" format="reference" />
 	<attr name="newTweetIcon" format="reference" />
 	<attr name="addAccountIcon" format="reference" />
@@ -66,6 +70,7 @@
 	<attr name="nearbyTab" format="reference" />
 	<attr name="mediaTab" format="reference" />
 	<attr name="aboutTab" format="reference" />
+	<attr name="userFeedTab" format="reference" />
 	
 	<declare-styleable name="DragSortListView">
 		<attr name="collapsed_height" format="dimension" />

@@ -24,6 +24,7 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
@@ -38,25 +39,22 @@ public class PushReceiver extends BroadcastReceiver {
 	
 	public static final String SENDER_EMAIL = "107821281305";
 	public static int pushForId = 0;
-	// In release builds this should be nodester, but I might change it back to my local IP for 
-	// changes ;)
-	// public static final String SERVER = "http://192.168.0.9:1337";
 	public static final String SERVER = "http://boid.nodester.com";
 	
-	public static class PushWorker extends Service{
+	public static class PushWorker extends Service {
 		
 		@Override
 		public IBinder onBind(Intent arg0) { return null; }
 		
-		private static final String ENCRYPTION_KEY = "boidisalovelyappandijustlovehavingencrpytiontoworkwithnodester...../.khnihi";
+		private static final String ENCRYPTION_KEY = "efjiowewefbhjdbfhjedbfhjdfhbfberjgbisdbhebfuiehfudbvhjdnbfjwqhvfhjiou9fywe8ftyw87rtwfueiofhwekfh";
 		
 		@Override
 		public int onStartCommand(final Intent intent, int flags, int startId) {
-			if(intent.hasExtra("reg")){
+			if(intent.hasExtra("reg")) {
 				final Intent i = new Intent("com.teamboid.twitter.PUSH_PROGRESS");
 				i.putExtra("progress", 500);
 				sendBroadcast(i);
-				new Thread(new Runnable(){
+				new Thread(new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -89,11 +87,11 @@ public class PushReceiver extends BroadcastReceiver {
 							p.setEntity( new StringEntity(query) );
 							HttpResponse r = dhc.execute(p);
 							
-							if(r.getStatusLine().getStatusCode() == 200){
+							if(r.getStatusLine().getStatusCode() == 200) {
 								Log.d("push", "REGISTERED");
 								i.putExtra("progress", 1000);
 								sendBroadcast(i);
-							} else{ throw new Exception("NON 200 RESPONSE"); }
+							} else throw new Exception("NON 200 RESPONSE");							
 							
 						} catch(Exception e) { 
 							e.printStackTrace();
@@ -106,7 +104,6 @@ public class PushReceiver extends BroadcastReceiver {
 				}).start();
 			} else if(intent.hasExtra("hm")) {
 				final Bundle b = intent.getBundleExtra("hm");
-				
 				if(NightModeUtils.isNightMode(this)){
 					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 					if(prefs.getBoolean("night_mode_pause_notifications", false) == true){
@@ -114,7 +111,6 @@ public class PushReceiver extends BroadcastReceiver {
 						return Service.START_NOT_STICKY;
 					}
 				}
-				
 				try {
 					String type = b.getString("type");
 					Integer accId = 0;
@@ -124,22 +120,16 @@ public class PushReceiver extends BroadcastReceiver {
 						JSONObject status = new JSONObject(b.getString("tweet"));
 						status.put("id", Long.parseLong(status.getString("id_str")));
 						final Status s = new StatusJSON(status);
-						//TODO The account the mention is for should be passed from the server too
-						// We have this now in "account" as a string
-						//Also, we need a way of combining multiple mentions/messages into one notification.
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
-						AccountService.activity.runOnUiThread(new Runnable() {
+						TimelineCAB.context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								// You MUST insert the mention into the adapter associated with the 
-								// account the mention is for, not the adapter for the current account.
-								FeedListAdapter adapt = AccountService.getFeedAdapter(AccountService.activity, 
+								FeedListAdapter adapt = AccountService.getFeedAdapter(TimelineCAB.context, 
 										MentionsFragment.ID, Long.parseLong(b.getString("account")), false);
 								if(adapt != null) adapt.add(new Status[] { s });
 							}
 						});
-					} else if(type.equals("dm")){
-						//Yes I know it's "tweet". Deal with it
+					} else if(type.equals("dm")) {
 						JSONObject json = new JSONObject(b.getString("tweet"));
 						final DirectMessage dm = new DirectMessageJSON(json);
 						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);

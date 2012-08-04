@@ -37,12 +37,15 @@ import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -76,6 +79,12 @@ public class TimelineScreen extends Activity {
     private boolean lastIconic;
     private TabsAdapter mTabsAdapter;
     private boolean newColumn;
+    
+    private void notifyWidget() {
+    	final AppWidgetManager mgr = AppWidgetManager.getInstance(this);
+        final ComponentName cn = new ComponentName(this, ResizableWidgetProvider.class);
+        mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widgetList);
+    }
 
     private SendTweetArrayAdapter sentTweetBinder;
 
@@ -85,6 +94,7 @@ public class TimelineScreen extends Activity {
             if (intent.getAction().equals(AccountManager.END_LOAD)) {
                 loadColumns(intent.getBooleanExtra("last_account_count", false));
                 accountsLoaded();
+                invalidateOptionsMenu();
                 return;
             }
             try {
@@ -177,10 +187,9 @@ public class TimelineScreen extends Activity {
             prefs.edit().putBoolean("enable_profileimg_download", true).commit();
         if (!prefs.contains("enable_media_download")) prefs.edit().putBoolean("enable_media_download", true).commit();
         if (!prefs.contains("enable_drafts")) prefs.edit().putBoolean("enable_drafts", true).commit();
-        if (!prefs.contains("enable_iconic_tabs")) prefs.edit().putBoolean("enable_iconic_tabs", true).commit();
         if (!prefs.contains("textual_userlist_tabs")) prefs.edit().putBoolean("textual_userlist_tabs", true).commit();
-        if (!prefs.contains("textual_savedsearch_tabs"))
-            prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();
+        if (!prefs.contains("textual_savedsearch_tabs")) prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();
+        if (!prefs.contains("enable_iconic_tabs")) prefs.edit().putBoolean("enable_iconic_tabs", true).commit();
         if (!prefs.contains("boid_theme")) prefs.edit().putString("boid_theme", "0").commit();
         if (!prefs.contains("upload_service")) prefs.edit().putString("upload_service", "twitter").commit();
         if (!prefs.contains("enable_inline_previewing"))
@@ -191,9 +200,6 @@ public class TimelineScreen extends Activity {
         ab.setDisplayShowHomeEnabled(false);
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         startService(new Intent(this, AccountService.class));
-        AccountService.activity = this;
-        AccountService.loadTwitterConfig(this);
-        AccountService.loadAccounts();
     }
 
     @Override
@@ -353,7 +359,7 @@ public class TimelineScreen extends Activity {
                 Tab toAdd = getActionBar().newTab();
                 String screenName = c.substring(ProfileTimelineFragment.ID.length() + 1);
                 if (iconic) {
-                    Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userListTab}).getDrawable(0);
+                    Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userFeedTab}).getDrawable(0);
                     toAdd.setIcon(icon);
                 } else toAdd.setText("@" + screenName);
                 mTabsAdapter.addTab(toAdd, ProfileTimelineFragment.class, index, screenName);
@@ -558,7 +564,6 @@ public class TimelineScreen extends Activity {
             restartActivity();
             return;
         }
-        AccountService.activity = this;
         TimelineCAB.context = this;
         UserListCAB.context = this;
         MessageConvoCAB.context = this;
@@ -577,6 +582,7 @@ public class TimelineScreen extends Activity {
         filter.addAction(SendTweetService.UPDATE_STATUS);
         filter.addAction(AccountManager.END_LOAD);
         registerReceiver(receiver, filter);
+        notifyWidget();
     }
 
     @Override
@@ -594,6 +600,7 @@ public class TimelineScreen extends Activity {
         if (MessageConvoCAB.ConvoActionMode != null) {
             MessageConvoCAB.ConvoActionMode.finish();
         }
+        notifyWidget();
     }
 
     @Override
@@ -614,7 +621,8 @@ public class TimelineScreen extends Activity {
         super.onSaveInstanceState(outState);
     }
 
-    @Override
+	@SuppressLint("AlwaysShowAction")
+	@Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main_actionbar, menu);
         final ArrayList<Account> accs = AccountService.getAccounts();
@@ -636,7 +644,7 @@ public class TimelineScreen extends Activity {
             for (int i = 0; i < accs.size(); i++) {
                 ImageManager imageManager = ImageManager.getInstance(this);
                 final int index = i;
-                imageManager.get("https://api.twitter.com/1/users/profile_image?screen_name=" + accs.get(i).getUser().getScreenName() + "&size=bigger", new OnImageReceivedListener() {
+                imageManager.get("http://api.twitter.com/1/users/profile_image?screen_name=" + accs.get(i).getUser().getScreenName() + "&size=bigger", new OnImageReceivedListener() {
                     @Override
                     public void onImageReceived(String source, Bitmap bitmap) {
                         switcher.getSubMenu().add("@" + accs.get(index).getUser().getScreenName()).setIcon(new BitmapDrawable(getResources(), bitmap));

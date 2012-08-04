@@ -18,8 +18,13 @@
 		<item name="helpIcon">@drawable/help_light</item>
 		<item name="settingsIcon">@drawable/settings_light</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
-		<item name="sideNavColor">#252930</item>
+		<item name="sideNavColor">@color/holo_dark</item>
 		<item name="spinnerActionBarDropDownColor">@color/white</item>
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+		
+		<item name="sendQueueEdit">@drawable/edit_action</item>
+		<item name="sendQueueRefresh">@drawable/refresh_action</item>
+		<item name="sendQueueDelete">@drawable/delete_light</item>
 		
 		<item name="timelineTab">@drawable/home_tab</item>
 		<item name="mentionsTab">@drawable/mentions_tab</item>
@@ -31,6 +36,7 @@
 		<item name="nearbyTab">@drawable/nearby_tab</item>
 		<item name="mediaTab">@drawable/media_tab</item>
 		<item name="aboutTab">@drawable/about_tab_light</item>
+		<item name="userFeedTab">@drawable/userfeed_light</item>
 
 		<item name="pinIcon">@drawable/pin_light</item>
 		<item name="addAccountIcon">@drawable/add_account_light</item>
@@ -71,6 +77,7 @@
 		<item name="android:textColor">#FFFFFF</item>
 		<item name="android:textSize">24dip</item>
 	</style>
+	
 	<style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
 		<item name="android:dividerPadding">15dp</item>

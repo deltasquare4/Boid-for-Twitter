@@ -5,7 +5,7 @@
 	<com.handlerexploit.prime.RemoteImageView
 		android:id="@+id/dmItemProfileImg" android:background="@android:color/transparent"
 		android:layout_alignParentRight="true" android:layout_marginLeft="10dp"
-		android:layout_width="60dp" android:layout_height="60dp"
+		android:layout_width="70dp" android:layout_height="70dp"
 		android:src="@drawable/sillouette" />
 	<TextView android:id="@+id/dmItemMessageTxt"
 		android:textAppearance="?android:attr/textAppearanceMedium"

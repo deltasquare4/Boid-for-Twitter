@@ -5,15 +5,17 @@
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
 	</string>
-	<string name="push_error">There was a problem with push, the servers may be down. Please try again later.</string>
+	<string name="push_error">There was a problem with push, the servers may be
+		down. Please try again later.</string>
 	<string name="push_updated">Your push settings have been updated</string>
 	<string name="push_registered">Push is now registered!</string>
 	<string name="messages_priv">Show Content</string>
 	<string name="message_recv">{user} sent you a Direct Message</string>
-	<string name="messages_priv_desc">Show the content of direct messages in notifications.</string>
+	<string name="messages_priv_desc">Show the content of direct messages in
+		notifications.</string>
 	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
-	<string name="failed_check_blocked">Failed to check if @{user} is blocked!</string>
+	<string name="failed_check_relationship">Failed to get your relationship to {user}!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
 	<string name="nearby_str">Nearby</string>
 	<string name="no_camera_app">Uh oh! You don\'t have any camera apps!</string>
@@ -84,7 +86,6 @@
 	<string name="no_favorites">No favorites</string>
 	<string name="no_results">No results</string>
 	<string name="no_media">No media</string>
-	<string name="no_accounts">No accounts. Please add one</string>
 	<string name="nodescription_str">(No description)</string>
 	<string name="no_internet">Please connect to the internet.</string>
 	<string name="error_str">Error</string>
@@ -132,7 +133,7 @@
 	<string name="authorizing_account">Authorizing your account…</string>
 	<string name="failed_load_account">Failed to load an account!</string>
 	<string name="failed_fetch_config">Failed to fetch Twitter\'s current configuration;
-		defaults will be used. Reason: {reason}
+		defaults will be used. {reason}
 	</string>
 	<string name="failed_load_tweet">Something happened while loading this Tweet!
 	</string>
@@ -150,11 +151,11 @@
 	<string name="manage_accounts_str">Accounts</string>
 	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts.</string>
 	<string name="remove_account">Remove Account</string>
-	<string name="confirm_remove_account">Are you sure you want to remove @{account}?</string>
+	<string name="confirm_remove_account">Are you sure you want to remove @{account}?
+	</string>
 	<string name="my_profile_str">My Profile</string>
 	<string name="settings_str">Settings</string>
 	<string name="addcolumn_str">Add Column</string>
-	<string name="removecolumn_str">Remove Column</string>
 	<string name="add_account_str">Add Account</string>
 	<string name="muting_str">Muting</string>
 	<string name="muting_str_desc">Add or remove timeline muting rules to filter
@@ -244,8 +245,8 @@
 	<string name="trends_str">Trends</string>
 	<string name="favorites_str">Favorites</string>
 	<string name="savedsearch_str">Saved Search</string>
-	<string name="userlist_str">User List</string>
-	<string name="list_str">List</string>
+	<string name="list_timeline_str">List Timeline</string>
+	<string name="user_timeline_str">User Timeline</string>
 
 	<string name="load_widget">Loading {widget}…</string>
 	<string name="youtube_embed">YouTube Embed</string>
@@ -294,7 +295,7 @@
 		<item>1000</item>
 	</string-array>
 	<string-array name="trend_sources">
-	    <item>Global Trends</item>
+		<item>Global Trends</item>
 		<item>Daily Trends</item>
 		<item>Weekly Trends</item>
 		<item>Local Trends</item>
@@ -302,22 +303,11 @@
 	
 	<string name="local_trend_with_place">Local - {place}</string>
 
-	<string name="upload_twitter">Twitter (Default)</string>
-	<string name="upload_yfrog">yFrog</string>
-	<string name="upload_twitgoo">TwitGoo</string>
-	<string name="upload_posterous">Posterous</string>
-	<string name="upload_lockerz">Lockerz</string>
-	<string name="upload_imgly">img.LY</string>
-	<string name="upload_imgur">imgur</string>
-	<string name="service_needs_config">{service} (needs setup)</string>
-	<string name="logged_in_as">Logged in as {user}</string>
-	<string name="not_logged_in">Not logged in</string>
-
 	<string name="push_title">Push Notifications</string>
 	<string name="enable_push">Enabling push notifications will push you updates
 		in near real-time
 	</string>
-
+	
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="imgur_note">Images will be uploaded using the same
@@ -397,7 +387,8 @@
 		manually later.
 	</string>
 	<string name="about_nodester">Nodester</string>
-	<string name="about_nodester_summary">Push notifications made possible by Nodester, free node.js hosting! Check them out!
+	<string name="about_nodester_summary">Push notifications made possible by Nodester, free
+		node.js hosting! Check them out!
 	</string>
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
@@ -425,24 +416,24 @@
 	<string name="x_convos_selected">{X} Conversations Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
-		teenagers of Team Boid!</string>
-		
+		teenagers of Team Boid!
+	</string>
+
 	<string-array name="sync_types">
-	    <item>Following</item>
-	    <item>Followers</item>
-	    <item>Mutual</item>
+		<item>Following</item>
+		<item>Followers</item>
+		<item>Mutual</item>
 	</string-array>
 	<string-array name="sync_types_values">
-	    <item>following</item>
-	    <item>followers</item>
-	    <item>mutual</item>
+		<item>following</item>
+		<item>followers</item>
+		<item>mutual</item>
 	</string-array>
 	<string name="contact_sync">Contact Sync</string>
-		
+
 	<string name="this_is_you">This is you</string>
 	<string name="failed_check_following">Failed to check if you\'re following @{user}!
 	</string>
-	<string name="quick_reply_hint">Press enter to send…</string>
 	<string name="failed_delete_dm">Failed to delete a message from your conversation
 		with @{user}!
 	</string>
@@ -467,10 +458,10 @@
 	<string name="night_mode_disabled_at">Night mode ends at {time}.</string>
 	<string name="pause_notifications">Pause Notifications</string>
 	<string name="pause_notifications_desc">When enabled, you will not receive notifications
-		while night mode is active.</string>
-		<string name="columns_str">Columns</string>
+		while night mode is active.
+	</string>
+	<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
-	<string name="user_feed_str">\@{user} (Feed)</string>
 	
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
@@ -482,4 +473,16 @@
 	<string name="no_location_str">No Location</string>
 	
 	<string name="please_wait">Please wait…</string>
+	<string name="no_column_backup">No column backup file was found!</string>
+	<string name="reset_str">Reset</string>
+	<string name="backed_up_columns">Your columns were successfully backed up!
+	</string>
+	<string name="restored_columns">Your columns were successfully restored!
+	</string>
+	<string name="screen_name_str">Screen name</string>
+	<string name="please_readd_accounts">Please re-add your accounts!</string>
+	
+	<string name="not_logged_in">You are not logged in</string>
+	<string name="logged_in_as">You are logged in as {user}</string>
+	<string name="service_needs_config">(needs logging in)</string>
 </resources>

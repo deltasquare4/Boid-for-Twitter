@@ -23,8 +23,8 @@ import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.user.User;
+import com.teamboid.twitterapi.utilities.Utils;
 
 /**
  * Represents the column that displays the feed of a user, this specific one is used in the timeline for profiles that have been pinned.
@@ -53,7 +53,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 		Status tweet = (Status)getAdapter().getItem(position);
 		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utilities.serializeObject(tweet))
+		.putExtra("sr_tweet", Utils.serializeObject(tweet))
 		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
@@ -96,9 +96,8 @@ public class ProfileTimelineFragment extends BaseListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (getView() == null)
-			return;
-		getAdapter().restoreLastViewed(getListView());
+		if (getView() == null) return;
+		else if(getAdapter() != null) getAdapter().restoreLastViewed(getListView());
 	}
 
 	@Override

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <issue id="AlwaysShowAction">
-        <ignore path="src/com/teamboid/twitter/TimelineScreen.java" />
-    </issue>
+    <issue id="ContentDescription" severity="ignore" />
 </lint>

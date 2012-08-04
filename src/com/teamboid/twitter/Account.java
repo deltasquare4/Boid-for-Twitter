@@ -1,57 +1,38 @@
 package com.teamboid.twitter;
 
-import org.json.*;
+import java.io.Serializable;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.user.User;
 
 /**
  * @author Aidan Follestad
  */
-public class Account {
+public class Account implements Serializable {
 
-	public Account(Context context, Twitter client, String token) {
+	private static final long serialVersionUID = 5774596574060143207L;
+
+	public Account() { }
+	public Account(Context context, Twitter client) {
 		_client = client;
-		_token = token;
-		prefs = context.getSharedPreferences("account_" + token, 0);
+		try {
+			_accessToken = client.getAccessToken();
+			_accessSecret = client.getAccessSecret();
+		} catch(Exception e) { e.printStackTrace(); }
 	}
 	
-	public JSONObject serialize() throws JSONException{
-		JSONObject r = new JSONObject();
-		r.put("key", _token);
-		r.put("secret", getSecret());
-		r.put("user", Utilities.serializeObject( getUser()));
-		return r;
-	}
-	
-	public static Account unserialize( Context c, JSONObject i ) throws JSONException{
-		Twitter client = AccountService.getAuthorizer().getAuthorizedInstance(i.getString("key"), i.getString("secret"));
-		Account r = new Account( c, client, i.getString("key") );
-		r.setUser( (User) Utilities.deserializeObject( i.getString("user") ) );
-		r.setSecret( i.getString("secret") );
-		return r;
-	}
-	
-	private Twitter _client;
-	private String _token;
-	private SharedPreferences prefs;
+	private String _accessToken;
+	private String _accessSecret;
 	private User _user;
+	private transient Twitter _client;
 
 	public Twitter getClient() { return _client; }
-	public String getToken() { return _token; }
-	public String getSecret() { return prefs.getString("secret", ""); }
+	public String getToken() { return _accessToken; }
+	public String getSecret() { return _accessSecret; }
 	public User getUser() { return _user; }
 	public long getId() { return _user.getId(); }
 
-	public Account setSecret(String secret) {
-		prefs.edit().putString("secret", secret).commit();
-		return this;
-	}
 	public Account setUser(User user) {
 		_user = user;
 		return this;
@@ -61,7 +42,7 @@ public class Account {
 		return this;
 	}
 	
-	public String toString(){
+	public String toString() {
 		return "BoidUser["+ getId() + "]";
 	}
 }

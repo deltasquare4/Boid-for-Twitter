@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,13 +44,8 @@ import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.NoUnderlineClickableSpan;
 import com.teamboid.twitter.views.TimePreference;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -481,6 +475,12 @@ public class Utilities {
             return hour + ":" + minute + am_pm + " " + convertMonth(time.get(Calendar.MONTH), false) + " " + day + ", " + year;
         }
     }
+    public static String friendlyTimeHourMinute(Calendar time) {
+    	int hour = time.get(Calendar.HOUR);
+    	String minute = Integer.toString(time.get(Calendar.MINUTE));
+    	if(minute.length() == 1) minute = ("0" + minute);
+    	return hour + ":" + minute;
+    }
 
 	public static String generateImageFileName(Context context) {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -538,7 +538,7 @@ public class Utilities {
 			for(String mention : mentions) {
 				if(index == 0 && mention.equals(AccountService.getCurrentAccount().getUser().getScreenName())) {
                     continue;
-                }
+                } else if(mention.equals(initScreenname)) continue;
 				toReturn += " @" + mention;
 			}
 		}
@@ -594,32 +594,6 @@ public class Utilities {
 		return list.size() > 0;
 	}
 
-	public static Object deserializeObject(String input){
-		try{
-			byte [] data = Base64.decode( input, Base64.DEFAULT );
-			ObjectInputStream ois = new ObjectInputStream( 
-					new ByteArrayInputStream(  data ) );
-			Object o  = ois.readObject();
-			ois.close();
-			return o;
-		} catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public static String serializeObject(Serializable tweet){
-		try{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream( baos );
-			oos.writeObject( tweet );
-			oos.close();
-			return new String( Base64.encode( baos.toByteArray(), Base64.DEFAULT ) );
-		} catch(Exception e){
-			e.printStackTrace();
-			return "";
-		}
-	}
 	public static String getUserImage(String screenname, Context mContext){
 		return getUserImage(screenname, mContext, null);
 	}

@@ -18,8 +18,13 @@
 		<item name="helpIcon">@drawable/help_dark</item>
 		<item name="settingsIcon">@drawable/settings_dark</item>
 		<item name="accountSwitchIcon">@drawable/account_switch_light</item>
-		<item name="sideNavColor">#DDDDDD</item>
+		<item name="sideNavColor">@color/holo_light</item>
 		<item name="spinnerActionBarDropDownColor">@color/white</item>
+		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+		
+		<item name="sendQueueEdit">@drawable/edit_action_dark</item>
+		<item name="sendQueueRefresh">@drawable/refresh_action_dark</item>
+		<item name="sendQueueDelete">@drawable/delete_dark</item>
 		
 		<item name="timelineTab">@drawable/home_tab</item>
 		<item name="mentionsTab">@drawable/mentions_tab</item>
@@ -31,6 +36,7 @@
 		<item name="nearbyTab">@drawable/nearby_tab</item>
 		<item name="mediaTab">@drawable/media_tab</item>
 		<item name="aboutTab">@drawable/about_tab_light</item>
+		<item name="userFeedTab">@drawable/userfeed_light</item>
 		
 		<item name="pinIcon">@drawable/pin_light</item>
 		<item name="addAccountIcon">@drawable/add_account_light</item>

@@ -13,6 +13,7 @@ import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
+import com.teamboid.twitterapi.utilities.Utils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -77,174 +78,178 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class TweetViewer extends MapActivity {
-	
-	private long statusId;
-	private boolean isFavorited;
-	private Status status;
-	private int lastTheme;
-	private String mediaUrl;
-	private boolean hasConvo;
-	
-	private FeedListAdapter binder;
 
-	public void showProgress(boolean show) {
-		findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
-	}
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		if(savedInstanceState != null) {
-			if(savedInstanceState.containsKey("lastTheme")) {
-				lastTheme = savedInstanceState.getInt("lastTheme");
-				setTheme(lastTheme);
-			} else setTheme(Utilities.getTheme(getApplicationContext()));
-		} else setTheme(Utilities.getTheme(getApplicationContext()));
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.tweet_view);
-		AccountService.initAccountServiceIfNeeded(this);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
-		ListView list = ((ListView)findViewById(android.R.id.list));
-		list.setAdapter(binder);
-		list.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
-				startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-					.putExtra("sr_tweet", Utilities.serializeObject( binder.getTweet(pos) ))
-					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
-		
-		if(getIntent().hasExtra("switchAcc")){
-			AccountService.selectedAccount = getIntent().getLongExtra("switchAcc", 0);
-		}
-		
-		if(Intent.ACTION_VIEW.equals(getIntent().getAction())){
-			try{
-				statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));
-				loadTweet();
-			} catch(Exception e){
-				e.printStackTrace();
-				Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT).show();
-				finish();
-			}
-		} else if(getIntent().hasExtra("sr_tweet")){
-			displayTweet((Status)Utilities.deserializeObject(getIntent().getStringExtra("sr_tweet")));
-		} else{
-			preloadTweet();
-			loadTweet();
-		}
-	}
+    private long statusId;
+    private boolean isFavorited;
+    private Status status;
+    private int lastTheme;
+    private String mediaUrl;
+    private boolean hasConvo;
 
-	private TweetWidgetHostHelper twhh = new TweetWidgetHostHelper();
+    private FeedListAdapter binder;
 
-	@Override
-	public void onBackPressed() {
-		SideNavigationLayout sideNav = (SideNavigationLayout)findViewById(R.id.slide);
-		if(sideNav.isShowingNavigationView()) {
-			sideNav.showContentView();
-		} else super.onBackPressed();
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if(lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
-		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
-			lastTheme = Utilities.getTheme(getApplicationContext()); 
-			recreate();
-		}
-		twhh.load(this);
-	}
+    public void showProgress(boolean show) {
+        findViewById(R.id.horizontalProgress).setVisibility((show == true) ? View.VISIBLE : View.GONE);
+    }
 
-	@Override
-	public void onPause(){
-		super.onPause();
-		twhh.stop(this);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("lastTheme")) {
+                lastTheme = savedInstanceState.getInt("lastTheme");
+                setTheme(lastTheme);
+            } else setTheme(Utilities.getTheme(getApplicationContext()));
+        } else setTheme(Utilities.getTheme(getApplicationContext()));
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.tweet_view);
+        if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("account")) {
+        	long accId = getIntent().getIntExtra("account", 0);
+        	AccountService.selectedAccount = (long)accId;
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+            	.putLong("last_sel_account", (long)accId).commit();
+        }
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
+        ListView list = ((ListView) findViewById(android.R.id.list));
+        list.setAdapter(binder);
+        list.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
+                startActivity(new Intent(getApplicationContext(), TweetViewer.class)
+                        .putExtra("sr_tweet", Utils.serializeObject(binder.getTweet(pos)))
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+            try {
+                statusId = Long.parseLong(getIntent().getData().getPathSegments().get(2));
+                loadTweet();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else if (getIntent().hasExtra("sr_tweet")) {
+            displayTweet((Status) Utils.deserializeObject(getIntent().getStringExtra("sr_tweet")));
+        } else {
+            preloadTweet();
+            loadTweet();
+        }
+    }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("lastTheme", lastTheme);
-		super.onSaveInstanceState(outState);
-	}
+    private TweetWidgetHostHelper twhh = new TweetWidgetHostHelper();
 
-	private void preloadTweet() {
-		statusId = getIntent().getLongExtra("tweet_id", 0l);
-		if(!getIntent().hasExtra("screen_name")) return;
-		final String screenName = getIntent().getStringExtra("screen_name");
-		setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
-		RelativeLayout toReturn = (RelativeLayout)findViewById(R.id.tweetDisplay);
-		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.tweetProfilePic);
-		profilePic.setImageResource(R.drawable.sillouette);
-		profilePic.setImageURL(Utilities.getUserImage(screenName, this));
-		profilePic.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) { 
-				startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
-		final TextView userName = (TextView)toReturn.findViewById(R.id.tweetUserName);
-		userName.setText(getIntent().getStringExtra("user_name"));
-		userName.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) { 
-				startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
-		final TextView screen = (TextView)toReturn.findViewById(R.id.tweetScreenName);
-		screen.setText("@" + screenName);
-		screen.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) { 
-				startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
-		TextView contents = (TextView)toReturn.findViewById(R.id.tweetContents);
-		contents.setText(Utilities.twitterifyText(this, getIntent().getStringExtra("content"), null, null, true));
-		contents.setMovementMethod(LinkMovementMethod.getInstance());
-		((TextView)toReturn.findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong(new Date(getIntent().getLongExtra("timer", 0l))) + " via " + Html.fromHtml(getIntent().getStringExtra("via")));
-		isFavorited = getIntent().getBooleanExtra("isFavorited", false);
-	}
+    @Override
+    public void onBackPressed() {
+        SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
+        if (sideNav.isShowingNavigationView()) {
+            sideNav.showContentView();
+        } else super.onBackPressed();
+    }
 
-	private void loadTweet() {
-		showProgress(true);
-		if(statusId == 0) {
-			finish();
-			return;
-		}
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					final Status tweet;
-					if(status == null) {
-						tweet = AccountService.getCurrentAccount().getClient().showStatus(statusId);
-					} else tweet = status;
-					runOnUiThread(new Runnable() {
-						public void run() {
-							displayTweet(tweet);
-							loadConversation(tweet);
-						} 
-					});
-				} catch(Exception e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() {
-							Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
-							showProgress(false);
-						}
-					});
-					return;
-				}
-				runOnUiThread(new Runnable() {
-					public void run() { showProgress(false); }
-				});
-			}
-		}).start();
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (lastTheme == 0) lastTheme = Utilities.getTheme(getApplicationContext());
+        else if (lastTheme != Utilities.getTheme(getApplicationContext())) {
+            lastTheme = Utilities.getTheme(getApplicationContext());
+            recreate();
+        }
+        twhh.load(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        twhh.stop(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("lastTheme", lastTheme);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void preloadTweet() {
+        statusId = getIntent().getLongExtra("tweet_id", 0l);
+        if (!getIntent().hasExtra("screen_name")) return;
+        final String screenName = getIntent().getStringExtra("screen_name");
+        setTitle(getString(R.string.tweet_str) + " (@" + screenName + ")");
+        RelativeLayout toReturn = (RelativeLayout) findViewById(R.id.tweetDisplay);
+        RemoteImageView profilePic = (RemoteImageView) toReturn.findViewById(R.id.tweetProfilePic);
+        profilePic.setImageResource(R.drawable.sillouette);
+        profilePic.setImageURL(Utilities.getUserImage(screenName, this));
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        final TextView userName = (TextView) toReturn.findViewById(R.id.tweetUserName);
+        userName.setText(getIntent().getStringExtra("user_name"));
+        userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        final TextView screen = (TextView) toReturn.findViewById(R.id.tweetScreenName);
+        screen.setText("@" + screenName);
+        screen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ProfileScreen.class).putExtra("screen_name", screenName)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        TextView contents = (TextView) toReturn.findViewById(R.id.tweetContents);
+        contents.setText(Utilities.twitterifyText(this, getIntent().getStringExtra("content"), null, null, true));
+        contents.setMovementMethod(LinkMovementMethod.getInstance());
+        ((TextView) toReturn.findViewById(R.id.tweetTimer)).setText(
+                Utilities.friendlyTimeLong(new Date(getIntent().getLongExtra("timer", 0l))) +
+                        " via " + Html.fromHtml(getIntent().getStringExtra("via")));
+        isFavorited = getIntent().getBooleanExtra("isFavorited", false);
+    }
+
+    private void loadTweet() {
+        showProgress(true);
+        if (statusId == 0) {
+            finish();
+            return;
+        }
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    final Status tweet;
+                    if (status == null) {
+                        tweet = AccountService.getCurrentAccount().getClient().showStatus(statusId);
+                    } else tweet = status;
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            displayTweet(tweet);
+                            loadConversation(tweet);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), R.string.failed_load_tweet, Toast.LENGTH_LONG).show();
+                            showProgress(false);
+                        }
+                    });
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showProgress(false);
+                    }
+                });
+            }
+        }).start();
+    }
 
     private void loadConversation(final Status tweet) {
         new Thread(new Runnable() {

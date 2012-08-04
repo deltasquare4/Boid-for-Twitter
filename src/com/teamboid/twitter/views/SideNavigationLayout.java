@@ -95,7 +95,7 @@ public class SideNavigationLayout extends FrameLayout {
         mScroller.startScroll((int) mOffsetX, 0,
                 (int) (getNavigationViewWidth() - mOffsetX), SCROLL_DURATION);
         getChildAt(0).animate().alpha(1.0F);
-        getChildAt(1).animate().alpha(0.3F);
+        if(getChildAt(1) != null) getChildAt(1).animate().alpha(0.3F);
         requestLayout();
         invalidate();
     }

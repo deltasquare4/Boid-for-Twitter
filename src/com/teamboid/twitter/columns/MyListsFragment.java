@@ -14,7 +14,6 @@ import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.list.UserList;
 import com.teamboid.twitterapi.search.Tweet;

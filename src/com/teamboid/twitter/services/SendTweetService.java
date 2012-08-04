@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SendTweetTask;
 import com.teamboid.twitter.SendTweetTask.Result;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.utilities.NetworkUtils;
 
@@ -47,16 +48,17 @@ public class SendTweetService extends Service {
 				sendBroadcast(update);
 				if(stt.sendTweet(SendTweetService.this).sent == true) {
 					try { 
-						((Activity)AccountService.activity).runOnUiThread(new Runnable() {
+						TimelineCAB.context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								AccountService.getFeedAdapter((Activity) AccountService.activity, TimelineFragment.ID,
-										AccountService.getCurrentAccount().getId()).add(new  com.teamboid.twitterapi.status.Status[]{stt.tweet});
+								AccountService.getFeedAdapter(TimelineCAB.context, TimelineFragment.ID,
+										AccountService.getCurrentAccount().getId())
+                                        .add(new com.teamboid.twitterapi.status.Status[] { stt.tweet });
 							}						
 						});
 					} catch(Exception e) { e.printStackTrace(); }
 					try {
-						if(!((Activity)AccountService.activity).hasWindowFocus()) {
+						if(!TimelineCAB.context.hasWindowFocus()) {
 							throw new Exception("Activity does not have focus");
 						}
 					} catch(Exception e) {

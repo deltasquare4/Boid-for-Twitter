@@ -1,5 +1,11 @@
 package com.teamboid.twitter;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.columns.FavoritesFragment;
@@ -25,17 +31,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teamboid.twitterapi.list.UserList;
@@ -51,7 +56,6 @@ public class ColumnManager extends Activity {
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
-			if(to < from && to >= 1) to--;
 			String toMove = adapt.getItem(from);
 			String toMoveRaw = cols.get(from);
 			removeColumn(from);
@@ -75,6 +79,14 @@ public class ColumnManager extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
+		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
+				removeColumn(index);
+				loadColumns();
+				return false;
+			}
+		});
 		list.setDropListener(dropListen);
 		list.setAdapter(adapt);
 	}
@@ -122,11 +134,11 @@ public class ColumnManager extends Activity {
 				adapt.add(getString(R.string.favorites_str));
 			} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
 				c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
-				adapt.add(c + " (" + getString(R.string.search_str) + ")");
+				adapt.add(c);
 			} else if(c.startsWith(UserListFragment.ID + "@")) {
 				c = c.substring(UserListFragment.ID.length() + 1);
 				c = c.substring(0, c.indexOf("@")).replace("%40", "@");
-				adapt.add(c + " (" + getString(R.string.list_str) + ")");
+				adapt.add(c);
 			} else if(c.equals(NearbyFragment.ID)) {
 				adapt.add(getString(R.string.nearby_str));
 			} else if(c.equals(MediaTimelineFragment.ID)) {
@@ -135,7 +147,7 @@ public class ColumnManager extends Activity {
 				adapt.add(getString(R.string.my_lists_str));
 			} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 				c = c.substring(ProfileTimelineFragment.ID.length() + 1);
-				adapt.add(getString(R.string.user_feed_str).replace("{user}", c));
+				adapt.add("@" + c);
 			}
 		}
 		adapt.notifyDataSetChanged();
@@ -166,6 +178,20 @@ public class ColumnManager extends Activity {
 		if(postIndex < 0) postIndex = 0;
 		selIndex = postIndex;
 	}
+
+	private void resetColumns() {
+		if(AccountService.getAccounts().size() == 0) return;
+		cols.clear();
+		cols.add(TimelineFragment.ID);
+        cols.add(MentionsFragment.ID);
+        cols.add(MessagesFragment.ID);
+        cols.add(TrendsFragment.ID);
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+                "_columns", Utilities.arrayToJson(cols)).commit();
+		selIndex = 0;
+		loadColumns();
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -179,6 +205,15 @@ public class ColumnManager extends Activity {
 		case android.R.id.home:
 			finish();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
+			return true;
+		case R.id.backupBtn:
+			backup();
+			return true;
+		case R.id.restoreBtn:
+			restore();
+			return true;
+		case R.id.resetBtn:
+			resetColumns();
 			return true;
 		case R.id.addTimelineColAction:
 			addColumn(TimelineFragment.ID, -1);
@@ -242,6 +277,9 @@ public class ColumnManager extends Activity {
 		case R.id.addMyListsColAction:
 			addColumn(MyListsFragment.ID, -1);
 			return true;
+		case R.id.addProfileFeedColAction:
+			showProfileFeedColumnAdd();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -275,50 +313,112 @@ public class ColumnManager extends Activity {
 		diag.setContentView(R.layout.savedsearch_dialog);
 		ArrayList<String> items = new ArrayList<String>();
 		for(SavedSearch l : lists) items.add(l.getName());
-		final ListView list = (ListView)diag.findViewById(android.R.id.list); 
+		
+		final ListView list = (ListView)diag.findViewById(android.R.id.list);
+		final EditText input = (EditText)diag.findViewById(android.R.id.input);
+		final Button addBtn = (Button)diag.findViewById(R.id.addBtn);
+		
 		list.setAdapter(new ArrayAdapter<String>(this, R.layout.trends_list_item, items));
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				SavedSearch curList = lists[index];
-				addColumn(SavedSearchFragment.ID + "@" + curList.getQuery().replace("@", "%40"), -1);
+				input.setText(lists[index].getName());
+			}
+		});
+		
+		addBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				final String query = input.getText().toString().trim();
+				new Thread(new Runnable() {
+					public void run() {
+						try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }
+						catch(Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_upload_error, Toast.LENGTH_SHORT).show(); }
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_uploaded, Toast.LENGTH_SHORT).show(); }
+						});
+					}
+				}).start();
+				addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
 				diag.dismiss();
 			}
 		});
-		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				Toast.makeText(ColumnManager.this, R.string.swipe_to_delete_items, Toast.LENGTH_LONG).show();
-				return false;
-			}
-		});
+		
+		diag.show();
+	}
+	
+	private void showProfileFeedColumnAdd() {
+		final Dialog diag = new Dialog(this);
+		diag.setTitle(R.string.user_timeline_str);
+		diag.setCancelable(true);
+		diag.setContentView(R.layout.savedsearch_dialog);
+		diag.findViewById(android.R.id.list).setVisibility(View.GONE); 
 		final EditText input = (EditText)diag.findViewById(android.R.id.input);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		final Button addBtn = (Button)diag.findViewById(R.id.addBtn);
+		input.setHint(R.string.screen_name_str);
+		addBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_GO) {
-					final String query = input.getText().toString().trim();
-					diag.dismiss();
-					addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
-					new Thread(new Runnable() {
-						public void run() {
-							try { AccountService.getCurrentAccount().getClient().createSavedSearch(query); }
-							catch(Exception e) {
-								e.printStackTrace();
-								runOnUiThread(new Runnable() {
-									public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_upload_error, Toast.LENGTH_SHORT).show(); }
-								});
-								return;
-							}
-							runOnUiThread(new Runnable() {
-								public void run() { Toast.makeText(getApplicationContext(), R.string.savedsearch_uploaded, Toast.LENGTH_SHORT).show(); }
-							});
-						}
-					}).start();
-				}
-				return false;
+			public void onClick(View v) {
+				final String query = input.getText().toString().trim();
+				diag.dismiss();
+				addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
 			}
 		});
 		diag.show();
 	}
+
+	public void backup() {
+		try {
+			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
+					Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt").getAbsolutePath()));
+			for(String key : cols) {
+				buf.write(key);
+				buf.newLine();
+			}
+			buf.flush();
+			buf.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.backed_up_columns, Toast.LENGTH_SHORT).show();
+	}
+	public void restore() {
+		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt");
+		if(!fi.exists()) {
+			Toast.makeText(getApplicationContext(), R.string.no_column_backup, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		try {
+			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));
+			cols.clear();
+			while(true) {
+				String line = buf.readLine();
+				if(line == null) break;
+				else if(line.isEmpty()) break;
+				cols.add(line);
+			}
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
+	                "_columns", Utilities.arrayToJson(cols)).commit();
+			buf.close();
+			selIndex = 0;
+			loadColumns();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), R.string.restored_columns, Toast.LENGTH_SHORT).show();
+	}
+
 }

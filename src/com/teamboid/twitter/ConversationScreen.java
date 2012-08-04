@@ -12,6 +12,7 @@ import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -55,6 +56,12 @@ public class ConversationScreen extends ListActivity {
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.conversation_screen);
+        if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("account")) {
+        	long accId = getIntent().getIntExtra("account", 0);
+        	AccountService.selectedAccount = (long)accId;
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+            	.putLong("last_sel_account", (long)accId).commit();
+        }
         setProgressBarIndeterminateVisibility(false);
         setTitle("@" + getIntent().getStringExtra("screen_name"));
         final EditText content = (EditText) findViewById(R.id.messageInput);

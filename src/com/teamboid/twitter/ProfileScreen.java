@@ -24,6 +24,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -45,6 +48,7 @@ import com.teamboid.twitterapi.user.User;
 
 /**
  * The activity that represents the profile viewer.
+ * 
  * @author Aidan Follestad
  */
 public class ProfileScreen extends Activity {
@@ -77,6 +81,8 @@ public class ProfileScreen extends Activity {
 		ab.setDisplayShowHomeEnabled(false);
 		setContentView(R.layout.profile_screen);
 		setProgressBarIndeterminateVisibility(false);
+		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
+		profileImg.setImageBitmap(Utilities.getRoundedImage(BitmapFactory.decodeResource(getResources(), R.drawable.sillouette), 90F));
 		initializeTabs(savedInstanceState);        
 	}
 
@@ -89,9 +95,12 @@ public class ProfileScreen extends Activity {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if(iconic) {
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)), PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)), ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)), 
+					PaddedProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)),
+					ProfileAboutFragment.class, 1, screenName);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0)),
+					MediaTimelineFragment.class, 2, screenName, false);
 		} else {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
@@ -126,7 +135,7 @@ public class ProfileScreen extends Activity {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
 						public void run() { 
-							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_blocked)
+							Toast.makeText(getApplicationContext(), getString(R.string.failed_check_relationship)
                                     .replace("{user}", user.getScreenName()), Toast.LENGTH_SHORT).show();
 							getAboutFragment().getAdapter().setIsError(true);
 						}
@@ -343,13 +352,18 @@ public class ProfileScreen extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 
-	void setHeaderBackground(String url){
-		ImageManager.getInstance(this).get(url, new OnImageReceivedListener(){
-			@Override
-			public void onImageReceived(String arg0, Bitmap bitmap) {
-				((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
-			}
-		});
+	void setHeaderBackground(String url) {
+		if(url.startsWith("http")) {
+			ImageManager.getInstance(this).get(url, new OnImageReceivedListener() {
+				@Override
+				public void onImageReceived(String arg0, Bitmap bitmap) {
+					((ImageView)findViewById(R.id.img)).setImageBitmap(bitmap);
+				}
+			});
+		} else if(user.getProfileBackgroundColor() != null) {
+			((ImageView)findViewById(R.id.img)).setImageDrawable(new ColorDrawable(
+					Color.parseColor("#" + user.getProfileBackgroundColor())));
+		}
 	}
 
 	public ProfileAboutFragment getAboutFragment() {
@@ -359,11 +373,12 @@ public class ProfileScreen extends Activity {
 	/**
 	 * Sets up our own views for this
 	 */
-	public void setupViews() {		
+	public void setupViews() {
+		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
 		ImageManager.getInstance(this).get(Utilities.getUserImage(user.getScreenName(), this), new OnImageReceivedListener(){
 			@Override
 			public void onImageReceived(String arg0, Bitmap bitmap) {
-				((ImageView)findViewById(R.id.userItemProfilePic)).setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
+				profileImg.setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 			}
 		});
 		TextView tv = (TextView)findViewById(R.id.profileTopLeftDetail);
@@ -373,13 +388,10 @@ public class ProfileScreen extends Activity {
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-				if(state != ViewPager.SCROLL_STATE_DRAGGING && lastPage == 2){
+				if(state != ViewPager.SCROLL_STATE_DRAGGING && lastPage == 2) {
 					findViewById(R.id.profileHeader).setVisibility(View.GONE);
-				} else{
-					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
-				}
-				
-				if(state == ViewPager.SCROLL_STATE_IDLE){
+				} else findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
+				if(state == ViewPager.SCROLL_STATE_IDLE) {
 					findViewById(R.id.profileHeader).setX(0);
 				}
 			}
