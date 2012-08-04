@@ -38,6 +38,10 @@ import com.teamboid.twitterapi.utilities.Utils;
  */
 public class AccountService extends Service {
 
+	public final static String CONSUMER_KEY = "5LvP1d0cOmkQleJlbKICtg";
+	public final static String CONSUMER_SECRET = "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI";
+	public final static String CALLBACK_URL = "boid://auth";
+	
 	private static Authorizer _authorizer;
 	public static Authorizer getAuthorizer() {
 		if(_authorizer == null) {
@@ -45,10 +49,6 @@ public class AccountService extends Service {
 		}
 		return _authorizer;
 	}
-
-	public final static String CONSUMER_KEY = "5LvP1d0cOmkQleJlbKICtg";
-	public final static String CONSUMER_SECRET = "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI";
-	public final static String CALLBACK_URL = "boid://auth";
 
 	private static ArrayList<Account> accounts;
 	public static ArrayList<FeedListAdapter> feedAdapters;
@@ -58,6 +58,7 @@ public class AccountService extends Service {
 	public static SearchFeedListAdapter nearbyAdapter;
 	public static ArrayList<SearchFeedListAdapter> searchFeedAdapters;
 	public static UserListDisplayAdapter myListsAdapter;
+	
 	public static int configShortURLLength;
 	public static int charactersPerMedia;
 	public static long selectedAccount;
@@ -368,14 +369,7 @@ public class AccountService extends Service {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+	public IBinder onBind(Intent intent) { return null; }
 
 	public static Account getAccount(long accId) {
 		Account result = null;
