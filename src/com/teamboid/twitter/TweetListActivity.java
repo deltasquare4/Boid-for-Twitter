@@ -16,6 +16,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.status.Status;
 
@@ -27,6 +28,7 @@ public class TweetListActivity extends ListActivity {
 	private int lastTheme;
 	private boolean showProgress;
 	private Status[] tweets = null;
+	
 	private boolean allowPagination = true;
 	public FeedListAdapter binder;
 	private ProgressDialog progDialog;

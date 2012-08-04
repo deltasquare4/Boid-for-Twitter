@@ -1,5 +1,6 @@
 package com.teamboid.twitter.views;
 
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
+
 import com.teamboid.twitterapi.status.GeoLocation;
 
 /**

@@ -21,7 +21,6 @@ import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;

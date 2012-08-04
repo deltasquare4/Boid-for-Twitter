@@ -34,6 +34,7 @@ import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitter.widgets.ResizableWidgetProvider;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -80,9 +81,9 @@ public class TimelineScreen extends Activity {
     private TabsAdapter mTabsAdapter;
     private boolean newColumn;
     
-    private void notifyWidget() {
-    	final AppWidgetManager mgr = AppWidgetManager.getInstance(this);
-        final ComponentName cn = new ComponentName(this, ResizableWidgetProvider.class);
+    private static void notifyWidget(Context context) {
+    	final AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+        final ComponentName cn = new ComponentName(context, ResizableWidgetProvider.class);
         mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widgetList);
     }
 
@@ -582,7 +583,7 @@ public class TimelineScreen extends Activity {
         filter.addAction(SendTweetService.UPDATE_STATUS);
         filter.addAction(AccountManager.END_LOAD);
         registerReceiver(receiver, filter);
-        notifyWidget();
+        notifyWidget(this);
     }
 
     @Override
@@ -600,7 +601,7 @@ public class TimelineScreen extends Activity {
         if (MessageConvoCAB.ConvoActionMode != null) {
             MessageConvoCAB.ConvoActionMode.finish();
         }
-        notifyWidget();
+        notifyWidget(this);
     }
 
     @Override

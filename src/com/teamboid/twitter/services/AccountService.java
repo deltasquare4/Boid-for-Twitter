@@ -14,12 +14,14 @@ import com.teamboid.twitterapi.client.Twitter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
@@ -41,7 +43,7 @@ public class AccountService extends Service {
 	public final static String CONSUMER_KEY = "5LvP1d0cOmkQleJlbKICtg";
 	public final static String CONSUMER_SECRET = "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI";
 	public final static String CALLBACK_URL = "boid://auth";
-	
+
 	private static Authorizer _authorizer;
 	public static Authorizer getAuthorizer() {
 		if(_authorizer == null) {
@@ -135,8 +137,9 @@ public class AccountService extends Service {
 					}
 					Account profile = new Account(activity, toAdd).setUser(toAddUser);
 					accounts.add(profile);
-					activity.getSharedPreferences("profiles", 0).edit()
-						.putString(toAdd.getAccessToken(), Utils.serializeObject(profile)).commit();
+					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
+						.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
+					AndroidAccountHelper.addAccount(activity, profile);
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -165,7 +168,7 @@ public class AccountService extends Service {
 			getApplicationContext().getSharedPreferences("accounts", 0).edit().clear().commit();
 			Toast.makeText(getApplicationContext(), R.string.please_readd_accounts, Toast.LENGTH_LONG).show();
 		}
-		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles", 0).getAll();
+		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles-v2", 0).getAll();
 		if (accountStore.size() == 0) {
 			getApplicationContext().startActivity(new Intent(getApplicationContext(), AccountManager.class)
 				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -175,6 +178,10 @@ public class AccountService extends Service {
 			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
 			return false;
 		}
+		
+		// Android Accounts
+		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
+		
 		final int lastAccountCount = getAccounts().size();
 		Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
 		for(final String token : accountStore.keySet()) {
@@ -193,6 +200,11 @@ public class AccountService extends Service {
 			client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 					.getBoolean("enable_ssl", false));
 			accounts.add(toAdd.setClient(client));
+			if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
+				androidAccounts.remove(toAdd.getUser().getId() + "");
+			} else{
+				AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+			}
 			
 //			try {
 //				final User accountUser = toAdd.verifyCredentials();
@@ -202,6 +214,11 @@ public class AccountService extends Service {
 //				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
 //						" " + e.getMessage(), Toast.LENGTH_LONG).show();
 //			}
+		}
+		
+		// Now remove dead accounts
+		for( android.accounts.Account acc : androidAccounts.values() ){
+			Log.d("acc", "Remove Account: " + acc.name);
 		}
 
 		if (getAccounts().size() > 0) {

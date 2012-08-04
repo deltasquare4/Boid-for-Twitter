@@ -42,6 +42,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.teamboid.twitterapi.list.UserList;
 import com.teamboid.twitterapi.savedsearch.SavedSearch;
 
@@ -119,6 +120,7 @@ public class ColumnManager extends Activity {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		cols = Utilities.jsonToArray(prefs.getString(Long.toString(
                 AccountService.getCurrentAccount().getId()) + "_columns", ""));
+		
 		for(String c : cols) {
 			if(c.equals(TimelineFragment.ID)) {
 				adapt.add(getString(R.string.timeline_str));
@@ -158,6 +160,7 @@ public class ColumnManager extends Activity {
 		else cols.add(id);
 		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
                 "_columns", Utilities.arrayToJson(cols)).commit();
+		
 		selIndex = getIntent().getIntExtra("tab_count", 4) - 1;
 		loadColumns();
 	}

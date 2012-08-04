@@ -18,6 +18,9 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.status.entity.media.MediaEntity;
@@ -25,8 +28,6 @@ import com.teamboid.twitterapi.status.entity.media.MediaSize;
 import com.teamboid.twitterapi.status.entity.mention.MentionEntity;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
 import com.teamboid.twitterapi.user.User;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
@@ -167,6 +168,7 @@ public class Utilities {
 			return R.style.Boid_PureBlackTheme;
 		}
 	}
+
 	public static String getMedia(UrlEntity[] urls){
 		String found = null;
 		for(int i = 0; i < urls.length; i++) {
@@ -410,26 +412,42 @@ public class Utilities {
 		return toReturn;
 	}
 	public static String friendlyTimeShort(Calendar createdAt) {
-		Date now = new Date();
-		long diff = now.getTime() - createdAt.getTime().getTime();
-		if(diff <= 60000) {
-			long seconds = (diff / 6000);
-			if(seconds < 5) return "now";
-			return Long.toString(seconds) + "s";
-		} else if(diff <= 3600000) {
-			return Long.toString(diff / 60000) + "m";
-		} else if(diff <= 86400000) {
-			return Long.toString(diff / 3600000) + "h";
-		} else if(diff <= 604800000) {
-			return Long.toString(diff / 86400000) + "d"; 
-		} else return Long.toString(diff / 604800000) + "w";
+        Date now = new Date();
+        long diff = now.getTime() - createdAt.getTime().getTime();
+        if(diff <= 60000) {
+                long seconds = (diff / 6000);
+                if(seconds < 5) return "now";
+                return Long.toString(seconds) + "s";
+        } else if(diff <= 3600000) {
+                return Long.toString(diff / 60000) + "m";
+        } else if(diff <= 86400000) {
+                return Long.toString(diff / 3600000) + "h";
+        } else if(diff <= 604800000) {
+                return Long.toString(diff / 86400000) + "d"; 
+        } else return Long.toString(diff / 604800000) + "w";
 	}
 	public static String friendlyTimeLong(Date time) {
-		Calendar timeCal = Calendar.getInstance();
-        timeCal.setTime(time);
-        return friendlyTimeLong(timeCal);
+	    Calendar timeCal = Calendar.getInstance();
+		timeCal.setTime(time);
+		return friendlyTimeLong(timeCal);
 	}
-    public static String friendlyTimeLong(Calendar time) {
+
+	public static String friendlyTimeMedium(Date createdAt) {
+		Date now = new Date();
+		long diff = now.getTime() - createdAt.getTime();
+		if(diff <= 60000) {
+			long seconds = (diff / 6000);
+			if(seconds < 5) return "moments";
+			return Long.toString(seconds) + " seconds";
+		} else if(diff <= 3600000) {
+			return Long.toString(diff / 60000) + " minutes";
+		} else if(diff <= 86400000) {
+			return Long.toString(diff / 3600000) + " hours";
+		} else if(diff <= 604800000) {
+			return Long.toString(diff / 86400000) + " days"; 
+		} else return Long.toString(diff / 604800000) + " weeks";
+	}
+	public static String friendlyTimeLong(Calendar time) {
         Calendar now = Calendar.getInstance();
         String am_pm = "AM";
         if(time.get(Calendar.AM_PM) == Calendar.PM) am_pm = "PM";
@@ -462,8 +480,7 @@ public class Utilities {
     	return hour + ":" + minute;
     }
 
-
-    public static String generateImageFileName(Context context) {
+	public static String generateImageFileName(Context context) {
 		String timeStamp =  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "IMG_" + timeStamp + ".jpg";
 		File storageDir = context.getExternalCacheDir();
@@ -584,6 +601,7 @@ public class Utilities {
 		return (int)(outMetrics.density * dp); // 50dp in pixels
 	}
 	
+
 	public static String getUserImage(String screenname, Context mContext, User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache

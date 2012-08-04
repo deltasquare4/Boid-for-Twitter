@@ -13,4 +13,11 @@
 		android:layout_height="0dp" android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
 		<requestFocus />
 	</EditText>
+	<TextView android:id="@+id/upload_with_label"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:textColor="@color/dark" android:text="@string/photo_service_title"
+		android:visibility="gone" />
+	<Button style="?android:spinnerStyle" android:id="@+id/upload_with"
+		android:visibility="gone" android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
 </LinearLayout>

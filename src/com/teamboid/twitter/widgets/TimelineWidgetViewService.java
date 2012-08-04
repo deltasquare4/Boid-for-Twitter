@@ -1,22 +1,28 @@
-package com.teamboid.twitter.views;
+package com.teamboid.twitter.widgets;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.NetworkUtils;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.status.Status;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-public class WidgetRemoteViewService extends RemoteViewsService {
+public class TimelineWidgetViewService extends RemoteViewsService {
 
 	@Override
 	public RemoteViewsFactory onGetViewFactory(Intent intent) {		
@@ -30,11 +36,11 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 			_items = new ArrayList<Status>();
 			mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
-		
+
 		private Context _context;
 		private ArrayList<Status> _items;
 		private int mAppWidgetId;
-		
+
 		@Override
 		public int getCount() { return _items.size(); }
 
@@ -44,25 +50,38 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 		@Override
 		public RemoteViews getLoadingView() { return null; }
 
+		private Bitmap downloadImage(String imageUrl) {
+			try {
+				HttpURLConnection conn= (HttpURLConnection)new URL(imageUrl).openConnection();
+				conn.setDoInput(true);
+				conn.connect();
+				Bitmap toReturn = BitmapFactory.decodeStream(conn.getInputStream());
+				conn.disconnect();
+				return toReturn;
+			} catch (Exception e) { e.printStackTrace(); }
+			return null;
+		}
+
 		@Override
 		public RemoteViews getViewAt(int position) {
 			Status status = _items.get(position);
 			final RemoteViews rv = new RemoteViews(_context.getPackageName(), R.layout.widget_feed_item);
-            
-            if(status.isRetweet()) {
-            	rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
-    			rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
-    			rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "@" + status.getUser().getScreenName());
-    			status = status.getRetweetedStatus();
-    		}
-            
-            if(PreferenceManager.getDefaultSharedPreferences(_context).getBoolean("show_real_names", false)) {
+
+			if(status.isRetweet()) {
+				rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.VISIBLE);
+				rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
+				rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "@" + status.getUser().getScreenName());
+				status = status.getRetweetedStatus();
+			}
+
+			rv.setImageViewBitmap(R.id.feedItemProfilePic, downloadImage(status.getUser().getProfileImageUrl()));
+			if(PreferenceManager.getDefaultSharedPreferences(_context).getBoolean("show_real_names", false)) {
 				rv.setTextViewText(R.id.feedItemUserName, status.getUser().getName());
 			} else rv.setTextViewText(R.id.feedItemUserName, status.getUser().getScreenName());
-            rv.setTextViewText(R.id.feedItemText, status.getText());
-            rv.setTextViewText(R.id.feedItemTimerTxt, Utilities.friendlyTimeHourMinute(status.getCreatedAt()));
-            
-            return rv;
+			rv.setTextViewText(R.id.feedItemText, status.getText());
+			rv.setTextViewText(R.id.feedItemTimerTxt, Utilities.friendlyTimeHourMinute(status.getCreatedAt()));
+
+			return rv;
 		}
 
 		@Override
@@ -84,6 +103,6 @@ public class WidgetRemoteViewService extends RemoteViewsService {
 		}
 
 		@Override
-		public void onDestroy() { _items.clear(); }
+		public void onDestroy() { }
 	}
 }

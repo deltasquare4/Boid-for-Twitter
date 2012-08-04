@@ -1,6 +1,6 @@
-package com.teamboid.twitter;
+package com.teamboid.twitter.widgets;
 
-import com.teamboid.twitter.views.WidgetRemoteViewService;
+import com.teamboid.twitter.R;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -21,7 +21,7 @@ public class ResizableWidgetProvider extends AppWidgetProvider {
 		for(int widgetId : allWidgetIds) {
 			RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.resizable_widget);
 
-			Intent intent = new Intent(context, WidgetRemoteViewService.class);
+			Intent intent = new Intent(context, TimelineWidgetViewService.class);
 	        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
 	        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 	        remoteViews.setRemoteAdapter(R.id.widgetList, intent);

@@ -166,8 +166,7 @@
 	<string name="delete_str">Delete</string>
 
 	<string name="help_title">Help</string>
-	<string name="help_description">View information about Boid, and get support via
-		email.
+	<string name="help_description">View information about Boid, or send a donation or email to us.
 	</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
@@ -300,13 +299,19 @@
 		<item>Weekly Trends</item>
 		<item>Local Trends</item>
 	</string-array>
+	
 	<string name="local_trend_with_place">Local - {place}</string>
 
 	<string name="push_title">Push Notifications</string>
 	<string name="enable_push">Enabling push notifications will push you updates
 		in near real-time
 	</string>
-
+	
+	<string name="login">Login</string>
+	<string name="logout">Logout</string>
+	<string name="imgur_note">Images will be uploaded using the same
+		account at the moment and follow the default access settings
+	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
 
 	<string name="photo_service_title">Upload Service</string>
@@ -456,10 +461,17 @@
 	</string>
 	<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
+	
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
+	
+	<string name="contactsync_what">What to sync</string>
+	<string name="contact_sync_on">Contact Sync is turned on</string>
+	<string name="contact_sync_off">Contact sync is turned off</string>
 	<string name="no_location_str">No Location</string>
+	
+	<string name="please_wait">Please wait…</string>
 	<string name="no_column_backup">No column backup file was found!</string>
 	<string name="reset_str">Reset</string>
 	<string name="backed_up_columns">Your columns were successfully backed up!
@@ -468,4 +480,11 @@
 	</string>
 	<string name="screen_name_str">Screen name</string>
 	<string name="please_readd_accounts">Please re-add your accounts!</string>
+	
+	<string name="not_logged_in">You are not logged in</string>
+	<string name="logged_in_as">You are logged in as {user}</string>
+	<string name="service_needs_config">{service} (needs logging in)</string>
+	<string name="login_to_service">Login to {service}</string>
+	<string name="email">Email Address</string>
+	<string name="password">Password</string>
 </resources>

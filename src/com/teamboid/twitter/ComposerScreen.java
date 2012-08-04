@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
@@ -15,6 +16,7 @@ import org.json.JSONObject;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Extractor;
+
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
@@ -37,10 +39,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -95,6 +101,8 @@ public class ComposerScreen extends Activity {
 		}
 		invalidateOptionsMenu();
 	}
+	
+	public static int SELECT_MEDIA = 2939;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -162,10 +170,32 @@ public class ComposerScreen extends Activity {
 				getApplicationContext()).getBoolean("attach_location", false)) {
 			getLocation();
 		}
+		
+		Button spinner = (Button)findViewById(R.id.upload_with);
+		spinner.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+				Intent i = new Intent(ComposerScreen.this, SelectMediaScreen.class);
+				startActivityForResult(i, SELECT_MEDIA);
+			}		
+		});
+		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter").toLowerCase();
+		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
 	}
-
+	
+	private void setUploadWith(String pref){
+		Button spinner = (Button)findViewById(R.id.upload_with);
+		try{
+			MediaServices.setupServices();
+			spinner.setText(MediaServices.getService(pref).getServiceName());
+			stt.mediaService = pref;
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	private void initializeAccountSwitcher(boolean firstLoad) {
 		ActionBar ab = getActionBar();
 		ab.setDisplayHomeAsUpEnabled(true);
@@ -210,9 +240,7 @@ public class ComposerScreen extends Activity {
 				.toString();
 		int toReturn = (140 - text.length());
 		if (stt.hasMedia())
-			toReturn -= AccountService.charactersPerMedia; // TODO: We should do
-															// a check on media
-															// service
+			toReturn -= (stt.mediaService == "twitter" ? AccountService.charactersPerMedia : shortLength);
 		List<String> urls = new Extractor().extractURLs(text);
 		for (String u : urls) {
 			if (!shownLinksMessage) {
@@ -313,76 +341,80 @@ public class ComposerScreen extends Activity {
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.composer_actionbar, menu);
 		if (getIntent().getLongExtra("reply_to", 0l) > 0) {
-			menu.findItem(R.id.sendAction).setTitle(
-					getString(R.string.reply_str) + " ("
-							+ Integer.toString(lengthIndic) + ")");
+				menu.findItem(R.id.sendAction).setTitle(
+								getString(R.string.reply_str) + " ("
+												+ Integer.toString(lengthIndic) + ")");
 		} else
-			menu.findItem(R.id.sendAction).setTitle(
-					getString(R.string.tweet_str) + " ("
-							+ Integer.toString(lengthIndic) + ")");
+				menu.findItem(R.id.sendAction).setTitle(
+								getString(R.string.tweet_str) + " ("
+												+ Integer.toString(lengthIndic) + ")");
 
 		if (!stt.isGalleryImage && stt.hasMedia()) {
-			MenuItem capAct = menu.findItem(R.id.captureAction);
-			capAct.setIcon(getTheme().obtainStyledAttributes(
-					new int[] { R.attr.cameraAttachedIcon }).getDrawable(0));
+				MenuItem capAct = menu.findItem(R.id.captureAction);
+				capAct.setIcon(getTheme().obtainStyledAttributes(
+								new int[] { R.attr.cameraAttachedIcon }).getDrawable(0));
 		} else if (stt.hasMedia()) { // could be uri
-			MenuItem galAct = menu.findItem(R.id.galleryAction);
-			galAct.setIcon(getTheme().obtainStyledAttributes(
-					new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
+				MenuItem galAct = menu.findItem(R.id.galleryAction);
+				galAct.setIcon(getTheme().obtainStyledAttributes(
+								new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
 		}
+		
+		findViewById(R.id.upload_with).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
+		findViewById(R.id.upload_with_label).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
 		final EditText content = (EditText) findViewById(R.id.tweetContent);
 		if (stt.attachedImage == null
-				&& content.getText().toString().trim().length() == 0) {
-			menu.findItem(R.id.sendAction).setEnabled(false);
+						&& content.getText().toString().trim().length() == 0) {
+				menu.findItem(R.id.sendAction).setEnabled(false);
 		} else
-			menu.findItem(R.id.sendAction).setEnabled(true);
+				menu.findItem(R.id.sendAction).setEnabled(true);
 
-		MenuItem locate = menu.findItem(R.id.locateAction);
+		final MenuItem locate = menu.findItem(R.id.locateAction);
 		locate.getSubMenu().clear();
+		
 		if (stt.location != null) {
-			locate.setIcon(getTheme().obtainStyledAttributes(
-					new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
-			if (places == null) {
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							places = AccountService
-									.getCurrentAccount()
-									.getClient()
-									.getReverseGeocode(stt.location,
-											(int) locationAccuracy + "m",
-											Granularity.POI, 4);
-							runOnUiThread(new Runnable() {
-								@Override
+				locate.setIcon(getTheme().obtainStyledAttributes(
+								new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
+				if (places == null) {
+						new Thread(new Runnable() {
 								public void run() {
-									invalidateOptionsMenu();
+									try {
+											places = AccountService
+															.getCurrentAccount()
+															.getClient()
+															.getReverseGeocode(stt.location,
+																			(int) locationAccuracy + "m",
+																			Granularity.POI, 4);
+											runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+															invalidateOptionsMenu();
+													}
+											});
+									} catch (final Exception e) {
+											e.printStackTrace();
+											runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+															Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+													}
+											});
+									}
 								}
-							});
-						} catch (final Exception e) {
-							e.printStackTrace();
-							runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-								}
-							});
+						}).start();
+				} else {
+						for (Place p : places) {
+								locate.getSubMenu().add(p.getFullName()).setIcon(R.drawable.locate_blue);
 						}
-					}
-				}).start();
-			} else {
-				for (Place p : places) {
-					locate.getSubMenu().add(p.getFullName()).setIcon(R.drawable.locate_blue);
+						locate.getSubMenu().add(R.string.no_location_str)
+										.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
+						if(stt.placeId == null) {
+								stt.placeId = places[0].getId();
+								Toast.makeText(getApplicationContext(), places[0].getFullName(), Toast.LENGTH_SHORT).show();
+						}
 				}
-				locate.getSubMenu().add(R.string.no_location_str)
-						.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
-				if(stt.placeId == null) {
-					stt.placeId = places[0].getId();
-					Toast.makeText(getApplicationContext(), places[0].getFullName(), Toast.LENGTH_SHORT).show();
-				}
-			}
 		} else {
-			locate.setIcon(getTheme().obtainStyledAttributes(
-					new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
+				locate.setIcon(getTheme().obtainStyledAttributes(
+								new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
 		}
 		return true;
 	}
@@ -502,6 +534,7 @@ public class ComposerScreen extends Activity {
 				.toString();
 		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
+		
 		SendTweetService.addTweet(stt);
 		finish();
 	}
