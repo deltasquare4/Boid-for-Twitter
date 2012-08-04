@@ -179,7 +179,7 @@ public class ComposerScreen extends Activity {
 				startActivityForResult(i, SELECT_MEDIA);
 			}		
 		});
-		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter");
+		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter").toLowerCase();
 		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
@@ -240,9 +240,7 @@ public class ComposerScreen extends Activity {
 				.toString();
 		int toReturn = (140 - text.length());
 		if (stt.hasMedia())
-			toReturn -= AccountService.charactersPerMedia; // TODO: We should do
-															// a check on media
-															// service
+			toReturn -= (stt.mediaService == "twitter" ? AccountService.charactersPerMedia : shortLength);
 		List<String> urls = new Extractor().extractURLs(text);
 		for (String u : urls) {
 			if (!shownLinksMessage) {

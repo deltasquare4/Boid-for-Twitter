@@ -320,7 +320,7 @@
 
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
-	<string name="imgur_note">Images will be uploaded using the same imgur
+	<string name="imgur_note">Images will be uploaded using the same
 		account at the moment and follow the default access settings
 	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
@@ -480,4 +480,6 @@
 	<string name="contact_sync_on">Contact Sync is turned on</string>
 	<string name="contact_sync_off">Contact sync is turned off</string>
 	<string name="no_location_str">No Location</string>
+	
+	<string name="please_wait">Please wait…</string>
 </resources>

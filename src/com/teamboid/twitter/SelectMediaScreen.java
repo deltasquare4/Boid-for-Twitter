@@ -2,8 +2,17 @@ package com.teamboid.twitter;
 
 import java.util.Map.Entry;
 
+import org.scribe.model.Token;
+import org.scribe.model.Verifier;
+import org.scribe.oauth.OAuthService;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -12,12 +21,17 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.teamboid.twitter.utilities.MediaUtilities;
 import com.teamboid.twitterapi.media.ExternalMediaService;
 import com.teamboid.twitterapi.media.MediaServices;
 
@@ -32,37 +46,20 @@ public class SelectMediaScreen extends PreferenceActivity {
 			super(context);
 			try { setTitle(m.getServiceName()); }
 			catch(Exception e) { e.printStackTrace(); }
-			/* TODO
-			
-			needsConfig = m.needs_config;
+			needsConfig = ! (m.getOAuthService() == null );
 			this.m = m;
-			m.configured = new MediaUtilities.MediaConfigured() {
-
-				@Override
-				public void startActivity(Intent activity) {
-					SelectMediaScreen.this.startActivity(activity);
-				}
-
-				@Override
-				public Uri getCallback() {
-					return Uri.parse("boid://finishconfig/" + key);
-				}
-
-				@Override
-				public void configured() {
-					//TODO this function is deprecated and needs to be replaced.
-					getPreferenceScreen().removeAll();
-					setupPreferences();
-				}
-			};*/
+			
+			Uri.parse("boid://finishconfig/" + key);
 		}
 
 		@Override
 		public View getView(View convertView, ViewGroup parent) {
 			if(convertView == null) convertView = LayoutInflater.from(getContext()).inflate(R.layout.media_service, null);
 			RadioButton r = (RadioButton)convertView.findViewById(R.id.radio);
-			//r.setEnabled(m.isConfigured(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())));
-			if(!needsConfig) r.setText(this.getTitle());
+			boolean configured = !getSharedPreferences().getString(getKey() + "-token", "").equals("");
+			if(needsConfig)
+				r.setEnabled( configured );
+			if(!needsConfig || ( needsConfig && configured) ) r.setText(this.getTitle());
 			else r.setText(getContext().getResources().getString(R.string.service_needs_config).replace("{service}", this.getTitle()));
 			r.setChecked(checked);
 			r.setOnCheckedChangeListener(new OnCheckedChangeListener(){
@@ -73,13 +70,103 @@ public class SelectMediaScreen extends PreferenceActivity {
 			});
 			ImageButton c = (ImageButton)convertView.findViewById(R.id.button);
 			c.setVisibility(needsConfig ? View.VISIBLE : View.GONE);
-			/*c.setOnClickListener(new OnClickListener(){
+			
+			c.setOnClickListener(new OnClickListener(){
 				@Override
-				public void onClick(View arg0) { m.configure(SelectMediaScreen.this); }
-			});*/
+				public void onClick(View arg0) {
+					AlertDialog.Builder ab = new AlertDialog.Builder(SelectMediaScreen.this);
+                    ab.setTitle(m.getServiceName());
+                    View v = LayoutInflater.from(SelectMediaScreen.this).inflate(R.layout.oauth_media_panel, null);
+                    
+                    TextView t = (TextView)v.findViewById(R.id.notes);
+                    t.setText(R.string.imgur_note);
+                    ab.setView(v);
+                    ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                            }
+                    });
+                    configureView(v);
+                    ab.show();
+				}
+				public void configureView(final View v){
+					final SharedPreferences sp = getSharedPreferences();
+					String auth_token = sp.getString(getKey() + "-token", "");
+					String user = sp.getString(getKey() + "-url", "");
+					
+                    TextView t = (TextView)v.findViewById(R.id.summary);
+                    if(auth_token.equals("")) t.setText(R.string.not_logged_in);
+                    else t.setText(getString(R.string.logged_in_as).replace("{user}", user));
+                    Button b = (Button)v.findViewById(R.id.action);
+                    if(auth_token.equals("")){
+                            b.setText(R.string.login);
+                            b.setOnClickListener(new OnClickListener(){
+                                    @Override
+                                    public void onClick(View button) {
+                                            requestAuth();
+                                    }
+                            });
+                    } else{
+                            b.setText(R.string.logout);
+                            b.setOnClickListener(new OnClickListener(){
+                                    @Override
+                                    public void onClick(View w) {
+                                        sp.edit().remove(getKey() + "-token").remove(getKey() + "-secret").remove(getKey() + "-url").commit();
+                                    	configureView(v);
+                                    }
+                            });
+                    }
+                    
+				}
+				public void requestAuth(){
+					final ProgressDialog pd = new ProgressDialog(SelectMediaScreen.this);
+					pd.setMessage(getText(R.string.please_wait));
+					pd.show();
+					
+					new Thread(new Runnable(){
+
+						@Override
+						public void run() {
+							try{
+								OAuthService auth = MediaUtilities.buildAuthService(getKey(), "boid://finishconfig/" + getKey());
+								requestToken = auth.getRequestToken();
+								final String url = auth.getAuthorizationUrl(requestToken);
+								
+								runOnUiThread(new Runnable(){
+	
+									@Override
+									public void run() {
+										pd.dismiss();
+										
+										Intent i = new Intent(Intent.ACTION_VIEW);
+										i.setData(Uri.parse(url));
+										startActivity(i);
+									}
+									
+								});
+							} catch(Exception e){
+								e.printStackTrace();
+								runOnUiThread(new Runnable(){
+
+									@Override
+									public void run() {
+										pd.dismiss();
+										Toast.makeText(SelectMediaScreen.this, getText(R.string.error_str), Toast.LENGTH_SHORT).show();
+									}
+									
+								});
+							}
+						}
+						
+					}).start();
+				}
+			});
 			return convertView;	
 		}
 	}
+	
+	private static Token requestToken;
 
 	@Override
 	public void onResume(){
@@ -88,14 +175,53 @@ public class SelectMediaScreen extends PreferenceActivity {
 	}
 
 	@Override
-	public void onNewIntent(Intent intent){
+	public void onNewIntent(final Intent intent){
 		Log.d("n", "NEW INTENT");
 		if(intent.getData() != null){
 			if(!intent.getData().getScheme().equals("boid")) return;
 			Log.d("i", "new intent");
-			String key = intent.getData().getPathSegments().get(0);
+			final String key = intent.getData().getPathSegments().get(0);
 			Log.d("i", key);
-			// MediaUtilities.getMediaServices(true, this).get(key).configure(this, intent);
+			
+			final ProgressDialog pd = new ProgressDialog(SelectMediaScreen.this);
+			pd.setMessage(getText(R.string.please_wait));
+			pd.show();
+			
+			new Thread( new Runnable(){
+
+				@Override
+				public void run() {
+					try{
+						OAuthService auth = MediaUtilities.buildAuthService(key);
+						Token accessToken = auth.getAccessToken(requestToken, new Verifier( intent.getData().getQueryParameter("oauth_verifier") ));
+						
+						SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(SelectMediaScreen.this);
+						
+						MediaServices.setupServices();
+						ExternalMediaService ems = MediaServices.getService(key);
+						ems.setAuthorized(auth, accessToken);
+						String user = ems.getUserName();
+						
+						sp.edit().putString(key + "-token", accessToken.getToken()).putString(key + "-secret", accessToken.getSecret()).putString(key + "-url", user).commit();
+						setupPreferences();
+						pd.dismiss();
+					} catch(Exception e){
+						e.printStackTrace();
+						runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								pd.dismiss();
+								Toast.makeText(SelectMediaScreen.this, getText(R.string.error_str), Toast.LENGTH_SHORT).show();
+							}
+							
+						});
+					}
+				}
+				
+			}).start();
+			
+			
 		}
 	}
 
@@ -103,6 +229,8 @@ public class SelectMediaScreen extends PreferenceActivity {
 		String pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("upload_service", "twitter");
 		
 		MediaServices.setupServices();
+		getPreferenceScreen().removeAll();
+		
 		for(final Entry<String, ExternalMediaService> entry : MediaServices.services.entrySet()){
 			MediaPreference m = new MediaPreference(this, entry.getValue(), entry.getKey());
 			m.setKey(entry.getKey());

@@ -14,15 +14,19 @@ import com.teamboid.twitterapi.status.entity.media.MediaEntity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scribe.model.Token;
 
 import com.teamboid.twitter.services.AccountService;
 
+import com.teamboid.twitter.utilities.MediaUtilities;
 import com.teamboid.twitter.utilities.TwitlongerHelper;
 import com.teamboid.twitter.utilities.TwitlongerHelper.TwitlongerPostResponse;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -38,7 +42,7 @@ public class SendTweetTask {
 	public static HashMap<String, String> MEDIA_API_KEYS = new HashMap<String, String>();
 	static {
 		MEDIA_API_KEYS.put("plixi", "10b6f8fd-c373-44cb-bd35-bbeb61a199f3");
-		MEDIA_API_KEYS.put("twitpic", "458BDELY0594bdbc2776ba73ac25e8fc96a03c27");
+		MEDIA_API_KEYS.put("twitpic", "10c80e3453f27d3b34cb0bba320a17b3");
 		MEDIA_API_KEYS.put("yfrog", "e1f3d4d1625ec410a79b573dbbfe0570");
 	}
 		
@@ -120,9 +124,22 @@ public class SendTweetTask {
 				MediaServices.setupServices();
 				ExternalMediaService ems = MediaServices.services.get(prefValue.toLowerCase());
 				ems.setAPIKey( MEDIA_API_KEYS.get( prefValue.toLowerCase() ) );
+				ems.setAttribution("Uploaded via Boid for Android. Download for free -- http://boidapp.com");
+				
+				// Authed
+				if(ems.getOAuthService() != null){
+					SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+					Token token = new Token(sp.getString(prefValue + "-token", ""), sp.getString(prefValue + "-secret", ""));
+					ems.setAuthorized(MediaUtilities.buildAuthService(prefValue), token);
+				}
+				
 				MediaEntity me = ems.uploadFile(update, from.getClient(), input);
 				if(!prefValue.equals("twitter")){ // Only twitter doesn't respond the same
-					contents = contents + ( contents.charAt(contents.length()-1) == ' ' ? "" : " " ) + me.getExpandedUrl();
+					if(contents.length() > 1){
+						contents = contents + ( contents.charAt(contents.length()-1) == ' ' ? "" : " " ) + me.getExpandedUrl();
+					} else{
+						contents = me.getExpandedUrl();
+					}
 					update = StatusUpdate.create(contents);
 				}
 				
