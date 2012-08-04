@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
@@ -142,6 +144,7 @@ public class AccountService extends Service {
 					accounts.add(profile);
 					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
 						.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
+					AndroidAccountHelper.addAccount(activity, profile);
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -180,6 +183,10 @@ public class AccountService extends Service {
 			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
 			return false;
 		}
+		
+		// Android Accounts
+		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
+		
 		final int lastAccountCount = getAccounts().size();
 		Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
 		for(final String token : accountStore.keySet()) {
@@ -198,6 +205,11 @@ public class AccountService extends Service {
 			client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 					.getBoolean("enable_ssl", false));
 			accounts.add(toAdd.setClient(client));
+			if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
+				androidAccounts.remove(toAdd.getUser().getId() + "");
+			} else{
+				AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+			}
 			
 //			try {
 //				final User accountUser = toAdd.verifyCredentials();
@@ -207,6 +219,11 @@ public class AccountService extends Service {
 //				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
 //						" " + e.getMessage(), Toast.LENGTH_LONG).show();
 //			}
+		}
+		
+		// Now remove dead accounts
+		for( android.accounts.Account acc : androidAccounts.values() ){
+			Log.d("acc", "Remove Account: " + acc.name);
 		}
 
 		if (getAccounts().size() > 0) {

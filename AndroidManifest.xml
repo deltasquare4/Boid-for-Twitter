@@ -227,7 +227,7 @@
 			<meta-data android:name="android.accounts.AccountAuthenticator"
 				android:resource="@xml/authenticator" />
 		</service>
-		<service android:name="com.teamboid.twitter.contactsync.ContactsSyncAdapterService"
+		<service android:name="com.teamboid.twitter.contactsync.ContactSyncAdapterService"
 			android:exported="true" android:process=":contacts">
 			<intent-filter>
 				<action android:name="android.content.SyncAdapter" />

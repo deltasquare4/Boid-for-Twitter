@@ -121,11 +121,11 @@ public class AccountManager extends PreferenceActivity {
 			findPreference(accountId + "_c2dm_messages").setOnPreferenceChangeListener(new RemotePushSettingChange("dm"));
 		
 			SwitchPreference syncPref = ((SwitchPreference)findPreference(accountId + "_contactsync_on"));
-			syncPref.setChecked( ContentResolver.getSyncAutomatically(AndroidAccountHelper.getAccount(AccountService.getAccount(accountId)), ContactsContract.AUTHORITY) );
+			syncPref.setChecked( ContentResolver.getSyncAutomatically(AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)), ContactsContract.AUTHORITY) );
 			syncPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(final Preference preference, Object newValue) {
-					ContentResolver.setSyncAutomatically(AndroidAccountHelper.getAccount(AccountService.getAccount(accountId)), ContactsContract.AUTHORITY, (Boolean)newValue);
+					ContentResolver.setSyncAutomatically(AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)), ContactsContract.AUTHORITY, (Boolean)newValue);
 					return true;
 				}
 			});
