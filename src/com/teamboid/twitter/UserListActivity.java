@@ -18,6 +18,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.user.User;
 

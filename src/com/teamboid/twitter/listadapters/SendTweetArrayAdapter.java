@@ -8,6 +8,8 @@ import com.teamboid.twitter.R;
 import com.teamboid.twitter.SendTweetTask;
 import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.services.SendTweetService;
+import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.utilities.Utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,8 +42,9 @@ public class SendTweetArrayAdapter extends ArrayAdapter<SendTweetTask> {
 		tv = (TextView)convertView.findViewById(R.id.feedItemUserName);
 		tv.setText(stt.from.getUser().getScreenName());
 		convertView.findViewById(R.id.feedItemMediaIndicator).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
+		
 		RemoteImageView profilePic = (RemoteImageView)convertView.findViewById(R.id.feedItemProfilePic);
-		profilePic.setImageURL("https://api.twitter.com/1/users/profile_image?screen_name=" + stt.from.getUser() + "&size=bigger");
+		profilePic.setImageURL( Utilities.getUserImage(stt.from.getUser().getScreenName(), getContext(), stt.from.getUser()) );
 		convertView.findViewById(R.id.progressBar).setVisibility(stt.result.errorCode == Result.WAITING ? View.VISIBLE : View.GONE);
 		ImageButton btn = (ImageButton)convertView.findViewById(R.id.delete);
 		btn.setVisibility(stt.result.errorCode == Result.WAITING ? View.GONE : View.VISIBLE);

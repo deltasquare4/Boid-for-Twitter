@@ -5,15 +5,13 @@ import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.teamboid.twitterapi.dm.DirectMessage;
-import com.teamboid.twitterapi.dm.DirectMessageJSON;
-import com.teamboid.twitterapi.json.JSONObject;
-import com.teamboid.twitterapi.status.Status;
-import com.teamboid.twitterapi.status.StatusJSON;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
+
+import android.app.Activity;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -32,6 +30,10 @@ import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.NightModeUtils;
+import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.dm.DirectMessageJSON;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.StatusJSON;
 
 public class PushReceiver extends BroadcastReceiver {
 	
@@ -116,6 +118,7 @@ public class PushReceiver extends BroadcastReceiver {
 					catch(Exception e) { }
 					if(type.equals("reply")) {
 						JSONObject status = new JSONObject(b.getString("tweet"));
+						status.put("id", Long.parseLong(status.getString("id_str")));
 						final Status s = new StatusJSON(status);
 						Api11.displayReplyNotification(accId, PushWorker.this, s);
 						TimelineCAB.context.runOnUiThread(new Runnable() {

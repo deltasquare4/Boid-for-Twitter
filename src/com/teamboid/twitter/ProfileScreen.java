@@ -39,10 +39,12 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.teamboid.twitterapi.list.UserList;
 import com.teamboid.twitterapi.relationship.Relationship;
 import com.teamboid.twitterapi.user.FollowingType;
 import com.teamboid.twitterapi.user.User;
+
 
 /**
  * The activity that represents the profile viewer.
@@ -114,6 +116,7 @@ public class ProfileScreen extends Activity {
 				try {
                     Relationship x = acc.getClient().getRelationship(AccountService.getCurrentAccount().getId(), user.getId());
 					getAboutFragment().getAdapter().updateIsBlocked(x.isSourceBlockingTarget());
+					
 					if(getAboutFragment().getAdapter().isBlocked()) {
 						runOnUiThread(new Runnable() {
 							public void run() {   
@@ -124,6 +127,7 @@ public class ProfileScreen extends Activity {
 						});
 						return;
 					}
+
 					getAboutFragment().getAdapter().updateIsFollowedBy(x.isSourceFollowedByTarget());
 					getAboutFragment().getAdapter().updateIsFollowing(x.isSourceFollowingTarget());
 					
@@ -189,7 +193,7 @@ public class ProfileScreen extends Activity {
 		}
 		return true;
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -260,7 +264,7 @@ public class ProfileScreen extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
+	
 	public void block() {
 		AlertDialog.Builder diag = new AlertDialog.Builder(this);
 		diag.setTitle(R.string.block_str);
@@ -403,11 +407,27 @@ public class ProfileScreen extends Activity {
 				mTabsAdapter.onPageSelected(position);
 			}
 		});
-		if(user.getProfileBackgroundImageUrl() != null) {
-			setHeaderBackground(user.getProfileBackgroundImageUrl());
-		} else if(user.getProfileBackgroundColor() != null) {
-			setHeaderBackground(user.getProfileBackgroundColor());
-		}
+	}
+
+	/**
+	 * Set first media
+	 */
+	public void setupMediaView(){
+		runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				try{
+					MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
+					setHeaderBackground(m.imgurl);
+				} catch(Exception e){
+					e.printStackTrace();
+					// Here we should divert to profile bg?
+					// setHeaderBackground(user.get());
+				}
+			}
+			
+		});
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {

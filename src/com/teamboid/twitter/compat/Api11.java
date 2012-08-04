@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+
 import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.utilities.Utils;
@@ -29,7 +30,6 @@ import com.teamboid.twitterapi.utilities.Utils;
  */
 @TargetApi(14)
 public class Api11 { //We don't support API 11, we only support API 14-16
-
     public static int SINGLE_NOTIFCATION = 100;
 
     /**

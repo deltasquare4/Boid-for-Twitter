@@ -2,9 +2,15 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
+import net.robotmedia.billing.BillingController;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
+import net.robotmedia.billing.helper.AbstractBillingObserver;
+import net.robotmedia.billing.model.Transaction.PurchaseState;
+
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.TimePreference;
+import com.teamboid.twitterapi.media.MediaServices;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -12,17 +18,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
 import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.BillingRequest;
-import net.robotmedia.billing.helper.AbstractBillingObserver;
-import net.robotmedia.billing.model.Transaction;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -44,9 +49,9 @@ public class SettingsScreen extends PreferenceActivity  {
 			@Override
 			public void onBillingChecked(boolean supported) { }
 			@Override
-			public void onPurchaseStateChanged(String itemId, Transaction.PurchaseState state) { }
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
 			@Override
-			public void onRequestPurchaseResponse(String itemId, BillingRequest.ResponseCode response) { }
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
 		};
 		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
@@ -148,12 +153,46 @@ public class SettingsScreen extends PreferenceActivity  {
 	}
 
     public static class ComposerFragment extends PreferenceFragment {
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.composer_category);
-		}
+        private void setMediaName(){
+	            final Preference uploadService = (Preference)findPreference("upload_service");
+	            String pref = uploadService.getSharedPreferences().getString("upload_service", "twitter");
+	            try{
+	                    uploadService.setSummary(MediaServices.services.get(pref).getServiceName());
+	            } catch(Exception e) { e.printStackTrace(); }
+	    }
+        
+	    public static int SELECT_MEDIA;
+	
+	    @Override
+	    public void onActivityResult(int requestCode, int resultCode, Intent data){
+	            if(requestCode == SELECT_MEDIA && resultCode == RESULT_OK){
+	                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("upload_service", data.getStringExtra("service").toLowerCase()).commit();
+	                    setMediaName();
+	            }
+	    }
+	
+	    @Override
+	    public void onCreate(Bundle savedInstanceState) {
+	            super.onCreate(savedInstanceState);
+	            addPreferencesFromResource(R.xml.composer_category);
+	            final Preference uploadService = (Preference)findPreference("upload_service"); 
+	            setMediaName();
+	            uploadService.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+	                    @Override
+	                    public boolean onPreferenceClick(final Preference arg0) {
+	                            Intent i = new Intent(getActivity(), SelectMediaScreen.class);
+	                            startActivityForResult(i, SELECT_MEDIA);
+	                            return true;
+	                    }
+	            });
+	            uploadService.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+	                    @Override
+	                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+	                            uploadService.setSummary(newValue.toString());
+	                            return true;
+	                    }
+	            });
+	    }
 	}
 
     public static class AppearanceFragment extends PreferenceFragment {

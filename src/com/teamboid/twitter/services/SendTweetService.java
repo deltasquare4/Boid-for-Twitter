@@ -12,12 +12,14 @@ import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.utilities.NetworkUtils;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ public class SendTweetService extends Service {
 	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
 	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	public List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
+	public Handler handler;
 	
 	public class SendTweetAsyncTask extends AsyncTask<Object,Object,Object> {
 		@Override
@@ -39,6 +42,7 @@ public class SendTweetService extends Service {
 			loadTweets();
 			for(int i = 0; i < tweets.size(); i++) {
 				final SendTweetTask stt = tweets.get(i);
+				final int ix = i;
 				stt.result.errorCode = Result.WAITING;
 				Intent update = new Intent(UPDATE_STATUS);
 				sendBroadcast(update);
@@ -55,14 +59,39 @@ public class SendTweetService extends Service {
 					} catch(Exception e) { e.printStackTrace(); }
 					try {
 						if(!TimelineCAB.context.hasWindowFocus()) {
-							Toast.makeText(getApplicationContext(), R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+							throw new Exception("Activity does not have focus");
 						}
-					} catch(Exception e) { e.printStackTrace(); }
-					tweets.remove(i);
-				} else tweets.set(i, stt);
+					} catch(Exception e) {
+						handler.post(new Runnable(){
+
+							@Override
+							public void run() {
+								Toast.makeText(SendTweetService.this, R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+							}
+							
+						});
+					}
+					handler.post(new Runnable(){
+
+						@Override
+						public void run() {
+							tweets.remove(ix);
+						}
+						
+					});
+				} else{
+					handler.post(new Runnable(){
+
+						@Override
+						public void run() {
+							tweets.set(ix, stt);
+						}
+						
+					});	
+				}
 				sendBroadcast(update);
 			}
-			saveTweets();
+			handler.post(new Runnable(){ public void run(){ saveTweets(); } });
 			return null;
 		}
 	}
@@ -99,8 +128,16 @@ public class SendTweetService extends Service {
 	}
 	
 	private void startBackground() {
-		try { new SendTweetAsyncTask().execute(); }
-		catch(Exception e) { e.printStackTrace(); }
+		handler = new Handler();
+		handler.post(new Runnable(){
+
+			@Override
+			public void run() {
+				try { new SendTweetAsyncTask().execute(); }
+				catch(Exception e) { e.printStackTrace(); }
+			}
+			
+		});
 	}
 	
 	private static SendTweetService scs;

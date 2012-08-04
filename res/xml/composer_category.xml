@@ -9,4 +9,5 @@
 	<SwitchPreference android:key="confirm_send_prompt"
 		android:layout="@layout/boid_preference" android:summary="@string/confirm_send_setting_desc"
 		android:title="@string/confirm_send_setting_title" android:persistent="true" />
+	<Preference android:key="upload_service" android:title="@string/photo_service_title" />
 </PreferenceScreen>

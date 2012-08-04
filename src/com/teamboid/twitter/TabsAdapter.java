@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.user.User;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -22,9 +25,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import com.teamboid.twitterapi.search.Tweet;
-import com.teamboid.twitterapi.status.Status;
-import com.teamboid.twitterapi.user.User;
+
 
 /**
  * The adapter used for columns in the TimelineScreen.
