@@ -2,13 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="wrap_content" android:layout_width="fill_parent"
 	android:padding="10dp">
+	<ImageView android:id="@+id/columnImage"
+		android:layout_width="40dp" android:layout_height="40dp"
+		android:layout_marginRight="8dp" android:layout_centerVertical="true"
+		android:src="@drawable/home_tab" />
 	<ImageView android:id="@+id/drag" android:layout_width="40dp"
-	    android:layout_centerVertical="true"
+		android:layout_marginLeft="5dp" android:layout_centerVertical="true"
 		android:layout_alignParentRight="true" android:layout_height="40dp"
 		android:background="?dragHandle" />
 	<TextView android:id="@+id/text" android:layout_width="fill_parent"
-		android:layout_marginLeft="10dp" android:textColor="?tweetColor"
+		android:layout_toRightOf="@+id/columnImage" android:textColor="?tweetColor"
 		android:layout_height="wrap_content" android:layout_centerVertical="true"
-		android:layout_alignParentLeft="true" android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_toLeftOf="@+id/drag" />
 </RelativeLayout>

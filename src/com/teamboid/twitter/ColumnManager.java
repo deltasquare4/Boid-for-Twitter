@@ -19,6 +19,7 @@ import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
+import com.teamboid.twitter.listadapters.ColumnManagerAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.DragSortListView;
@@ -29,10 +30,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,21 +47,13 @@ import com.teamboid.twitterapi.savedsearch.SavedSearch;
 
 public class ColumnManager extends Activity {
 
-	private ArrayAdapter<String> adapt;
-	private int selIndex;
-	ArrayList<String> cols;
+	private ColumnManagerAdapter adapt;
 	private int lastTheme;
 	
 	private DropListener dropListen = new DropListener() {
 		@Override
 		public void drop(int from, int to) {
-			String toMove = adapt.getItem(from);
-			String toMoveRaw = cols.get(from);
-			removeColumn(from);
-			adapt.remove(toMove);
-			adapt.insert(toMove, to);
-			adapt.notifyDataSetChanged();
-			addColumn(toMoveRaw, to);
+			adapt.moveColumn(from, to);
 		}
 	};
 	
@@ -77,13 +68,12 @@ public class ColumnManager extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.column_manager);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		adapt = new ArrayAdapter<String>(this, R.layout.drag_list_item, R.id.text);
+		adapt = new ColumnManagerAdapter(this);
 		final DragSortListView list = (DragSortListView)findViewById(android.R.id.list);
 		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				removeColumn(index);
-				loadColumns();
+				adapt.removeColumn(index);
 				return false;
 			}
 		});
@@ -106,91 +96,13 @@ public class ColumnManager extends Activity {
 			recreate();
 			return;
 		}
-		loadColumns();
+		adapt.notifyDataSetChanged();
 	}
 
 	@Override
 	public void onBackPressed() {
 		finish();
-		startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
-	}
-	
-	private void loadColumns() {
-		adapt.clear();
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		cols = Utilities.jsonToArray(prefs.getString(Long.toString(
-                AccountService.getCurrentAccount().getId()) + "_columns", ""));
-		
-		for(String c : cols) {
-			if(c.equals(TimelineFragment.ID)) {
-				adapt.add(getString(R.string.timeline_str));
-			} else if(c.equals(MentionsFragment.ID)) {
-				adapt.add(getString(R.string.mentions_str));
-			} else if(c.equals(MessagesFragment.ID)) {
-				adapt.add(getString(R.string.messages_str));
-			} else if(c.equals(TrendsFragment.ID)) {
-				adapt.add(getString(R.string.trends_str));
-			} else if(c.equals(FavoritesFragment.ID)) {
-				adapt.add(getString(R.string.favorites_str));
-			} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
-				c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
-				adapt.add(c);
-			} else if(c.startsWith(UserListFragment.ID + "@")) {
-				c = c.substring(UserListFragment.ID.length() + 1);
-				c = c.substring(0, c.indexOf("@")).replace("%40", "@");
-				adapt.add(c);
-			} else if(c.equals(NearbyFragment.ID)) {
-				adapt.add(getString(R.string.nearby_str));
-			} else if(c.equals(MediaTimelineFragment.ID)) {
-				adapt.add(getString(R.string.media_timeline_str));
-			} else if(c.equals(MyListsFragment.ID)) {
-				adapt.add(getString(R.string.my_lists_str));
-			} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
-				c = c.substring(ProfileTimelineFragment.ID.length() + 1);
-				adapt.add("@" + c);
-			}
-		}
-		adapt.notifyDataSetChanged();
-	}
-	
-	private void addColumn(String id, int index) {
-		if(AccountService.getAccounts().size() == 0) return;
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		if(index > -1) cols.add(index, id);
-		else cols.add(id);
-		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
-                "_columns", Utilities.arrayToJson(cols)).commit();
-		
-		selIndex = getIntent().getIntExtra("tab_count", 4) - 1;
-		loadColumns();
-	}
-	
-	private void removeColumn(int index) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		final String prefName = Long.toString(
-                AccountService.getCurrentAccount().getId()) + "_default_column";
-		int beforeDefCol = prefs.getInt(prefName, 0);
-		if(beforeDefCol > 0) prefs.edit().putInt(prefName, beforeDefCol - 1).commit();
-		cols.remove(index);
-		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
-                "_columns", Utilities.arrayToJson(cols)).commit();
-		int postIndex = index - 1;
-		if(postIndex < 0) postIndex = 0;
-		selIndex = postIndex;
-	}
-
-	private void resetColumns() {
-		if(AccountService.getAccounts().size() == 0) return;
-		cols.clear();
-		cols.add(TimelineFragment.ID);
-        cols.add(MentionsFragment.ID);
-        cols.add(MessagesFragment.ID);
-        cols.add(TrendsFragment.ID);
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
-                "_columns", Utilities.arrayToJson(cols)).commit();
-		selIndex = 0;
-		loadColumns();
+		startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true));
 	}
 	
 	@Override
@@ -204,7 +116,7 @@ public class ColumnManager extends Activity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			finish();
-			startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true).putExtra("sel_index", selIndex));
+			startActivity(new Intent(this, TimelineScreen.class).putExtra("restart", true));
 			return true;
 		case R.id.backupBtn:
 			backup();
@@ -213,25 +125,25 @@ public class ColumnManager extends Activity {
 			restore();
 			return true;
 		case R.id.resetBtn:
-			resetColumns();
+			adapt.resetColumns();
 			return true;
 		case R.id.addTimelineColAction:
-			addColumn(TimelineFragment.ID, -1);
+			adapt.addColumn(TimelineFragment.ID, -1);
 			return true;
 		case R.id.addMentionsColAction:
-			addColumn(MentionsFragment.ID, -1);
+			adapt.addColumn(MentionsFragment.ID, -1);
 			return true;
 		case R.id.addMessagesColAction:
-			addColumn(MessagesFragment.ID, -1);
+			adapt.addColumn(MessagesFragment.ID, -1);
 			return true;
 		case R.id.addTrendsColAction:
-			addColumn(TrendsFragment.ID, -1);
+			adapt.addColumn(TrendsFragment.ID, -1);
 			return true;
 		case R.id.addNearbyColAction:
-			addColumn(NearbyFragment.ID, -1);
+			adapt.addColumn(NearbyFragment.ID, -1);
 			return true;
 		case R.id.addMediaColAction:
-			addColumn(MediaTimelineFragment.ID, -1);
+			adapt.addColumn(MediaTimelineFragment.ID, -1);
 			return true;
 		case R.id.addSavedSearchColAction:		
 			Toast.makeText(getApplicationContext(), getString(R.string.loading_savedsearches), Toast.LENGTH_SHORT).show();
@@ -253,7 +165,7 @@ public class ColumnManager extends Activity {
 			}).start();
 			return true;
 		case R.id.addFavoritesColAction:
-			addColumn(FavoritesFragment.ID, -1);
+			adapt.addColumn(FavoritesFragment.ID, -1);
 			return true;
 		case R.id.addUserListColAction:
 			Toast.makeText(getApplicationContext(), getString(R.string.loading_lists), Toast.LENGTH_SHORT).show();
@@ -275,7 +187,7 @@ public class ColumnManager extends Activity {
 			}).start();
 			return true;
 		case R.id.addMyListsColAction:
-			addColumn(MyListsFragment.ID, -1);
+			adapt.addColumn(MyListsFragment.ID, -1);
 			return true;
 		case R.id.addProfileFeedColAction:
 			showProfileFeedColumnAdd();
@@ -299,7 +211,7 @@ public class ColumnManager extends Activity {
 		builder.setItems(items.toArray(new String[0]), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				UserList curList = lists[item];
-				addColumn(UserListFragment.ID + "@" + curList.getFullName().replace("@", "%40") +
+				adapt.addColumn(UserListFragment.ID + "@" + curList.getFullName().replace("@", "%40") +
 						"@" + Long.toString(curList.getId()), -1);
 			}
 		});
@@ -345,7 +257,7 @@ public class ColumnManager extends Activity {
 						});
 					}
 				}).start();
-				addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
+				adapt.addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
 				diag.dismiss();
 			}
 		});
@@ -367,7 +279,7 @@ public class ColumnManager extends Activity {
 			public void onClick(View v) {
 				final String query = input.getText().toString().trim();
 				diag.dismiss();
-				addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
+				adapt.addColumn(ProfileTimelineFragment.ID + "@" + query.replace("@", ""), -1);
 			}
 		});
 		diag.show();
@@ -377,6 +289,7 @@ public class ColumnManager extends Activity {
 		try {
 			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
 					Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt").getAbsolutePath()));
+			ArrayList<String> cols = adapt.getColumns();
 			for(String key : cols) {
 				buf.write(key);
 				buf.newLine();
@@ -399,19 +312,15 @@ public class ColumnManager extends Activity {
 		}
 		try {
 			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));
-			cols.clear();
+			ArrayList<String> cols = new ArrayList<String>();
 			while(true) {
 				String line = buf.readLine();
 				if(line == null) break;
 				else if(line.isEmpty()) break;
 				cols.add(line);
 			}
-			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
-	                "_columns", Utilities.arrayToJson(cols)).commit();
+			adapt.setColumns(cols);
 			buf.close();
-			selIndex = 0;
-			loadColumns();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

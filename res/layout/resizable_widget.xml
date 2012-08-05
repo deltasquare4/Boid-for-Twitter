@@ -11,9 +11,13 @@
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:text="@string/timeline_str" />
 		<ImageView android:id="@+id/refreshIcon"
-			android:layout_width="30dp" android:layout_height="30dp"
+			android:layout_width="35dp" android:layout_height="35dp"
 			android:layout_centerVertical="true" android:layout_alignParentRight="true"
 			android:layout_marginRight="10dp" android:src="@drawable/refresh_action" />
+		<ImageView android:id="@+id/tweetIcon"
+			android:layout_toLeftOf="@+id/refreshIcon" android:layout_width="35dp"
+			android:layout_height="35dp" android:layout_centerVertical="true"
+			android:layout_marginRight="8dp" android:src="@drawable/new_tweet_action" />
 	</RelativeLayout>
 	<RelativeLayout android:id="@+id/content"
 		android:background="@color/black_transparent" android:layout_below="@+id/header"

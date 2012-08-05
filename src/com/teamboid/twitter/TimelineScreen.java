@@ -223,7 +223,6 @@ public class TimelineScreen extends Activity {
                 }
             }
             if (intent.getExtras().containsKey("restart")) {
-                getActionBar().setSelectedNavigationItem(intent.getIntExtra("sel_index", 0));
                 restartActivity();
             }
         }
