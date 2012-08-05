@@ -60,7 +60,7 @@ public class AccountService extends Service {
 	public static SearchFeedListAdapter nearbyAdapter;
 	public static ArrayList<SearchFeedListAdapter> searchFeedAdapters;
 	public static UserListDisplayAdapter myListsAdapter;
-	
+
 	public static int configShortURLLength;
 	public static int charactersPerMedia;
 	public static long selectedAccount;
@@ -138,7 +138,7 @@ public class AccountService extends Service {
 					Account profile = new Account(activity, toAdd).setUser(toAddUser);
 					accounts.add(profile);
 					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
-						.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
+					.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
 					AndroidAccountHelper.addAccount(activity, profile);
 					activity.runOnUiThread(new Runnable() {
 						@Override
@@ -171,17 +171,17 @@ public class AccountService extends Service {
 		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles-v2", 0).getAll();
 		if (accountStore.size() == 0) {
 			getApplicationContext().startActivity(new Intent(getApplicationContext(), AccountManager.class)
-				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 			return false;
 		} else if (getAccounts().size() == accountStore.size()) return false;
 		if (!NetworkUtils.haveNetworkConnection(getApplicationContext())) {
 			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
 			return false;
 		}
-		
+
 		// Android Accounts
 		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
-		
+
 		final int lastAccountCount = getAccounts().size();
 		Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
 		for(final String token : accountStore.keySet()) {
@@ -205,17 +205,17 @@ public class AccountService extends Service {
 			} else{
 				AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
 			}
-			
-//			try {
-//				final User accountUser = toAdd.verifyCredentials();
-//				accounts.add(new Account(getApplicationContext(), toAdd).setUser(accountUser));
-//			} catch (final Exception e) {
-//				e.printStackTrace();
-//				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
-//						" " + e.getMessage(), Toast.LENGTH_LONG).show();
-//			}
+
+			//			try {
+			//				final User accountUser = toAdd.verifyCredentials();
+			//				accounts.add(new Account(getApplicationContext(), toAdd).setUser(accountUser));
+			//			} catch (final Exception e) {
+			//				e.printStackTrace();
+			//				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
+			//						" " + e.getMessage(), Toast.LENGTH_LONG).show();
+			//			}
 		}
-		
+
 		// Now remove dead accounts
 		for( android.accounts.Account acc : androidAccounts.values() ){
 			Log.d("acc", "Remove Account: " + acc.name);
@@ -241,24 +241,25 @@ public class AccountService extends Service {
 		charactersPerMedia = 21;
 		if (lastConfigUpdate <= (new Date().getTime() - 86400000)) {
 			Log.i("BOID", "Loading Twitter config (this should only happen once every 24 hours)...");
-			try {
-				final Twitter tempClient = getAuthorizer().getUnauthorizedInstance();
-				tempClient.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-						.getBoolean("enable_ssl", false));
-				TwitterAPIConfig config = tempClient.getAPIConfiguration();
-				configShortURLLength = config.getShortUrlLength();
-				charactersPerMedia = config.getCharactersReservedPerMedia();
-				prefs.edit()
-				.putInt("shorturl_length", config.getShortUrlLength())
-				.putInt("mediachars_length", config.getCharactersReservedPerMedia())
-				.putLong("last_config_update", new Date().getTime()).commit();
-			} catch (final Exception e) {
-				e.printStackTrace();
-				configShortURLLength = 21;
-				charactersPerMedia = 21;
-				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_fetch_config)
-						.replace("{reason}", e.getMessage()), Toast.LENGTH_LONG).show();
-			}
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						final Twitter tempClient = getAuthorizer().getUnauthorizedInstance();
+						tempClient.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+								.getBoolean("enable_ssl", false));
+						TwitterAPIConfig config = tempClient.getAPIConfiguration();
+						configShortURLLength = config.getShortUrlLength();
+						charactersPerMedia = config.getCharactersReservedPerMedia();
+						prefs.edit().putInt("shorturl_length", config.getShortUrlLength())
+						.putInt("mediachars_length", config.getCharactersReservedPerMedia())
+						.putLong("last_config_update", new Date().getTime()).commit();
+					} catch (final Exception e) {
+						e.printStackTrace();
+						configShortURLLength = 21;
+						charactersPerMedia = 21;
+					}
+				}
+			}).start();
 		}
 	}
 

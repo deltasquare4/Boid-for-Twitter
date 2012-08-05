@@ -136,9 +136,11 @@ public class ColumnManagerAdapter extends BaseAdapter {
 		} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 			c = "@" + c.substring(ProfileTimelineFragment.ID.length() + 1);
 			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.userFeedTab }).getDrawable(0);
-		}
+		} else c = "Invalid Column";
 		
-		((ImageView)toReturn.findViewById(R.id.columnImage)).setImageDrawable(image);
+		if(image != null) {
+			((ImageView)toReturn.findViewById(R.id.columnImage)).setImageDrawable(image);
+		}
 		((TextView)toReturn.findViewById(R.id.text)).setText(c);
 		return toReturn;
 	}
