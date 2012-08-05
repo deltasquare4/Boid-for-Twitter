@@ -110,7 +110,7 @@
 
 	<string name="edit_profile_str">Edit Profile</string>
 	<string name="pin_column_str">Pin as Column</string>
-	<string name="in_reply_to">In reply to</string>
+	<string name="in_reply_to">In reply to @{user}</string>
 	<string name="search_query_hint_str">Search Twitter</string>
 	<string name="what_you_wanna_say">What\'s happening?</string>
 

@@ -269,7 +269,7 @@ public class FeedListAdapter extends BaseAdapter {
 				}
 			});
 		} else profilePic.setVisibility(View.GONE);
-		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(), tweet.getUrlEntities(), tweet.getMediaEntities(), false));
+		itemTxt.setText(Utilities.twitterifyText(mContext, tweet));
 		itemTxt.setLinksClickable(false);
 		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		boolean hasMedia = false;
@@ -316,7 +316,7 @@ public class FeedListAdapter extends BaseAdapter {
 		else favoritedIndic.setVisibility(View.GONE);
 		if(tweet.getInReplyToStatusId() > 0) {
 			replyFrame.setVisibility(View.VISIBLE);
-			replyIndic.setText(mContext.getString(R.string.in_reply_to) + " @" + tweet.getInReplyToScreenName());
+			replyIndic.setText(mContext.getString(R.string.in_reply_to).replace("{user}", tweet.getInReplyToScreenName()));
 			if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
 				addRule(replyFrame, R.id.locationFrame, RelativeLayout.BELOW);
 			} else if(!hasMedia) addRule(replyFrame, R.id.feedItemText, RelativeLayout.BELOW);

@@ -248,6 +248,9 @@ public class Utilities {
 		return false;
 	}
 
+	public static Spannable twitterifyText(final Context context, Status status) {
+		return twitterifyText(context, status.getText(), status.getUrlEntities(), status.getMediaEntities(), false);
+	}
 	public static Spannable twitterifyText(final Context context, String text, final UrlEntity[] urls, final MediaEntity[] pics, final boolean expand) {
 		if(urls != null) {
 			for(UrlEntity url : urls) {
