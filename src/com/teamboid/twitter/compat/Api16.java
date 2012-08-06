@@ -20,13 +20,14 @@ import android.graphics.Bitmap;
 /**
  * Api level 16 (Jellybean) only methods!
  *
- * @author kennydude
+ * @author kennydude and Aidan Follestad
  */
 @TargetApi(16)
 public class Api16 {
 	
-	private static PendingIntent getReplyActionIntent(Context context, Status s) {
+	private static PendingIntent getReplyActionIntent(Context context, Status s, int accId) {
 		Intent replyIntent = new Intent(context, ComposerScreen.class)
+			.putExtra("account", accId)
     		.putExtra("reply_to", s.getId())
     		.putExtra("reply_to_name", s.getUser().getScreenName())
     		.putExtra("append", Utilities.getAllMentions(s))
@@ -40,7 +41,7 @@ public class Api16 {
 	 */
 	public static void displayReplyNotification(final int accId, final Context context, final Bitmap profileImg, final Status s, final Builder nb, final NotificationManager nm) {
 		nb.addAction(R.drawable.reply_light, context.getString(R.string.reply_str),
-				getReplyActionIntent(context, s));
+				getReplyActionIntent(context, s, accId));
 		nb.addAction(R.drawable.retweet_light, context.getString(R.string.retweet_str), null); //TODO
 		
 		String media = Utilities.getTweetYFrogTwitpicMedia(s);
