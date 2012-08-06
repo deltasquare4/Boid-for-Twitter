@@ -222,8 +222,10 @@ public class ComposerScreen extends Activity {
 				stt.from = AccountService.getCurrentAccount();
 				loadDraft();
 			}
+			long accExtra = getIntent().getLongExtra("account", 0l);
 			for (int i = 0; i < accs.size(); i++) {
-				if (accs.get(i).getId() == stt.from.getId()) {
+				if (accs.get(i).getId() == stt.from.getId() ||
+						accs.get(i).getId() == accExtra) {
 					getActionBar().setSelectedNavigationItem(i);
 					break;
 				}
