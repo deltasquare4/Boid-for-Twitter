@@ -61,6 +61,7 @@ public class UserListFragment extends BaseListFragment {
         super.onStart();
         listName = getArguments().getString("list_name");
         listID = getArguments().getInt("list_id");
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         getListView().setOnScrollListener(
                 new AbsListView.OnScrollListener() {
                     @Override

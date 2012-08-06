@@ -267,6 +267,7 @@ public class AccountService extends Service {
 	 * Used from the WidgetRemoteViewServie
 	 */
 	public static FeedListAdapter getTimelineFeedAdapter(long account) {
+		if(feedAdapters == null) return null;
 		FeedListAdapter toReturn = null;
 		for (FeedListAdapter adapt : feedAdapters) {
 			if (TimelineFragment.ID.equals(adapt.ID) && account == adapt.account) {

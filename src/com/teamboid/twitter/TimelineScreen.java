@@ -352,7 +352,9 @@ public class TimelineScreen extends Activity {
                 if (iconic) {
                     Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userListTab}).getDrawable(0);
                     toAdd.setIcon(icon);
-                    if (prefs.getBoolean("textual_userlist_tabs", true)) toAdd.setText(R.string.my_lists_str);
+                    if (prefs.getBoolean("textual_userlist_tabs", true)) {
+                    	toAdd.setText(R.string.my_lists_str);
+                    }
                 } else toAdd.setText(R.string.my_lists_str);
                 mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
             }
@@ -362,7 +364,9 @@ public class TimelineScreen extends Activity {
                 if (iconic) {
                     Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userFeedTab}).getDrawable(0);
                     toAdd.setIcon(icon);
-                    if(prefs.getBoolean("textual_profilefeed_tabs", true)) toAdd.setText("@" + screenName);
+                    if(prefs.getBoolean("textual_profilefeed_tabs", true)) {
+                    	toAdd.setText("@" + screenName);
+                    }
                 } else toAdd.setText("@" + screenName);
                 mTabsAdapter.addTab(toAdd, ProfileTimelineFragment.class, index, screenName);
             }
