@@ -356,11 +356,11 @@
 	<string name="clear_str">Clear</string>
 	<string name="backup_str">Backup</string>
 	<string name="restore_str">Restore</string>
-	<string name="backed_up_muting">Your muting filters were successfully backed up!
+	<string name="backed_up_muting">Your muting filters were successfully backed up for this account!
 	</string>
-	<string name="restored_muting">Your muting filters were successfully restored!
+	<string name="restored_muting">Your muting filters were successfully restored for this account!
 	</string>
-	<string name="no_muting_backup">No muting filters backup file was found!</string>
+	<string name="no_muting_backup">No muting filters backup file was found for this account!</string>
 	<string name="loading_str">Loading…</string>
 	<string name="enable_ssl_str">Enable SSL</string>
 	<string name="disable_ssl_str">Disable SSL</string>
@@ -480,11 +480,11 @@
 	<string name="no_location_str">No Location</string>
 
 	<string name="please_wait">Please wait…</string>
-	<string name="no_column_backup">No column backup file was found!</string>
+	<string name="no_column_backup">No column backup file was found for this account!</string>
 	<string name="reset_str">Reset</string>
-	<string name="backed_up_columns">Your columns were successfully backed up!
+	<string name="backed_up_columns">Your columns were successfully backed up for this account!
 	</string>
-	<string name="restored_columns">Your columns were successfully restored!
+	<string name="restored_columns">Your columns were successfully restored for this account!
 	</string>
 	<string name="screen_name_str">Screen name</string>
 	<string name="please_readd_accounts">Please re-add your accounts!</string>

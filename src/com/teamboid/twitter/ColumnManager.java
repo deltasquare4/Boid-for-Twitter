@@ -288,7 +288,8 @@ public class ColumnManager extends Activity {
 	public void backup() {
 		try {
 			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
-					Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt").getAbsolutePath()));
+					Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup_" + 
+					AccountService.getCurrentAccount().getId() + ".txt").getAbsolutePath()));
 			ArrayList<String> cols = adapt.getColumns();
 			for(String key : cols) {
 				buf.write(key);
@@ -305,10 +306,14 @@ public class ColumnManager extends Activity {
 		Toast.makeText(getApplicationContext(), R.string.backed_up_columns, Toast.LENGTH_SHORT).show();
 	}
 	public void restore() {
-		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt");
+		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup_" + 
+				AccountService.getCurrentAccount().getId() + ".txt");
 		if(!fi.exists()) {
-			Toast.makeText(getApplicationContext(), R.string.no_column_backup, Toast.LENGTH_SHORT).show();
-			return;
+			fi = new File(Environment.getExternalStorageDirectory(), "Boid_ColumnsBackup.txt");
+			if(!fi.exists()) {
+				Toast.makeText(getApplicationContext(), R.string.no_column_backup, Toast.LENGTH_SHORT).show();
+				return;
+			}
 		}
 		try {
 			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.listadapters.MutingListAdapter;
+import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
@@ -192,7 +193,8 @@ public class MutingManager extends ListActivity {
 	public void backup() {
 		try {
 			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(
-					Environment.getExternalStorageDirectory(), "Boid_MutingBackup.txt").getAbsolutePath()));
+					Environment.getExternalStorageDirectory(), "Boid_MutingBackup_" +
+					AccountService.getCurrentAccount().getId() + ".txt").getAbsolutePath()));
 			String[] toWrite = adapt.loadKeywords();
 			for(String key : toWrite) {
 				buf.write(key);
@@ -208,10 +210,14 @@ public class MutingManager extends ListActivity {
 		Toast.makeText(getApplicationContext(), R.string.backed_up_muting, Toast.LENGTH_SHORT).show();
 	}
 	public void restore() {
-		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_MutingBackup.txt");
+		File fi = new File(Environment.getExternalStorageDirectory(), "Boid_MutingBackup_" +
+				AccountService.getCurrentAccount().getId() + ".txt");
 		if(!fi.exists()) {
-			Toast.makeText(getApplicationContext(), R.string.no_muting_backup, Toast.LENGTH_SHORT).show();
-			return;
+			fi = new File(Environment.getExternalStorageDirectory(), "Boid_MutingBackup.txt");
+			if(!fi.exists()) {
+				Toast.makeText(getApplicationContext(), R.string.no_muting_backup, Toast.LENGTH_SHORT).show();
+				return;
+			}
 		}
 		try {
 			BufferedReader buf = new BufferedReader(new FileReader(fi.getAbsolutePath()));

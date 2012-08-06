@@ -136,7 +136,10 @@ public class ColumnManagerAdapter extends BaseAdapter {
 		} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 			c = "@" + c.substring(ProfileTimelineFragment.ID.length() + 1);
 			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.userFeedTab }).getDrawable(0);
-		} else c = "Invalid Column";
+		} else {
+			c = "Invalid Column";
+			image = null;
+		}
 		
 		if(image != null) {
 			((ImageView)toReturn.findViewById(R.id.columnImage)).setImageDrawable(image);
