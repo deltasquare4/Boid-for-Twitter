@@ -20,17 +20,22 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +44,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.LoaderManager;
 
 import com.teamboid.twitterapi.list.UserList;
 import com.teamboid.twitterapi.relationship.Relationship;
@@ -52,6 +58,7 @@ import com.teamboid.twitterapi.user.User;
  * @author Aidan Follestad
  */
 public class ProfileScreen extends Activity {
+	public static final int LOAD_CONTACT_ID = 1;
 
 	private int lastTheme;
 	private boolean showProgress;
@@ -66,7 +73,7 @@ public class ProfileScreen extends Activity {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
 			if(savedInstanceState.containsKey("lastTheme")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");
@@ -83,12 +90,34 @@ public class ProfileScreen extends Activity {
 		setProgressBarIndeterminateVisibility(false);
 		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
 		profileImg.setImageBitmap(Utilities.getRoundedImage(BitmapFactory.decodeResource(getResources(), R.drawable.sillouette), 90F));
-		initializeTabs(savedInstanceState);        
+		
+		if(getIntent().hasExtra("screen_name")){
+			initializeTabs(savedInstanceState, getIntent().getStringExtra("screen_name"));
+		} else if(getIntent().getDataString().contains("com.android.contacts")){ // Loading from Contact
+			getLoaderManager().initLoader(LOAD_CONTACT_ID, null, new LoaderManager.LoaderCallbacks<Cursor>(){
+
+				@Override
+				public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+					return new CursorLoader(ProfileScreen.this, getIntent().getData(), new String[]{ContactsContract.Data.DATA1}, null, null, null);
+				}
+
+				@Override
+				public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+					cursor.moveToNext();
+					initializeTabs(savedInstanceState, cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DATA1)));
+				}
+
+				@Override
+				public void onLoaderReset(Loader<Cursor> arg0) {}
+				
+			});
+			setTitle(R.string.please_wait);
+		}    
 	}
 
 	private TabsAdapter mTabsAdapter;
-	private void initializeTabs(Bundle savedInstanceState) {
-		final String screenName = getIntent().getStringExtra("screen_name");
+	private void initializeTabs(Bundle savedInstanceState, String screenName) {
+		Log.d("boid", "Showing " + screenName);
 		setTitle("@" + screenName);
 		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
 		final ActionBar bar = getActionBar();
@@ -105,7 +134,7 @@ public class ProfileScreen extends Activity {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str), PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str), ProfileAboutFragment.class, 1, screenName);
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title), MediaTimelineFragment.class, 2, screenName, false);
-		}	
+		}
 		if(savedInstanceState != null) getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("lastTab", 0));
 	}
 

@@ -101,7 +101,13 @@
 		</activity>
 		<activity android:name=".ProfileScreen"
 			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow" />
+			android:uiOptions="splitActionBarWhenNarrow">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="vnd.android.cursor.item/vnd.com.teamboid.twitter.account" />
+			</intent-filter>
+		</activity>
 		<activity android:name=".TweetViewer" android:noHistory="true"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />
@@ -200,6 +206,8 @@
 				<category android:name="com.teamboid.twitter" />
 			</intent-filter>
 		</receiver>
+		
+		<!-- Webkit Views -->
 		<activity android:name=".LoginHandler" android:launchMode="singleTop"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
@@ -208,6 +216,8 @@
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:windowSoftInputMode="adjustResize" android:label="@string/boid_browser"
 			android:hardwareAccelerated="true" />
+			
+		<!-- In-App Billing -->
 		<service android:name="net.robotmedia.billing.BillingService" />
 		<receiver android:name="net.robotmedia.billing.BillingReceiver"
 			android:exported="false">
