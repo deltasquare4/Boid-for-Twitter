@@ -6,13 +6,15 @@
 		your accounts. Stopping the service will disable Boid.
 	</string>
 	<string name="push_error">There was a problem with push, the servers may be
-		down. Please try again later.</string>
+		down. Please try again later.
+	</string>
 	<string name="push_updated">Your push settings have been updated</string>
 	<string name="push_registered">Push is now registered!</string>
 	<string name="messages_priv">Show Content</string>
 	<string name="message_recv">{user} sent you a Direct Message</string>
 	<string name="messages_priv_desc">Show the content of direct messages in
-		notifications.</string>
+		notifications.
+	</string>
 	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
 	<string name="failed_check_relationship">Failed to get your relationship to {user}!</string>
@@ -35,8 +37,8 @@
 		composed tweets by default.
 	</string>
 	<string name="display_real_name">Display Real Name</string>
-	<string name="display_real_name_desc">When enabled, columns display the full name of a
-		user instead of their screen name.
+	<string name="display_real_name_desc">The full name of users are displayed in feeds, as
+		opposed to screen names.
 	</string>
 	<string name="mention_notify_desc">When enabled, you will receive notifications for
 		new mentions.
@@ -166,7 +168,8 @@
 	<string name="delete_str">Delete</string>
 
 	<string name="help_title">Help</string>
-	<string name="help_description">View information about Boid, or send a donation or email to us.
+	<string name="help_description">View information about Boid, or send a donation or
+		email to us.
 	</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
@@ -215,12 +218,16 @@
 	<string name="appearance_category_desc">Settings for modifying Boid\'s look and feel.
 	</string>
 	<string name="enable_textual_list_title">Textual User Lists</string>
-	<string name="enable_textual_list_desc">If iconic tabs are enabled, user list columns will
-		display their title along side the icon.
+	<string name="enable_textual_list_desc">User list columns display their name, even with
+		iconic tabs.
 	</string>
 	<string name="enable_textual_search_title">Textual Saved Searches</string>
-	<string name="enable_textual_search_desc">If iconic tabs are enabled, saved search columns
-		will display their title along side the icon.
+	<string name="enable_textual_search_desc">Saved search columns display their query, even with
+		iconic tabs.
+	</string>
+	<string name="enable_textual_profilefeed_title">Textual Profile Feeds</string>
+	<string name="enable_textual_profilefeed_desc">Profile feed columns display their screen name,
+		even with iconic tabs.
 	</string>
 	<string name="enable_inline_title">Inline Previewing</string>
 	<string name="enable_inline_desc">Enabling allows Boid to display image previews of
@@ -299,18 +306,19 @@
 		<item>Weekly Trends</item>
 		<item>Local Trends</item>
 	</string-array>
-	
+
 	<string name="local_trend_with_place">Local - {place}</string>
 
 	<string name="push_title">Push Notifications</string>
 	<string name="enable_push">Enabling push notifications will push you updates
 		in near real-time
 	</string>
-	
+
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="imgur_note">Images will be uploaded using the same
-		account at the moment and follow the default access settings
+		account at
+		the moment and follow the default access settings
 	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
 
@@ -461,16 +469,16 @@
 	</string>
 	<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
-	
+
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
-	
+
 	<string name="contactsync_what">What to sync</string>
 	<string name="contact_sync_on">Contact Sync is turned on</string>
 	<string name="contact_sync_off">Contact sync is turned off</string>
 	<string name="no_location_str">No Location</string>
-	
+
 	<string name="please_wait">Please wait…</string>
 	<string name="no_column_backup">No column backup file was found!</string>
 	<string name="reset_str">Reset</string>
@@ -480,7 +488,7 @@
 	</string>
 	<string name="screen_name_str">Screen name</string>
 	<string name="please_readd_accounts">Please re-add your accounts!</string>
-	
+
 	<string name="not_logged_in">You are not logged in</string>
 	<string name="logged_in_as">You are logged in as {user}</string>
 	<string name="service_needs_config">{service} (needs logging in)</string>

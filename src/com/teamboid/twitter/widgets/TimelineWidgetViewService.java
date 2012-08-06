@@ -12,7 +12,6 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.utilities.Utils;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -34,12 +33,12 @@ public class TimelineWidgetViewService extends RemoteViewsService {
 		public WidgetRemoteViewFactory(Context context, Intent intent) {
 			_context = context;
 			_items = new ArrayList<Status>();
-			mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+			//mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
 
 		private Context _context;
 		private ArrayList<Status> _items;
-		private int mAppWidgetId;
+		//private int mAppWidgetId;
 
 		@Override
 		public int getCount() { return _items.size(); }
@@ -71,7 +70,11 @@ public class TimelineWidgetViewService extends RemoteViewsService {
 				rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.VISIBLE);
 				rv.setTextViewText(R.id.feedItemRetweetIndicatorTxt, "@" + status.getUser().getScreenName());
 				status = status.getRetweetedStatus();
+			} else {
+				rv.setViewVisibility(R.id.feedItemRetweetIndicatorImg, View.GONE);
+				rv.setViewVisibility(R.id.feedItemRetweetIndicatorTxt, View.GONE);
 			}
+			
 			Intent itemClickIntent = new Intent(getApplicationContext(), TweetViewer.class)
 				.putExtra("sr_tweet", Utils.serializeObject(status))
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -87,10 +90,11 @@ public class TimelineWidgetViewService extends RemoteViewsService {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(status);
 			if(media != null && !media.isEmpty()) { 
 				rv.setViewVisibility(R.id.feedItemMediaIndicator, View.VISIBLE);
-			}
+			} else rv.setViewVisibility(R.id.feedItemMediaIndicator, View.GONE);
 			if(Utilities.tweetContainsVideo(status)) {
 				rv.setViewVisibility(R.id.feedItemVideoIndicator, View.VISIBLE);
-			}
+			} else rv.setViewVisibility(R.id.feedItemVideoIndicator, View.GONE);
+			
 //			if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
 //				if(!hasMedia) addRule(locFrame, R.id.feedItemText, RelativeLayout.BELOW);
 //				locFrame.setVisibility(View.VISIBLE);
@@ -104,14 +108,14 @@ public class TimelineWidgetViewService extends RemoteViewsService {
 //			}
 			if(status.isFavorited()) {
 				rv.setViewVisibility(R.id.feedItemFavoritedIndicator, View.VISIBLE);
-			}
+			} else rv.setViewVisibility(R.id.feedItemFavoritedIndicator, View.GONE);
 			if(status.getInReplyToStatusId() > 0) {
 				rv.setViewVisibility(R.id.inReplyToFrame, View.VISIBLE);
 				rv.setTextViewText(R.id.inReplyIndicTxt, status.getInReplyToScreenName());
 //				if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
 //					addRule(replyFrame, R.id.locationFrame, RelativeLayout.BELOW);
 //				} else if(!hasMedia) addRule(replyFrame, R.id.feedItemText, RelativeLayout.BELOW);
-			}
+			} else rv.setViewVisibility(R.id.inReplyToFrame, View.GONE);
 			
 			return rv;
 		}

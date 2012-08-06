@@ -190,6 +190,7 @@ public class TimelineScreen extends Activity {
         if (!prefs.contains("enable_drafts")) prefs.edit().putBoolean("enable_drafts", true).commit();
         if (!prefs.contains("textual_userlist_tabs")) prefs.edit().putBoolean("textual_userlist_tabs", true).commit();
         if (!prefs.contains("textual_savedsearch_tabs")) prefs.edit().putBoolean("textual_savedsearch_tabs", true).commit();
+        if (!prefs.contains("textual_profilefeed_tabs")) prefs.edit().putBoolean("textual_profilefeed_tabs", true).commit();
         if (!prefs.contains("enable_iconic_tabs")) prefs.edit().putBoolean("enable_iconic_tabs", true).commit();
         if (!prefs.contains("boid_theme")) prefs.edit().putString("boid_theme", "0").commit();
         if (!prefs.contains("upload_service")) prefs.edit().putString("upload_service", "twitter").commit();
@@ -361,6 +362,7 @@ public class TimelineScreen extends Activity {
                 if (iconic) {
                     Drawable icon = getTheme().obtainStyledAttributes(new int[]{R.attr.userFeedTab}).getDrawable(0);
                     toAdd.setIcon(icon);
+                    if(prefs.getBoolean("textual_profilefeed_tabs", true)) toAdd.setText("@" + screenName);
                 } else toAdd.setText("@" + screenName);
                 mTabsAdapter.addTab(toAdd, ProfileTimelineFragment.class, index, screenName);
             }

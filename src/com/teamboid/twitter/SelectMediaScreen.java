@@ -320,6 +320,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		String pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("upload_service", "twitter");
 		
 		MediaServices.setupServices();
+		//TODO this function is deprecated and needs to be replaced.
 		getPreferenceScreen().removeAll();
 		
 		for(final Entry<String, ExternalMediaService> entry : MediaServices.services.entrySet()){

@@ -64,7 +64,9 @@ public class TimelineCAB {
             if (checkedItems != null) {
                 for (int i = 0; i < checkedItems.size(); i++) {
                     if (checkedItems.valueAt(i)) {
-                        toReturn.add((Status) activity.binder.getItem(checkedItems.keyAt(i)));
+                    	Status toAdd = (Status)activity.binder.getItem(checkedItems.keyAt(i));
+                    	if(toAdd.isRetweet()) toAdd = toAdd.getRetweetedStatus();
+                        toReturn.add(toAdd);
                     }
                 }
             }
@@ -74,7 +76,10 @@ public class TimelineCAB {
                 if (frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
                     Status[] toAdd = ((BaseListFragment) frag).getSelectedStatuses();
                     if (toAdd != null && toAdd.length > 0) {
-                        for (Status s : toAdd) toReturn.add(s);
+                        for (Status s : toAdd) {
+                        	if(s.isRetweet()) s = s.getRetweetedStatus();
+                        	toReturn.add(s);
+                        }
                     }
                 }
             }
