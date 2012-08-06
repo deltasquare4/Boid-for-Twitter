@@ -73,7 +73,7 @@ public class FeedListAdapter extends BaseAdapter {
 		lastViewedTopMargin = (v == null) ? 0 : v.getTop();
 	}
 	public void restoreLastViewed(ListView list) {
-		if(lastViewedTweet == 0 || list == null) return;
+		if(list == null) return;
 		else if(getCount() == 0) return;
 		list.setSelectionFromTop(find(lastViewedTweet), lastViewedTopMargin);
 	}
