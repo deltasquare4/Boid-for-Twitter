@@ -1,7 +1,12 @@
 package com.teamboid.twitter.contactsync;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitterapi.client.Authorizer;
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.relationship.IDs;
@@ -13,12 +18,18 @@ import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
+import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
@@ -42,6 +53,21 @@ public class ContactSyncAdapterService extends Service {
 		public SyncAdapterImpl(Context context) {
 			super(context, true);
 			mContext = context;
+		}
+		
+		private static void saveBitmapToRawContact(Context context, long rawContactId, byte[] photo) throws Exception {
+		    Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
+		    Uri outputFileUri =
+		        Uri.withAppendedPath(rawContactUri, RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
+		    AssetFileDescriptor descriptor = context.getContentResolver().openAssetFileDescriptor(
+		        outputFileUri, "rw");
+		    FileOutputStream stream = descriptor.createOutputStream();
+		    try {
+		      stream.write(photo);
+		    } finally {
+		      stream.close();
+		      descriptor.close();
+		    }
 		}
 		
 		public void addContact(User user){
@@ -72,7 +98,7 @@ public class ContactSyncAdapterService extends Service {
 				mContext.getContentResolver().applyBatch(ContactsContract.AUTHORITY, operationList);
 			} catch(Exception e){
 				Log.d("sync", "Couldn't add " + user.getScreenName());
-			}	
+			}
 		}
 		
 		long _id = -1;
@@ -89,7 +115,10 @@ public class ContactSyncAdapterService extends Service {
 			String s = sp.getString(getId() + "", null);
 			if(s == null) return null;
 			
-			return (Twitter) Utils.deserializeObject( s );
+			com.teamboid.twitter.Account toAdd = (com.teamboid.twitter.Account) Utils.deserializeObject( s );
+			Log.d("contactsync", "Hello " + toAdd.getId());
+			return Authorizer.create(AccountService.CONSUMER_KEY, AccountService.CONSUMER_SECRET, AccountService.CALLBACK_URL)
+					.getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
 		}
 		
 		String getWhatToSync(){ // TODO: Actually make this return something the user wants
@@ -110,20 +139,55 @@ public class ContactSyncAdapterService extends Service {
 			return -1;
 		}
 		
-		User[] getTimeline(Paging paging){
+		// Notes:
+		// This works by having a queue `idQueue` which contains up to 1000 ids
+		// which is how twitter works, but when it empties we grab more if needed
+		// and we drain them out into batches of 100 to query Twitter with
+		Queue<Long> idQueue = new LinkedList<Long>();
+		long cursor = -1;
+		
+		User[] getTimeline(){
 			try{
 				Twitter client = getTwitter();
 				String type = getWhatToSync();
 				
-				if(type.equals("following")){
-					IDs ids = client.getFriends( getId(), paging.getMaxId() );
-					return client.lookupUsers( ids.getIds() );
-				} else if(type.equals("followers")){
-					IDs ids = client.getFollowers( getId(), paging.getMaxId() );
-					return client.lookupUsers( ids.getIds() );
+				if(idQueue.isEmpty()){ // If we have no more IDs Left in the queue
+					IDs ids = null;
+					if(type.equals("following")){
+						ids = client.getFriends( getId(), cursor );
+					} else if(type.equals("followers")){
+						ids = client.getFollowers( getId(), cursor );
+					} else{
+						Log.d("contactsync", "Righto, someone is hacking our app. Let's just let it crash");
+					}
+					
+					cursor = ids.getNextCursor();
+					for(Long id : ids.getIds()){
+						idQueue.add(id);
+					}
+					// Now the queue is stocked up with up to 5000 IDs (as twitter says).
 				}
+				
+				// Off-load up to 100 ids from the queue
+				Long[] ids = new Long[ idQueue.size() >= 100 ? 100 : idQueue.size() ];
+				for(int i = 0; i < ids.length; i++){
+					ids[i] = idQueue.remove();
+				}
+				
+				// Now fetch information about them
+				return client.lookupUsers( ids );
 			}catch(Exception e){ e.printStackTrace(); return null; }
-			return null;
+		}
+		
+		private void deleteContact(long rawContactId) {
+			Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId).buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build();
+			ContentProviderClient client = mContext.getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
+			try {
+				client.delete(uri, null, null);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			client.release();
 		}
 		
 		@Override
@@ -133,15 +197,27 @@ public class ContactSyncAdapterService extends Service {
 			this.account = account;
 			// Here we can actually sync
 			
+			// Step 1: Remove all of our existing contacts, as they are not required (we have to download all of them anyway)
+			Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
+					RawContacts.ACCOUNT_TYPE, account.type).build();
+			Cursor c1 = mContext.getContentResolver().query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1 }, null, null, null);
+			while (c1.moveToNext()) {
+				deleteContact(c1.getLong(0)); 
+			}
+			
+			// Step 2: Get the total number of contacts we need to download
 			int total = getTotalNumber();
 			int got = 0;
-			Paging p = new Paging(0);
 			
-			while(got > total){
-				User[] users = getTimeline(p);
+			// Step 3: Start downloading contacts
+			Log.d("contactsync", "Starting with a total of " + got + " out of " + total);
+			while(got < total){
+				Log.d("contactsync", "Downloading more users...");
+				User[] users = getTimeline();
 				
 				if(users == null){
-					// Error?
+					Log.d("contactsync", "Could not download users?");
+					syncResult.delayUntil = 60 * 60 * 2; // sync again in 2 hours
 					return;
 				}
 				
@@ -152,12 +228,9 @@ public class ContactSyncAdapterService extends Service {
 				}
 				got += users.length;
 				
-				p.setMaxId( p.getMaxId() + got );
+				Log.d("contactsync", "At a total of " + got + " out of " + total);
 			}
 			
 		}
-		
-		
-		
 	}
 }

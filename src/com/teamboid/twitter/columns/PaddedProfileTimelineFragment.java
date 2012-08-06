@@ -94,7 +94,7 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (getView() == null)
+		if (getView() == null || getAdapter() == null)
 			return;
 		getAdapter().restoreLastViewed(getListView());
 	}
