@@ -139,8 +139,9 @@ public class SendTweetTask {
 					sp = PreferenceManager.getDefaultSharedPreferences(context);
 					Token token = new Token(sp.getString(prefValue + "-token", ""), sp.getString(prefValue + "-secret", ""));
 					ems.setAuthorized(MediaUtilities.buildAuthService(prefValue), token);
+					break;
 				default:
-					throw new Exception();
+					break;
 				}
 				
 				MediaEntity me = ems.uploadFile(update, from.getClient(), input);
