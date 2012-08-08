@@ -87,6 +87,28 @@ public class ContactSyncAdapterService extends Service {
 			
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.NAME, user.getScreenName());
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.TYPE, ContactsContract.CommonDataKinds.Nickname.TYPE_CUSTOM);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.LABEL, "Twitter Screen Name");
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Note.NOTE, user.getDescription());
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.URL, user.getUrl());
+			builder.withValue(ContactsContract.CommonDataKinds.Website.TYPE, ContactsContract.CommonDataKinds.Website.TYPE_CUSTOM);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.LABEL, "Profile Link");
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
 			builder.withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/vnd.com.teamboid.twitter.account");
 			builder.withValue(ContactsContract.Data.DATA1, user.getScreenName());
 			builder.withValue(ContactsContract.Data.DATA2, "Twitter Profile");

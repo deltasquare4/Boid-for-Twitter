@@ -13,6 +13,8 @@
 		android:layout_height="0dp" android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
 		<requestFocus />
 	</EditText>
+	
+	<!-- Upload Service Config. TODO: Probably could be better UI, deffo on Tablet at least -->
 	<TextView android:id="@+id/upload_with_label"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:textColor="@color/dark" android:text="@string/photo_service_title"
@@ -20,4 +22,26 @@
 	<Button style="?android:spinnerStyle" android:id="@+id/upload_with"
 		android:visibility="gone" android:layout_width="match_parent"
 		android:layout_height="wrap_content" />
+	
+	<!-- Auto-completion -->
+	<ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:id="@+id/autocompletion">
+	        <!-- TEST while I get UI right -->
+	        
+	        <ImageView
+	            android:layout_width="32dp"
+	            android:layout_height="32dp" android:src="@drawable/sillouette" />
+	        
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="match_parent"
+	            android:text="kennydude" />
+	        
+	    </LinearLayout>
+	</ScrollView>
+	
 </LinearLayout>
