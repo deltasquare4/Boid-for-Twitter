@@ -474,8 +474,10 @@ public class TimelineScreen extends Activity {
             if (getIntent().getData().getPath().contains("/status/")) {
                 startActivity(getIntent().setClass(this, TweetViewer.class));
                 finish();
-            } else {
-                //TODO: Handle other URLs
+            } else if(getIntent().getDataString().contains("twitter.com/") &&
+            		getIntent().getData().getPathSegments().size() == 1) {
+            	startActivity(getIntent().setClass(this, ProfileScreen.class));
+                finish();
             }
         }
         invalidateOptionsMenu();

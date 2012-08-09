@@ -7,7 +7,6 @@ import java.util.Queue;
 
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.client.Authorizer;
-import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.relationship.IDs;
 import com.teamboid.twitterapi.user.User;
