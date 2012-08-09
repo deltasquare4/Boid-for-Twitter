@@ -46,19 +46,20 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		Status tweet = (Status) getAdapter().getItem(position);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utils.serializeObject(tweet))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+	public void onListItemClick(ListView l, View v, int index, long id) {
+		super.onListItemClick(l, v, index, id);
+        Status tweet = (Status)context.adapter.getItem(index);
+        if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+        context.startActivity(new Intent(context, TweetViewer.class)
+                .putExtra("sr_tweet", Utils.serializeObject(tweet))
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
@@ -75,14 +76,6 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
 							}
 						}
-					}
-				});
-		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
-					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), context.adapter, index);
-						return true;
 					}
 				});
 		setRetainInstance(true);

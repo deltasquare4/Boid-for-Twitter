@@ -15,8 +15,8 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
@@ -47,13 +47,13 @@ public class UserListFragment extends BaseListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Status tweet = (Status) adapt.getItem(position);
+    public void onListItemClick(ListView l, View v, int index, long id) {
+        super.onListItemClick(l, v, index, id);
+        Status tweet = (Status)adapt.getItem(index);
         if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
         context.startActivity(new Intent(context, TweetViewer.class)
-        .putExtra("sr_tweet", Utils.serializeObject(tweet))
-        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                .putExtra("sr_tweet", Utils.serializeObject(tweet))
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 
     @Override
@@ -61,7 +61,8 @@ public class UserListFragment extends BaseListFragment {
         super.onStart();
         listName = getArguments().getString("list_name");
         listID = getArguments().getInt("list_id");
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
         getListView().setOnScrollListener(
                 new AbsListView.OnScrollListener() {
                     @Override
@@ -82,14 +83,6 @@ public class UserListFragment extends BaseListFragment {
                                 context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
                             }
                         }
-                    }
-                });
-        getListView().setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-                        TimelineCAB.performLongPressAction(getListView(), adapt, index);
-                        return true;
                     }
                 });
         setRetainInstance(true);

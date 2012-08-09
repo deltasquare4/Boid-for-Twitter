@@ -5,9 +5,6 @@
 	<SwitchPreference android:key="enable_ssl"
 		android:layout="@layout/boid_preference" android:summary="@string/enable_ssl_description"
 		android:title="@string/enable_ssl_title" android:persistent="true" />
-	<SwitchPreference android:key="cab"
-		android:layout="@layout/boid_preference" android:summary="@string/contextual_action_bar_desc"
-		android:title="@string/contextual_action_bar" android:persistent="true" />
 	<PreferenceCategory android:key="profile_picture_category"
 		android:title="@string/profile_picture_header">
 		<SwitchPreference android:key="enable_profileimg_download"

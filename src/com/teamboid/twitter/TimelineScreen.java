@@ -170,16 +170,11 @@ public class TimelineScreen extends Activity {
         //This callback must stay here, otherwise in-app billing doesn't work for some reason.
         AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(this) {
             @Override
-            public void onBillingChecked(boolean supported) {
-            }
-
+            public void onBillingChecked(boolean supported) { }
             @Override
-            public void onPurchaseStateChanged(String itemId, PurchaseState state) {
-            }
-
+            public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
             @Override
-            public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
-            }
+            public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
         };
         BillingController.registerObserver(mBillingObserver);
         BillingController.checkBillingSupported(this);
@@ -196,7 +191,6 @@ public class TimelineScreen extends Activity {
         if (!prefs.contains("upload_service")) prefs.edit().putString("upload_service", "twitter").commit();
         if (!prefs.contains("enable_inline_previewing"))
             prefs.edit().putBoolean("enable_inline_previewing", true).commit();
-        if (!prefs.contains("cab")) prefs.edit().putBoolean("cab", true).commit();
         ActionBar ab = getActionBar();
         ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayShowHomeEnabled(false);
@@ -243,7 +237,7 @@ public class TimelineScreen extends Activity {
             }
         }
         if (mTabsAdapter == null) {
-            mTabsAdapter = new TabsAdapter(this, (ViewPager) findViewById(R.id.pager));
+            mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
             mTabsAdapter.filterDefaultColumnSelection = true;
         } else {
             mTabsAdapter.filterDefaultColumnSelection = true;
@@ -474,8 +468,10 @@ public class TimelineScreen extends Activity {
             if (getIntent().getData().getPath().contains("/status/")) {
                 startActivity(getIntent().setClass(this, TweetViewer.class));
                 finish();
-            } else {
-                //TODO: Handle other URLs
+            } else if(getIntent().getDataString().contains("twitter.com/") &&
+            		getIntent().getData().getPathSegments().size() == 1) {
+            	startActivity(getIntent().setClass(this, ProfileScreen.class));
+                finish();
             }
         }
         invalidateOptionsMenu();
@@ -594,10 +590,6 @@ public class TimelineScreen extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        TimelineCAB.clearSelectedItems();
-        if (TimelineCAB.TimelineActionMode != null) {
-            TimelineCAB.TimelineActionMode.finish();
-        }
         UserListCAB.clearSelectedItems();
         if (UserListCAB.UserActionMode != null) {
             UserListCAB.UserActionMode.finish();
@@ -612,10 +604,8 @@ public class TimelineScreen extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try {
-            unregisterReceiver(receiver);
-        } catch (Exception e) {
-        }
+        try { unregisterReceiver(receiver); }
+        catch (Exception e) { e.printStackTrace(); }
     }
 
     @Override
@@ -638,8 +628,7 @@ public class TimelineScreen extends Activity {
                 ProgressBar p = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
                 menu.findItem(R.id.refreshAction).setActionView(p).setEnabled(false);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) { e.printStackTrace(); }
 
         final MenuItem switcher = menu.findItem(R.id.accountSwitcher);
         final MenuItem myProfile = menu.findItem(R.id.myProfileAction);

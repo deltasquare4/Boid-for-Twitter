@@ -57,7 +57,7 @@ import com.teamboid.twitterapi.user.User;
  * 
  * @author Aidan Follestad
  */
-public class ProfileScreen extends Activity {
+public class ProfileScreen 	extends Activity {
 	public static final int LOAD_CONTACT_ID = 1;
 
 	private int lastTheme;
@@ -91,7 +91,16 @@ public class ProfileScreen extends Activity {
 		final ImageView profileImg = (ImageView)findViewById(R.id.userItemProfilePic);
 		profileImg.setImageBitmap(Utilities.getRoundedImage(BitmapFactory.decodeResource(getResources(), R.drawable.sillouette), 90F));
 		
-		if(getIntent().hasExtra("screen_name")){
+		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+            try {
+                String screenName = getIntent().getData().getPathSegments().get(0);
+                initializeTabs(savedInstanceState, screenName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }  else if(getIntent().hasExtra("screen_name")){
 			initializeTabs(savedInstanceState, getIntent().getStringExtra("screen_name"));
 		} else if(getIntent().getDataString().contains("com.android.contacts")){ // Loading from Contact
 			getLoaderManager().initLoader(LOAD_CONTACT_ID, null, new LoaderManager.LoaderCallbacks<Cursor>(){
@@ -197,10 +206,10 @@ public class ProfileScreen extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		TimelineCAB.clearSelectedItems();
-		if(TimelineCAB.TimelineActionMode != null) {
-			TimelineCAB.TimelineActionMode.finish();
-		}
+//		TODO TimelineCAB.clearSelectedItems();
+//		if(TimelineCAB.TimelineActionMode != null) {
+//			TimelineCAB.TimelineActionMode.finish();
+//		}
 	}
 
 	@Override
