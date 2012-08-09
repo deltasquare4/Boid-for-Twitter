@@ -3,17 +3,26 @@ package com.teamboid.twitter.columns;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TweetListActivity;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.cab.TimelineCAB;
@@ -43,19 +52,20 @@ public class MentionsFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		Status tweet = (Status)adapt.getItem(position);
-		if(tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
+	public void onListItemClick(ListView l, View v, int index, long id) {
+		super.onListItemClick(l, v, index, id);
+		Status tweet = (Status)adapt.getItem(index);
+		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
 		context.startActivity(new Intent(context, TweetViewer.class)
-		.putExtra("sr_tweet", Utils.serializeObject(tweet))
-		.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			.putExtra("sr_tweet", Utils.serializeObject(tweet))
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
@@ -72,14 +82,6 @@ public class MentionsFragment extends BaseListFragment {
 								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
 							}
 						}
-					}
-				});
-		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
-					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						TimelineCAB.performLongPressAction(getListView(), adapt, index);
-						return true;
 					}
 				});
 		setRetainInstance(true);

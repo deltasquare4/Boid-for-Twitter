@@ -54,7 +54,7 @@ public class ContactSyncAdapterService extends Service {
 			mContext = context;
 		}
 		
-		private static void saveBitmapToRawContact(Context context, long rawContactId, byte[] photo) throws Exception {
+		public static void saveBitmapToRawContact(Context context, long rawContactId, byte[] photo) throws Exception {
 		    Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
 		    Uri outputFileUri =
 		        Uri.withAppendedPath(rawContactUri, RawContacts.DisplayPhoto.CONTENT_DIRECTORY);

@@ -87,14 +87,8 @@ public class TweetListActivity extends ListActivity {
 				}
 			}
 		});
-		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				TimelineCAB.performLongPressAction(getListView(), binder, index);
-				return true;
-			}
-		});		
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		setProgressBarIndeterminateVisibility(false);
 	}
 	
@@ -102,15 +96,6 @@ public class TweetListActivity extends ListActivity {
 	public void onResume() {
 		super.onResume();
 		TimelineCAB.context = this;
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		TimelineCAB.clearSelectedItems();
-		if(TimelineCAB.TimelineActionMode != null) {
-			TimelineCAB.TimelineActionMode.finish();
-		}
 	}
 
 	public void refresh() {

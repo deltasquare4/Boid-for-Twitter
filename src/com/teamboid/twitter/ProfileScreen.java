@@ -206,10 +206,10 @@ public class ProfileScreen 	extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		TimelineCAB.clearSelectedItems();
-		if(TimelineCAB.TimelineActionMode != null) {
-			TimelineCAB.TimelineActionMode.finish();
-		}
+//		TODO TimelineCAB.clearSelectedItems();
+//		if(TimelineCAB.TimelineActionMode != null) {
+//			TimelineCAB.TimelineActionMode.finish();
+//		}
 	}
 
 	@Override
