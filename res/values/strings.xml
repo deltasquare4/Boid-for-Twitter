@@ -495,4 +495,5 @@
 	<string name="login_to_service">Login to {service}</string>
 	<string name="email">Email Address</string>
 	<string name="password">Password</string>
+	<string name="autocomplete">Nickname Auto-completion</string>
 </resources>

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent" android:layout_height="match_parent"
-	android:orientation="vertical" android:padding="15dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp" >
+
 	<TextView android:id="@+id/twitlongerUsed"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:visibility="gone" android:text="@string/will_use_twitlonger"
@@ -26,11 +29,14 @@
 	<!-- Auto-completion -->
 	<ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <LinearLayout
+	        android:layout_marginLeft="5dp"
+	        android:layout_marginRight="5dp"
+	        android:layout_marginTop="5dp"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:orientation="horizontal"
 	        android:id="@+id/autocompletion">
-	        <!-- TEST while I get UI right -->
+	        <!-- TEST while I get UI right. I don't care about Lint. Will fix later -->
 	        
 	        <ImageView
 	            android:layout_width="32dp"
@@ -39,7 +45,33 @@
 	        <TextView
 	            android:layout_width="wrap_content"
 	            android:layout_height="match_parent"
+	            android:paddingLeft="5dp"
+	            android:gravity="center"
 	            android:text="kennydude" />
+	        
+	       	<ImageView
+	            android:layout_width="32dp"
+	            android:layout_marginLeft="5dp"
+	            android:layout_height="32dp" android:src="@drawable/sillouette" />
+	        
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="match_parent"
+	            android:paddingLeft="5dp"
+	            android:gravity="center"
+	            android:text="someone else" />
+	        
+	      	<ImageView
+	      	    android:layout_marginLeft="5dp"
+	            android:layout_width="32dp"
+	            android:layout_height="32dp" android:src="@drawable/sillouette" />
+	        
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="match_parent"
+	            android:paddingLeft="5dp"
+	            android:gravity="center"
+	            android:text="another user" />
 	        
 	    </LinearLayout>
 	</ScrollView>

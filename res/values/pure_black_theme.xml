@@ -2,10 +2,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="Boid.PureBlackTheme" parent="@style/Boid.DarkTheme">
         <item name="android:actionBarItemBackground">@android:color/black</item>
-        <item name="android:dropDownListViewStyle">@style/pure_black_DropDownListView</item>
         <item name="android:actionBarStyle">@style/pure_black_solid_ActionBar</item>
         <item name="android:actionBarTabBarStyle">@style/pure_black_customTabBar</item>
-        <item name="android:actionDropDownStyle">@style/pure_black_DropDownNav</item>
         
         <item name="android:windowBackground">@android:color/black</item>  
         <item name="themeColor">@android:color/black</item>
@@ -20,16 +18,9 @@
     <style name="pure_black_PopupMenu" parent="@android:style/Widget.Holo.ListPopupWindow">
         <item name="android:popupBackground">@android:color/black</item>	
     </style>
-    <style name="pure_black_DropDownListView" parent="@android:style/Widget.Holo.ListView.DropDown">
-        <item name="android:listSelector">@android:color/black</item>
-    </style>
-    <style name="pure_black_DropDownNav" parent="@android:style/Widget.Holo.Spinner">
-        <item name="android:background">@android:color/black</item>
-        <item name="android:popupBackground">@android:color/black</item>
-        <item name="android:dropDownSelector">@android:color/black</item>
-    </style>
     <style name="pure_black_customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
 		<item name="android:showDividers">middle</item>
+		<item name="android:dividerPadding">15dp</item>
 		<item name="android:background">@android:color/black</item>
 	</style>
 </resources>
