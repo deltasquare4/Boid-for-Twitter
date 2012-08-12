@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -202,17 +203,19 @@ public class MentionsFragment extends BaseListFragment {
 
 	@Override
 	public Status[] getSelectedStatuses() {
-		if(adapt == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)adapt.getItem(checkedItems.keyAt(i)));
-				}
-			}
-		}
-		return toReturn.toArray(new Status[0]);
+        if (adapt == null && getView() == null) {
+            Log.d("BOID CAB", "Adapter or view is null, getSelectedStatuses() cancelled...");
+            return null;
+        }
+        ArrayList<Status> toReturn = new ArrayList<Status>();
+        SparseBooleanArray choices = getListView().getCheckedItemPositions();
+        for (int i = 0; i < choices.size(); i++) {
+            if(choices.valueAt(i)) {
+                toReturn.add((Status)adapt.getItem(choices.keyAt(i)));
+            }
+        }
+        Log.d("BOID CAB", "getSelectedStatuses() returning " + toReturn.size() + " items!");
+        return toReturn.toArray(new Status[0]);
 	}
 
 	@Override

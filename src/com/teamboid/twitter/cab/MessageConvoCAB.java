@@ -6,9 +6,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.widget.AbsListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.R;
@@ -27,16 +27,6 @@ public class MessageConvoCAB {
 
     public static Activity context;
 
-    public static void clearSelectedItems() {
-        for (int i = 0; i < context.getActionBar().getTabCount(); i++) {
-            Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-            if (frag instanceof BaseListFragment) {
-                ((BaseListFragment) frag).getListView().clearChoices();
-                ((BaseAdapter) ((BaseListFragment) frag).getListView().getAdapter()).notifyDataSetChanged();
-            }
-        }
-    }
-
     public static DMConversation[] getSelectedConvos() {
         ArrayList<DMConversation> toReturn = new ArrayList<DMConversation>();
         for (int i = 0; i < context.getActionBar().getTabCount(); i++) {
@@ -51,57 +41,42 @@ public class MessageConvoCAB {
         return toReturn.toArray(new DMConversation[0]);
     }
 
-    public static void updateTitle() {
-        DMConversation[] selConvos = MessageConvoCAB.getSelectedConvos();
-        if (selConvos.length == 1) {
-            MessageConvoCAB.ConvoActionMode.setTitle(R.string.one_convo_selected);
-        } else {
-            MessageConvoCAB.ConvoActionMode.setTitle(context.getString(R.string.x_convos_selected).replace("{X}", Integer.toString(selConvos.length)));
-        }
-    }
 
-    public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
-        if (list.isItemChecked(index)) {
-            list.setItemChecked(index, false);
-        } else list.setItemChecked(index, true);
-        if (MessageConvoCAB.ConvoActionMode == null) {
-            context.startActionMode(MessageConvoCAB.ConvoActionModeCallback);
-        } else {
-            final DMConversation[] convos = MessageConvoCAB.getSelectedConvos();
-            MessageConvoCAB.ConvoActionMode.getMenu().clear();
-            MessageConvoCAB.ConvoActionMode.getMenuInflater().inflate(R.menu.convo_cab, MessageConvoCAB.ConvoActionMode.getMenu());
-            if (convos.length == 0) {
-                MessageConvoCAB.ConvoActionMode.finish();
-            } else MessageConvoCAB.updateTitle();
+    public static final AbsListView.MultiChoiceModeListener choiceListener = new AbsListView.MultiChoiceModeListener() {
+
+        private void updateTitle(int selectedConvoLength) {
+            if (selectedConvoLength == 1) {
+                actionMode.setTitle(R.string.one_convo_selected);
+            } else {
+                actionMode.setTitle(context.getString(R.string.x_convos_selected).replace("{X}", Integer.toString(selectedConvoLength)));
+            }
         }
 
-    }
+        private ActionMode actionMode;
 
-    public static ActionMode ConvoActionMode;
-    public static ActionMode.Callback ConvoActionModeCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) { }
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MessageConvoCAB.ConvoActionMode = mode;
-            mode.getMenuInflater().inflate(R.menu.convo_cab, menu);
-            updateTitle();
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.convo_cab, menu);
+            actionMode = mode;
             return true;
         }
 
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             item.setEnabled(false);
             item.setTitle(R.string.deleting_str);
             final DMConversation[] selConvos = getSelectedConvos();
-            MessageConvoCAB.clearSelectedItems();
+            mode.finish();
+
             switch (item.getItemId()) {
-                case R.id.deleteAction:
-                    mode.finish();
+                case R.id.deleteAction: {
                     for (final DMConversation convo : selConvos) {
                         new Thread(new Runnable() {
                             public void run() {
@@ -130,15 +105,17 @@ public class MessageConvoCAB {
                         });
                     }
                     return true;
-                default:
+                }
+                default: {
                     return false;
+                }
             }
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            MessageConvoCAB.clearSelectedItems();
-            MessageConvoCAB.ConvoActionMode = null;
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+            DMConversation[] selConvos = getSelectedConvos();
+            updateTitle(selConvos.length);
         }
     };
 }

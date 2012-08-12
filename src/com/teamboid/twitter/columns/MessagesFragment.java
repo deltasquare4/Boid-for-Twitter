@@ -52,15 +52,8 @@ public class MessagesFragment extends BaseListFragment {
     @Override
     public void onStart() {
         super.onStart();
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-        getListView().setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int index, long id) {
-                        MessageConvoCAB.performLongPressAction(getListView(), adapt, index);
-                        return true;
-                    }
-                });
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(MessageConvoCAB.choiceListener);
         setRetainInstance(true);
         setEmptyText(getString(R.string.no_messages));
         reloadAdapter(true);

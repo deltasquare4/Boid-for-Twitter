@@ -52,7 +52,8 @@ public class SearchUsersFragment extends BaseListFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(UserListCAB.choiceListener);
 		getListView().setOnScrollListener(
 				new AbsListView.OnScrollListener() {
 					@Override
@@ -69,14 +70,6 @@ public class SearchUsersFragment extends BaseListFragment {
 						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
 							context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.users_str);
 						}
-					}
-				});
-		getListView().setOnItemLongClickListener(
-				new AdapterView.OnItemLongClickListener() {
-					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						UserListCAB.performLongPressAction(getListView(), context.userAdapter, index);
-						return true;
 					}
 				});
 		setRetainInstance(true);

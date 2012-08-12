@@ -8,31 +8,25 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetListActivity;
-import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
-import com.teamboid.twitter.columns.ProfilePaddedFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.status.Status;
-import com.teamboid.twitterapi.utilities.Utils;
 
 /**
  * The contextual action bar for any lists/columns that display twitter4j.Status objects.
@@ -60,7 +54,7 @@ public class TimelineCAB {
 		} else {
 			for (int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-				if (frag instanceof BaseListFragment || frag instanceof ProfilePaddedFragment) {
+				if (frag instanceof BaseListFragment) {
 					Status[] toAdd = ((BaseListFragment) frag).getSelectedStatuses();
 					if (toAdd != null && toAdd.length > 0) {
 						for (Status s : toAdd) {
@@ -111,12 +105,11 @@ public class TimelineCAB {
 
 	public static final AbsListView.MultiChoiceModeListener choiceListener = new AbsListView.MultiChoiceModeListener() {
 
-		private void updateTitle() {
-			Status[] selTweets = getSelectedTweets();
-			if (selTweets.length == 1) {
+		private void updateTitle(int selectedCount) {
+			if (selectedCount == 1) {
 				actionMode.setTitle(R.string.one_tweet_selected);
 			} else {
-				actionMode.setTitle(context.getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(selTweets.length)));
+				actionMode.setTitle(context.getString(R.string.x_tweets_Selected).replace("{X}", Integer.toString(selectedCount)));
 			}
 		}
 
@@ -167,10 +160,7 @@ public class TimelineCAB {
 		private ActionMode actionMode;
 
 		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			// TODO Auto-generated method stub
-			return false;
-		}
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) { }
@@ -185,12 +175,13 @@ public class TimelineCAB {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            final Status[] selTweets = TimelineCAB.getSelectedTweets();
 			mode.finish();
 			final Twitter cl = AccountService.getCurrentAccount().getClient();
 
 			switch (item.getItemId()) {
 			case R.id.replyAction: {
-				Status toReply = TimelineCAB.getSelectedTweets()[0];
+				Status toReply = selTweets[0];
 				if (toReply.isRetweet()) toReply = toReply.getRetweetedStatus();
 				TimelineCAB.context.startActivity(new Intent(TimelineCAB.context, ComposerScreen.class)
 				.putExtra("reply_to", toReply.getId())
@@ -200,7 +191,7 @@ public class TimelineCAB {
 				return true;
 			}
 			case R.id.favoriteAction: {
-				for (Status t : TimelineCAB.getSelectedTweets()) {
+				for (Status t : selTweets) {
 					if (t.isRetweet()) t = t.getRetweetedStatus();
 					final Status tweet = t;
 					if (tweet.isFavorited()) {
@@ -250,7 +241,7 @@ public class TimelineCAB {
 				return true;
 			}
 			case R.id.retweetAction: {
-				for (Status t2 : TimelineCAB.getSelectedTweets()) {
+				for (Status t2 : selTweets) {
 					if (t2.isRetweet()) t2 = t2.getRetweetedStatus();
 					final Status tweet = t2;
 					new Thread(new Runnable() {
@@ -280,15 +271,15 @@ public class TimelineCAB {
 				return true;
 			}
 			case R.id.shareAction: {
-				Status toShare = TimelineCAB.getSelectedTweets()[0];
+				Status toShare = selTweets[0];
 				if (toShare.isRetweet()) toShare = toShare.getRetweetedStatus();
-				String text = toShare.getText() + "\n\n(via @" + toShare.getUser().getScreenName() + ", http://twitter.com/" + toShare.getUser().getScreenName() + "/status/" + Long.toString(toShare.getId()) + ")";
+				String text = toShare.getText() + "\n\n(via @" + toShare.getUser().getScreenName() + " on Twitter)";
 				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text),
 						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			}
 			case R.id.copyAction: {
-				Status toCopy = TimelineCAB.getSelectedTweets()[0];
+				Status toCopy = selTweets[0];
 				if (toCopy.isRetweet()) toCopy = toCopy.getRetweetedStatus();
 				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_Tweet", toCopy.getText()));
@@ -296,7 +287,7 @@ public class TimelineCAB {
 				return true;
 			}
 			case R.id.deleteAction: {
-				for (final Status t : TimelineCAB.getSelectedTweets()) {
+				for (final Status t : selTweets) {
 					new Thread(new Runnable() {
 						public void run() {
 							try {
@@ -329,8 +320,9 @@ public class TimelineCAB {
 
 		@Override
 		public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-			updateTitle();
-			updateMenuItems(getSelectedTweets(), mode.getMenu());
+            Status[] selTweets = getSelectedTweets();
+			updateTitle(selTweets.length);
+			updateMenuItems(selTweets, mode.getMenu());
 		}
 	};
 }

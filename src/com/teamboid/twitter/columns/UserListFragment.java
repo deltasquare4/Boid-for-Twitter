@@ -213,14 +213,12 @@ public class UserListFragment extends BaseListFragment {
 
     @Override
     public Status[] getSelectedStatuses() {
-        if (adapt == null) return null;
+        if (adapt == null && getView() == null) return null;
         ArrayList<Status> toReturn = new ArrayList<Status>();
-        SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-        if (checkedItems != null) {
-            for (int i = 0; i < checkedItems.size(); i++) {
-                if (checkedItems.valueAt(i)) {
-                    toReturn.add((Status) adapt.getItem(checkedItems.keyAt(i)));
-                }
+        SparseBooleanArray choices = getListView().getCheckedItemPositions();
+        for (int i = 0; i < choices.size(); i++) {
+            if(choices.valueAt(i)) {
+                toReturn.add((Status)adapt.getItem(choices.keyAt(i)));
             }
         }
         return toReturn.toArray(new Status[0]);

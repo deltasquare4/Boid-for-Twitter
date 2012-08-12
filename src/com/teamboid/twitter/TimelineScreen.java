@@ -590,14 +590,6 @@ public class TimelineScreen extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        UserListCAB.clearSelectedItems();
-        if (UserListCAB.UserActionMode != null) {
-            UserListCAB.UserActionMode.finish();
-        }
-        MessageConvoCAB.clearSelectedItems();
-        if (MessageConvoCAB.ConvoActionMode != null) {
-            MessageConvoCAB.ConvoActionMode.finish();
-        }
         notifyWidget(this);
     }
 

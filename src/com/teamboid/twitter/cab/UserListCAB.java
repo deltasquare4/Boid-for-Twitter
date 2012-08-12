@@ -11,10 +11,7 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ComposerScreen;
@@ -35,22 +32,6 @@ import com.teamboid.twitterapi.user.User;
 public class UserListCAB {
 
     public static Activity context;
-
-    public static void clearSelectedItems() {
-        if (context instanceof UserListActivity) {
-            ((UserListActivity) context).getListView().clearChoices();
-            ListView list = ((UserListActivity) context).getListView();
-            ((BaseAdapter) list.getAdapter()).notifyDataSetChanged();
-        } else {
-            for (int i = 0; i < context.getActionBar().getTabCount(); i++) {
-                Fragment frag = context.getFragmentManager().findFragmentByTag("page:" + Integer.toString(i));
-                if (frag instanceof BaseListFragment) {
-                    ((BaseListFragment) frag).getListView().clearChoices();
-                    ((BaseAdapter) ((BaseListFragment) frag).getListView().getAdapter()).notifyDataSetChanged();
-                }
-            }
-        }
-    }
 
     public static User[] getSelectedUsers() {
         ArrayList<User> toReturn = new ArrayList<User>();
@@ -95,122 +76,104 @@ public class UserListCAB {
         }
     }
 
-    public static void updateTitle() {
-        User[] selUsers = UserListCAB.getSelectedUsers();
-        if (selUsers.length == 1) {
-            UserListCAB.UserActionMode.setTitle(R.string.one_user_selected);
-        } else {
-            UserListCAB.UserActionMode.setTitle(context.getString(R.string.x_users_selected).replace("{X}", Integer.toString(selUsers.length)));
-        }
-    }
 
-    public static void updateMenuItems(final User[] selUsers, Menu menu) {
-        final MenuItem follow = menu.findItem(R.id.followAction);
-        follow.setEnabled(false);
-        final Account acc = AccountService.getCurrentAccount();
-        if (selUsers.length == 1 && selUsers[0].getId() == acc.getId()) {
-            follow.setTitle(R.string.this_is_you);
-            return;
-        }
-        follow.setTitle(R.string.loading_str);
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < selUsers.length; i++) {
-                    if (selUsers[i].getId() == acc.getId() ||
-                            selUsers[i].getFollowingType() != FollowingType.UNKNOWN) {
-                        continue;
-                    }
-                    try {
-                        boolean isFollowing = acc.getClient().existsFriendship(acc.getUser().getScreenName(), selUsers[i].getScreenName());
-                        if (isFollowing) {
-                            selUsers[i].setFollowingType(FollowingType.FOLLOWING);
-                        } else selUsers[i].setFollowingType(FollowingType.NOT_FOLLOWING);
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                        final User curUser = selUsers[i];
-                        context.runOnUiThread(new Runnable() {
-                            public void run() {
-                                Toast.makeText(context, context.getString(R.string.failed_check_following).replace("{user}", curUser.getScreenName()), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                }
-                context.runOnUiThread(new Runnable() {
-                    public void run() {
-                        boolean allFollowing = true;
-                        for (User u : selUsers) {
-                            if (u.getId() == acc.getId()) continue;
-                            UserListCAB.reinsertUser(u);
-                            if (u.getFollowingType() == FollowingType.NOT_FOLLOWING) {
-                                allFollowing = false;
-                            }
-                        }
-                        if (allFollowing) {
-                            follow.setTitle(R.string.unfollow_str);
-                        } else follow.setTitle(R.string.follow_str);
-                        follow.setEnabled(true);
-                    }
-                });
-            }
-        }).start();
-    }
+    public static final AbsListView.MultiChoiceModeListener choiceListener = new AbsListView.MultiChoiceModeListener() {
 
-    public static void performLongPressAction(ListView list, BaseAdapter adapt, int index) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("cab", true)) {
-            if (list.isItemChecked(index)) {
-                list.setItemChecked(index, false);
-            } else list.setItemChecked(index, true);
-            if (UserListCAB.UserActionMode == null) {
-                context.startActionMode(UserListCAB.UserActionModeCallback);
+        private void updateTitle(int selectedUsersLength) {
+            if (selectedUsersLength == 1) {
+                actionMode.setTitle(R.string.one_user_selected);
             } else {
-                final User[] users = UserListCAB.getSelectedUsers();
-                if (users.length == 0) {
-                    UserListCAB.UserActionMode.finish();
-                } else {
-                    UserListCAB.updateTitle();
-                    UserListCAB.updateMenuItems(users, UserListCAB.UserActionMode.getMenu());
-                }
+                actionMode.setTitle(context.getString(R.string.x_users_selected).replace("{X}", Integer.toString(selectedUsersLength)));
             }
-        } else {
-            context.startActivity(new Intent(context, ComposerScreen.class)
-                    .putExtra("append", "@" + ((User) adapt.getItem(index)).getScreenName() + " ")
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }
-    }
 
-    public static ActionMode UserActionMode;
-    public static ActionMode.Callback UserActionModeCallback = new ActionMode.Callback() {
+        private void updateMenuItems(final User[] selUsers, Menu menu) {
+            final MenuItem follow = menu.findItem(R.id.followAction);
+            follow.setEnabled(false);
+            final Account acc = AccountService.getCurrentAccount();
+            if (selUsers.length == 1 && selUsers[0].getId() == acc.getId()) {
+                follow.setTitle(R.string.this_is_you);
+                return;
+            }
+            follow.setTitle(R.string.loading_str);
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < selUsers.length; i++) {
+                        if (selUsers[i].getId() == acc.getId() ||
+                                selUsers[i].getFollowingType() != FollowingType.UNKNOWN) {
+                            continue;
+                        }
+                        try {
+                            boolean isFollowing = acc.getClient().existsFriendship(acc.getUser().getScreenName(), selUsers[i].getScreenName());
+                            if (isFollowing) {
+                                selUsers[i].setFollowingType(FollowingType.FOLLOWING);
+                            } else selUsers[i].setFollowingType(FollowingType.NOT_FOLLOWING);
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                            final User curUser = selUsers[i];
+                            context.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context, context.getString(R.string.failed_check_following).replace("{user}", curUser.getScreenName()), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                    context.runOnUiThread(new Runnable() {
+                        public void run() {
+                            boolean allFollowing = true;
+                            for (User u : selUsers) {
+                                if (u.getId() == acc.getId()) continue;
+                                UserListCAB.reinsertUser(u);
+                                if (u.getFollowingType() == FollowingType.NOT_FOLLOWING) {
+                                    allFollowing = false;
+                                }
+                            }
+                            if (allFollowing) {
+                                follow.setTitle(R.string.unfollow_str);
+                            } else follow.setTitle(R.string.follow_str);
+                            follow.setEnabled(true);
+                        }
+                    });
+                }
+            }).start();
+        }
+
+        private ActionMode actionMode;
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int i, long l, boolean b) {
+            User[] selUsers = getSelectedUsers();
+            updateTitle(selUsers.length);
+            updateMenuItems(selUsers, mode.getMenu());
+        }
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            UserListCAB.UserActionMode = mode;
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.user_cab, menu);
-            updateTitle();
-            updateMenuItems(UserListCAB.getSelectedUsers(), menu);
+            actionMode = mode;
             return true;
         }
 
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) { return false; }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, final MenuItem item) {
             final User[] selUsers = getSelectedUsers();
-            UserListCAB.clearSelectedItems();
             mode.finish();
+
             switch (item.getItemId()) {
-                case R.id.mentionAction:
+                case R.id.mentionAction: {
                     String mentionStr = "";
                     for (User user : selUsers) {
                         mentionStr += "@" + user.getScreenName() + " ";
                     }
                     context.startActivity(new Intent(context, ComposerScreen.class)
-                            .putExtra("append", mentionStr).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                            .putExtra("append", mentionStr.trim()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     return true;
-                case R.id.followAction:
+                }
+                case R.id.followAction: {
                     item.setEnabled(false);
                     final Twitter cl = AccountService.getCurrentAccount().getClient();
                     if (item.getTitle().equals(context.getString(R.string.follow_str))) {
@@ -220,7 +183,10 @@ public class UserListCAB {
                                     try {
                                         cl.createFriendship(user.getId());
                                         user.setFollowingType(FollowingType.FOLLOWING);
-                                        UserListCAB.reinsertUser(user);
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() { UserListCAB.reinsertUser(user); }
+                                        });
                                     } catch (final Exception e) {
                                         e.printStackTrace();
                                         context.runOnUiThread(new Runnable() {
@@ -247,7 +213,10 @@ public class UserListCAB {
                                     try {
                                         cl.destroyFriendship(user.getId());
                                         user.setFollowingType(FollowingType.NOT_FOLLOWING);
-                                        UserListCAB.reinsertUser(user);
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() { UserListCAB.reinsertUser(user); }
+                                        });
                                     } catch (final Exception e) {
                                         e.printStackTrace();
                                         context.runOnUiThread(new Runnable() {
@@ -269,7 +238,8 @@ public class UserListCAB {
                         }).start();
                     }
                     return true;
-                case R.id.shareAction:
+                }
+                case R.id.shareAction: {
                     String shareStr = "";
                     for (int i = 0; i < selUsers.length; i++) {
                         String name = selUsers[i].getScreenName();
@@ -279,15 +249,14 @@ public class UserListCAB {
                     context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareStr),
                             context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     return true;
-                default:
+                }
+                default: {
                     return false;
+                }
             }
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            UserListCAB.clearSelectedItems();
-            UserListCAB.UserActionMode = null;
-        }
+        public void onDestroyActionMode(ActionMode actionMode) { }
     };
 }
