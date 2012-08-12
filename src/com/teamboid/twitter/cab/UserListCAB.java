@@ -183,7 +183,10 @@ public class UserListCAB {
                                     try {
                                         cl.createFriendship(user.getId());
                                         user.setFollowingType(FollowingType.FOLLOWING);
-                                        UserListCAB.reinsertUser(user);
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() { UserListCAB.reinsertUser(user); }
+                                        });
                                     } catch (final Exception e) {
                                         e.printStackTrace();
                                         context.runOnUiThread(new Runnable() {
