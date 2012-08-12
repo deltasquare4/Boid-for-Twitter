@@ -27,53 +27,18 @@
 		android:layout_height="wrap_content" />
 	
 	<!-- Auto-completion -->
-	<ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<HorizontalScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <LinearLayout
 	        android:layout_marginLeft="5dp"
 	        android:layout_marginRight="5dp"
+	        android:visibility="gone"
 	        android:layout_marginTop="5dp"
 	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
+	        android:layout_height="32dp"
 	        android:orientation="horizontal"
 	        android:id="@+id/autocompletion">
-	        <!-- TEST while I get UI right. I don't care about Lint. Will fix later -->
-	        
-	        <ImageView
-	            android:layout_width="32dp"
-	            android:layout_height="32dp" android:src="@drawable/sillouette" />
-	        
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="match_parent"
-	            android:paddingLeft="5dp"
-	            android:gravity="center"
-	            android:text="kennydude" />
-	        
-	       	<ImageView
-	            android:layout_width="32dp"
-	            android:layout_marginLeft="5dp"
-	            android:layout_height="32dp" android:src="@drawable/sillouette" />
-	        
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="match_parent"
-	            android:paddingLeft="5dp"
-	            android:gravity="center"
-	            android:text="someone else" />
-	        
-	      	<ImageView
-	      	    android:layout_marginLeft="5dp"
-	            android:layout_width="32dp"
-	            android:layout_height="32dp" android:src="@drawable/sillouette" />
-	        
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="match_parent"
-	            android:paddingLeft="5dp"
-	            android:gravity="center"
-	            android:text="another user" />
 	        
 	    </LinearLayout>
-	</ScrollView>
+	</HorizontalScrollView>
 	
 </LinearLayout>

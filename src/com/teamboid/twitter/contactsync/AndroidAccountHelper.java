@@ -27,6 +27,7 @@ public class AndroidAccountHelper {
 		am.addAccountExplicitly( toAdd, "TRY.HARDER.HACKER", userdata);
 		am.setUserData(toAdd, "accId", a.getId() + "");
 		ContentResolver.setSyncAutomatically(toAdd, ContactsContract.AUTHORITY, AUTO_SYNC_CONTACTS);
+		ContentResolver.setSyncAutomatically(toAdd, AutocompleteService.AUTHORITY, AUTO_SYNC_CONTACTS);
 	}
 	
 	public static HashMap<String, android.accounts.Account> getAccounts(Context c){

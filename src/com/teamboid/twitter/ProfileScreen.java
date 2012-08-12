@@ -125,8 +125,10 @@ public class ProfileScreen 	extends Activity {
 	}
 
 	private TabsAdapter mTabsAdapter;
+	private String mScreenName;
 	private void initializeTabs(Bundle savedInstanceState, String screenName) {
 		Log.d("boid", "Showing " + screenName);
+		mScreenName = screenName;
 		setTitle("@" + screenName);
 		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
 		final ActionBar bar = getActionBar();
@@ -215,7 +217,7 @@ public class ProfileScreen 	extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		if(AccountService.getCurrentAccount() != null && AccountService.getCurrentAccount().getUser().getScreenName().equals(getIntent().getStringExtra("screen_name"))) {
+		if(AccountService.getCurrentAccount() != null && AccountService.getCurrentAccount().getUser().getScreenName().equals(mScreenName)) {
 			inflater.inflate(R.menu.profile_self_actionbar, menu);
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
@@ -244,21 +246,21 @@ public class ProfileScreen 	extends Activity {
 			return true;
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class)
-				.putExtra("append", "@" + getIntent().getStringExtra("screen_name") + " ")
+				.putExtra("append", "@" + mScreenName + " ")
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:		
 			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
                     Long.toString(AccountService.getCurrentAccount().getId()) + "_columns", ""));
-			cols.add(ProfileTimelineFragment.ID + "@" + getIntent().getStringExtra("screen_name"));
+			cols.add(ProfileTimelineFragment.ID + "@" + mScreenName);
 			prefs.edit().putString(Long.toString(AccountService.getCurrentAccount().getId()) +
                     "_columns", Utilities.arrayToJson(cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra("new_column", true));
 			finish();
 			return true;
 		case R.id.messageAction:
-			startActivity(new Intent(getApplicationContext(), ConversationScreen.class).putExtra("screen_name", getIntent().getStringExtra("screen_name")));
+			startActivity(new Intent(getApplicationContext(), ConversationScreen.class).putExtra("screen_name", mScreenName));
 			return true;
 		case R.id.blockAction:
 			if(user == null) return false;

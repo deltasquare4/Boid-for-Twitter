@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.teamboid.twitter.contactsync.AutocompleteService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Extractor;
@@ -28,6 +31,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,10 +40,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,6 +55,8 @@ import android.widget.ArrayAdapter;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -185,6 +194,123 @@ public class ComposerScreen extends Activity {
 		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
+		
+		setupAutocomplete();
+	}
+	
+	List<String> autocomplete;
+	Thread currentAC = null;
+	public void setupAutocomplete(){
+		EditText editor = (EditText)findViewById(R.id.tweetContent);
+		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
+		l.removeAllViews();
+		
+		autocomplete = new ArrayList<String>();
+		JSONArray ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
+		if(ja == null) return;
+		for(int i = 0; i < ja.length(); i++){
+			autocomplete.add(ja.optString(i, ""));
+		}
+		
+		editor.addTextChangedListener(new TextWatcher(){
+			@Override
+			public void afterTextChanged(Editable arg0) {}
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {}
+
+			@Override
+			public void onTextChanged(final CharSequence text, final int s, int before,
+					int count) {
+				if(currentAC != null) currentAC.interrupt();
+				final int start = s + count;
+				
+				l.removeAllViews();
+				currentAC = new Thread(new Runnable(){
+	
+					@Override
+					public void run() {
+						final boolean b = doRun();
+						runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								l.setVisibility(b ? View.VISIBLE : View.GONE);
+							}
+							
+						});
+					}
+					
+					public boolean doRun(){
+						
+						int p = text.toString().lastIndexOf(" ", start);
+						if(p+2 >= text.length()) return false;
+						
+						Log.d("autocomplete", text.charAt( p + 1) + "");
+						
+						if(text.charAt( p + 1) == '@'){
+							// We are typing @someone
+							String typed = text.subSequence(p+1, start).toString().toLowerCase();
+							if(typed.length() <= 3) return false;
+							
+							if(typed.charAt(0) == '@') typed = typed.substring(1);
+							Log.d("autocomplete", "[" + (p+1) + "," + start + "]: " + typed);
+						
+							boolean r = false;
+							for(final String u : autocomplete){
+								if(u.toLowerCase().contains(typed)){
+									r = true;
+									OnClickListener oc = new OnClickListener(){
+
+										@Override
+										public void onClick(View arg0) {
+											EditText editor = (EditText)findViewById(R.id.tweetContent);
+											String r = "@" + u + " ";
+											editor.getText().replace(s, start, r);
+											editor.setSelection(s + r.length());
+										}
+										
+									};
+									
+									final RemoteImageView riv = new RemoteImageView(ComposerScreen.this);
+									final int w = Utilities.DpToPx(32, ComposerScreen.this);
+									riv.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									riv.setOnClickListener(oc);
+									
+									final TextView t = new TextView(ComposerScreen.this);
+									SpannableString s = new SpannableString(u);
+									int selStart = u.toLowerCase().indexOf(typed);
+									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+									t.setText(s);
+									t.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									t.setGravity(Gravity.CENTER);
+									t.setOnClickListener(oc);
+									
+									runOnUiThread(new Runnable(){
+	
+										@Override
+										public void run() {
+											l.addView(riv, w, w);
+											riv.setImageURL(Utilities.getUserImage(u, ComposerScreen.this));
+											
+											
+											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT,
+													LinearLayout.LayoutParams.MATCH_PARENT);
+										}
+										
+									});
+								}
+							}
+							return r;
+						}
+						return false;
+					}
+					
+				});
+				currentAC.setPriority(Thread.MIN_PRIORITY);
+				currentAC.start();
+			}
+		});
 	}
 
 	private void setUploadWith(String pref) {
@@ -217,6 +343,7 @@ public class ComposerScreen extends Activity {
 						long itemId) {
 					stt.from = accs.get(itemPosition);
 					loadDraft();
+					setupAutocomplete();
 					return true;
 				}
 			});

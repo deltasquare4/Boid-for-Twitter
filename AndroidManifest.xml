@@ -250,12 +250,18 @@
 			<meta-data android:name="android.provider.CONTACTS_STRUCTURE"
 				android:resource="@xml/contact_structure" />
 		</service>
-		<service android:exported="true" android:name=".contactsync.ContactViewNotifyService"></service>
+		<service
+		    android:process=":contacts"
+		    android:exported="true"
+		    android:name=".contactsync.ContactViewNotifyService"
+		    android:permission="android.permission.READ_CONTACTS"></service>
 		
+		<!-- Auto-complete -->
 		<provider
 		    android:name="com.teamboid.twitter.contactsync.AutocompleteProvider"
 		   	android:authorities="com.teamboid.twitter.autocomplete"
 		   	android:label="@string/autocomplete"
+		   	android:process=":contacts"
 		   	android:exported="false"
 		   	android:syncable="true">
 		</provider>

@@ -25,9 +25,11 @@ import com.teamboid.twitterapi.user.User;
  *
  */
 public class AutocompleteService extends Service {
+	public static final String AUTHORITY = "com.teamboid.twitter.autocomplete";
+	
 	public static JSONArray readAutocompleteFile(Context c, long accId){
 		try{
-			FileInputStream fis = c.openFileInput("autocomplete" + accId + ".json");
+			FileInputStream fis = c.openFileInput("autocomplete-" + accId + ".json");
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 			JSONArray ja = new JSONArray( br.readLine() );
 			br.close(); fis.close();
@@ -76,7 +78,7 @@ public class AutocompleteService extends Service {
 				}
 				
 				for(User user : users){
-					ja.put(user.getScreenName());
+					ja.put(user.getScreenName().toLowerCase());
 				}
 				got += users.length;
 				
