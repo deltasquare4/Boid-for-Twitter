@@ -87,15 +87,6 @@ public class SearchScreen extends Activity {
 		}
 		UserListCAB.context = this;
 	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		UserListCAB.clearSelectedItems();
-		if(UserListCAB.UserActionMode != null) {
-			UserListCAB.UserActionMode.finish();
-		}
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {

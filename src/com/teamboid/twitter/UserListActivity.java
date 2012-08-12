@@ -76,7 +76,8 @@ public class UserListActivity extends ListActivity {
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
-		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setMultiChoiceModeListener(UserListCAB.choiceListener);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
@@ -85,13 +86,6 @@ public class UserListActivity extends ListActivity {
 				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) paginate();
 			}
 		});
-		getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				UserListCAB.performLongPressAction(getListView(), binder, index);
-				return true;
-			}
-		});		
 		setProgressBarIndeterminateVisibility(false);
 	}
 	
@@ -178,15 +172,6 @@ public class UserListActivity extends ListActivity {
 				}
 			}
 		}).start();
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		UserListCAB.clearSelectedItems();
-		if(UserListCAB.UserActionMode != null) {
-			UserListCAB.UserActionMode.finish();
-		}
 	}
 	
 	@Override
