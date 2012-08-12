@@ -4,4 +4,6 @@
     android:minHeight="110dp"
     android:minWidth="100dp"
     android:updatePeriodMillis="600000" 
-    android:resizeMode="horizontal|vertical" />
+    android:resizeMode="horizontal|vertical"
+    android:configure="com.teamboid.twitter.widgets.TimelineWidgetConfigurator"
+    />

@@ -10,4 +10,5 @@
 	
 	<color name="holo_light">#DDDDDD</color>
 	<color name="holo_dark">#252930</color>
+    <color name="pressed_pure_black">#CC33B5E5</color>
 </resources>
