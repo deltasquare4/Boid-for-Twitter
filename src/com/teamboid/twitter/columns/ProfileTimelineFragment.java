@@ -12,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -203,17 +202,15 @@ public class ProfileTimelineFragment extends BaseListFragment {
 
 	@Override
 	public Status[] getSelectedStatuses() {
-		if(globalAdapter == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)globalAdapter.getItem(checkedItems.keyAt(i)));
-				}
-			}
-		}
-		return toReturn.toArray(new Status[0]);
+        if (globalAdapter == null && getView() == null) return null;
+        ArrayList<Status> toReturn = new ArrayList<Status>();
+        SparseBooleanArray choices = getListView().getCheckedItemPositions();
+        for (int i = 0; i < choices.size(); i++) {
+            if(choices.valueAt(i)) {
+                toReturn.add((Status)globalAdapter.getItem(choices.keyAt(i)));
+            }
+        }
+        return toReturn.toArray(new Status[0]);
 	}
 
 	@Override

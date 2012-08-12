@@ -202,17 +202,15 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 
 	@Override
 	public Status[] getSelectedStatuses() {
-		if(context.adapter == null) return null;
-		ArrayList<Status> toReturn = new ArrayList<Status>(); 
-		SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
-		if(checkedItems != null) {
-			for(int i = 0; i < checkedItems.size(); i++) {
-				if(checkedItems.valueAt(i)) {
-					toReturn.add((Status)context.adapter.getItem(checkedItems.keyAt(i)));
-				}
-			}
-		}
-		return toReturn.toArray(new Status[0]);
+        if (context.adapter == null && getView() == null) return null;
+        ArrayList<Status> toReturn = new ArrayList<Status>();
+        SparseBooleanArray choices = getListView().getCheckedItemPositions();
+        for (int i = 0; i < choices.size(); i++) {
+            if(choices.valueAt(i)) {
+                toReturn.add((Status)context.adapter.getItem(choices.keyAt(i)));
+            }
+        }
+        return toReturn.toArray(new Status[0]);
 	}
 
 	@Override

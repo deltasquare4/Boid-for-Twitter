@@ -282,7 +282,7 @@ public class TimelineCAB {
 			case R.id.shareAction: {
 				Status toShare = TimelineCAB.getSelectedTweets()[0];
 				if (toShare.isRetweet()) toShare = toShare.getRetweetedStatus();
-				String text = toShare.getText() + "\n\n(via @" + toShare.getUser().getScreenName() + ", http://twitter.com/" + toShare.getUser().getScreenName() + "/status/" + Long.toString(toShare.getId()) + ")";
+				String text = toShare.getText() + "\n\n(via @" + toShare.getUser().getScreenName() + " on Twitter)";
 				context.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text),
 						context.getString(R.string.share_str)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
