@@ -213,7 +213,10 @@ public class UserListCAB {
                                     try {
                                         cl.destroyFriendship(user.getId());
                                         user.setFollowingType(FollowingType.NOT_FOLLOWING);
-                                        UserListCAB.reinsertUser(user);
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() { UserListCAB.reinsertUser(user); }
+                                        });
                                     } catch (final Exception e) {
                                         e.printStackTrace();
                                         context.runOnUiThread(new Runnable() {
