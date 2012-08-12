@@ -11,11 +11,13 @@ import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
+import com.teamboid.twitterapi.status.Status;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.contactsync.AutocompleteService;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Extractor;
@@ -50,6 +52,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewStub;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 
@@ -146,7 +149,18 @@ public class ComposerScreen extends Activity {
 			}
 		});
 		if (getIntent().getExtras() != null) {
-			if (getIntent().hasExtra("stt")) {
+			if(getIntent().hasExtra("reply_to")){
+				Status replyTo = (Status) getIntent().getSerializableExtra("reply_to");
+				stt.in_reply_to = replyTo.getId();
+				
+				ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
+				View replyToV = replyToL.inflate();
+				FeedListAdapter.createStatusView(replyTo, this, replyToV);
+				
+				TextView tv = (TextView)findViewById(R.id.replyToText);
+				tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getUser().getScreenName()));
+				tv.setVisibility(View.VISIBLE);
+			}else if (getIntent().hasExtra("stt")) {
 				try {
 					stt = SendTweetTask.fromBundle(getIntent().getBundleExtra(
 							"stt"));
@@ -196,6 +210,8 @@ public class ComposerScreen extends Activity {
 		setProgressBarIndeterminateVisibility(false);
 		
 		setupAutocomplete();
+		
+		content.requestFocus();
 	}
 	
 	List<String> autocomplete;
@@ -413,7 +429,7 @@ public class ComposerScreen extends Activity {
 		if (stt.from == null
 				|| !PreferenceManager.getDefaultSharedPreferences(
 						getApplicationContext()).getBoolean("enable_drafts",
-						true) || getIntent().getLongExtra("reply_to", 0l) > 0) {
+						true) || stt.in_reply_to > 0) {
 			finish();
 			return;
 		}
@@ -472,7 +488,7 @@ public class ComposerScreen extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.composer_actionbar, menu);
-		if (getIntent().getLongExtra("reply_to", 0l) > 0) {
+		if (stt.in_reply_to > 0) {
 			menu.findItem(R.id.sendAction).setTitle(
 					getString(R.string.reply_str) + " ("
 							+ Integer.toString(lengthIndic) + ")");
@@ -675,7 +691,7 @@ public class ComposerScreen extends Activity {
 			stt.twtlonger = true;
 		stt.contents = ((EditText) findViewById(R.id.tweetContent)).getText()
 				.toString();
-		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
+		// stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
 
 		SendTweetService.addTweet(stt);

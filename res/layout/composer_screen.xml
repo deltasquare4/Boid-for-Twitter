@@ -1,33 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="15dp" >
+    android:layout_height="match_parent">
+    
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        
+		<LinearLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical"
+		    android:paddingLeft="15dp"
+		    android:paddingRight="15dp"
+		    android:paddingTop="15dp"
+		    
+		    android:paddingBottom="34dp">
+		    
+		    <ViewStub 
+		        android:id="@+id/replyTo"
+		        android:layout="@layout/feed_item"
+		        android:layout_height="wrap_content"
+		        android:layout_width="match_parent" />
 
-	<TextView android:id="@+id/twitlongerUsed"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:visibility="gone" android:text="@string/will_use_twitlonger"
-		android:textColor="@color/dark" android:textStyle="italic"
-		android:layout_marginBottom="5dp" />
-	<EditText android:id="@+id/tweetContent" android:layout_width="fill_parent"
-		android:gravity="top" android:layout_weight="100"
-		android:hint="@string/what_you_wanna_say" android:textColor="?tweetColor"
-		android:layout_height="0dp" android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
-		<requestFocus />
-	</EditText>
+		    <TextView
+		        style="?android:listSeparatorTextViewStyle"
+		        android:visibility="gone"
+		        android:id="@+id/replyToText"
+		        android:layout_width="match_parent"
+		        android:text="@string/in_reply_to"
+		        android:layout_height="wrap_content"
+		        android:textAllCaps="true"
+		        android:textSize="10sp" />
+		
+			<TextView android:id="@+id/twitlongerUsed"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:visibility="gone" android:text="@string/will_use_twitlonger"
+				android:textColor="@color/dark" android:textStyle="italic"
+				android:layout_marginBottom="5dp" />
+			<EditText android:id="@+id/tweetContent" android:layout_width="fill_parent"
+				android:gravity="top" android:layout_weight="100"
+				android:minLines="5"
+				android:hint="@string/what_you_wanna_say" android:textColor="?tweetColor"
+				android:layout_height="0dp" android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
+				<requestFocus />
+			</EditText>
+			
+			<!-- Upload Service Config. TODO: Probably could be better UI, deffo on Tablet at least -->
+			<TextView android:id="@+id/upload_with_label"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:textColor="@color/dark" android:text="@string/photo_service_title"
+				android:visibility="gone" />
+			<Button style="?android:spinnerStyle" android:id="@+id/upload_with"
+				android:visibility="gone" android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+			
+		</LinearLayout>
+	</ScrollView>
 	
-	<!-- Upload Service Config. TODO: Probably could be better UI, deffo on Tablet at least -->
-	<TextView android:id="@+id/upload_with_label"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:textColor="@color/dark" android:text="@string/photo_service_title"
-		android:visibility="gone" />
-	<Button style="?android:spinnerStyle" android:id="@+id/upload_with"
-		android:visibility="gone" android:layout_width="match_parent"
-		android:layout_height="wrap_content" />
-	
-	<!-- Auto-completion -->
-	<HorizontalScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+    <!-- Auto-completion -->
+	<HorizontalScrollView
+	    android:background="?android:windowBackground"
+	    android:layout_gravity="end|bottom"
+	    android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <LinearLayout
 	        android:layout_marginLeft="5dp"
 	        android:layout_marginRight="5dp"
@@ -40,5 +75,4 @@
 	        
 	    </LinearLayout>
 	</HorizontalScrollView>
-	
-</LinearLayout>
+</FrameLayout>
