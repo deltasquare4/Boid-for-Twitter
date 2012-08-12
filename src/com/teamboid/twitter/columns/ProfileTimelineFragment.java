@@ -3,6 +3,7 @@ package com.teamboid.twitter.columns;
 import java.util.ArrayList;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.search.Tweet;
@@ -70,8 +71,9 @@ public class ProfileTimelineFragment extends BaseListFragment {
 						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
 							performRefresh(true);
 						}
+                        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-							if(!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
+							if(!prefs.getBoolean("enable_iconic_tabs", true) || prefs.getBoolean("textual_profilefeed_tabs", true)) {
 								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("@" + screenName);									
 							} else {
 								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
