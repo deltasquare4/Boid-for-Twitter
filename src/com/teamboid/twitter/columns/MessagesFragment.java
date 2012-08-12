@@ -53,7 +53,7 @@ public class MessagesFragment extends BaseListFragment {
     public void onStart() {
         super.onStart();
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().setMultiChoiceModeListener(MessageConvoCAB2.choiceListener);
+        getListView().setMultiChoiceModeListener(MessageConvoCAB.choiceListener);
         setRetainInstance(true);
         setEmptyText(getString(R.string.no_messages));
         reloadAdapter(true);
