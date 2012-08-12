@@ -496,4 +496,6 @@
 	<string name="email">Email Address</string>
 	<string name="password">Password</string>
 	<string name="autocomplete">Nickname Auto-completion</string>
+    <string name="timeline_widget_str">Timeline widget</string>
+    <string name="done_str">Done</string>
 </resources>
