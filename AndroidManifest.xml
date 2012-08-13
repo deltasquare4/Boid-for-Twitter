@@ -239,7 +239,7 @@
 		<!-- Contact Sync -->
 		<service
 			android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
-			android:exported="true" android:process=":auth">
+			android:exported="false" android:process=":auth">
 			<intent-filter>
 				<action android:name="android.accounts.AccountAuthenticator" />
 			</intent-filter>
@@ -247,7 +247,7 @@
 				android:resource="@xml/authenticator" />
 		</service>
 		<service android:name="com.teamboid.twitter.contactsync.ContactSyncAdapterService"
-			android:exported="true" android:process=":contacts">
+			android:exported="false" android:process=":contacts">
 			<intent-filter>
 				<action android:name="android.content.SyncAdapter" />
 			</intent-filter>
@@ -255,6 +255,29 @@
 				android:resource="@xml/sync_contacts" />
 			<meta-data android:name="android.provider.CONTACTS_STRUCTURE"
 				android:resource="@xml/contact_structure" />
+		</service>
+		<service
+		    android:process=":contacts"
+		    android:exported="true"
+		    android:name=".contactsync.ContactViewNotifyService"
+		    android:permission="android.permission.READ_CONTACTS"></service>
+		
+		<!-- Auto-complete -->
+		<provider
+		    android:name="com.teamboid.twitter.contactsync.AutocompleteProvider"
+		   	android:authorities="com.teamboid.twitter.autocomplete"
+		   	android:label="@string/autocomplete"
+		   	android:process=":contacts"
+		   	android:exported="false"
+		   	android:syncable="true">
+		</provider>
+		<service android:name="com.teamboid.twitter.contactsync.AutocompleteService"
+			android:exported="false" android:process=":contacts">
+			<intent-filter>
+				<action android:name="android.content.SyncAdapter" />
+			</intent-filter>
+			<meta-data android:name="android.content.SyncAdapter"
+				android:resource="@xml/sync_autocomplete" />
 		</service>
 	</application>
 </manifest>

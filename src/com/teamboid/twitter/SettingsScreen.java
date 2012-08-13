@@ -157,7 +157,8 @@ public class SettingsScreen extends PreferenceActivity  {
 	            final Preference uploadService = (Preference)findPreference("upload_service");
 	            String pref = uploadService.getSharedPreferences().getString("upload_service", "twitter");
 	            try{
-	                    uploadService.setSummary(MediaServices.services.get(pref).getServiceName());
+	            	MediaServices.setupServices();
+	                uploadService.setSummary(MediaServices.services.get(pref).getServiceName());
 	            } catch(Exception e) { e.printStackTrace(); }
 	    }
         

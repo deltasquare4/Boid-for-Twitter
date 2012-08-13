@@ -6,13 +6,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
+import com.teamboid.twitterapi.status.Status;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.teamboid.twitter.contactsync.AutocompleteService;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Extractor;
@@ -28,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,18 +42,24 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewStub;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -60,12 +72,12 @@ public class ComposerScreen extends Activity {
 	private SendTweetTask stt = new SendTweetTask();
 	private int lastTheme;
 	private boolean shownLinksMessage;
-	
+
 	private float locationAccuracy;
 	private Place[] places;
 	private boolean isGettingLocation;
 	private int lengthIndic;
-	
+
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
 	 */
@@ -101,7 +113,7 @@ public class ComposerScreen extends Activity {
 		}
 		invalidateOptionsMenu();
 	}
-	
+
 	public static int SELECT_MEDIA = 2939;
 
 	@Override
@@ -137,7 +149,18 @@ public class ComposerScreen extends Activity {
 			}
 		});
 		if (getIntent().getExtras() != null) {
-			if (getIntent().hasExtra("stt")) {
+			if(getIntent().hasExtra("reply_to")){
+				Status replyTo = (Status) getIntent().getSerializableExtra("reply_to");
+				stt.in_reply_to = replyTo.getId();
+				
+				ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
+				View replyToV = replyToL.inflate();
+				FeedListAdapter.createStatusView(replyTo, this, replyToV);
+				
+				TextView tv = (TextView)findViewById(R.id.replyToText);
+				tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getUser().getScreenName()));
+				tv.setVisibility(View.VISIBLE);
+			}else if (getIntent().hasExtra("stt")) {
 				try {
 					stt = SendTweetTask.fromBundle(getIntent().getBundleExtra(
 							"stt"));
@@ -170,32 +193,153 @@ public class ComposerScreen extends Activity {
 				getApplicationContext()).getBoolean("attach_location", false)) {
 			getLocation();
 		}
-		
-		Button spinner = (Button)findViewById(R.id.upload_with);
-		spinner.setOnClickListener(new OnClickListener(){
+
+		Button spinner = (Button) findViewById(R.id.upload_with);
+		spinner.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Intent i = new Intent(ComposerScreen.this, SelectMediaScreen.class);
+				Intent i = new Intent(ComposerScreen.this,
+						SelectMediaScreen.class);
 				startActivityForResult(i, SELECT_MEDIA);
-			}		
+			}
 		});
-		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter").toLowerCase();
+		String pref = PreferenceManager.getDefaultSharedPreferences(this)
+				.getString("upload_service", "twitter").toLowerCase();
 		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
+		
+		setupAutocomplete();
+		
+		content.requestFocus();
 	}
 	
-	private void setUploadWith(String pref){
-		Button spinner = (Button)findViewById(R.id.upload_with);
-		try{
+	List<String> autocomplete;
+	Thread currentAC = null;
+	public void setupAutocomplete(){
+		EditText editor = (EditText)findViewById(R.id.tweetContent);
+		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
+		l.removeAllViews();
+		
+		autocomplete = new ArrayList<String>();
+		JSONArray ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
+		if(ja == null) return;
+		for(int i = 0; i < ja.length(); i++){
+			autocomplete.add(ja.optString(i, ""));
+		}
+		
+		editor.addTextChangedListener(new TextWatcher(){
+			@Override
+			public void afterTextChanged(Editable arg0) {}
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {}
+
+			@Override
+			public void onTextChanged(final CharSequence text, final int s, int before,
+					int count) {
+				if(currentAC != null) currentAC.interrupt();
+				final int start = s + count;
+				
+				l.removeAllViews();
+				currentAC = new Thread(new Runnable(){
+	
+					@Override
+					public void run() {
+						final boolean b = doRun();
+						runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								l.setVisibility(b ? View.VISIBLE : View.GONE);
+							}
+							
+						});
+					}
+					
+					public boolean doRun(){
+						
+						int p = text.toString().lastIndexOf(" ", start);
+						if(p+2 >= text.length()) return false;
+						
+						Log.d("autocomplete", text.charAt( p + 1) + "");
+						
+						if(text.charAt( p + 1) == '@'){
+							// We are typing @someone
+							String typed = text.subSequence(p+1, start).toString().toLowerCase();
+							if(typed.length() <= 3) return false;
+							
+							if(typed.charAt(0) == '@') typed = typed.substring(1);
+							Log.d("autocomplete", "[" + (p+1) + "," + start + "]: " + typed);
+						
+							boolean r = false;
+							for(final String u : autocomplete){
+								if(u.toLowerCase().contains(typed)){
+									r = true;
+									OnClickListener oc = new OnClickListener(){
+
+										@Override
+										public void onClick(View arg0) {
+											EditText editor = (EditText)findViewById(R.id.tweetContent);
+											String r = "@" + u + " ";
+											editor.getText().replace(s, start, r);
+											editor.setSelection(s + r.length());
+										}
+										
+									};
+									
+									final RemoteImageView riv = new RemoteImageView(ComposerScreen.this);
+									final int w = Utilities.DpToPx(32, ComposerScreen.this);
+									riv.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									riv.setOnClickListener(oc);
+									
+									final TextView t = new TextView(ComposerScreen.this);
+									SpannableString s = new SpannableString(u);
+									int selStart = u.toLowerCase().indexOf(typed);
+									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+									t.setText(s);
+									t.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									t.setGravity(Gravity.CENTER);
+									t.setOnClickListener(oc);
+									
+									runOnUiThread(new Runnable(){
+	
+										@Override
+										public void run() {
+											l.addView(riv, w, w);
+											riv.setImageURL(Utilities.getUserImage(u, ComposerScreen.this));
+											
+											
+											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT,
+													LinearLayout.LayoutParams.MATCH_PARENT);
+										}
+										
+									});
+								}
+							}
+							return r;
+						}
+						return false;
+					}
+					
+				});
+				currentAC.setPriority(Thread.MIN_PRIORITY);
+				currentAC.start();
+			}
+		});
+	}
+
+	private void setUploadWith(String pref) {
+		Button spinner = (Button) findViewById(R.id.upload_with);
+		try {
 			MediaServices.setupServices();
 			spinner.setText(MediaServices.getService(pref).getServiceName());
 			stt.mediaService = pref;
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void initializeAccountSwitcher(boolean firstLoad) {
 		ActionBar ab = getActionBar();
 		ab.setDisplayHomeAsUpEnabled(true);
@@ -215,6 +359,7 @@ public class ComposerScreen extends Activity {
 						long itemId) {
 					stt.from = accs.get(itemPosition);
 					loadDraft();
+					setupAutocomplete();
 					return true;
 				}
 			});
@@ -224,8 +369,8 @@ public class ComposerScreen extends Activity {
 			}
 			long accExtra = getIntent().getLongExtra("account", 0l);
 			for (int i = 0; i < accs.size(); i++) {
-				if (accs.get(i).getId() == stt.from.getId() ||
-						accs.get(i).getId() == accExtra) {
+				if (accs.get(i).getId() == stt.from.getId()
+						|| accs.get(i).getId() == accExtra) {
 					getActionBar().setSelectedNavigationItem(i);
 					break;
 				}
@@ -242,7 +387,8 @@ public class ComposerScreen extends Activity {
 				.toString();
 		int toReturn = (140 - text.length());
 		if (stt.hasMedia())
-			toReturn -= (stt.mediaService == "twitter" ? AccountService.charactersPerMedia : shortLength);
+			toReturn -= (stt.mediaService == "twitter" ? AccountService.charactersPerMedia
+					: shortLength);
 		List<String> urls = new Extractor().extractURLs(text);
 		for (String u : urls) {
 			if (!shownLinksMessage) {
@@ -283,7 +429,7 @@ public class ComposerScreen extends Activity {
 		if (stt.from == null
 				|| !PreferenceManager.getDefaultSharedPreferences(
 						getApplicationContext()).getBoolean("enable_drafts",
-						true) || getIntent().getLongExtra("reply_to", 0l) > 0) {
+						true) || stt.in_reply_to > 0) {
 			finish();
 			return;
 		}
@@ -342,81 +488,92 @@ public class ComposerScreen extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.composer_actionbar, menu);
-		if (getIntent().getLongExtra("reply_to", 0l) > 0) {
-				menu.findItem(R.id.sendAction).setTitle(
-								getString(R.string.reply_str) + " ("
-												+ Integer.toString(lengthIndic) + ")");
+		if (stt.in_reply_to > 0) {
+			menu.findItem(R.id.sendAction).setTitle(
+					getString(R.string.reply_str) + " ("
+							+ Integer.toString(lengthIndic) + ")");
 		} else
-				menu.findItem(R.id.sendAction).setTitle(
-								getString(R.string.tweet_str) + " ("
-												+ Integer.toString(lengthIndic) + ")");
+			menu.findItem(R.id.sendAction).setTitle(
+					getString(R.string.tweet_str) + " ("
+							+ Integer.toString(lengthIndic) + ")");
 
 		if (!stt.isGalleryImage && stt.hasMedia()) {
-				MenuItem capAct = menu.findItem(R.id.captureAction);
-				capAct.setIcon(getTheme().obtainStyledAttributes(
-								new int[] { R.attr.cameraAttachedIcon }).getDrawable(0));
+			MenuItem capAct = menu.findItem(R.id.captureAction);
+			capAct.setIcon(getTheme().obtainStyledAttributes(
+					new int[] { R.attr.cameraAttachedIcon }).getDrawable(0));
 		} else if (stt.hasMedia()) { // could be uri
-				MenuItem galAct = menu.findItem(R.id.galleryAction);
-				galAct.setIcon(getTheme().obtainStyledAttributes(
-								new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
+			MenuItem galAct = menu.findItem(R.id.galleryAction);
+			galAct.setIcon(getTheme().obtainStyledAttributes(
+					new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
 		}
-		
-		findViewById(R.id.upload_with).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
-		findViewById(R.id.upload_with_label).setVisibility(stt.hasMedia() ? View.VISIBLE : View.GONE);
+
+		findViewById(R.id.upload_with).setVisibility(
+				stt.hasMedia() ? View.VISIBLE : View.GONE);
+		findViewById(R.id.upload_with_label).setVisibility(
+				stt.hasMedia() ? View.VISIBLE : View.GONE);
 		final EditText content = (EditText) findViewById(R.id.tweetContent);
 		if (stt.attachedImage == null
-						&& content.getText().toString().trim().length() == 0) {
-				menu.findItem(R.id.sendAction).setEnabled(false);
+				&& content.getText().toString().trim().length() == 0) {
+			menu.findItem(R.id.sendAction).setEnabled(false);
 		} else
-				menu.findItem(R.id.sendAction).setEnabled(true);
+			menu.findItem(R.id.sendAction).setEnabled(true);
 
 		final MenuItem locate = menu.findItem(R.id.locateAction);
 		locate.getSubMenu().clear();
-		
+
 		if (stt.location != null) {
-				locate.setIcon(getTheme().obtainStyledAttributes(
-								new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
-				if (places == null) {
-						new Thread(new Runnable() {
+			locate.setIcon(getTheme().obtainStyledAttributes(
+					new int[] { R.attr.locationAttachedIcon }).getDrawable(0));
+			if (places == null) {
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							places = AccountService
+									.getCurrentAccount()
+									.getClient()
+									.getReverseGeocode(stt.location,
+											(int) locationAccuracy + "m",
+											Granularity.POI, 4);
+							runOnUiThread(new Runnable() {
+								@Override
 								public void run() {
-									try {
-											places = AccountService
-															.getCurrentAccount()
-															.getClient()
-															.getReverseGeocode(stt.location,
-																			(int) locationAccuracy + "m",
-																			Granularity.POI, 4);
-											runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-															invalidateOptionsMenu();
-													}
-											});
-									} catch (final Exception e) {
-											e.printStackTrace();
-											runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-															Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-													}
-											});
-									}
+									invalidateOptionsMenu();
 								}
-						}).start();
-				} else {
-						for (Place p : places) {
-								locate.getSubMenu().add(p.getFullName()).setIcon(R.drawable.locate_blue);
+							});
+						} catch (final Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									Toast.makeText(getApplicationContext(),
+											e.getMessage(), Toast.LENGTH_LONG)
+											.show();
+								}
+							});
 						}
-						locate.getSubMenu().add(R.string.no_location_str)
-										.setIcon(getTheme().obtainStyledAttributes(new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
-						if(stt.placeId == null) {
-								stt.placeId = places[0].getId();
-								Toast.makeText(getApplicationContext(), places[0].getFullName(), Toast.LENGTH_SHORT).show();
-						}
+					}
+				}).start();
+			} else {
+				for (Place p : places) {
+					locate.getSubMenu().add(p.getFullName())
+							.setIcon(R.drawable.locate_blue);
 				}
+				locate.getSubMenu()
+						.add(R.string.no_location_str)
+						.setIcon(
+								getTheme()
+										.obtainStyledAttributes(
+												new int[] { R.attr.locationDetachedIcon })
+										.getDrawable(0));
+				if (stt.placeId == null) {
+					stt.placeId = places[0].getId();
+					Toast.makeText(getApplicationContext(),
+							places[0].getFullName(), Toast.LENGTH_SHORT).show();
+				}
+			}
 		} else {
-				locate.setIcon(getTheme().obtainStyledAttributes(
-								new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
+			locate.setIcon(getTheme().obtainStyledAttributes(
+					new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
 		}
 		return true;
 	}
@@ -534,9 +691,9 @@ public class ComposerScreen extends Activity {
 			stt.twtlonger = true;
 		stt.contents = ((EditText) findViewById(R.id.tweetContent)).getText()
 				.toString();
-		stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
+		// stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
-		
+
 		SendTweetService.addTweet(stt);
 		finish();
 	}
@@ -565,6 +722,14 @@ public class ComposerScreen extends Activity {
 							+ intent.getData().toString());
 					stt.attachedImageUri = intent.getData();
 				}
+			} else if (requestCode == CAMERA_SELECT_INTENT) {
+				if (getFileSize(new File(stt.attachedImage)) == 0) {
+					Log.d("e", "Empty File. Using "
+							+ intent.getData().toString());
+					stt.attachedImageUri = intent.getData();
+				}
+			} else if (resultCode == SELECT_MEDIA) {
+				setUploadWith(intent.getStringExtra("service"));
 			}
 			getLengthIndicator();
 			invalidateOptionsMenu();

@@ -1,28 +1,16 @@
 package com.teamboid.twitter.contactsync;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashMap;
 
-import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitterapi.client.Authorizer;
-import com.teamboid.twitterapi.client.Twitter;
-import com.teamboid.twitterapi.relationship.IDs;
 import com.teamboid.twitterapi.user.User;
-import com.teamboid.twitterapi.utilities.Utils;
-
 import android.accounts.Account;
 import android.app.Service;
-import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SyncResult;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,7 +22,8 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 public class ContactSyncAdapterService extends Service {
-
+	public static final String CONTACT_VERSION = "1";
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return getSyncAdapter().getSyncAdapterBinder();
@@ -46,27 +35,10 @@ public class ContactSyncAdapterService extends Service {
 		return instance;
 	}
 	
-	private static class SyncAdapterImpl extends AbstractThreadedSyncAdapter{
-		Context mContext;
-		Account account;
-		public SyncAdapterImpl(Context context) {
-			super(context, true);
-			mContext = context;
-		}
-		
-		public static void saveBitmapToRawContact(Context context, long rawContactId, byte[] photo) throws Exception {
-		    Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
-		    Uri outputFileUri =
-		        Uri.withAppendedPath(rawContactUri, RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
-		    AssetFileDescriptor descriptor = context.getContentResolver().openAssetFileDescriptor(
-		        outputFileUri, "rw");
-		    FileOutputStream stream = descriptor.createOutputStream();
-		    try {
-		      stream.write(photo);
-		    } finally {
-		      stream.close();
-		      descriptor.close();
-		    }
+	private static class SyncAdapterImpl extends BaseTwitterSync{
+		public SyncAdapterImpl(
+				ContactSyncAdapterService contactSyncAdapterService) {
+			super(contactSyncAdapterService);
 		}
 		
 		public void addContact(User user){
@@ -76,12 +48,35 @@ public class ContactSyncAdapterService extends Service {
 			builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 			builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
 			builder.withValue(RawContacts.SYNC1, user.getScreenName());
+			builder.withValue(RawContacts.SYNC4, CONTACT_VERSION);
 			operationList.add(builder.build());
 			
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 			builder.withValueBackReference(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
 			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
 			builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, user.getName());
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.NAME, user.getScreenName());
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.TYPE, ContactsContract.CommonDataKinds.Nickname.TYPE_CUSTOM);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.LABEL, "Twitter Screen Name");
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Note.NOTE, user.getDescription());
+			operationList.add(builder.build());
+			
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.URL, user.getUrl());
+			builder.withValue(ContactsContract.CommonDataKinds.Website.TYPE, ContactsContract.CommonDataKinds.Website.TYPE_CUSTOM);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.LABEL, "Profile Link");
 			operationList.add(builder.build());
 			
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
@@ -100,84 +95,6 @@ public class ContactSyncAdapterService extends Service {
 			}
 		}
 		
-		long _id = -1;
-		Long getId(){
-			if(_id != -1) return _id;
-			
-			android.accounts.AccountManager am = android.accounts.AccountManager.get(mContext);
-			_id = Long.parseLong( am.getUserData(account, "accId") );
-			return _id;
-		}
-		
-		Twitter getTwitter(){
-			SharedPreferences sp = mContext.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE);
-			String s = sp.getString(getId() + "", null);
-			if(s == null) return null;
-			
-			com.teamboid.twitter.Account toAdd = (com.teamboid.twitter.Account) Utils.deserializeObject( s );
-			Log.d("contactsync", "Hello " + toAdd.getId());
-			return Authorizer.create(AccountService.CONSUMER_KEY, AccountService.CONSUMER_SECRET, AccountService.CALLBACK_URL)
-					.getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
-		}
-		
-		String getWhatToSync(){ // TODO: Actually make this return something the user wants
-			return "following";
-		}
-		
-		int getTotalNumber(){
-			try{
-				Twitter client = getTwitter();
-				String type = getWhatToSync();
-				
-				if(type.equals("following")){
-					return (int) client.verifyCredentials().getFriendsCount();
-				} else if(type.equals("followers")){
-					return (int) client.verifyCredentials().getFollowersCount();
-				}
-			}catch(Exception e){ e.printStackTrace(); return -1; }
-			return -1;
-		}
-		
-		// Notes:
-		// This works by having a queue `idQueue` which contains up to 1000 ids
-		// which is how twitter works, but when it empties we grab more if needed
-		// and we drain them out into batches of 100 to query Twitter with
-		Queue<Long> idQueue = new LinkedList<Long>();
-		long cursor = -1;
-		
-		User[] getTimeline(){
-			try{
-				Twitter client = getTwitter();
-				String type = getWhatToSync();
-				
-				if(idQueue.isEmpty()){ // If we have no more IDs Left in the queue
-					IDs ids = null;
-					if(type.equals("following")){
-						ids = client.getFriends( getId(), cursor );
-					} else if(type.equals("followers")){
-						ids = client.getFollowers( getId(), cursor );
-					} else{
-						Log.d("contactsync", "Righto, someone is hacking our app. Let's just let it crash");
-					}
-					
-					cursor = ids.getNextCursor();
-					for(Long id : ids.getIds()){
-						idQueue.add(id);
-					}
-					// Now the queue is stocked up with up to 5000 IDs (as twitter says).
-				}
-				
-				// Off-load up to 100 ids from the queue
-				Long[] ids = new Long[ idQueue.size() >= 100 ? 100 : idQueue.size() ];
-				for(int i = 0; i < ids.length; i++){
-					ids[i] = idQueue.remove();
-				}
-				
-				// Now fetch information about them
-				return client.lookupUsers( ids );
-			}catch(Exception e){ e.printStackTrace(); return null; }
-		}
-		
 		private void deleteContact(long rawContactId) {
 			Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId).buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build();
 			ContentProviderClient client = mContext.getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
@@ -189,19 +106,30 @@ public class ContactSyncAdapterService extends Service {
 			client.release();
 		}
 		
+		class TempoaryContactDetails{
+			public String version;
+			public Long id;
+			public TempoaryContactDetails( String v, Long rawid ){
+				id = rawid; version = v;
+			}
+		}
+		
+		HashMap<String, TempoaryContactDetails> existingAccounts;
+		
 		@Override
 		public void onPerformSync(Account account, Bundle extras,
 				String authority, ContentProviderClient provider,
 				SyncResult syncResult) {
 			this.account = account;
 			// Here we can actually sync
+			existingAccounts = new HashMap<String, TempoaryContactDetails>();
 			
-			// Step 1: Remove all of our existing contacts, as they are not required (we have to download all of them anyway)
+			// Step 1: Get all existing contacts with username, raw contact ID (to remove) and version
 			Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 					RawContacts.ACCOUNT_TYPE, account.type).build();
-			Cursor c1 = mContext.getContentResolver().query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1 }, null, null, null);
+			Cursor c1 = mContext.getContentResolver().query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1, RawContacts.SYNC4 }, null, null, null);
 			while (c1.moveToNext()) {
-				deleteContact(c1.getLong(0)); 
+				existingAccounts.put(c1.getString(2), new TempoaryContactDetails( c1.getString(1), c1.getLong(0) )); 
 			}
 			
 			// Step 2: Get the total number of contacts we need to download
@@ -221,15 +149,29 @@ public class ContactSyncAdapterService extends Service {
 				}
 				
 				for(User user : users){
-					addContact(user);
-					
-					// TODO: add to some fast cache for username autocompletion
+					if(existingAccounts.containsKey(user.getScreenName())){
+						// If the account is out of date, re-add otherwise we leave it
+						if(!existingAccounts.get(user.getScreenName()).version.equals(CONTACT_VERSION)){
+							deleteContact(existingAccounts.get(user.getScreenName()).id);
+							addContact(user);
+						}
+						// Delete out of array, so we don't bin the contact
+						existingAccounts.remove(user.getScreenName());
+					} else{
+						addContact(user);
+					}
 				}
 				got += users.length;
 				
 				Log.d("contactsync", "At a total of " + got + " out of " + total);
 			}
 			
+			Log.d("contactsync", "Deleting " + existingAccounts.size() + " dead accounts from system");
+			for(TempoaryContactDetails acc : existingAccounts.values()){
+				deleteContact(acc.id);
+			}
+			
+			Log.d("contactsync", "Sync has completed. Party!");
 		}
 	}
 }

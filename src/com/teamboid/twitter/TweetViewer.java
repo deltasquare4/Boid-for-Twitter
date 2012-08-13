@@ -449,7 +449,7 @@ public class TweetViewer extends MapActivity {
 			super.onBackPressed();
 			return true;
 		case R.id.replyAction:
-			startActivity(new Intent(this, ComposerScreen.class).putExtra("reply_to", statusId).putExtra("reply_to_name", replyToName)
+			startActivity(new Intent(this, ComposerScreen.class).putExtra("reply_to", status).putExtra("reply_to_name", replyToName)
 					.putExtra("append", Utilities.getAllMentions(replyToName, content)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.favoriteAction:

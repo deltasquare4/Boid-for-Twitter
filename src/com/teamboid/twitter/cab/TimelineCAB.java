@@ -184,7 +184,7 @@ public class TimelineCAB {
 				Status toReply = selTweets[0];
 				if (toReply.isRetweet()) toReply = toReply.getRetweetedStatus();
 				TimelineCAB.context.startActivity(new Intent(TimelineCAB.context, ComposerScreen.class)
-				.putExtra("reply_to", toReply.getId())
+				.putExtra("reply_to", toReply)
 				.putExtra("reply_to_name", toReply.getUser().getScreenName())
 				.putExtra("append", Utilities.getAllMentions(toReply.getUser().getScreenName(), toReply.getText()))
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
