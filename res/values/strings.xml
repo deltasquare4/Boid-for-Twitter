@@ -500,4 +500,6 @@
     <string name="done_str">Done</string>
     <string name="name_str">Name</string>
     <string name="failed_get_accountinfo">Failed to get your most up to date account info, the last know info will be used.</string>
+    <string name="camera_str">Camera</string>
+    <string name="gallery_str">Gallery</string>
 </resources>

@@ -5,8 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.widgets.TimelineWidgetViewService;
@@ -61,6 +61,12 @@ public class ProfileEditor extends Activity {
         loadAccount();
 	}
 
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.inflate(R.menu.camera_gallery_choosepopup);
+        popup.show();
+    }
+
     private void loadAccount() {
         showProgress(true);
         final ArrayList<Account> accs = AccountService.getAccounts();
@@ -109,6 +115,7 @@ public class ProfileEditor extends Activity {
         ((EditText)findViewById(R.id.urlTxt)).setText(toSet.getUser().getUrl());
         ((EditText)findViewById(R.id.locationTxt)).setText(toSet.getUser().getLocation());
         ((EditText)findViewById(R.id.descriptionTxt)).setText(toSet.getUser().getDescription());
+        ((RemoteImageView)findViewById(R.id.profilePic)).setImageURL(toSet.getUser().getProfileImageUrl());
         //Update the account's information in the account service. This function also updates the account in the local preferences cache.
         AccountService.setAccount(this, index, toSet);
     }
