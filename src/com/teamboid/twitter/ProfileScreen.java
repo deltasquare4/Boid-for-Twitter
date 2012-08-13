@@ -440,6 +440,7 @@ public class ProfileScreen 	extends Activity {
 				mTabsAdapter.onPageSelected(position);
 			}
 		});
+        setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {
