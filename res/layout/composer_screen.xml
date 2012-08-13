@@ -60,7 +60,7 @@
 	
     <!-- Auto-completion -->
 	<HorizontalScrollView
-	    android:background="?android:windowBackground"
+	    android:background="?android:colorBackground"
 	    android:layout_gravity="end|bottom"
 	    android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <LinearLayout
