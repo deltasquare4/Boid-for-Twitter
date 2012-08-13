@@ -58,7 +58,9 @@ import com.teamboid.twitterapi.user.User;
  * @author Aidan Follestad
  */
 public class ProfileScreen 	extends Activity {
-	public static final int LOAD_CONTACT_ID = 1;
+
+    public static final int LOAD_CONTACT_ID = 1;
+    public static final int EDITOR_REQUEST_CODE = 700;
 
 	private int lastTheme;
 	private boolean showProgress;
@@ -233,7 +235,7 @@ public class ProfileScreen 	extends Activity {
 			super.onBackPressed();
 			return true;
 		case R.id.editAction:
-			startActivity(new Intent(this, ProfileEditor.class).putExtra("screen_name", mScreenName));
+			startActivityForResult(new Intent(this, ProfileEditor.class).putExtra("screen_name", mScreenName), EDITOR_REQUEST_CODE);
 			return true;
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class)
@@ -440,27 +442,6 @@ public class ProfileScreen 	extends Activity {
 		});
 	}
 
-	/**
-	 * Set first media
-	 */
-	public void setupMediaView(){
-		runOnUiThread(new Runnable(){
-
-			@Override
-			public void run() {
-				try{
-					MediaFeedListAdapter.MediaFeedItem m = mediaAdapter.get(0);
-					setHeaderBackground(m.imgurl);
-				} catch(Exception e){
-					e.printStackTrace();
-					// Here we should divert to profile bg?
-					// setHeaderBackground(user.get());
-				}
-			}
-			
-		});
-	}
-
 	public void showAddToListDialog(final UserList[] lists) {
 		if(lists == null || lists.length == 0) {
 			Toast.makeText(getApplicationContext(), R.string.no_lists, Toast.LENGTH_SHORT).show();
@@ -501,4 +482,11 @@ public class ProfileScreen 	extends Activity {
 		});
 		builder.create().show();
 	}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if(requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
+            getAboutFragment().performRefresh(false);
+        }
+    }
 }
