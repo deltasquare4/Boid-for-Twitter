@@ -147,7 +147,7 @@ public class ProfileEditor extends Activity {
                     @Override
                     public void run() {
                         showProgress(false);
-                        //finish();
+                        finish();
                     }
                 });
             }
