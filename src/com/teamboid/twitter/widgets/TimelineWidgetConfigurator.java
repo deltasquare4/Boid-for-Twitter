@@ -73,7 +73,6 @@ public class TimelineWidgetConfigurator extends PreferenceActivity {
         super.onSaveInstanceState(outState);
     }
 
-    @SuppressLint("AlwaysShowAction")
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.config_activity_actionbar, menu);

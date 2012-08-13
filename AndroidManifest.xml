@@ -1,283 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="69"
-	android:versionName="0.8.1.9 Beta">
-	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
-	<uses-feature android:name="android.hardware.camera"
-		android:required="false" />
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.VIBRATE" />
+          package="com.teamboid.twitter" android:versionCode="69"
+          android:versionName="0.8.1.9 Beta">
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16"/>
+    <uses-feature android:name="android.hardware.camera"
+                  android:required="false"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
-	<!-- Contact Sync Required. Yeah, annoying as hell -->
-	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <!-- Contact Sync Required. Yeah, annoying as hell -->
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 
-	<permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"
-		android:protectionLevel="signature" />
-	<uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" />
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-	<uses-permission android:name="com.android.vending.BILLING" />
+    <permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"
+                android:protectionLevel="signature"/>
+    <uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
-	<supports-screens android:xlargeScreens="true"
-		android:anyDensity="true" android:resizeable="true"
-		android:normalScreens="true" android:largeScreens="true"
-		android:smallScreens="true" />
-	<application android:icon="@drawable/launcher_icon"
-		android:label="@string/app_name">
+    <supports-screens android:xlargeScreens="true"
+                      android:anyDensity="true" android:resizeable="true"
+                      android:normalScreens="true" android:largeScreens="true"
+                      android:smallScreens="true"/>
+    <application android:icon="@drawable/launcher_icon"
+                 android:label="@string/app_name">
 
-		<meta-data android:name="android.app.default_searchable"
-			android:value=".SearchScreen" />
-		<uses-library android:name="com.google.android.maps" />
-		<provider android:name="SearchSuggestionsProvider"
-			android:exported="false" android:authorities="com.teamboid.twitter.SearchSuggestionsProvider" />
+        <meta-data android:name="android.app.default_searchable"
+                   android:value=".SearchScreen"/>
+        <uses-library android:name="com.google.android.maps"/>
+        <provider android:name="SearchSuggestionsProvider"
+                  android:exported="false" android:authorities="com.teamboid.twitter.SearchSuggestionsProvider"/>
 
-		<receiver android:name=".widgets.ResizableWidgetProvider"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-			</intent-filter>
-			<meta-data android:name="android.appwidget.provider"
-				android:resource="@xml/widget_info" />
-		</receiver>
-		<service android:name=".widgets.TimelineWidgetViewService"
-			android:permission="android.permission.BIND_REMOTEVIEWS"
-			android:exported="false" />
+        <receiver android:name=".widgets.ResizableWidgetProvider"
+                  android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/widget_info"/>
+        </receiver>
+        <service android:name=".widgets.TimelineWidgetViewService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"
+                 android:exported="false"/>
 
-		<activity android:name=".TimelineScreen"
-			android:configChanges="orientation|screenSize" android:launchMode="singleInstance"
-			android:uiOptions="splitActionBarWhenNarrow"
-			android:clearTaskOnLaunch="true">
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-			
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.SEND" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="text/*" />
-				<data android:mimeType="image/*" />
-			</intent-filter>
+        <activity android:name=".TimelineScreen"
+                  android:configChanges="orientation|screenSize" android:launchMode="singleInstance"
+                  android:uiOptions="splitActionBarWhenNarrow"
+                  android:clearTaskOnLaunch="true">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
 
-			<!-- View Tweets/Users from Browser/Other Apps -->
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:scheme="http" android:host="twitter.com" />
-			</intent-filter>
-			
-			<intent-filter android:label="@string/app_name">
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:scheme="https" android:host="twitter.com" />
-			</intent-filter>
-		</activity>
-		<activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
-			android:exported="false" android:configChanges="screenSize" />
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/*"/>
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+
+            <!-- View Tweets/Users from Browser/Other Apps -->
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="http" android:host="twitter.com"/>
+            </intent-filter>
+
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="https" android:host="twitter.com"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
+                  android:exported="false" android:configChanges="screenSize"/>
         <activity android:name=".widgets.TimelineWidgetConfigurator" android:label="@string/timeline_widget_str"
                   android:exported="false" android:configChanges="screenSize">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
-		<service android:name=".services.AccountService"
-			android:label="@string/account_service_name" android:description="@string/account_service_desc"
-			android:icon="@drawable/launcher_icon" />
-		<activity android:name=".SettingsScreen" android:label="@string/settings_str"
-			android:configChanges="screenSize" />
-		<activity android:name=".ComposerScreen" android:uiOptions="splitActionBarWhenNarrow"
-			android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
-			android:label="@string/new_tweet_str" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:launchMode="singleTask" />
-		<activity android:name=".SearchScreen" android:label="@string/search_str"
-			android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow">
-			<intent-filter>
-				<action android:name="android.intent.action.SEARCH" />
-			</intent-filter>
-			<meta-data android:name="android.app.searchable"
-				android:resource="@xml/search_config" />
-		</activity>
-		<activity android:name=".ProfileScreen"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="vnd.android.cursor.item/vnd.com.teamboid.twitter.account" />
-			</intent-filter>
-		</activity>
-		<activity android:name=".TweetViewer" android:noHistory="true"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow" />
-		<activity android:name=".ConversationScreen"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:label="@string/messaging_str" android:windowSoftInputMode="adjustResize" />
-		<activity android:name=".MutingManager" android:launchMode="singleTask"
-			android:configChanges="screenSize" android:label="@string/muting_str"
-			android:windowSoftInputMode="adjustResize" />
-		<activity android:name=".UserListActivity" android:noHistory="true"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow" />
-		<activity android:name=".ColumnManager" android:launchMode="singleTask"
-			android:configChanges="screenSize" android:label="@string/columns_str" />
-		<activity android:name=".TweetListActivity"
-			android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize"
-			android:uiOptions="splitActionBarWhenNarrow" />
-		<service android:name=".services.SendTweetService"
-			android:exported="false" android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
-		<activity android:label="@string/photo_service_title"
-			android:exported="true" android:launchMode="singleTop" android:name=".SelectMediaScreen">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-				<data android:scheme="boid" android:host="finishconfig" />
-			</intent-filter>
-		</activity>
+        <activity android:name=".ProfileEditor" android:exported="false"
+                  android:configChanges="screenSize|keyboardHidden|orientation"/>
+        <service android:name=".services.AccountService"
+                 android:label="@string/account_service_name" android:description="@string/account_service_desc"
+                 android:icon="@drawable/launcher_icon"/>
+        <activity android:name=".SettingsScreen" android:label="@string/settings_str"
+                  android:configChanges="screenSize"/>
+        <activity android:name=".ComposerScreen" android:uiOptions="splitActionBarWhenNarrow"
+                  android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
+                  android:label="@string/new_tweet_str" android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:launchMode="singleTask"/>
+        <activity android:name=".SearchScreen" android:label="@string/search_str"
+                  android:exported="false" android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:uiOptions="splitActionBarWhenNarrow">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                       android:resource="@xml/search_config"/>
+        </activity>
+        <activity android:name=".ProfileScreen"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:uiOptions="splitActionBarWhenNarrow">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.teamboid.twitter.account"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".TweetViewer" android:noHistory="true"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:label="@string/tweet_str" android:uiOptions="splitActionBarWhenNarrow"/>
+        <activity android:name=".ConversationScreen"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:label="@string/messaging_str" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".MutingManager" android:launchMode="singleTask"
+                  android:configChanges="screenSize" android:label="@string/muting_str"
+                  android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".UserListActivity" android:noHistory="true"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:uiOptions="splitActionBarWhenNarrow"/>
+        <activity android:name=".ColumnManager" android:launchMode="singleTask"
+                  android:configChanges="screenSize" android:label="@string/columns_str"/>
+        <activity android:name=".TweetListActivity"
+                  android:noHistory="true" android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:uiOptions="splitActionBarWhenNarrow"/>
+        <service android:name=".services.SendTweetService"
+                 android:exported="false" android:permission="com.teamboid.twitter.permission.C2D_MESSAGE"/>
+        <activity android:label="@string/photo_service_title"
+                  android:exported="true" android:launchMode="singleTop" android:name=".SelectMediaScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="boid" android:host="finishconfig"/>
+            </intent-filter>
+        </activity>
 
-		<!-- Tweet Widget Services -->
-		<service android:name=".tweetwidgets.TweetWidgetService"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="com.teamboid.twitter.ACTION_TWEET_WIDGET" />
-			</intent-filter>
-		</service>
-		<receiver android:name=".services.SendTweetStarter"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-			</intent-filter>
-		</receiver>
+        <!-- Tweet Widget Services -->
+        <service android:name=".tweetwidgets.TweetWidgetService"
+                 android:exported="false">
+            <intent-filter>
+                <action android:name="com.teamboid.twitter.ACTION_TWEET_WIDGET"/>
+            </intent-filter>
+        </service>
+        <receiver android:name=".services.SendTweetStarter"
+                  android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
 
-		<!-- Internal Tweet Widgets -->
-		<service android:label="@string/youtube_embed" android:name=".YouTubeWidget"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtu.be" android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtube.com" android:pathPrefix="/watch"
-					android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtu.be" android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="youtube.com" android:pathPrefix="/watch"
-					android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtu.be" android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtube.com" android:pathPrefix="/watch"
-					android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtu.be" android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-				<data android:host="www.youtube.com" android:pathPrefix="/watch"
-					android:scheme="https" />
-			</intent-filter>
-		</service>
+        <!-- Internal Tweet Widgets -->
+        <service android:label="@string/youtube_embed" android:name=".YouTubeWidget"
+                 android:exported="false">
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="youtu.be" android:scheme="http"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="youtube.com" android:pathPrefix="/watch"
+                      android:scheme="http"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="youtu.be" android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="youtube.com" android:pathPrefix="/watch"
+                      android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="www.youtu.be" android:scheme="http"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="www.youtube.com" android:pathPrefix="/watch"
+                      android:scheme="http"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="www.youtu.be" android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.android.ACTION_EMBED"/>
+                <data android:host="www.youtube.com" android:pathPrefix="/watch"
+                      android:scheme="https"/>
+            </intent-filter>
+        </service>
 
-		<service android:name=".PushReceiver$PushWorker" />
-		<receiver android:name=".PushReceiver"
-			android:permission="com.google.android.c2dm.permission.SEND">
-			<!-- Receive the actual message -->
-			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
-				<category android:name="com.teamboid.twitter" />
-			</intent-filter>
-			<!-- Receive the registration id -->
-			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-				<category android:name="com.teamboid.twitter" />
-			</intent-filter>
-		</receiver>
+        <service android:name=".PushReceiver$PushWorker"/>
+        <receiver android:name=".PushReceiver"
+                  android:permission="com.google.android.c2dm.permission.SEND">
+            <!-- Receive the actual message -->
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="com.teamboid.twitter"/>
+            </intent-filter>
+            <!-- Receive the registration id -->
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <category android:name="com.teamboid.twitter"/>
+            </intent-filter>
+        </receiver>
 
-		<!-- Webkit Views -->
-		<activity android:name=".LoginHandler" android:launchMode="singleTop"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
-			android:hardwareAccelerated="true" />
-		<activity android:name=".InAppBrowser" android:launchMode="singleTop"
-			android:configChanges="keyboardHidden|orientation|screenSize"
-			android:windowSoftInputMode="adjustResize" android:label="@string/boid_browser"
-			android:hardwareAccelerated="true" />
+        <!-- Webkit Views -->
+        <activity android:name=".LoginHandler" android:launchMode="singleTop"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:windowSoftInputMode="adjustResize" android:label="@string/add_account_str"
+                  android:hardwareAccelerated="true"/>
+        <activity android:name=".InAppBrowser" android:launchMode="singleTop"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
+                  android:windowSoftInputMode="adjustResize" android:label="@string/boid_browser"
+                  android:hardwareAccelerated="true"/>
 
-		<!-- In-App Billing -->
-		<service android:name="net.robotmedia.billing.BillingService" />
-		<receiver android:name="net.robotmedia.billing.BillingReceiver"
-			android:exported="false">
-			<intent-filter>
-				<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-				<action android:name="com.android.vending.billing.RESPONSE_CODE" />
-				<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
-			</intent-filter>
-		</receiver>
+        <!-- In-App Billing -->
+        <service android:name="net.robotmedia.billing.BillingService"/>
+        <receiver android:name="net.robotmedia.billing.BillingReceiver"
+                  android:exported="false">
+            <intent-filter>
+                <action android:name="com.android.vending.billing.IN_APP_NOTIFY"/>
+                <action android:name="com.android.vending.billing.RESPONSE_CODE"/>
+                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
 
-		<!-- Contact Sync -->
-		<service
-			android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
-			android:exported="false" android:process=":auth">
-			<intent-filter>
-				<action android:name="android.accounts.AccountAuthenticator" />
-			</intent-filter>
-			<meta-data android:name="android.accounts.AccountAuthenticator"
-				android:resource="@xml/authenticator" />
-		</service>
-		<service android:name="com.teamboid.twitter.contactsync.ContactSyncAdapterService"
-			android:exported="false" android:process=":contacts">
-			<intent-filter>
-				<action android:name="android.content.SyncAdapter" />
-			</intent-filter>
-			<meta-data android:name="android.content.SyncAdapter"
-				android:resource="@xml/sync_contacts" />
-			<meta-data android:name="android.provider.CONTACTS_STRUCTURE"
-				android:resource="@xml/contact_structure" />
-		</service>
-		<service
-		    android:process=":contacts"
-		    android:exported="true"
-		    android:name=".contactsync.ContactViewNotifyService"
-		    android:permission="android.permission.READ_CONTACTS"></service>
-		
-		<!-- Auto-complete -->
-		<provider
-		    android:name="com.teamboid.twitter.contactsync.AutocompleteProvider"
-		   	android:authorities="com.teamboid.twitter.autocomplete"
-		   	android:label="@string/autocomplete"
-		   	android:process=":contacts"
-		   	android:exported="false"
-		   	android:syncable="true">
-		</provider>
-		<service android:name="com.teamboid.twitter.contactsync.AutocompleteService"
-			android:exported="false" android:process=":contacts">
-			<intent-filter>
-				<action android:name="android.content.SyncAdapter" />
-			</intent-filter>
-			<meta-data android:name="android.content.SyncAdapter"
-				android:resource="@xml/sync_autocomplete" />
-		</service>
-	</application>
+        <!-- Contact Sync -->
+        <service
+                android:name="com.teamboid.twitter.contactsync.AccountAuthenticatorService"
+                android:exported="false" android:process=":auth">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                       android:resource="@xml/authenticator"/>
+        </service>
+        <service android:name="com.teamboid.twitter.contactsync.ContactSyncAdapterService"
+                 android:exported="false" android:process=":contacts">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/sync_contacts"/>
+            <meta-data android:name="android.provider.CONTACTS_STRUCTURE"
+                       android:resource="@xml/contact_structure"/>
+        </service>
+        <service
+                android:process=":contacts"
+                android:exported="true"
+                android:name=".contactsync.ContactViewNotifyService"
+                android:permission="android.permission.READ_CONTACTS"></service>
+
+        <!-- Auto-complete -->
+        <provider
+                android:name="com.teamboid.twitter.contactsync.AutocompleteProvider"
+                android:authorities="com.teamboid.twitter.autocomplete"
+                android:label="@string/autocomplete"
+                android:process=":contacts"
+                android:exported="false"
+                android:syncable="true">
+        </provider>
+        <service android:name="com.teamboid.twitter.contactsync.AutocompleteService"
+                 android:exported="false" android:process=":contacts">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/sync_autocomplete"/>
+        </service>
+    </application>
 </manifest>

@@ -132,7 +132,7 @@ public class SettingsScreen extends PreferenceActivity  {
 					int index = 0;
 					for(Account acc : AccountService.getAccounts()) {
 						acc.setClient(acc.getClient().setSslEnabled((Boolean)newValue));
-						AccountService.setAccount(index, acc);
+						AccountService.setAccount(getActivity(), index, acc);
 						index++;
 					}
 					return true;
