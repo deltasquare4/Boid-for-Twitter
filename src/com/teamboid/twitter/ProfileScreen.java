@@ -201,17 +201,9 @@ public class ProfileScreen 	extends Activity {
 		else if(lastTheme != Utilities.getTheme(getApplicationContext())) {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
+            return;
 		}
 		TimelineCAB.context = this;
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-//		TODO TimelineCAB.clearSelectedItems();
-//		if(TimelineCAB.TimelineActionMode != null) {
-//			TimelineCAB.TimelineActionMode.finish();
-//		}
 	}
 
 	@Override
@@ -241,8 +233,7 @@ public class ProfileScreen 	extends Activity {
 			super.onBackPressed();
 			return true;
 		case R.id.editAction:
-			//TODO
-			Toast.makeText(getApplicationContext(), "Coming soon!", Toast.LENGTH_SHORT).show();
+			startActivity(new Intent(this, ProfileEditor.class).putExtra("screen_name", mScreenName));
 			return true;
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class)

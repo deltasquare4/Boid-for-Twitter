@@ -391,7 +391,7 @@ public class AccountManager extends PreferenceActivity {
                         int index = 0;
                         for (Account acc : AccountService.getAccounts()) {
                             acc.setClient(acc.getClient().setSslEnabled(newValue));
-                            AccountService.setAccount(index, acc);
+                            AccountService.setAccount(getApplicationContext(), index, acc);
                             index++;
                         }
                     }

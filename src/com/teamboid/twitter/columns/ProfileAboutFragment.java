@@ -121,7 +121,7 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 							acc.setUser(temp);
 							ArrayList<Account> accs = AccountService.getAccounts();
 							for (int i = 0; i < accs.size(); i++) {
-								if (accs.get(i).getId() == acc.getId()) AccountService.setAccount(i, acc);
+								if (accs.get(i).getId() == acc.getId()) AccountService.setAccount(context, i, acc);
 							}
 						} else temp = acc.getClient().showUser(screenName);
 						final User user = temp;

@@ -81,9 +81,11 @@ public class AccountService extends Service {
 		return found;
 	}
 
-	public static void setAccount(int index, Account acc) {
+	public static void setAccount(Context context, int index, Account acc) {
 		if (accounts == null) accounts = new ArrayList<Account>();
 		accounts.set(index, acc);
+        context.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
+                .putString(acc.getUser().getId() + "", Utils.serializeObject(acc)).commit();
 	}
 
 	public static Account getCurrentAccount() {
