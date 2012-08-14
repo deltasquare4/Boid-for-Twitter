@@ -698,7 +698,7 @@ public class ComposerScreen extends Activity {
 		finish();
 	}
 
-	private Integer getFileSize(File in) {
+	public static int getFileSize(File in) {
 		try {
 			FileInputStream fis = new FileInputStream(in);
 			int r = fis.available();
@@ -710,22 +710,15 @@ public class ComposerScreen extends Activity {
 		}
 	}
 
-	public static final Integer CAMERA_SELECT_INTENT = 500;
-	public static final Integer GALLERY_SELECT_INTENT = 600;
+	public static final int CAMERA_SELECT_INTENT = 500;
+	public static final int GALLERY_SELECT_INTENT = 600;
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (resultCode == RESULT_OK) {
-			if (requestCode == GALLERY_SELECT_INTENT) {
+			if (requestCode == GALLERY_SELECT_INTENT || requestCode == CAMERA_SELECT_INTENT) {
 				if (getFileSize(new File(stt.attachedImage)) == 0) {
-					Log.d("e", "Empty File. Using "
-							+ intent.getData().toString());
-					stt.attachedImageUri = intent.getData();
-				}
-			} else if (requestCode == CAMERA_SELECT_INTENT) {
-				if (getFileSize(new File(stt.attachedImage)) == 0) {
-					Log.d("e", "Empty File. Using "
-							+ intent.getData().toString());
+					Log.d("e", "Empty File. Using " + intent.getData().toString());
 					stt.attachedImageUri = intent.getData();
 				}
 			} else if (resultCode == SELECT_MEDIA) {
