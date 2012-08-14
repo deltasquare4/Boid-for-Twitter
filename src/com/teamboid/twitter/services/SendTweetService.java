@@ -71,21 +71,17 @@ public class SendTweetService extends Service {
 						});
 					}
 					handler.post(new Runnable(){
-
 						@Override
 						public void run() {
 							tweets.remove(ix);
 						}
-						
 					});
 				} else{
 					handler.post(new Runnable(){
-
 						@Override
 						public void run() {
 							tweets.set(ix, stt);
 						}
-						
 					});	
 				}
 				sendBroadcast(update);

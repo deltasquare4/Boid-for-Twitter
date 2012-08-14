@@ -116,7 +116,7 @@ public class SendTweetTask {
 				InputStream input;
 				if(attachedImageUri != null){
 					input = context.getContentResolver().openAssetFileDescriptor(attachedImageUri, "r").createInputStream();
-				} else{
+				} else {
 					input = new FileInputStream(new File(attachedImage));
 				}
 				Log.d("up", "Uploading with " + prefValue);

@@ -3,7 +3,12 @@ package com.teamboid.twitter;
 import android.app.*;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
@@ -12,6 +17,9 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.widgets.TimelineWidgetViewService;
 import com.teamboid.twitterapi.user.User;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -19,12 +27,18 @@ import java.util.ArrayList;
  * 
  * @author Aidan Follestad
  */
-public class ProfileEditor extends Activity {
+public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClickListener {
 
 	private int lastTheme;
     private boolean showProgress;
     private Account toSet;
     private int index;
+    private File newProfileImg;
+    private Uri newProfileUri;
+
+    public static final int CROP_RESULT = 400;
+    public static final int CAMERA_SELECT_INTENT = 500;
+    public static final int GALLERY_SELECT_INTENT = 600;
 
     public void showProgress(boolean visible) {
         if(showProgress == visible) return;
@@ -64,6 +78,7 @@ public class ProfileEditor extends Activity {
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
         popup.inflate(R.menu.camera_gallery_choosepopup);
+        popup.setOnMenuItemClickListener(this);
         popup.show();
     }
 
@@ -110,6 +125,7 @@ public class ProfileEditor extends Activity {
 
 
     }
+
     private void displayAccount() {
         ((EditText)findViewById(R.id.nameTxt)).setText(toSet.getUser().getName());
         ((EditText)findViewById(R.id.urlTxt)).setText(toSet.getUser().getUrl());
@@ -130,6 +146,21 @@ public class ProfileEditor extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    toSet.getClient().updateProfileImage(newProfileImg);
+                    //TODO Update account cache and icon in timeline account switcher
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showProgress(false);
+                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return;
+                }
+
                 try {
                     final User user = toSet.getClient().updateProfile(name, url, location, description);
                     runOnUiThread(new Runnable() {
@@ -161,6 +192,69 @@ public class ProfileEditor extends Activity {
         }).start();
     }
 
+    private void crop(Uri imageUri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setClassName("com.android.camera", "com.android.camera.CropImage");
+        intent.setData(imageUri);
+        intent.putExtra("outputX", 96);
+        intent.putExtra("outputY", 96);
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("scale", true);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, CROP_RESULT);
+    }
+
+    private void captureImage() {
+        if (!Utilities.isIntentAvailable(this, MediaStore.ACTION_IMAGE_CAPTURE)) {
+            Toast.makeText(getApplicationContext(), R.string.no_camera_app,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        newProfileImg = new File(Utilities.generateImageFileName(this));
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newProfileImg));
+        startActivityForResult(takePictureIntent, CAMERA_SELECT_INTENT);
+    }
+
+    private void selectImage() {
+        try {
+            newProfileImg = Utilities.createImageFile(this);
+            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null).setType("image/*")
+                    .putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newProfileImg))
+                    .putExtra("outputFormat", Bitmap.CompressFormat.PNG.name());
+            startActivityForResult(galleryIntent, GALLERY_SELECT_INTENT);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == GALLERY_SELECT_INTENT || requestCode == CAMERA_SELECT_INTENT) {
+            if (resultCode == RESULT_OK) {
+                if (ComposerScreen.getFileSize(newProfileImg) == 0) {
+                    Log.d("e", "Empty File. Using " + intent.getData().toString());
+                    newProfileUri = intent.getData();
+                }
+                try {
+                    ((RemoteImageView)findViewById(R.id.profilePic)).setImageBitmap(
+                            BitmapFactory.decodeStream(new FileInputStream(newProfileImg)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                if(newProfileImg != null) {
+                    if(newProfileImg.exists()) newProfileImg.delete();
+                }
+                newProfileImg = null;
+            }
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.config_activity_actionbar, menu);
@@ -181,6 +275,20 @@ public class ProfileEditor extends Activity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.cameraAction:
+                captureImage();
+                return true;
+            case R.id.galleryAction:
+                selectImage();
+                return true;
+            default:
+                return false;
         }
     }
 }
