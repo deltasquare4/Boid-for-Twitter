@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.handlerexploit.prime.RemoteImageView;
@@ -52,6 +54,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewStub;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -59,6 +62,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -178,15 +182,15 @@ public class ComposerScreen extends Activity {
 					stt.isGalleryImage = true;
 					invalidateOptionsMenu();
 				}
-			} else {
-				if (getIntent().getExtras().containsKey("text"))
-					content.setText(getIntent().getStringExtra("text"));
-				else if (getIntent().getExtras().containsKey("append"))
-					content.append(getIntent().getStringExtra("append") + " ");
-				if (getIntent().getExtras().containsKey("image")) {
-					stt.attachedImage = getIntent().getStringExtra("image");
-					invalidateOptionsMenu();
-				}
+			}
+			
+			if (getIntent().hasExtra("text"))
+				content.setText(getIntent().getStringExtra("text"));
+			else if (getIntent().hasExtra("append"))
+				content.append(getIntent().getStringExtra("append") + " ");
+			if (getIntent().hasExtra("image")) {
+				stt.attachedImage = getIntent().getStringExtra("image");
+				invalidateOptionsMenu();
 			}
 		}
 		if (PreferenceManager.getDefaultSharedPreferences(
@@ -214,19 +218,25 @@ public class ComposerScreen extends Activity {
 		content.requestFocus();
 	}
 	
-	List<String> autocomplete;
+	HashMap<String, String> autocomplete;
 	Thread currentAC = null;
 	public void setupAutocomplete(){
-		EditText editor = (EditText)findViewById(R.id.tweetContent);
+		final EditText editor = (EditText)findViewById(R.id.tweetContent);
 		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
+		final ScrollView sc = (ScrollView)findViewById(R.id.scroll);
 		l.removeAllViews();
 		
-		autocomplete = new ArrayList<String>();
-		JSONArray ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
+		autocomplete = new HashMap<String, String>();
+		JSONObject ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
 		if(ja == null) return;
-		for(int i = 0; i < ja.length(); i++){
-			autocomplete.add(ja.optString(i, ""));
-		}
+		try{
+			@SuppressWarnings("rawtypes")
+			Iterator i = ja.keys();
+			while(i.hasNext()){
+				String key = (String) i.next();
+				autocomplete.put(key, ja.getString(key));
+			}
+		} catch(Exception e){ e.printStackTrace(); } // Should never happen
 		
 		editor.addTextChangedListener(new TextWatcher(){
 			@Override
@@ -242,6 +252,10 @@ public class ComposerScreen extends Activity {
 				final int start = s + count;
 				
 				l.removeAllViews();
+				if( l.getY() > editor.getY() ){
+					sc.fullScroll(ScrollView.FOCUS_DOWN);
+				}
+				
 				currentAC = new Thread(new Runnable(){
 	
 					@Override
@@ -273,7 +287,7 @@ public class ComposerScreen extends Activity {
 							Log.d("autocomplete", "[" + (p+1) + "," + start + "]: " + typed);
 						
 							boolean r = false;
-							for(final String u : autocomplete){
+							for(final String u : autocomplete.keySet()){
 								if(u.toLowerCase().contains(typed)){
 									r = true;
 									OnClickListener oc = new OnClickListener(){
@@ -281,7 +295,7 @@ public class ComposerScreen extends Activity {
 										@Override
 										public void onClick(View arg0) {
 											EditText editor = (EditText)findViewById(R.id.tweetContent);
-											String r = "@" + u + " ";
+											String r = "@" + autocomplete.get(u) + " ";
 											editor.getText().replace(s, start, r);
 											editor.setSelection(s + r.length());
 										}
@@ -307,7 +321,7 @@ public class ComposerScreen extends Activity {
 										@Override
 										public void run() {
 											l.addView(riv, w, w);
-											riv.setImageURL(Utilities.getUserImage(u, ComposerScreen.this));
+											riv.setImageURL(Utilities.getUserImage(autocomplete.get(u), ComposerScreen.this));
 											
 											
 											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT,

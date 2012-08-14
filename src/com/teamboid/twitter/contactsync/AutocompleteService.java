@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.app.Service;
@@ -27,11 +28,11 @@ import com.teamboid.twitterapi.user.User;
 public class AutocompleteService extends Service {
 	public static final String AUTHORITY = "com.teamboid.twitter.autocomplete";
 	
-	public static JSONArray readAutocompleteFile(Context c, long accId){
+	public static JSONObject readAutocompleteFile(Context c, long accId){
 		try{
 			FileInputStream fis = c.openFileInput("autocomplete-" + accId + ".json");
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-			JSONArray ja = new JSONArray( br.readLine() );
+			JSONObject ja = new JSONObject( br.readLine() );
 			br.close(); fis.close();
 			return ja;
 		} catch(Exception e){e.printStackTrace();}
@@ -60,7 +61,7 @@ public class AutocompleteService extends Service {
 				String authority, ContentProviderClient provider,
 				SyncResult syncResult) {
 			this.account = account;
-			JSONArray ja = new JSONArray();
+			JSONObject ja = new JSONObject();
 			
 			int total = getTotalNumber();
 			int got = 0;
@@ -78,7 +79,12 @@ public class AutocompleteService extends Service {
 				}
 				
 				for(User user : users){
-					ja.put(user.getScreenName().toLowerCase());
+					try{
+						ja.put(user.getScreenName(), user.getScreenName());
+						ja.put(user.getName(), user.getScreenName());
+					} catch(Exception e){ // Should never happen
+						e.printStackTrace();
+					}
 				}
 				got += users.length;
 				
