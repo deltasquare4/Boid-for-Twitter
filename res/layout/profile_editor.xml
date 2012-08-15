@@ -14,27 +14,24 @@
                   android:gravity="top" android:layout_toRightOf="@+id/profilePic"/>
 
         <TextView android:id="@+id/nameLabel" android:layout_width="fill_parent" android:textStyle="bold" android:textColor="@color/blue"
-                  android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/descriptionTxt"
+                  android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/descriptionTxt" style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/name_str" android:layout_marginTop="15dp"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/nameLabel" />
         <EditText android:id="@+id/nameTxt" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_below="@+id/nameLabel"
                   android:hint="@string/name_str" android:maxLength="20"/>
 
         <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/nameTxt"
                   android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@color/blue"
-                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textAppearance="?android:attr/textAppearanceMedium" style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/website_str"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/urlLabel" />
         <EditText android:id="@+id/urlTxt" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_below="@+id/urlLabel"
                   android:hint="@string/website_str" android:maxLength="100"/>
 
         <TextView android:id="@+id/locationLabel" android:layout_width="fill_parent" android:layout_below="@+id/urlTxt"
                   android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@color/blue"
-                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textAppearance="?android:attr/textAppearanceMedium" style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/location_str"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/locationLabel" />
         <EditText android:id="@+id/locationTxt" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_below="@+id/locationLabel"
                   android:hint="@string/location_str" android:maxLength="30"/>

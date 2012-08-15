@@ -20,6 +20,7 @@ import com.teamboid.twitterapi.user.User;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -146,8 +147,20 @@ public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClick
         new Thread(new Runnable() {
             @Override
             public void run() {
+
+                InputStream input = null;
                 try {
-                    toSet.getClient().updateProfileImage(newProfileImg);
+                    if(newProfileUri != null) {
+                        input = getContentResolver().openAssetFileDescriptor(newProfileUri, "r").createInputStream();
+                    } else input = new FileInputStream(newProfileImg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                try {
+                    toSet.getClient().updateProfileImage(input);
                     //TODO Update account cache and icon in timeline account switcher
                 } catch (final Exception e) {
                     e.printStackTrace();
@@ -237,15 +250,16 @@ public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClick
             if (resultCode == RESULT_OK) {
                 if (ComposerScreen.getFileSize(newProfileImg) == 0) {
                     Log.d("e", "Empty File. Using " + intent.getData().toString());
+                    newProfileImg = null;
                     newProfileUri = intent.getData();
                 }
-                try {
-                    ((RemoteImageView)findViewById(R.id.profilePic)).setImageBitmap(
-                            BitmapFactory.decodeStream(new FileInputStream(newProfileImg)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
+//                try {
+//                    ((RemoteImageView)findViewById(R.id.profilePic)).setImageBitmap(
+//                            BitmapFactory.decodeStream(new FileInputStream(newProfileImg)));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+//                }
             } else if (resultCode == RESULT_CANCELED) {
                 if(newProfileImg != null) {
                     if(newProfileImg.exists()) newProfileImg.delete();
