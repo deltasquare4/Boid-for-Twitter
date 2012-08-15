@@ -185,6 +185,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			});
 		} else {
 			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
+            if(position == 0) {
+                //If the position is 0 here that means the follow button isn't visible
+                int fiveDp = Utilities.convertDpToPx(mContext, 5);
+                int tenDp = Utilities.convertDpToPx(mContext, 10);
+                toReturn.setPadding(tenDp, tenDp, tenDp, fiveDp);
+            }
 			BasicNameValuePair curItem = null;
 			if(AccountService.getCurrentAccount().getUser().getId() == user.getId()) {
 				curItem = values.get(position);
