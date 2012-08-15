@@ -3,11 +3,9 @@ package com.teamboid.twitter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
+import android.graphics.Color;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
@@ -193,11 +191,9 @@ public class ComposerScreen extends Activity {
 				invalidateOptionsMenu();
 			}
 		}
-		if (PreferenceManager.getDefaultSharedPreferences(
-				getApplicationContext()).getBoolean("attach_location", false)) {
+		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("attach_location", false)) {
 			getLocation();
 		}
-
 		Button spinner = (Button) findViewById(R.id.upload_with);
 		spinner.setOnClickListener(new OnClickListener() {
 			@Override
@@ -207,107 +203,93 @@ public class ComposerScreen extends Activity {
 				startActivityForResult(i, SELECT_MEDIA);
 			}
 		});
-		String pref = PreferenceManager.getDefaultSharedPreferences(this)
-				.getString("upload_service", "twitter").toLowerCase();
+
+		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter").toLowerCase();
 		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
-		
 		setupAutocomplete();
-		
 		content.requestFocus();
 	}
 	
 	HashMap<String, String> autocomplete;
 	Thread currentAC = null;
-	public void setupAutocomplete(){
+
+	public void setupAutocomplete() {
+
 		final EditText editor = (EditText)findViewById(R.id.tweetContent);
 		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
 		final ScrollView sc = (ScrollView)findViewById(R.id.scroll);
 		l.removeAllViews();
-		
 		autocomplete = new HashMap<String, String>();
 		JSONObject ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
 		if(ja == null) return;
-		try{
+
+		try {
 			@SuppressWarnings("rawtypes")
 			Iterator i = ja.keys();
-			while(i.hasNext()){
+			while(i.hasNext()) {
 				String key = (String) i.next();
 				autocomplete.put(key, ja.getString(key));
 			}
-		} catch(Exception e){ e.printStackTrace(); } // Should never happen
+		} catch(Exception e) { e.printStackTrace(); }
 		
 		editor.addTextChangedListener(new TextWatcher(){
 			@Override
 			public void afterTextChanged(Editable arg0) {}
 			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1,
-					int arg2, int arg3) {}
-
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
 			@Override
-			public void onTextChanged(final CharSequence text, final int s, int before,
-					int count) {
+			public void onTextChanged(final CharSequence text, final int s, int before, int count) {
 				if(currentAC != null) currentAC.interrupt();
 				final int start = s + count;
-				
 				l.removeAllViews();
-				if( l.getY() > editor.getY() ){
-					sc.fullScroll(ScrollView.FOCUS_DOWN);
-				}
-				
-				currentAC = new Thread(new Runnable(){
-	
+				if(l.getY() > editor.getY()) sc.fullScroll(ScrollView.FOCUS_DOWN);
+
+				currentAC = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						final boolean b = doRun();
-						runOnUiThread(new Runnable(){
-
+						runOnUiThread(new Runnable() {
 							@Override
-							public void run() {
-								l.setVisibility(b ? View.VISIBLE : View.GONE);
-							}
-							
+							public void run() { l.setVisibility(b ? View.VISIBLE : View.GONE); }
 						});
 					}
-					
-					public boolean doRun(){
-						
-						int p = text.toString().lastIndexOf(" ", start);
-						if(p+2 >= text.length()) return false;
-						
-						Log.d("autocomplete", text.charAt( p + 1) + "");
-						
-						if(text.charAt( p + 1) == '@'){
-							// We are typing @someone
-							String typed = text.subSequence(p+1, start).toString().toLowerCase();
-							if(typed.length() <= 3) return false;
-							
-							if(typed.charAt(0) == '@') typed = typed.substring(1);
-							Log.d("autocomplete", "[" + (p+1) + "," + start + "]: " + typed);
-						
-							boolean r = false;
-							for(final String u : autocomplete.keySet()){
-								if(u.toLowerCase().contains(typed)){
-									r = true;
-									OnClickListener oc = new OnClickListener(){
 
+					public boolean doRun() {
+						int p = text.toString().lastIndexOf(" ", start);
+						if((p + 2) >= text.length()) return false;
+						Log.d("autocomplete", text.charAt(p + 1) + "");
+
+						if(text.charAt(p + 1) == '@') {
+							// We are typing @someone
+							String typed = text.subSequence(p + 1, start).toString().toLowerCase();
+							if(typed.length() <= 2) return false;
+							if(typed.charAt(0) == '@') typed = typed.substring(1);
+							Log.d("autocomplete", "[" + (p + 1) + "," + start + "]: " + typed);
+
+							boolean r = false;
+							for(final String u : autocomplete.keySet()) {
+								if(u.toLowerCase().contains(typed)) {
+									r = true;
+									OnClickListener oc = new OnClickListener() {
 										@Override
 										public void onClick(View arg0) {
-											EditText editor = (EditText)findViewById(R.id.tweetContent);
-											String r = "@" + autocomplete.get(u) + " ";
-											editor.getText().replace(s, start, r);
-											editor.setSelection(s + r.length());
+										    EditText editor = (EditText)findViewById(R.id.tweetContent);
+										    String r = autocomplete.get(u);
+										    editor.getText().replace(s, start, r);
+										    editor.setSelection(s + r.length());
 										}
-										
 									};
-									
+
 									final RemoteImageView riv = new RemoteImageView(ComposerScreen.this);
 									final int w = Utilities.convertDpToPx(ComposerScreen.this, 32);
 									riv.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
 									riv.setOnClickListener(oc);
-									
+
 									final TextView t = new TextView(ComposerScreen.this);
+                                    t.setTextColor(getTheme().obtainStyledAttributes(new int[] { R.attr.tweetColor })
+                                            .getColor(0, Color.parseColor("#000000")));
 									SpannableString s = new SpannableString(u);
 									int selStart = u.toLowerCase().indexOf(typed);
 									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
@@ -315,19 +297,14 @@ public class ComposerScreen extends Activity {
 									t.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
 									t.setGravity(Gravity.CENTER);
 									t.setOnClickListener(oc);
-									
-									runOnUiThread(new Runnable(){
-	
+
+									runOnUiThread(new Runnable() {
 										@Override
 										public void run() {
 											l.addView(riv, w, w);
 											riv.setImageURL(Utilities.getUserImage(autocomplete.get(u), ComposerScreen.this));
-											
-											
-											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT,
-													LinearLayout.LayoutParams.MATCH_PARENT);
+											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
 										}
-										
 									});
 								}
 							}
@@ -335,7 +312,7 @@ public class ComposerScreen extends Activity {
 						}
 						return false;
 					}
-					
+
 				});
 				currentAC.setPriority(Thread.MIN_PRIORITY);
 				currentAC.start();
