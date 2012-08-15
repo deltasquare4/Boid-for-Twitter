@@ -45,7 +45,7 @@
                       android:minLines="5"
                       android:imeOptions="flagNoExtractUi"
                       android:hint="@string/what_you_wanna_say" android:textColor="?tweetColor"
-                      android:layout_height="wrap_content" android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
+                      android:layout_height="wrap_content" android:inputType="textMultiLine|textCapSentences|textNoSuggestions">
                 <requestFocus/>
             </EditText>
 
@@ -63,19 +63,18 @@
 
     <!-- Auto-completion -->
 	<HorizontalScrollView
-	    android:background="?android:colorBackground"
+        android:background="?sideNavColor"
 	    android:layout_gravity="end|bottom"
 	    android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <LinearLayout
 	        android:layout_marginLeft="5dp"
 	        android:layout_marginRight="5dp"
 	        android:visibility="gone"
-	        android:layout_marginTop="5dp"
 	        android:layout_width="wrap_content"
-	        android:layout_height="32dp"
+	        android:layout_height="wrap_content"
 	        android:orientation="horizontal"
-	        android:id="@+id/autocompletion">
-	        
-	    </LinearLayout>
+	        android:id="@+id/autocompletion"
+            android:background="?sideNavColor"
+            />
 	</HorizontalScrollView>
 </LinearLayout>

@@ -7,37 +7,44 @@
             android:layout_height="fill_parent" android:padding="10dp">
 
         <com.handlerexploit.prime.RemoteImageView android:id="@+id/profilePic" android:layout_width="70dp"
-            android:layout_height="70dp" android:src="@drawable/sillouette" android:onClick="showPopup" />
-        <EditText android:id="@+id/descriptionTxt" android:layout_width="fill_parent" android:layout_marginLeft="5dp"
-                  android:layout_height="wrap_content" android:inputType="textMultiLine"
-                  android:hint="@string/description_str" android:maxLength="160" android:minHeight="75dp"
-                  android:gravity="top" android:layout_toRightOf="@+id/profilePic"/>
+                                                  android:layout_height="70dp" android:src="@drawable/sillouette"
+                                                  android:onClick="showPopup" android:layout_marginRight="5dp" />
 
-        <TextView android:id="@+id/nameLabel" android:layout_width="fill_parent" android:textStyle="bold" android:textColor="@color/blue"
-                  android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/descriptionTxt"
-                  android:layout_height="wrap_content" android:text="@string/name_str" android:layout_marginTop="15dp"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/nameLabel" />
-        <EditText android:id="@+id/nameTxt" android:layout_width="fill_parent"
+        <TextView android:id="@+id/nameLabel" android:layout_width="fill_parent" android:textStyle="bold"
+                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
+                  style="?android:listSeparatorTextViewStyle" android:layout_height="wrap_content"
+                  android:text="@string/name_str" android:layout_toRightOf="@+id/profilePic"/>
+        <EditText android:id="@+id/nameTxt" android:layout_width="fill_parent" android:layout_toRightOf="@+id/profilePic"
                   android:layout_height="wrap_content" android:layout_below="@+id/nameLabel"
                   android:hint="@string/name_str" android:maxLength="20"/>
 
-        <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/nameTxt"
+        <TextView android:id="@+id/locationLabel" android:layout_width="fill_parent" android:layout_below="@+id/nameTxt"
                   android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@color/blue"
                   android:textAppearance="?android:attr/textAppearanceMedium"
+                  style="?android:listSeparatorTextViewStyle"
+                  android:layout_height="wrap_content" android:text="@string/location_str"/>
+        <EditText android:id="@+id/locationTxt" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:layout_below="@+id/locationLabel"
+                  android:hint="@string/location_str" android:maxLength="30"/>
+
+        <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/locationTxt"
+                  android:layout_marginTop="5dp" android:textStyle="bold" android:textColor="@color/blue"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/website_str"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/urlLabel" />
         <EditText android:id="@+id/urlTxt" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_below="@+id/urlLabel"
                   android:hint="@string/website_str" android:maxLength="100"/>
 
-        <TextView android:id="@+id/locationLabel" android:layout_width="fill_parent" android:layout_below="@+id/urlTxt"
-                  android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@color/blue"
-                  android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:layout_height="wrap_content" android:text="@string/location_str"/>
-        <ImageView android:layout_width="fill_parent" android:layout_height="1dp" android:src="@drawable/divider" android:layout_below="@+id/locationLabel" />
-        <EditText android:id="@+id/locationTxt" android:layout_width="fill_parent"
-                  android:layout_height="wrap_content" android:layout_below="@+id/locationLabel"
-                  android:hint="@string/location_str" android:maxLength="30"/>
+        <TextView android:id="@+id/bioLabel" android:layout_width="fill_parent" android:textStyle="bold"
+                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:layout_below="@+id/urlTxt" style="?android:listSeparatorTextViewStyle"
+                  android:layout_height="wrap_content" android:text="@string/bio_str" android:layout_marginTop="5dp"/>
+        <EditText android:id="@+id/bioTxt" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:inputType="textMultiLine"
+                  android:hint="@string/bio_str" android:maxLength="160"
+                  android:gravity="top" android:layout_below="@+id/bioLabel" />
+
 
     </RelativeLayout>
 </ScrollView>
