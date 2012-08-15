@@ -27,16 +27,7 @@
                   android:layout_height="wrap_content" android:layout_below="@+id/locationLabel"
                   android:hint="@string/location_str" android:maxLength="30"/>
 
-        <TextView android:id="@+id/bioLabel" android:layout_width="fill_parent" android:textStyle="bold"
-                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:layout_below="@+id/locationTxt" style="?android:listSeparatorTextViewStyle"
-                  android:layout_height="wrap_content" android:text="@string/bio_str" android:layout_marginTop="5dp"/>
-        <EditText android:id="@+id/bioTxt" android:layout_width="fill_parent"
-                  android:layout_height="wrap_content" android:inputType="textMultiLine"
-                  android:hint="@string/bio_str" android:maxLength="160"
-                  android:gravity="top" android:layout_below="@+id/bioLabel" />
-
-        <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/bioTxt"
+        <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/locationTxt"
                   android:layout_marginTop="5dp" android:textStyle="bold" android:textColor="@color/blue"
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   style="?android:listSeparatorTextViewStyle"
@@ -44,6 +35,15 @@
         <EditText android:id="@+id/urlTxt" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_below="@+id/urlLabel"
                   android:hint="@string/website_str" android:maxLength="100"/>
+
+        <TextView android:id="@+id/bioLabel" android:layout_width="fill_parent" android:textStyle="bold"
+                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:layout_below="@+id/urlTxt" style="?android:listSeparatorTextViewStyle"
+                  android:layout_height="wrap_content" android:text="@string/bio_str" android:layout_marginTop="5dp"/>
+        <EditText android:id="@+id/bioTxt" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:inputType="textMultiLine"
+                  android:hint="@string/bio_str" android:maxLength="160"
+                  android:gravity="top" android:layout_below="@+id/bioLabel" />
 
 
     </RelativeLayout>
