@@ -199,7 +199,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			title.setText(curItem.getName());
 			FeedListAdapter.ApplyFontSize(title, mContext, true);
 			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
-			if(curItem.getName().equals(mContext.getString(R.string.description_str))) {
+			if(curItem.getName().equals(mContext.getString(R.string.bio_str))) {
 				body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
 				body.setMovementMethod(LinkMovementMethod.getInstance());
 			} else body.setText(curItem.getValue());

@@ -446,21 +446,6 @@ public class Utilities {
 		return friendlyTimeLong(timeCal);
 	}
 
-	public static String friendlyTimeMedium(Date createdAt) {
-		Date now = new Date();
-		long diff = now.getTime() - createdAt.getTime();
-		if(diff <= 60000) {
-			long seconds = (diff / 6000);
-			if(seconds < 5) return "moments";
-			return Long.toString(seconds) + " seconds";
-		} else if(diff <= 3600000) {
-			return Long.toString(diff / 60000) + " minutes";
-		} else if(diff <= 86400000) {
-			return Long.toString(diff / 3600000) + " hours";
-		} else if(diff <= 604800000) {
-			return Long.toString(diff / 86400000) + " days"; 
-		} else return Long.toString(diff / 604800000) + " weeks";
-	}
 	public static String friendlyTimeLong(Calendar time) {
         Calendar now = Calendar.getInstance();
         String am_pm = "AM";
@@ -566,17 +551,6 @@ public class Utilities {
 			}
 		}
 		return toReturn;
-	}
-
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-		final int height = options.outHeight;
-		final int width = options.outWidth;
-		int inSampleSize = 1;
-		if (height > reqHeight || width > reqWidth) {
-			if (width > height) inSampleSize = Math.round((float)height / (float)reqHeight);
-			else inSampleSize = Math.round((float)width / (float)reqWidth);
-		}
-		return inSampleSize;
 	}
 
 	public static Bitmap getRoundedImage(Bitmap bitmap, float roundPx) {

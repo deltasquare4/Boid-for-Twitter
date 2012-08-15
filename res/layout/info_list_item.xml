@@ -5,7 +5,7 @@
 	<TextView android:id="@+id/infoListItemTitle" android:textColor="?usernameColor"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:textAppearance="?android:attr/textAppearanceLarge" style="?android:listSeparatorTextViewStyle" />
-	<TextView android:id="@+id/infoListItemBody" android:layout_marginLeft="5dp"
+	<TextView android:id="@+id/infoListItemBody" android:layout_marginLeft="10dp"
 		android:textColor="?tweetColor" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_below="@+id/infoListItemTitle"
 		android:textAppearance="?android:attr/textAppearanceMedium" />
