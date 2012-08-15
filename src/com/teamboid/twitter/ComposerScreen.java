@@ -303,8 +303,8 @@ public class ComposerScreen extends Activity {
 									};
 									
 									final RemoteImageView riv = new RemoteImageView(ComposerScreen.this);
-									final int w = Utilities.DpToPx(32, ComposerScreen.this);
-									riv.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									final int w = Utilities.convertDpToPx(ComposerScreen.this, 32);
+									riv.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
 									riv.setOnClickListener(oc);
 									
 									final TextView t = new TextView(ComposerScreen.this);
@@ -312,7 +312,7 @@ public class ComposerScreen extends Activity {
 									int selStart = u.toLowerCase().indexOf(typed);
 									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
 									t.setText(s);
-									t.setPadding(0, 0, Utilities.DpToPx(5, ComposerScreen.this), 0);
+									t.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
 									t.setGravity(Gravity.CENTER);
 									t.setOnClickListener(oc);
 									

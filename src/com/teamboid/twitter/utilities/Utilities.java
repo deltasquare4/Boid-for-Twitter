@@ -598,19 +598,13 @@ public class Utilities {
 	public static String getUserImage(String screenname, Context mContext){
 		return getUserImage(screenname, mContext, null);
 	}
-	public static int DpToPx(int dp, Context mContext){
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(outMetrics);
-		return (int)(outMetrics.density * dp); // 50dp in pixels
-	}
-	
 
 	public static String getUserImage(String screenname, Context mContext, User user){
 		String url = "https://api.twitter.com/1/users/profile_image?screen_name=" + screenname;
 		if(user != null){ // Allows us to have auto-updating cache
 			url += "&v=" + Uri.encode(user.getProfileImageUrl().toString());
 		}
-		int size = DpToPx(50, mContext);
+		int size = convertDpToPx(mContext, 50);
 		if( size >= 73 ) {
 			url += "&size=bigger";
 		} else if( size >= 48 ) {
