@@ -10,7 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
+import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
 import com.teamboid.twitterapi.media.MediaServices;
+import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
@@ -159,7 +161,18 @@ public class ComposerScreen extends Activity {
 				tv = (TextView)findViewById(R.id.replyToText);
 				tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getUser().getScreenName()));
 				tv.setVisibility(View.VISIBLE);
-			}else if (getIntent().hasExtra("stt")) {
+			} else if(getIntent().hasExtra("reply_to_tweet")){
+                Tweet replyTo = (Tweet) getIntent().getSerializableExtra("reply_to_tweet");
+                stt.in_reply_to = replyTo.getId();
+                ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
+                View replyToV = replyToL.inflate();
+                SearchFeedListAdapter.createTweetView(replyTo, this, replyToV);
+                TextView tv = (TextView)findViewById(R.id.feedItemText);
+                tv.setMovementMethod(new LinkMovementMethod());
+                tv = (TextView)findViewById(R.id.replyToText);
+                tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getFromUser()));
+                tv.setVisibility(View.VISIBLE);
+            } else if (getIntent().hasExtra("stt")) {
 				try {
 					stt = SendTweetTask.fromBundle(getIntent().getBundleExtra(
 							"stt"));
@@ -254,53 +267,55 @@ public class ComposerScreen extends Activity {
 				timer = new Timer();
 				l.removeAllViews();
 
-				timer.schedule( new TimerTask() {
-					@Override
-					public void run() {
-						final boolean b = doRun();
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() { l.setVisibility(b ? View.VISIBLE : View.GONE); }
-						});
-					}
+				timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        final boolean b = doRun();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                l.setVisibility(b ? View.VISIBLE : View.GONE);
+                            }
+                        });
+                    }
 
-					public boolean doRun() {
-						String text = editor.getText().toString();
-						int start = editor.getSelectionStart();
-						
-						final int p = text.toString().lastIndexOf(" ", start);
-						if((p + 2) >= text.length()) return false;
-						Log.d("autocomplete", text.charAt(p + 1) + "");
+                    public boolean doRun() {
+                        String text = editor.getText().toString();
+                        int start = editor.getSelectionStart();
 
-						if(text.charAt(p + 1) == '@') {
-							// We are typing @someone
-							String typed = text.subSequence(p + 1, start).toString().toLowerCase();
-							if(typed.length() <= 2) return false;
-							if(typed.charAt(0) == '@') typed = typed.substring(1);
-							Log.d("autocomplete", "[" + (p + 1) + "," + start + "]: " + typed);
+                        final int p = text.toString().lastIndexOf(" ", start);
+                        if ((p + 2) >= text.length()) return false;
+                        Log.d("autocomplete", text.charAt(p + 1) + "");
 
-							boolean r = false;
-							for(final String u : autocomplete.keySet()) {
-								if(u.toLowerCase().contains(typed)) {
+                        if (text.charAt(p + 1) == '@') {
+                            // We are typing @someone
+                            String typed = text.subSequence(p + 1, start).toString().toLowerCase();
+                            if (typed.length() <= 2) return false;
+                            if (typed.charAt(0) == '@') typed = typed.substring(1);
+                            Log.d("autocomplete", "[" + (p + 1) + "," + start + "]: " + typed);
+
+                            boolean r = false;
+                            for (final String u : autocomplete.keySet()) {
+                                if (u.toLowerCase().contains(typed)) {
                                     r = true;
-                                    final LinearLayout item = (LinearLayout)getLayoutInflater().inflate(R.layout.autocomplete_item, null);
+                                    final LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.autocomplete_item, null);
                                     item.setOnClickListener(new OnClickListener() {
                                         @Override
                                         public void onClick(View arg0) {
-                                        	int start = editor.getSelectionStart();
-                                            EditText editor = (EditText)findViewById(R.id.tweetContent);
+                                            int start = editor.getSelectionStart();
+                                            EditText editor = (EditText) findViewById(R.id.tweetContent);
                                             String r = "@" + autocomplete.get(u) + " ";
-                                            editor.getText().replace(p+1, start, r);
-                                            editor.setSelection(p+1 + r.length());
+                                            editor.getText().replace(p + 1, start, r);
+                                            editor.setSelection(p + 1 + r.length());
                                         }
                                     });
 
-                                    final RemoteImageView riv = (RemoteImageView)item.findViewById(R.id.image);
-                                    final TextView t = (TextView)item.findViewById(R.id.name);
-									SpannableString s = new SpannableString(u);
-									int selStart = u.toLowerCase().indexOf(typed);
-									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-									t.setText(s);
+                                    final RemoteImageView riv = (RemoteImageView) item.findViewById(R.id.image);
+                                    final TextView t = (TextView) item.findViewById(R.id.name);
+                                    SpannableString s = new SpannableString(u);
+                                    int selStart = u.toLowerCase().indexOf(typed);
+                                    s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                                    t.setText(s);
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -308,14 +323,14 @@ public class ComposerScreen extends Activity {
                                             l.addView(item);
                                         }
                                     });
-								}
-							}
-							return r;
-						}
-						return false;
-					}
+                                }
+                            }
+                            return r;
+                        }
+                        return false;
+                    }
 
-				}, 500L);
+                }, 500L);
 			}
 		});
 	}

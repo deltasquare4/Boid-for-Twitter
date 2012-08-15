@@ -91,11 +91,11 @@ public class SavedSearchFragment extends BaseListFragment {
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-                        Tweet item = (Tweet) adapt.getItem(index);
+                        Tweet toReply = (Tweet) adapt.getItem(index);
                         context.startActivity(new Intent(context, ComposerScreen.class)
-                                .putExtra("reply_to", item.getId())
-                                .putExtra("reply_to_name", item.getFromUser())
-                                .putExtra("append", Utilities.getAllMentions(item))
+                                .putExtra("reply_to_tweet", toReply)
+                                .putExtra("reply_to_name", toReply.getFromUser())
+                                .putExtra("append", Utilities.getAllMentions(toReply.getFromUser(), toReply.getText()))
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         return false;
                     }

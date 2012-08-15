@@ -20,6 +20,7 @@ import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
@@ -323,7 +324,7 @@ public class FeedListAdapter extends BaseAdapter {
 		} else replyFrame.setVisibility(View.GONE);
 		return toReturn;
 	}
-	
+
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		return createStatusView(tweets.get(position), mContext, convertView);

@@ -80,12 +80,12 @@ public class SearchTweetsFragment extends BaseListFragment {
 				new AdapterView.OnItemLongClickListener() {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-						Tweet item = (Tweet) context.tweetAdapter.getItem(index);
+						Tweet toReply = (Tweet)context.tweetAdapter.getItem(index);
 						context.startActivity(new Intent(context, ComposerScreen.class)
-						.putExtra("reply_to", item.getId())
-						.putExtra("reply_to_name", item.getFromUser())
-						.putExtra("append", Utilities.getAllMentions(item))
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                .putExtra("reply_to_tweet", toReply)
+                                .putExtra("reply_to_name", toReply.getFromUser())
+                                .putExtra("append", Utilities.getAllMentions(toReply.getFromUser(), toReply.getText()))
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 						return false;
 					}
 				});

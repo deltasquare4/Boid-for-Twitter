@@ -144,91 +144,94 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		return tweets.get(position).getId();
 	}
 
-	@Override
-	public View getView(final int position, View convertView, ViewGroup parent) {
-		RelativeLayout toReturn = null;
-		if(convertView != null) toReturn = (RelativeLayout)convertView;
-		else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
-		Tweet tweet = tweets.get(position);
-		
-		TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
-		TextView timerTxt = (TextView)toReturn.findViewById(R.id.feedItemTimerTxt);
-		TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText);
-		TextView locIndicator = (TextView)toReturn.findViewById(R.id.locationIndicTxt);
-		final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
-		ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
-		ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
-		RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
-		final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
-		View replyFrame = toReturn.findViewById(R.id.inReplyToFrame);
-		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
-		View locFrame = toReturn.findViewById(R.id.locationFrame);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		FeedListAdapter.ApplyFontSize(itemTxt, mContext);
-		FeedListAdapter.ApplyFontSize(userNameTxt, mContext);
-		
-		if(prefs.getBoolean("show_real_names", false)) {
-			userNameTxt.setText(tweet.getFromUser());
-		} else userNameTxt.setText(tweet.getFromUser());
-		if(prefs.getBoolean("enable_profileimg_download", true)) {
-			profilePic.setImageResource(R.drawable.sillouette);
-			profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
-			final Tweet fTweet = tweet;
-			profilePic.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
-					.putExtra("screen_name", fTweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-				}
-			});
-		} else profilePic.setVisibility(View.GONE);
-		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(),
+    public static RelativeLayout createTweetView(final Tweet tweet, final Context mContext, View convertView) {
+        RelativeLayout toReturn = null;
+        if(convertView != null) toReturn = (RelativeLayout)convertView;
+        else toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.feed_item, null);
+
+        TextView userNameTxt = (TextView)toReturn.findViewById(R.id.feedItemUserName);
+        TextView timerTxt = (TextView)toReturn.findViewById(R.id.feedItemTimerTxt);
+        TextView itemTxt = (TextView)toReturn.findViewById(R.id.feedItemText);
+        TextView locIndicator = (TextView)toReturn.findViewById(R.id.locationIndicTxt);
+        final ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
+        ImageView mediaIndic = (ImageView)toReturn.findViewById(R.id.feedItemMediaIndicator);
+        ImageView videoIndic = (ImageView)toReturn.findViewById(R.id.feedItemVideoIndicator);
+        RemoteImageView profilePic = (RemoteImageView)toReturn.findViewById(R.id.feedItemProfilePic);
+        final ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
+        View replyFrame = toReturn.findViewById(R.id.inReplyToFrame);
+        View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
+        View locFrame = toReturn.findViewById(R.id.locationFrame);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        FeedListAdapter.ApplyFontSize(itemTxt, mContext);
+        FeedListAdapter.ApplyFontSize(userNameTxt, mContext);
+
+        if(prefs.getBoolean("show_real_names", false)) {
+            userNameTxt.setText(tweet.getFromUser());
+        } else userNameTxt.setText(tweet.getFromUser());
+        if(prefs.getBoolean("enable_profileimg_download", true)) {
+            profilePic.setImageResource(R.drawable.sillouette);
+            profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));
+            final Tweet fTweet = tweet;
+            profilePic.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    mContext.startActivity(new Intent(mContext.getApplicationContext(), ProfileScreen.class)
+                            .putExtra("screen_name", fTweet.getFromUser()).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                }
+            });
+        } else profilePic.setVisibility(View.GONE);
+        itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(),
                 tweet.getUrlEntities(), tweet.getMediaEntities(), false));
-		itemTxt.setLinksClickable(false);
-		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
-		boolean hasMedia = false;
-		if(prefs.getBoolean("enable_media_download", true)) {
-			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
-			if(media != null && !media.isEmpty()) {
-				hasMedia = true;
-				FeedListAdapter.addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
-				FeedListAdapter.addRule(replyFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
-				mediaFrame.setVisibility(View.VISIBLE);
-				mediaPreview.setVisibility(View.GONE);
-				mediaIndic.setVisibility(View.VISIBLE);
-				if(prefs.getBoolean("enable_inline_previewing", true)) {
-					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30) +
-							Integer.parseInt(prefs.getString("font_size", "16")));
-					mediaProg.setVisibility(View.VISIBLE);
-					ImageManager download = ImageManager.getInstance(mContext);
-					download.get(media, new ImageManager.OnImageReceivedListener() {
-						@Override
-						public void onImageReceived(String source, Bitmap bitmap) {
-							mediaProg.setVisibility(View.GONE);
-							mediaPreview.setVisibility(View.VISIBLE);
-							mediaPreview.setImageBitmap(bitmap);
-						}
-					});
-				} else hideInlineMedia(toReturn);
-			} else hideInlineMedia(toReturn);
-		} else hideInlineMedia(toReturn);
-		if(Utilities.tweetContainsVideo(tweet)) {
-			videoIndic.setVisibility(View.VISIBLE);
-		} else videoIndic.setVisibility(View.GONE);
-		if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
-			if(!hasMedia) FeedListAdapter.addRule(locFrame, R.id.feedItemText, RelativeLayout.BELOW);
-			locFrame.setVisibility(View.VISIBLE);
-			if(tweet.getPlace() != null) {
-				Place p = tweet.getPlace();
-				locIndicator.setText(p.getFullName());
-			} else {
-				GeoLocation g = tweet.getGeoLocation();
-				locIndicator.setText(g.toString());
-			}
-		} else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
-		return toReturn;
+        itemTxt.setLinksClickable(false);
+        timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
+        boolean hasMedia = false;
+        if(prefs.getBoolean("enable_media_download", true)) {
+            final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
+            if(media != null && !media.isEmpty()) {
+                hasMedia = true;
+                FeedListAdapter.addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+                FeedListAdapter.addRule(replyFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+                mediaFrame.setVisibility(View.VISIBLE);
+                mediaPreview.setVisibility(View.GONE);
+                mediaIndic.setVisibility(View.VISIBLE);
+                if(prefs.getBoolean("enable_inline_previewing", true)) {
+                    itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 30) +
+                            Integer.parseInt(prefs.getString("font_size", "16")));
+                    mediaProg.setVisibility(View.VISIBLE);
+                    ImageManager download = ImageManager.getInstance(mContext);
+                    download.get(media, new ImageManager.OnImageReceivedListener() {
+                        @Override
+                        public void onImageReceived(String source, Bitmap bitmap) {
+                            mediaProg.setVisibility(View.GONE);
+                            mediaPreview.setVisibility(View.VISIBLE);
+                            mediaPreview.setImageBitmap(bitmap);
+                        }
+                    });
+                } else hideInlineMedia(toReturn);
+            } else hideInlineMedia(toReturn);
+        } else hideInlineMedia(toReturn);
+        if(Utilities.tweetContainsVideo(tweet)) {
+            videoIndic.setVisibility(View.VISIBLE);
+        } else videoIndic.setVisibility(View.GONE);
+        if(tweet.getGeoLocation() != null || tweet.getPlace() != null) {
+            if(!hasMedia) FeedListAdapter.addRule(locFrame, R.id.feedItemText, RelativeLayout.BELOW);
+            locFrame.setVisibility(View.VISIBLE);
+            if(tweet.getPlace() != null) {
+                Place p = tweet.getPlace();
+                locIndicator.setText(p.getFullName());
+            } else {
+                GeoLocation g = tweet.getGeoLocation();
+                locIndicator.setText(g.toString());
+            }
+        } else toReturn.findViewById(R.id.locationFrame).setVisibility(View.GONE);
+        return toReturn;
+    }
+
+    @Override
+	public View getView(final int position, View convertView, ViewGroup parent) {
+        return createTweetView(tweets.get(position), mContext, convertView);
 	}
 	
-	private void hideInlineMedia(View toReturn) {
+	private static void hideInlineMedia(View toReturn) {
 		ProgressBar mediaProg = (ProgressBar)toReturn.findViewById(R.id.feedItemMediaProgress);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
 		ImageView mediaPreview = (ImageView)toReturn.findViewById(R.id.feedItemMediaPreview);
