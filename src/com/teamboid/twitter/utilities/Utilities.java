@@ -29,6 +29,7 @@ import com.teamboid.twitterapi.status.entity.mention.MentionEntity;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
 import com.teamboid.twitterapi.user.User;
 
+import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
@@ -274,10 +275,14 @@ public class Utilities {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
 					public void onClick(View widget) {
-						context.startActivity(new Intent(context, SearchScreen.class)
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-						.putExtra("query", hashText));
+						if(ComposerScreen.class.isInstance( widget.getContext()) ){
+							((ComposerScreen)widget.getContext()).appendText(hashText);
+						}else{
+							context.startActivity(new Intent(context, SearchScreen.class)
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+							.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+							.putExtra("query", hashText));
+						}
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if(e.getType() == Extractor.Entity.Type.MENTION) {
@@ -285,6 +290,7 @@ public class Utilities {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
 					public void onClick(View widget) {
+						if(ComposerScreen.class.isInstance( widget.getContext()) ){ return; }
 						context.startActivity(new Intent(context, ProfileScreen.class)
 						.putExtra("screen_name", screenName)
 						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -294,7 +300,8 @@ public class Utilities {
 			} else if(e.getType() == Extractor.Entity.Type.URL) {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
-					public void onClick(View arg0) {
+					public void onClick(View widget) {
+						if(ComposerScreen.class.isInstance( widget.getContext()) ){return;}
 						String url = null;
 						if(realLinks.contains(e.getValue())) url = realLinks.get(e.getValue());
 						else url = e.getValue();
@@ -307,8 +314,9 @@ public class Utilities {
 			} else if(e.getType() == Extractor.Entity.Type.SEARCH) {
 				rtSpan.setSpan(new NoUnderlineClickableSpan() {
 					@Override
-					public void onClick(View arg0) {
+					public void onClick(View widget) {
 						try { 
+							if(ComposerScreen.class.isInstance( widget.getContext()) ){return;}
 							context.startActivity(new Intent(context, InAppBrowser.class)
 							.putExtra("url", context.getString(R.string.google_url) +
 									URLEncoder.encode(e.getValue(), "UTF-8"))

@@ -46,6 +46,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
@@ -160,8 +161,10 @@ public class ComposerScreen extends Activity {
 				ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
 				View replyToV = replyToL.inflate();
 				FeedListAdapter.createStatusView(replyTo, this, replyToV);
+				TextView tv = (TextView)findViewById(R.id.feedItemText);
+				tv.setMovementMethod(new LinkMovementMethod());
 				
-				TextView tv = (TextView)findViewById(R.id.replyToText);
+				tv = (TextView)findViewById(R.id.replyToText);
 				tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getUser().getScreenName()));
 				tv.setVisibility(View.VISIBLE);
 			}else if (getIntent().hasExtra("stt")) {
@@ -218,12 +221,23 @@ public class ComposerScreen extends Activity {
 		content.requestFocus();
 	}
 	
+	public void appendText(String a){
+		EditText editor = (EditText)findViewById(R.id.tweetContent);
+		
+		a = editor.getText().toString() + a;
+		if(editor.getText().charAt(editor.getText().length()-1) != ' '){
+			a = " " + a;
+		}
+		
+		editor.setText(a);
+	}
+	
 	HashMap<String, String> autocomplete;
 	Thread currentAC = null;
 	public void setupAutocomplete(){
 		final EditText editor = (EditText)findViewById(R.id.tweetContent);
 		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
-		final ScrollView sc = (ScrollView)findViewById(R.id.scroll);
+		// final ScrollView sc = (ScrollView)findViewById(R.id.scroll);
 		l.removeAllViews();
 		
 		autocomplete = new HashMap<String, String>();
@@ -252,9 +266,6 @@ public class ComposerScreen extends Activity {
 				final int start = s + count;
 				
 				l.removeAllViews();
-				if( l.getY() > editor.getY() ){
-					sc.fullScroll(ScrollView.FOCUS_DOWN);
-				}
 				
 				currentAC = new Thread(new Runnable(){
 	

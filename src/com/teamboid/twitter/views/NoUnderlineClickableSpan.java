@@ -13,4 +13,5 @@ public abstract class NoUnderlineClickableSpan extends ClickableSpan {
 		ds.setColor(ds.linkColor);
 		ds.setUnderlineText(false);
 	}
+	
 }
