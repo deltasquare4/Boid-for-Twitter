@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
-import android.graphics.Color;
+import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitterapi.media.MediaServices;
 import com.teamboid.twitterapi.status.GeoLocation;
@@ -13,7 +13,6 @@ import com.teamboid.twitterapi.status.Granularity;
 import com.teamboid.twitterapi.status.Place;
 import com.teamboid.twitterapi.status.Status;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.teamboid.twitter.contactsync.AutocompleteService;
@@ -55,19 +54,11 @@ import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewStub;
 import android.view.Window;
-import android.widget.ArrayAdapter;
-
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * The activity that represents the tweet composer screen.
  * 
- * @author Aidan Follestad
+ * @author Aidan Follestad and kennydude
  */
 public class ComposerScreen extends Activity {
 
@@ -234,11 +225,11 @@ public class ComposerScreen extends Activity {
 			}
 		} catch(Exception e) { e.printStackTrace(); }
 		
-		editor.addTextChangedListener(new TextWatcher(){
+		editor.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void afterTextChanged(Editable arg0) {}
+			public void afterTextChanged(Editable arg0) { }
 			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
 			@Override
 			public void onTextChanged(final CharSequence text, final int s, int before, int count) {
 				if(currentAC != null) currentAC.interrupt();
@@ -271,41 +262,31 @@ public class ComposerScreen extends Activity {
 							boolean r = false;
 							for(final String u : autocomplete.keySet()) {
 								if(u.toLowerCase().contains(typed)) {
-									r = true;
-									OnClickListener oc = new OnClickListener() {
-										@Override
-										public void onClick(View arg0) {
-										    EditText editor = (EditText)findViewById(R.id.tweetContent);
-										    String r = autocomplete.get(u);
-										    editor.getText().replace(s, start, r);
-										    editor.setSelection(s + r.length());
-										}
-									};
+                                    r = true;
+                                    final LinearLayout item = (LinearLayout)getLayoutInflater().inflate(R.layout.autocomplete_item, null);
+                                    item.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View arg0) {
+                                            EditText editor = (EditText)findViewById(R.id.tweetContent);
+                                            String r = autocomplete.get(u);
+                                            editor.getText().replace(s, start, r);
+                                            editor.setSelection(s + r.length());
+                                        }
+                                    });
 
-									final RemoteImageView riv = new RemoteImageView(ComposerScreen.this);
-									final int w = Utilities.convertDpToPx(ComposerScreen.this, 32);
-									riv.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
-									riv.setOnClickListener(oc);
-
-									final TextView t = new TextView(ComposerScreen.this);
-                                    t.setTextColor(getTheme().obtainStyledAttributes(new int[] { R.attr.tweetColor })
-                                            .getColor(0, Color.parseColor("#000000")));
+                                    final RemoteImageView riv = (RemoteImageView)item.findViewById(R.id.image);
+                                    final TextView t = (TextView)item.findViewById(R.id.name);
 									SpannableString s = new SpannableString(u);
 									int selStart = u.toLowerCase().indexOf(typed);
 									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
 									t.setText(s);
-									t.setPadding(0, 0, Utilities.convertDpToPx(ComposerScreen.this, 5), 0);
-									t.setGravity(Gravity.CENTER);
-									t.setOnClickListener(oc);
-
-									runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											l.addView(riv, w, w);
-											riv.setImageURL(Utilities.getUserImage(autocomplete.get(u), ComposerScreen.this));
-											l.addView(t, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
-										}
-									});
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            riv.setImageURL(Utilities.getUserImage(autocomplete.get(u), ComposerScreen.this));
+                                            l.addView(item);
+                                        }
+                                    });
 								}
 							}
 							return r;
