@@ -45,7 +45,7 @@
                       android:minLines="5"
                       android:imeOptions="flagNoExtractUi"
                       android:hint="@string/what_you_wanna_say" android:textColor="?tweetColor"
-                      android:layout_height="wrap_content" android:inputType="textMultiLine|textCapSentences|textNoSuggestions">
+                      android:layout_height="wrap_content" android:inputType="textMultiLine|textCapSentences">
                 <requestFocus/>
             </EditText>
 

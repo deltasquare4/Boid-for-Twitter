@@ -1,9 +1,12 @@
 package com.teamboid.twitter;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.TimerTask;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
@@ -218,7 +221,7 @@ public class ComposerScreen extends Activity {
 	}
 	
 	HashMap<String, String> autocomplete;
-	Thread currentAC = null;
+	Timer timer;
 
 	public void setupAutocomplete() {
 
@@ -239,18 +242,19 @@ public class ComposerScreen extends Activity {
 			}
 		} catch(Exception e) { e.printStackTrace(); }
 		
+		timer = new Timer();
 		editor.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) { }
 			@Override
 			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
 			@Override
-			public void onTextChanged(final CharSequence text, final int s, int before, int count) {
-				if(currentAC != null) currentAC.interrupt();
-				final int start = s + count;
+			public void onTextChanged(CharSequence text, int s, int before, int count) {
+				timer.cancel();
+				timer = new Timer();
 				l.removeAllViews();
 
-				currentAC = new Thread(new Runnable() {
+				timer.schedule( new TimerTask() {
 					@Override
 					public void run() {
 						final boolean b = doRun();
@@ -261,7 +265,10 @@ public class ComposerScreen extends Activity {
 					}
 
 					public boolean doRun() {
-						int p = text.toString().lastIndexOf(" ", start);
+						String text = editor.getText().toString();
+						int start = editor.getSelectionStart();
+						
+						final int p = text.toString().lastIndexOf(" ", start);
 						if((p + 2) >= text.length()) return false;
 						Log.d("autocomplete", text.charAt(p + 1) + "");
 
@@ -280,10 +287,11 @@ public class ComposerScreen extends Activity {
                                     item.setOnClickListener(new OnClickListener() {
                                         @Override
                                         public void onClick(View arg0) {
+                                        	int start = editor.getSelectionStart();
                                             EditText editor = (EditText)findViewById(R.id.tweetContent);
-                                            String r = autocomplete.get(u);
-                                            editor.getText().replace(s, start, r);
-                                            editor.setSelection(s + r.length());
+                                            String r = "@" + autocomplete.get(u) + " ";
+                                            editor.getText().replace(p+1, start, r);
+                                            editor.setSelection(p+1 + r.length());
                                         }
                                     });
 
@@ -307,9 +315,7 @@ public class ComposerScreen extends Activity {
 						return false;
 					}
 
-				});
-				currentAC.setPriority(Thread.MIN_PRIORITY);
-				currentAC.start();
+				}, 500L);
 			}
 		});
 	}
