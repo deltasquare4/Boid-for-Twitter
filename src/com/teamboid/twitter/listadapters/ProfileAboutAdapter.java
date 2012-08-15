@@ -113,7 +113,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 		df.applyPattern("###,###,###,###,###.###");
 		String desc = user.getDescription().replace("\n", " ").trim();
 		if(!desc.isEmpty()) {
-			values.add(new BasicNameValuePair(mContext.getString(R.string.description_str), desc));
+			values.add(new BasicNameValuePair(mContext.getString(R.string.bio_str), desc));
 		}
 		values.add(new BasicNameValuePair(mContext.getString(R.string.tweets_str), df.format(_user.getStatusCount())));
 		double tweetsPerDay = user.getStatusCount();

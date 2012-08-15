@@ -49,12 +49,12 @@ public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClick
             findViewById(R.id.nameTxt).setEnabled(false);
             findViewById(R.id.urlTxt).setEnabled(false);
             findViewById(R.id.locationTxt).setEnabled(false);
-            findViewById(R.id.descriptionTxt).setEnabled(false);
+            findViewById(R.id.bioTxt).setEnabled(false);
         } else {
             findViewById(R.id.nameTxt).setEnabled(true);
             findViewById(R.id.urlTxt).setEnabled(true);
             findViewById(R.id.locationTxt).setEnabled(true);
-            findViewById(R.id.descriptionTxt).setEnabled(true);
+            findViewById(R.id.bioTxt).setEnabled(true);
         }
         invalidateOptionsMenu();
     }
@@ -131,7 +131,7 @@ public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClick
         ((EditText)findViewById(R.id.nameTxt)).setText(toSet.getUser().getName());
         ((EditText)findViewById(R.id.urlTxt)).setText(toSet.getUser().getUrl());
         ((EditText)findViewById(R.id.locationTxt)).setText(toSet.getUser().getLocation());
-        ((EditText)findViewById(R.id.descriptionTxt)).setText(toSet.getUser().getDescription());
+        ((EditText)findViewById(R.id.bioTxt)).setText(toSet.getUser().getDescription());
         ((RemoteImageView)findViewById(R.id.profilePic)).setImageURL(toSet.getUser().getProfileImageUrl());
         //Update the account's information in the account service. This function also updates the account in the local preferences cache.
         AccountService.setAccount(this, index, toSet);
@@ -142,7 +142,7 @@ public class ProfileEditor extends Activity implements PopupMenu.OnMenuItemClick
         final String name = ((EditText)findViewById(R.id.nameTxt)).getText().toString();
         final String url = ((EditText)findViewById(R.id.urlTxt)).getText().toString();
         final String location = ((EditText)findViewById(R.id.locationTxt)).getText().toString();
-        final String description = ((EditText)findViewById(R.id.descriptionTxt)).getText().toString();
+        final String description = ((EditText)findViewById(R.id.bioTxt)).getText().toString();
 
         new Thread(new Runnable() {
             @Override
