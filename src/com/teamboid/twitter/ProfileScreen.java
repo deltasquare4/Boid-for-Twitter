@@ -239,7 +239,7 @@ public class ProfileScreen 	extends Activity {
 			return true;
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class)
-				.putExtra("append", "@" + mScreenName + " ")
+				.putExtra("append", "@" + mScreenName)
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:		

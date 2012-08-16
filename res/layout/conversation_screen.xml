@@ -5,7 +5,7 @@
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true">
 		<View android:id="@+id/messageInputDivider" android:layout_width="fill_parent"
-			android:layout_height="1dp" android:background="@color/blue"
+			android:layout_height="1dp" android:background="@android:color/holo_blue_dark"
 			android:layout_alignParentTop="true" />
 		<EditText android:id="@+id/messageInput" android:hint="@string/what_you_wanna_say"
 			android:layout_marginLeft="10dp" android:layout_marginRight="10dp"

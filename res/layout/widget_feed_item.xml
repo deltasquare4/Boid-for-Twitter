@@ -37,7 +37,7 @@
 		android:layout_alignBaseline="@+id/feedItemRetweetIndicatorImg"
 		android:layout_toRightOf="@+id/feedItemRetweetIndicatorImg"
 		android:textAppearance="?android:attr/textAppearanceSmall"
-		android:textColor="@color/white" android:textColorLink="@color/blue_secondary"
+		android:textColor="@color/white" android:textColorLink="@android:color/holo_blue_light"
 		android:visibility="gone" />
 	<TextView android:id="@+id/feedItemUserName"
 		android:layout_below="@+id/feedItemRetweetIndicatorTxt"
@@ -52,7 +52,7 @@
 		android:layout_toRightOf="@+id/feedItemProfilePic"
 		android:layout_marginRight="5dp" android:textAppearance="?android:attr/textAppearanceSmall"
 		android:layout_below="@+id/feedItemUserName" android:textColor="@color/white"
-		android:textColorLink="@color/blue_secondary" />
+		android:textColorLink="@android:color/holo_blue_light" />
 	<RelativeLayout android:id="@+id/locationFrame"
 		android:layout_marginTop="5dp" android:layout_width="fill_parent"
 		android:layout_marginRight="5dp" android:visibility="gone"
@@ -65,7 +65,7 @@
 			android:layout_alignTop="@+id/locationIndicImg"
 			android:layout_toRightOf="@+id/locationIndicImg"
 			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:textColor="@color/lighter_dark" android:textColorLink="@color/blue_secondary" />
+			android:textColor="@color/lighter_dark" android:textColorLink="@android:color/holo_blue_light" />
 	</RelativeLayout>
 	<RelativeLayout android:id="@+id/inReplyToFrame"
 		android:layout_marginTop="5dp" android:layout_width="fill_parent"
@@ -80,6 +80,6 @@
 			android:layout_alignTop="@+id/inReplyIndicImg"
 			android:layout_toRightOf="@+id/inReplyIndicImg"
 			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:textColor="@color/lighter_dark" android:textColorLink="@color/blue_secondary" />
+			android:textColor="@color/lighter_dark" android:textColorLink="@android:color/holo_blue_light" />
 	</RelativeLayout>
 </RelativeLayout>

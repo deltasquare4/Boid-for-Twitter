@@ -11,7 +11,7 @@
                                                   android:onClick="showPopup" android:layout_marginRight="5dp" />
 
         <TextView android:id="@+id/nameLabel" android:layout_width="fill_parent" android:textStyle="bold"
-                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="@android:color/holo_blue_dark" android:textAppearance="?android:attr/textAppearanceMedium"
                   style="?android:listSeparatorTextViewStyle" android:layout_height="wrap_content"
                   android:text="@string/name_str" android:layout_toRightOf="@+id/profilePic"/>
         <EditText android:id="@+id/nameTxt" android:layout_width="fill_parent" android:layout_toRightOf="@+id/profilePic"
@@ -19,7 +19,7 @@
                   android:hint="@string/name_str" android:maxLength="20"/>
 
         <TextView android:id="@+id/locationLabel" android:layout_width="fill_parent" android:layout_below="@+id/nameTxt"
-                  android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@color/blue"
+                  android:layout_marginTop="10dp" android:textStyle="bold" android:textColor="@android:color/holo_blue_dark"
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/location_str"/>
@@ -28,7 +28,7 @@
                   android:hint="@string/location_str" android:maxLength="30"/>
 
         <TextView android:id="@+id/urlLabel" android:layout_width="fill_parent" android:layout_below="@+id/locationTxt"
-                  android:layout_marginTop="5dp" android:textStyle="bold" android:textColor="@color/blue"
+                  android:layout_marginTop="5dp" android:textStyle="bold" android:textColor="@android:color/holo_blue_dark"
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/website_str"/>
@@ -37,7 +37,7 @@
                   android:hint="@string/website_str" android:maxLength="100"/>
 
         <TextView android:id="@+id/bioLabel" android:layout_width="fill_parent" android:textStyle="bold"
-                  android:textColor="@color/blue" android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="@android:color/holo_blue_dark" android:textAppearance="?android:attr/textAppearanceMedium"
                   android:layout_below="@+id/urlTxt" style="?android:listSeparatorTextViewStyle"
                   android:layout_height="wrap_content" android:text="@string/bio_str" android:layout_marginTop="5dp"/>
         <EditText android:id="@+id/bioTxt" android:layout_width="fill_parent"
