@@ -37,8 +37,8 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 	public static void ApplyFontSize(TextView in, Context c, boolean scaleUp) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		if(scaleUp) in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")) + 3);
-		else in.setTextSize(Float.parseFloat(prefs.getString("font_size", "14")));
+		if(scaleUp) in.setTextSize(Float.parseFloat(prefs.getString("font_size", "15")) + 2);
+		else in.setTextSize(Float.parseFloat(prefs.getString("font_size", "15")));
 	}
 	public static void addRule(View target, int relativeToId, int rule) {
 		RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)target.getLayoutParams();

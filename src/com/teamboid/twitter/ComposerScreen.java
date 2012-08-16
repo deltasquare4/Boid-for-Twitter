@@ -330,7 +330,7 @@ public class ComposerScreen extends Activity {
                         return false;
                     }
 
-                }, 500L);
+                }, 400L);
 			}
 		});
 	}
