@@ -7,16 +7,16 @@
 		<intent android:targetClass="com.teamboid.twitter.AccountManager"
 			android:targetPackage="com.teamboid.twitter" />
 	</header>
-	<header android:summary="@string/muting_str_desc" android:title="@string/muting_str">
-		<intent android:targetClass="com.teamboid.twitter.MutingManager"
-			android:targetPackage="com.teamboid.twitter" />
-	</header>
+    <header android:fragment="com.teamboid.twitter.SettingsScreen$GeneralFragment"
+            android:summary="@string/general_description" android:title="@string/general_title" />
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$AppearanceFragment"
 		android:summary="@string/appearance_category_desc" android:title="@string/appearance_category" />
-	<header android:fragment="com.teamboid.twitter.SettingsScreen$GeneralFragment"
-		android:summary="@string/general_description" android:title="@string/general_title" />
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$ComposerFragment"
 		android:summary="@string/composer_desc_str" android:title="@string/composer_str" />
+    <header android:summary="@string/muting_str_desc" android:title="@string/muting_str">
+        <intent android:targetClass="com.teamboid.twitter.MutingManager"
+                android:targetPackage="com.teamboid.twitter" />
+    </header>
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$NightModeFragment"
 		android:summary="@string/night_mode_desc" android:title="@string/night_mode" />
 </preference-headers>

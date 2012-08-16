@@ -168,9 +168,7 @@
 	<string name="delete_str">Delete</string>
 
 	<string name="help_title">Help</string>
-	<string name="help_description">View information about Boid, or send a donation or
-		email to us.
-	</string>
+	<string name="help_description">Send feedback, donate, and view version/build information.</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
 		Macphee, Philip
@@ -215,8 +213,7 @@
 		the timeline screen\'s search interface).
 	</string>
 	<string name="appearance_category">Appearance</string>
-	<string name="appearance_category_desc">Settings for modifying Boid\'s look and feel.
-	</string>
+	<string name="appearance_category_desc">Themes, font sizing, and other UI element settings.</string>
 	<string name="enable_textual_list_title">Textual User Lists</string>
 	<string name="enable_textual_list_desc">User list columns display their name, even with
 		iconic tabs.
@@ -329,9 +326,7 @@
 	</string>
 	<string name="confirm_send_prompt">Send this tweet as @{account}?</string>
 	<string name="composer_str">Composer</string>
-	<string name="composer_desc_str">Settings that deal with elements of the tweet
-		composer, such as picture services.
-	</string>
+	<string name="composer_desc_str">Enable drafts, attaching location by default, and other composer options.</string>
 	<string name="users_and_tweets">Users and tweets</string>
 	<string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.
 	</string>
@@ -445,7 +440,7 @@
 		with @{user}!
 	</string>
 	<string name="night_mode">Night Mode</string>
-	<string name="night_mode_desc">Automatically switch themes when the night falls.
+	<string name="night_mode_desc">Automatically switch themes or disable push notifications when the night falls.
 	</string>
 	<string name="start_time_str">Start Time</string>
 	<string name="end_time_str">End Time</string>
