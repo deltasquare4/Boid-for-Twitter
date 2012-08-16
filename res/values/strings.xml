@@ -149,7 +149,7 @@
 
 	<string name="search_str">Search</string>
 	<string name="manage_accounts_str">Accounts</string>
-	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts.</string>
+	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access push notification settings.</string>
 	<string name="remove_account">Remove Account</string>
 	<string name="confirm_remove_account">Are you sure you want to remove @{account}?
 	</string>
