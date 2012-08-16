@@ -40,6 +40,7 @@
         <provider android:name="SearchSuggestionsProvider"
                   android:exported="false" android:authorities="com.teamboid.twitter.SearchSuggestionsProvider"/>
 
+        <!--
         <receiver android:name=".widgets.ResizableWidgetProvider"
                   android:exported="false">
             <intent-filter>
@@ -51,6 +52,13 @@
         <service android:name=".widgets.TimelineWidgetViewService"
                  android:permission="android.permission.BIND_REMOTEVIEWS"
                  android:exported="false"/>
+        <activity android:name=".widgets.TimelineWidgetConfigurator" android:label="@string/timeline_widget_str"
+                  android:exported="false" android:configChanges="screenSize">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+        -->
 
         <activity android:name=".TimelineScreen"
                   android:configChanges="orientation|screenSize" android:launchMode="singleInstance"
@@ -83,12 +91,6 @@
         </activity>
         <activity android:name=".AccountManager" android:label="@string/manage_accounts_str"
                   android:exported="false" android:configChanges="screenSize"/>
-        <activity android:name=".widgets.TimelineWidgetConfigurator" android:label="@string/timeline_widget_str"
-                  android:exported="false" android:configChanges="screenSize">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-            </intent-filter>
-        </activity>
         <activity android:name=".ProfileEditor" android:exported="false"
                   android:configChanges="screenSize|keyboardHidden|orientation"/>
         <service android:name=".services.AccountService"
