@@ -33,9 +33,7 @@
 	<string name="draft_str">Draft</string>
 	<string name="draft_prompt">Do you want to save this Tweet as a draft?</string>
 	<string name="always_attach_loc">Always Attach Location</string>
-	<string name="always_attach_loc_desc">When enabled, your location will be attached to
-		composed tweets by default.
-	</string>
+	<string name="always_attach_loc_desc">Whether the composer will attach your location by default.</string>
 	<string name="display_real_name">Display Real Name</string>
 	<string name="display_real_name_desc">The full name of users are displayed in feeds, as
 		opposed to screen names.
@@ -171,8 +169,7 @@
 	<string name="help_description">Send feedback, donate, and view version/build information.</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
-		Macphee, Philip
-		Oakley, and Federico Zubani.
+		Macphee, Philip Oakley, and Federico Zubani.
 	</string>
 	<string name="version_title">Version</string>
 	<string name="build_title">Build Number</string>
@@ -205,9 +202,7 @@
 		Tweets while viewing a Tweet.
 	</string>
 	<string name="enable_drafts_title">Drafts</string>
-	<string name="enable_drafts_desc">Enable or disable Tweet drafting, not including
-		replies. Drafts are saved for each account.
-	</string>
+	<string name="enable_drafts_desc">When disabled, a prompt will not be shown asking you whether you want to save an unsent tweet as a draft.</string>
 	<string name="clear_searchhistory_title">Clear Search History</string>
 	<string name="clear_searchhistory_desc">Clears your search history (that\'s accessed from
 		the timeline screen\'s search interface).
@@ -321,9 +316,7 @@
 
 	<string name="photo_service_title">Upload Service</string>
 	<string name="confirm_send_setting_title">Send Prompt</string>
-	<string name="confirm_send_setting_desc">Boid will ask you to confirm sending your tweets
-		before doing so.
-	</string>
+	<string name="confirm_send_setting_desc">Whether a prompt will be shown before sending a Tweet.</string>
 	<string name="confirm_send_prompt">Send this tweet as @{account}?</string>
 	<string name="composer_str">Composer</string>
 	<string name="composer_desc_str">Enable drafts, attaching location by default, and other composer options.</string>

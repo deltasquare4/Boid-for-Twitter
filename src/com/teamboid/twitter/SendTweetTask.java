@@ -215,11 +215,13 @@ public class SendTweetTask {
 		r.put("twtlonger", twtlonger);
 		r.put("in_reply_to", in_reply_to);
 		r.put("replyName", replyToName);
-		if(attachedImage != null)
+		if(attachedImage != null) {
 			r.put("file", attachedImage);
-		if(attachedImageUri != null)
+        }
+		if(attachedImageUri != null) {
 			r.put("fileU", attachedImageUri.toString());
-		if(location != null){
+        }
+		if(location != null) {
 			r.put("lat", location.getLatitude());
 			r.put("lon", location.getLongitude());
 		}
@@ -227,9 +229,9 @@ public class SendTweetTask {
 		r.put("res-code", result.errorCode);
 		r.put("res-sent", result.sent);
 		r.put("isGallery", isGalleryImage);
-		if(mediaService != null)
-			r.put("mediaService", mediaService);
-		
+		if(mediaService != null) {
+            r.put("mediaService", mediaService);
+        }
 		return r;
 	}
 	public static SendTweetTask fromJSONObject(JSONObject in) throws JSONException{

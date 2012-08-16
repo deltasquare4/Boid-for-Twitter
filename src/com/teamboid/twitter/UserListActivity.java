@@ -83,7 +83,9 @@ public class UserListActivity extends ListActivity {
 			public void onScrollStateChanged(AbsListView view, int scrollState) { }
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) paginate();
+                if(totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
+                    paginate();
+                }
 			}
 		});
 		setProgressBarIndeterminateVisibility(false);
@@ -96,10 +98,7 @@ public class UserListActivity extends ListActivity {
 	}
 
 	public void paginate() {
-		if(ids.size() == 0 || !allowPagination) {
-			allowPagination = false;
-			return;
-		}
+		if(ids.size() == 0 || !allowPagination) return;
 		final Twitter cl = AccountService.getCurrentAccount().getClient();
 		showProgress(true);
 		final ArrayList<Long> toLookup = new ArrayList<Long>();

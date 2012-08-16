@@ -167,6 +167,8 @@ public class AccountService extends Service {
 
 	public boolean loadAccounts() {
 		if(getApplicationContext().getSharedPreferences("accounts", 0).getAll().size() > 0) {
+            //Removes old style of account storage before offline caching.
+            //This does NOT clear column/muting settings.
 			getApplicationContext().getSharedPreferences("accounts", 0).edit().clear().commit();
 			Toast.makeText(getApplicationContext(), R.string.please_readd_accounts, Toast.LENGTH_LONG).show();
 		}

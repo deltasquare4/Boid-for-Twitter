@@ -10,4 +10,8 @@
 	</item>
 	<item android:id="@+id/sendAction" android:title="@string/tweet_str"
 		android:showAsAction="always" android:enabled="false" />
+    <item android:id="@+id/draftAction" android:icon="?sendIcon" android:title="@string/enable_drafts_title"
+          android:showAsAction="ifRoom">
+        <menu />
+    </item>
 </menu>

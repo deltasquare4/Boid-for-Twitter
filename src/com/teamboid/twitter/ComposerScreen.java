@@ -76,6 +76,7 @@ public class ComposerScreen extends Activity {
 	private Place[] places;
 	private boolean isGettingLocation;
 	private int lengthIndic;
+    private ArrayList<SendTweetTask> _drafts;
 
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
@@ -87,33 +88,74 @@ public class ComposerScreen extends Activity {
 		initializeAccountSwitcher(false);
 	}
 
-	private void loadDraft() {
-		if (!PreferenceManager.getDefaultSharedPreferences(
-				getApplicationContext()).getBoolean("enable_drafts", true))
-			return;
-		if (getIntent().getExtras() != null)
-			return;
-		final SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+	private void loadDrafts() {
+		if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_drafts", true)) {
+            return;
+        }
+		if (getIntent().getExtras() != null) return;
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (prefs.contains(stt.from.getId() + "_stt_draft")) {
 			EditText content = (EditText) findViewById(R.id.tweetContent);
-			if (content.getText().toString().trim().length() > 0)
+			if (content.getText().toString().trim().length() > 0) {
 				return; // Don't override if user is tweeting something already!
-
-			try {
-				stt = SendTweetTask.fromJSONObject(new JSONObject(prefs
-						.getString(stt.from.getId() + "_stt_draft", "{}")));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			prefs.edit().remove(stt.from.getId() + "_stt_draft").commit();
-			loadTask();
+            }
+            ArrayList<String> draftStore = Utilities.jsonToArray(
+                    prefs.getString(stt.from.getId() + "_stt_draft", null));
+            _drafts = new ArrayList<SendTweetTask>();
+            for(String d : draftStore) {
+                try { _drafts.add(SendTweetTask.fromJSONObject(new JSONObject(d))); }
+                catch (Exception e) { e.printStackTrace(); }
+            }
+            invalidateOptionsMenu();
+			//loadTask();
 		}
 		invalidateOptionsMenu();
 	}
 
-	public static int SELECT_MEDIA = 2939;
+    private void saveDraft() {
+        if (stt.from == null || !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean("enable_drafts", true) || stt.in_reply_to > 0) {
+            finish();
+            return;
+        }
+        final String content = ((EditText) findViewById(R.id.tweetContent)).getText().toString().trim();
+        if (content.length() == 0 && stt.attachedImage == null) {
+            finish();
+            return;
+        }
+        AlertDialog.Builder prompt = new AlertDialog.Builder(this);
+        prompt.setTitle(R.string.draft_str);
+        prompt.setMessage(R.string.draft_prompt);
+        prompt.setPositiveButton(R.string.yes_str,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        stt.contents = content;
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        ArrayList<String> draftStore = Utilities.jsonToArray(
+                                prefs.getString(stt.from.getId() + "_stt_draft", null));
+                        try {
+                            draftStore.add(stt.toJSONObject().toString());
+                            prefs.edit().putString(stt.from.getId() + "_stt_draft", Utilities.arrayToJson(draftStore)).commit();
+                            // _stt_draft is so we don't get any issues with upgrading
+                        } catch (Exception e) { e.printStackTrace(); }
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+        prompt.setNegativeButton(R.string.no_str,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+        prompt.create().show();
+    }
+
+    public static int SELECT_MEDIA = 2939;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -364,14 +406,14 @@ public class ComposerScreen extends Activity {
 				public boolean onNavigationItemSelected(int itemPosition,
 						long itemId) {
 					stt.from = accs.get(itemPosition);
-					loadDraft();
+					loadDrafts();
 					setupAutocomplete();
 					return true;
 				}
 			});
 			if (firstLoad == true) {
 				stt.from = AccountService.getCurrentAccount();
-				loadDraft();
+				loadDrafts();
 			}
 			long accExtra = getIntent().getLongExtra("account", 0l);
 			for (int i = 0; i < accs.size(); i++) {
@@ -383,7 +425,7 @@ public class ComposerScreen extends Activity {
 			}
 		} else if (firstLoad == true) {
 			stt.from = AccountService.getCurrentAccount();
-			loadDraft();
+			loadDrafts();
 		}
 	}
 
@@ -429,55 +471,6 @@ public class ComposerScreen extends Activity {
 			recreate();
 			return;
 		}
-	}
-
-	private void saveDraft() {
-		if (stt.from == null
-				|| !PreferenceManager.getDefaultSharedPreferences(
-						getApplicationContext()).getBoolean("enable_drafts",
-						true) || stt.in_reply_to > 0) {
-			finish();
-			return;
-		}
-		final String content = ((EditText) findViewById(R.id.tweetContent))
-				.getText().toString().trim();
-		if (content.length() == 0 && stt.attachedImage == null) {
-			finish();
-			return;
-		}
-		AlertDialog.Builder prompt = new AlertDialog.Builder(this);
-		prompt.setTitle(R.string.draft_str);
-		prompt.setMessage(R.string.draft_prompt);
-		prompt.setPositiveButton(R.string.yes_str,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						stt.contents = content;
-						SharedPreferences prefs = PreferenceManager
-								.getDefaultSharedPreferences(getApplicationContext());
-						try {
-							prefs.edit()
-									.putString(stt.from.getId() + "_stt_draft",
-											stt.toJSONObject().toString())
-									.commit();
-							// _stt_draft is so we don't get any issues with
-							// upgrading
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						dialog.dismiss();
-						finish();
-					}
-				});
-		prompt.setNegativeButton(R.string.no_str,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						finish();
-					}
-				});
-		prompt.create().show();
 	}
 
 	@Override
@@ -581,6 +574,12 @@ public class ComposerScreen extends Activity {
 			locate.setIcon(getTheme().obtainStyledAttributes(
 					new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
 		}
+        MenuItem draftsMenu = menu.findItem(R.id.draftAction);
+        if(_drafts != null) {
+            for(SendTweetTask draft : _drafts) {
+                draftsMenu.getSubMenu().add(draft.contents);
+            }
+        }
 		return true;
 	}
 
