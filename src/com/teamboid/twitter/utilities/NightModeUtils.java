@@ -28,12 +28,16 @@ public class NightModeUtils {
 			return false; // SLEEP IS FOR THE WEAK!
 
 		Calendar now = Calendar.getInstance();
-		Calendar time = parseTimePreference(prefs.getString("night_mode",
+		Calendar start = parseTimePreference(prefs.getString("night_mode",
 				"00:00"));
-		if (now.after(time)) { // We have passed the begining of the night time
-			time = parseTimePreference(prefs.getString("night_mode_endtime",
-					"00:00"));
-			if (now.before(time)) { // We are actually inside night time now
+		Calendar end = parseTimePreference(prefs.getString("night_mode_endtime",
+				"00:00"));
+		if(start.get(Calendar.HOUR) >= 12 && now.get(Calendar.HOUR) < 12){
+			start.roll(Calendar.DAY_OF_YEAR, -1);
+		}
+		
+		if (now.after(start)) { // We have passed the begining of the night time
+			if (now.before(end)) { // We are actually inside night time now
 				return true;
 			}
 		}

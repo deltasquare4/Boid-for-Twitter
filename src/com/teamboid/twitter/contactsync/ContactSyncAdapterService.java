@@ -3,6 +3,7 @@ package com.teamboid.twitter.contactsync;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.teamboid.twitter.R;
 import com.teamboid.twitterapi.user.User;
 import android.accounts.Account;
 import android.app.Service;
@@ -156,10 +157,35 @@ public class ContactSyncAdapterService extends Service {
 		HashMap<String, TempoaryContactDetails> existingAccounts;
 
 		@Override
-		public void onPerformSync(Account account, Bundle extras,
-				String authority, ContentProviderClient provider,
-				SyncResult syncResult) {
-			this.account = account;
+		Integer whatAmI() {
+			return R.string.contact_sync;
+		}
+
+		@Override
+		int getNotificationId() {
+			return 39484;
+		}
+
+		@Override
+		void processUser(User user) {
+			if (existingAccounts.containsKey(user.getScreenName())) {
+				// If the account is out of date, re-add otherwise we
+				// leave it
+				if (!existingAccounts.get(user.getScreenName()).version
+						.equals(CONTACT_VERSION)) {
+					deleteContact(existingAccounts.get(user
+							.getScreenName()).id);
+					addContact(user);
+				}
+				// Delete out of array, so we don't bin the contact
+				existingAccounts.remove(user.getScreenName());
+			} else {
+				addContact(user);
+			}
+		}
+
+		@Override
+		void preSync() {
 			// Here we can actually sync
 			existingAccounts = new HashMap<String, TempoaryContactDetails>();
 
@@ -176,59 +202,25 @@ public class ContactSyncAdapterService extends Service {
 					new String[] { BaseColumns._ID, RawContacts.SYNC1,
 							RawContacts.SYNC4 }, null, null, null);
 			while (c1.moveToNext()) {
-				existingAccounts.put(
-						c1.getString(2),
-						new TempoaryContactDetails(c1.getString(1), c1
-								.getLong(0)));
-			}
-
-			// Step 2: Get the total number of contacts we need to download
-			int total = getTotalNumber();
-			int got = 0;
-
-			// Step 3: Start downloading contacts
-			Log.d("contactsync", "Starting with a total of " + got + " out of "
-					+ total);
-			while (got < total) {
-				Log.d("contactsync", "Downloading more users...");
-				User[] users = getTimeline();
-
-				if (users == null) {
-					Log.d("contactsync", "Could not download users?");
-					syncResult.delayUntil = 60 * 60 * 2; // sync again in 2
-															// hours
-					return;
+				Log.d("contactsync", c1.getString(1) + "");
+				if(existingAccounts.containsKey(c1.getString(1))){
+					deleteContact(c1.getLong(0));
+				} else{
+					existingAccounts.put(
+							c1.getString(1),
+							new TempoaryContactDetails(c1.getString(2), c1
+									.getLong(0)));
 				}
-
-				for (User user : users) {
-					if (existingAccounts.containsKey(user.getScreenName())) {
-						// If the account is out of date, re-add otherwise we
-						// leave it
-						if (!existingAccounts.get(user.getScreenName()).version
-								.equals(CONTACT_VERSION)) {
-							deleteContact(existingAccounts.get(user
-									.getScreenName()).id);
-							addContact(user);
-						}
-						// Delete out of array, so we don't bin the contact
-						existingAccounts.remove(user.getScreenName());
-					} else {
-						addContact(user);
-					}
-				}
-				got += users.length;
-
-				Log.d("contactsync", "At a total of " + got + " out of "
-						+ total);
 			}
+		}
 
+		@Override
+		void postSync(SyncResult syncResult) {
 			Log.d("contactsync", "Deleting " + existingAccounts.size()
 					+ " dead accounts from system");
 			for (TempoaryContactDetails acc : existingAccounts.values()) {
 				deleteContact(acc.id);
 			}
-
-			Log.d("contactsync", "Sync has completed. Party!");
 		}
 	}
 }

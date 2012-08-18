@@ -80,4 +80,8 @@ public class Api16 {
 		context);
 		nm.notify(msg.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
 	}
+
+	public static void setLowPirority(Builder nb) {
+		nb.setPriority(Notification.PRIORITY_LOW);
+	}
 }

@@ -4,11 +4,19 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import android.accounts.Account;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SyncResult;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.teamboid.twitter.R;
+import com.teamboid.twitter.compat.Api16;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.client.Authorizer;
 import com.teamboid.twitterapi.client.Twitter;
@@ -24,6 +32,8 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 								// user wants
 		return "following";
 	}
+	
+	abstract Integer whatAmI();
 
 	// Notes:
 	// This works by having a queue `idQueue` which contains up to 1000 ids
@@ -69,6 +79,68 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 			return null;
 		}
 	}
+	
+	abstract int getNotificationId();
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public final void onPerformSync(Account account, Bundle extras,
+			String authority, ContentProviderClient provider,
+			SyncResult syncResult) {
+		this.account = account;
+		
+		int total = getTotalNumber();
+		int got = 0;
+		
+		Notification.Builder nb = new Notification.Builder(mContext);
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+			Api16.setLowPirority(nb);
+		}
+		nb.setContentTitle(mContext.getString(R.string.syncing));
+		nb.setContentText(mContext.getString(whatAmI()));
+		nb.setSmallIcon(android.R.drawable.ic_popup_sync);
+		nb.setProgress(total, 0, false);
+		nb.setOngoing(true);
+		nb.setOnlyAlertOnce(true);
+		
+		NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.notify(getNotificationId(), nb.getNotification());
+		
+		preSync();
+		
+		Log.d("sync", "Starting with a total of " + got
+				+ " out of " + total);
+		while (got < total) {
+			Log.d("sync", "Downloading more users...");
+			User[] users = getTimeline();
+
+			if (users == null) {
+				Log.d("sync", "Could not download users?");
+				syncResult.delayUntil = 60 * 60 * 2; // sync again in 2
+														// hours
+				return;
+			}
+
+			for (User user : users) {
+				processUser(user);
+				got += 1;
+			}
+			
+			nb.setProgress(total, got, false);
+			nm.notify(getNotificationId(), nb.getNotification());
+
+			Log.d("autocopmlete", "At a total of " + got + " out of "
+					+ total);
+		}
+		
+		nm.cancel(getNotificationId());
+		
+		postSync(syncResult);
+	}
+	
+	abstract void processUser(User u);
+	abstract void preSync();
+	abstract void postSync(SyncResult syncResult);
 
 	int getTotalNumber() {
 		try {
