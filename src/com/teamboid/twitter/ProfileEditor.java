@@ -244,10 +244,10 @@ PopupMenu.OnMenuItemClickListener {
 			return;
 		}
 		intent.setData(imageUri);
-		intent.putExtra("outputX", 96);
-		intent.putExtra("outputY", 96);
-		intent.putExtra("aspectX", 1);
-		intent.putExtra("aspectY", 1);
+		intent.putExtra("outputX", 70);
+		intent.putExtra("outputY", 70);
+		intent.putExtra("aspectX", 70);
+		intent.putExtra("aspectY", 70);
 		intent.putExtra("scale", true);
 		intent.putExtra("return-data", true);
 		startActivityForResult(intent, CROP_RESULT);
