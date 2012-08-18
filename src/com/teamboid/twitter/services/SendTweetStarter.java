@@ -1,6 +1,5 @@
 package com.teamboid.twitter.services;
 
-
 import com.teamboid.twitter.utilities.NetworkUtils;
 
 import android.content.BroadcastReceiver;
@@ -10,13 +9,14 @@ import android.util.Log;
 
 /**
  * This allows us to "queue" tweets until network is available.
+ * 
  * @author kennydude
  */
 public class SendTweetStarter extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent arg1) {
-		if(NetworkUtils.haveNetworkConnection(context)){
+		if (NetworkUtils.haveNetworkConnection(context)) {
 			Log.d("network", "Boid: The network is back! :D");
 			Intent start = new Intent(context, SendTweetService.class);
 			start.setAction(SendTweetService.NETWORK_AVAIL);

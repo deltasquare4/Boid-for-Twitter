@@ -7,8 +7,9 @@ import android.net.Uri;
 
 /**
  * Purely here to keep Android happy, actually does nothing
+ * 
  * @author kennydude
- *
+ * 
  */
 public class AutocompleteProvider extends ContentProvider {
 

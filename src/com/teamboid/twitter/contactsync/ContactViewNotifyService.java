@@ -19,27 +19,31 @@ public class ContactViewNotifyService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(final Intent intent) {
-		/*Cursor c = this.getContentResolver().query(intent.getData(),
-				new String[]{ContactsContract.Data.DATA1}, ContactsContract.Data.MIMETYPE + "='vnd.android.cursor.item/vnd.com.teamboid.twitter.account'", null, null);
-		
-		c.moveToNext();
-		String uname = c.getString(0);
-		Log.d("cv", uname);*/
-		Log.d("cv",intent.getDataString());
+		/*
+		 * Cursor c = this.getContentResolver().query(intent.getData(), new
+		 * String[]{ContactsContract.Data.DATA1}, ContactsContract.Data.MIMETYPE
+		 * + "='vnd.android.cursor.item/vnd.com.teamboid.twitter.account'",
+		 * null, null);
+		 * 
+		 * c.moveToNext(); String uname = c.getString(0); Log.d("cv", uname);
+		 */
+		Log.d("cv", intent.getDataString());
 	}
-	
-	private static void saveBitmapToRawContact(Context context, long rawContactId, byte[] photo) throws Exception {
-	    Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
-	    Uri outputFileUri =
-	        Uri.withAppendedPath(rawContactUri, RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
-	    AssetFileDescriptor descriptor = context.getContentResolver().openAssetFileDescriptor(
-	        outputFileUri, "rw");
-	    FileOutputStream stream = descriptor.createOutputStream();
-	    try {
-	      stream.write(photo);
-	    } finally {
-	      stream.close();
-	      descriptor.close();
-	    }
+
+	private static void saveBitmapToRawContact(Context context,
+			long rawContactId, byte[] photo) throws Exception {
+		Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI,
+				rawContactId);
+		Uri outputFileUri = Uri.withAppendedPath(rawContactUri,
+				RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
+		AssetFileDescriptor descriptor = context.getContentResolver()
+				.openAssetFileDescriptor(outputFileUri, "rw");
+		FileOutputStream stream = descriptor.createOutputStream();
+		try {
+			stream.write(photo);
+		} finally {
+			stream.close();
+			descriptor.close();
+		}
 	}
 }

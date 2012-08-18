@@ -24,157 +24,193 @@ import android.widget.Toast;
 
 /**
  * Sends Tweets for us in the background
+ * 
  * @author kennydude
  */
 public class SendTweetService extends Service {
-	
+
 	public static final String NETWORK_AVAIL = "com.teamboid.twitter.NETWORK_AVAIL";
 	public static final String UPDATE_STATUS = "com.teamboid.twitter.UPDATE_SENDTWEET_STATUS";
 	public static final String LOAD_TWEETS = "com.teamboid.twitter.LOAD_TWEET";
 	public List<SendTweetTask> tweets = new ArrayList<SendTweetTask>();
 	public Handler handler;
-	
-	public class SendTweetAsyncTask extends AsyncTask<Object,Object,Object> {
+
+	public class SendTweetAsyncTask extends AsyncTask<Object, Object, Object> {
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			if(!NetworkUtils.haveNetworkConnection(SendTweetService.this)) return null;
+			if (!NetworkUtils.haveNetworkConnection(SendTweetService.this))
+				return null;
 			loadTweets();
-			for(int i = 0; i < tweets.size(); i++) {
+			for (int i = 0; i < tweets.size(); i++) {
 				final SendTweetTask stt = tweets.get(i);
 				final int ix = i;
 				stt.result.errorCode = Result.WAITING;
 				Intent update = new Intent(UPDATE_STATUS);
 				sendBroadcast(update);
-				if(stt.sendTweet(SendTweetService.this).sent == true) {
-					try { 
+				if (stt.sendTweet(SendTweetService.this).sent == true) {
+					try {
 						TimelineCAB.context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								AccountService.getFeedAdapter(TimelineCAB.context, TimelineFragment.ID,
-										AccountService.getCurrentAccount().getId())
-                                        .add(new com.teamboid.twitterapi.status.Status[] { stt.tweet });
-							}						
+								AccountService
+										.getFeedAdapter(
+												TimelineCAB.context,
+												TimelineFragment.ID,
+												AccountService
+														.getCurrentAccount()
+														.getId())
+										.add(new com.teamboid.twitterapi.status.Status[] { stt.tweet });
+							}
 						});
-					} catch(Exception e) { e.printStackTrace(); }
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					try {
-						if(!TimelineCAB.context.hasWindowFocus()) {
+						if (!TimelineCAB.context.hasWindowFocus()) {
 							throw new Exception("Activity does not have focus");
 						}
-					} catch(Exception e) {
-						handler.post(new Runnable(){
+					} catch (Exception e) {
+						handler.post(new Runnable() {
 
 							@Override
 							public void run() {
-								Toast.makeText(SendTweetService.this, R.string.sent_tweet, Toast.LENGTH_SHORT).show();
+								Toast.makeText(SendTweetService.this,
+										R.string.sent_tweet, Toast.LENGTH_SHORT)
+										.show();
 							}
-							
+
 						});
 					}
-					handler.post(new Runnable(){
+					handler.post(new Runnable() {
 						@Override
 						public void run() {
 							tweets.remove(ix);
 						}
 					});
-				} else{
-					handler.post(new Runnable(){
+				} else {
+					handler.post(new Runnable() {
 						@Override
 						public void run() {
 							tweets.set(ix, stt);
 						}
-					});	
+					});
 				}
 				sendBroadcast(update);
 			}
-			handler.post(new Runnable(){ public void run(){ saveTweets(); } });
+			handler.post(new Runnable() {
+				public void run() {
+					saveTweets();
+				}
+			});
 			return null;
 		}
 	}
-	
+
 	@Override
-	public IBinder onBind(Intent arg0) { return null; }
-	
+	public IBinder onBind(Intent arg0) {
+		return null;
+	}
+
 	private static final String TWEETS = "sendtweetservice-queue";
-	
+
 	private SharedPreferences getPrefs() {
 		return getSharedPreferences(TWEETS, Context.MODE_PRIVATE);
 	}
+
 	private static boolean loaded = false;
-	
+
 	private void loadTweets() {
-		if(loaded) return;
+		if (loaded)
+			return;
 		SharedPreferences sp = getPrefs();
-		for(String key : sp.getAll().keySet()) {
-			try { tweets.add(SendTweetTask.fromJSONObject(new JSONObject(sp.getString(key, "{}")))); }
-			catch(Exception e) { e.printStackTrace(); }
+		for (String key : sp.getAll().keySet()) {
+			try {
+				tweets.add(SendTweetTask.fromJSONObject(new JSONObject(sp
+						.getString(key, "{}"))));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		loaded = true;
 		sp.edit().clear().commit();
 	}
-	
-	private void saveTweets(){
+
+	private void saveTweets() {
 		Editor ed = getPrefs().edit();
-		for(int i = 0; i < tweets.size(); i++) {
+		for (int i = 0; i < tweets.size(); i++) {
 			SendTweetTask stt = tweets.get(i);
-			try { ed.putString(i + "", stt.toJSONObject().toString()); }
-			catch(Exception e) { e.printStackTrace(); }
+			try {
+				ed.putString(i + "", stt.toJSONObject().toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		ed.commit();
 	}
-	
+
 	private void startBackground() {
 		handler = new Handler();
-		handler.post(new Runnable(){
+		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				try { new SendTweetAsyncTask().execute(); }
-				catch(Exception e) { e.printStackTrace(); }
+				try {
+					new SendTweetAsyncTask().execute();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			
+
 		});
 	}
-	
+
 	private static SendTweetService scs;
+
 	public static SendTweetService getInstance() {
-		if(scs == null) {
-			synchronized(SendTweetService.class) { new SendTweetService(); }
+		if (scs == null) {
+			synchronized (SendTweetService.class) {
+				new SendTweetService();
+			}
 		}
 		return scs;
 	}
-	
-	public SendTweetService() { scs = this; }
-	
-	public static void addTweet(SendTweetTask stt){
+
+	public SendTweetService() {
+		scs = this;
+	}
+
+	public static void addTweet(SendTweetTask stt) {
 		getInstance().tweets.add(stt);
 		getInstance().startBackground();
 	}
-	public static void initialize(){
+
+	public static void initialize() {
 		getInstance().loadTweets();
-    	getInstance().sendBroadcast(new Intent(UPDATE_STATUS));
+		getInstance().sendBroadcast(new Intent(UPDATE_STATUS));
 	}
-	
-	public static void removeTweet(SendTweetTask tweet){
+
+	public static void removeTweet(SendTweetTask tweet) {
 		getInstance().loadTweets();
 		getInstance().tweets.remove(tweet);
 		getInstance().saveTweets();
-    	Intent update = new Intent(UPDATE_STATUS);
-    	update.putExtra("delete", true);
-    	getInstance().sendBroadcast(update);
+		Intent update = new Intent(UPDATE_STATUS);
+		update.putExtra("delete", true);
+		getInstance().sendBroadcast(update);
 	}
-		
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if(intent == null) return Service.START_STICKY;
-	    if(intent.getAction().equals(NETWORK_AVAIL)) {
-	    	startBackground();
-	    } else if(intent.getAction().equals(LOAD_TWEETS)) {
-	    	loadTweets();
-	    	Intent update = new Intent(UPDATE_STATUS);
-	    	update.putExtra("dontupdate", true);
-	    	sendBroadcast(update);
-	    	startBackground();
-	    }	
-	    return Service.START_STICKY;
-	}	
+		if (intent == null)
+			return Service.START_STICKY;
+		if (intent.getAction().equals(NETWORK_AVAIL)) {
+			startBackground();
+		} else if (intent.getAction().equals(LOAD_TWEETS)) {
+			loadTweets();
+			Intent update = new Intent(UPDATE_STATUS);
+			update.putExtra("dontupdate", true);
+			sendBroadcast(update);
+			startBackground();
+		}
+		return Service.START_STICKY;
+	}
 }
