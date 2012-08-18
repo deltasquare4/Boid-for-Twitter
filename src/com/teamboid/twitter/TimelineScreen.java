@@ -34,7 +34,6 @@ import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.Utilities;
-import com.teamboid.twitter.widgets.ResizableWidgetProvider;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -44,9 +43,7 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,12 +77,6 @@ public class TimelineScreen extends Activity {
     private boolean lastIconic;
     private TabsAdapter mTabsAdapter;
     private boolean newColumn;
-    
-    private static void notifyWidget(Context context) {
-    	final AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        final ComponentName cn = new ComponentName(context, ResizableWidgetProvider.class);
-        mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widgetList);
-    }
 
     private SendTweetArrayAdapter sentTweetBinder;
 
@@ -584,13 +575,6 @@ public class TimelineScreen extends Activity {
         filter.addAction(SendTweetService.UPDATE_STATUS);
         filter.addAction(AccountManager.END_LOAD);
         registerReceiver(receiver, filter);
-        notifyWidget(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        notifyWidget(this);
     }
 
     @Override

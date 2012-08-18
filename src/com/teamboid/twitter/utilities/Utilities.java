@@ -14,9 +14,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;

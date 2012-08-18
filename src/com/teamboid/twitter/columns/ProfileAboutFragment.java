@@ -1,7 +1,6 @@
 package com.teamboid.twitter.columns;
 
 import java.net.URLEncoder;
-import java.util.ArrayList;
 
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;

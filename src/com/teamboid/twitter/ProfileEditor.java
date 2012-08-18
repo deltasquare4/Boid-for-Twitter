@@ -1,10 +1,8 @@
 package com.teamboid.twitter;
 
 import android.app.*;
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,7 +12,6 @@ import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
-import com.teamboid.twitter.widgets.TimelineWidgetViewService;
 import com.teamboid.twitterapi.user.User;
 
 import java.io.File;

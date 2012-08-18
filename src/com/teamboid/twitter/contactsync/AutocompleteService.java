@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.accounts.Account;
@@ -23,7 +22,6 @@ import com.teamboid.twitterapi.user.User;
 /**
  * Provides Auto-completion data
  * @author kennydude
- *
  */
 public class AutocompleteService extends Service {
 	public static final String AUTHORITY = "com.teamboid.twitter.autocomplete";
