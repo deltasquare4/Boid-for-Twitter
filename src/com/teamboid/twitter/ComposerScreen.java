@@ -73,7 +73,7 @@ public class ComposerScreen extends Activity {
 	private Place[] places;
 	private boolean isGettingLocation;
 	private int lengthIndic;
-    private ArrayList<SendTweetTask> _drafts;
+	private ArrayList<SendTweetTask> _drafts;
 
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
@@ -86,73 +86,90 @@ public class ComposerScreen extends Activity {
 	}
 
 	private void loadDrafts() {
-		if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_drafts", true)) {
-            return;
-        }
-		if (getIntent().getExtras() != null) return;
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		if (!PreferenceManager.getDefaultSharedPreferences(
+				getApplicationContext()).getBoolean("enable_drafts", true)) {
+			return;
+		}
+		if (getIntent().getExtras() != null)
+			return;
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
 
 		if (prefs.contains(stt.from.getId() + "_stt_draft")) {
 			EditText content = (EditText) findViewById(R.id.tweetContent);
 			if (content.getText().toString().trim().length() > 0) {
 				return; // Don't override if user is tweeting something already!
-            }
-            ArrayList<String> draftStore = Utilities.jsonToArray(
-                    prefs.getString(stt.from.getId() + "_stt_draft", null));
-            _drafts = new ArrayList<SendTweetTask>();
-            for(String d : draftStore) {
-                try { _drafts.add(SendTweetTask.fromJSONObject(new JSONObject(d))); }
-                catch (Exception e) { e.printStackTrace(); }
-            }
-            invalidateOptionsMenu();
-			//loadTask();
+			}
+			ArrayList<String> draftStore = Utilities.jsonToArray(prefs
+					.getString(stt.from.getId() + "_stt_draft", null));
+			_drafts = new ArrayList<SendTweetTask>();
+			for (String d : draftStore) {
+				try {
+					_drafts.add(SendTweetTask.fromJSONObject(new JSONObject(d)));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			invalidateOptionsMenu();
+			// loadTask();
 		}
 		invalidateOptionsMenu();
 	}
 
-    private void saveDraft() {
-        if (stt.from == null || !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean("enable_drafts", true) || stt.in_reply_to > 0) {
-            finish();
-            return;
-        }
-        final String content = ((EditText) findViewById(R.id.tweetContent)).getText().toString().trim();
-        if (content.length() == 0 && stt.attachedImage == null) {
-            finish();
-            return;
-        }
-        AlertDialog.Builder prompt = new AlertDialog.Builder(this);
-        prompt.setTitle(R.string.draft_str);
-        prompt.setMessage(R.string.draft_prompt);
-        prompt.setPositiveButton(R.string.yes_str,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        stt.contents = content;
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        ArrayList<String> draftStore = Utilities.jsonToArray(
-                                prefs.getString(stt.from.getId() + "_stt_draft", null));
-                        try {
-                            draftStore.add(stt.toJSONObject().toString());
-                            prefs.edit().putString(stt.from.getId() + "_stt_draft", Utilities.arrayToJson(draftStore)).commit();
-                            // _stt_draft is so we don't get any issues with upgrading
-                        } catch (Exception e) { e.printStackTrace(); }
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-        prompt.setNegativeButton(R.string.no_str,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-        prompt.create().show();
-    }
+	private void saveDraft() {
+		if (stt.from == null
+				|| !PreferenceManager.getDefaultSharedPreferences(
+						getApplicationContext()).getBoolean("enable_drafts",
+						true) || stt.in_reply_to > 0) {
+			finish();
+			return;
+		}
+		final String content = ((EditText) findViewById(R.id.tweetContent))
+				.getText().toString().trim();
+		if (content.length() == 0 && stt.attachedImage == null) {
+			finish();
+			return;
+		}
+		AlertDialog.Builder prompt = new AlertDialog.Builder(this);
+		prompt.setTitle(R.string.draft_str);
+		prompt.setMessage(R.string.draft_prompt);
+		prompt.setPositiveButton(R.string.yes_str,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						stt.contents = content;
+						SharedPreferences prefs = PreferenceManager
+								.getDefaultSharedPreferences(getApplicationContext());
+						ArrayList<String> draftStore = Utilities
+								.jsonToArray(prefs.getString(stt.from.getId()
+										+ "_stt_draft", null));
+						try {
+							draftStore.add(stt.toJSONObject().toString());
+							prefs.edit()
+									.putString(stt.from.getId() + "_stt_draft",
+											Utilities.arrayToJson(draftStore))
+									.commit();
+							// _stt_draft is so we don't get any issues with
+							// upgrading
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						dialog.dismiss();
+						finish();
+					}
+				});
+		prompt.setNegativeButton(R.string.no_str,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						finish();
+					}
+				});
+		prompt.create().show();
+	}
 
-    public static int SELECT_MEDIA = 2939;
+	public static int SELECT_MEDIA = 2939;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -187,31 +204,35 @@ public class ComposerScreen extends Activity {
 			}
 		});
 		if (getIntent().getExtras() != null) {
-			if(getIntent().hasExtra("reply_to")){
-				Status replyTo = (Status) getIntent().getSerializableExtra("reply_to");
+			if (getIntent().hasExtra("reply_to")) {
+				Status replyTo = (Status) getIntent().getSerializableExtra(
+						"reply_to");
 				stt.in_reply_to = replyTo.getId();
-				
-				ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
+
+				ViewStub replyToL = (ViewStub) findViewById(R.id.replyTo);
 				View replyToV = replyToL.inflate();
 				FeedListAdapter.createStatusView(replyTo, this, replyToV);
-				TextView tv = (TextView)findViewById(R.id.feedItemText);
+				TextView tv = (TextView) findViewById(R.id.feedItemText);
 				tv.setMovementMethod(new LinkMovementMethod());
-				
-				tv = (TextView)findViewById(R.id.replyToText);
-				tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getUser().getScreenName()));
+
+				tv = (TextView) findViewById(R.id.replyToText);
+				tv.setText(getString(R.string.in_reply_to).replace("{user}",
+						replyTo.getUser().getScreenName()));
 				tv.setVisibility(View.VISIBLE);
-			} else if(getIntent().hasExtra("reply_to_tweet")){
-                Tweet replyTo = (Tweet) getIntent().getSerializableExtra("reply_to_tweet");
-                stt.in_reply_to = replyTo.getId();
-                ViewStub replyToL = (ViewStub)findViewById(R.id.replyTo);
-                View replyToV = replyToL.inflate();
-                SearchFeedListAdapter.createTweetView(replyTo, this, replyToV);
-                TextView tv = (TextView)findViewById(R.id.feedItemText);
-                tv.setMovementMethod(new LinkMovementMethod());
-                tv = (TextView)findViewById(R.id.replyToText);
-                tv.setText(getString(R.string.in_reply_to).replace("{user}", replyTo.getFromUser()));
-                tv.setVisibility(View.VISIBLE);
-            } else if (getIntent().hasExtra("stt")) {
+			} else if (getIntent().hasExtra("reply_to_tweet")) {
+				Tweet replyTo = (Tweet) getIntent().getSerializableExtra(
+						"reply_to_tweet");
+				stt.in_reply_to = replyTo.getId();
+				ViewStub replyToL = (ViewStub) findViewById(R.id.replyTo);
+				View replyToV = replyToL.inflate();
+				SearchFeedListAdapter.createTweetView(replyTo, this, replyToV);
+				TextView tv = (TextView) findViewById(R.id.feedItemText);
+				tv.setMovementMethod(new LinkMovementMethod());
+				tv = (TextView) findViewById(R.id.replyToText);
+				tv.setText(getString(R.string.in_reply_to).replace("{user}",
+						replyTo.getFromUser()));
+				tv.setVisibility(View.VISIBLE);
+			} else if (getIntent().hasExtra("stt")) {
 				try {
 					stt = SendTweetTask.fromBundle(getIntent().getBundleExtra(
 							"stt"));
@@ -230,7 +251,7 @@ public class ComposerScreen extends Activity {
 					invalidateOptionsMenu();
 				}
 			}
-			
+
 			if (getIntent().hasExtra("text"))
 				content.setText(getIntent().getStringExtra("text"));
 			else if (getIntent().hasExtra("append"))
@@ -240,7 +261,8 @@ public class ComposerScreen extends Activity {
 				invalidateOptionsMenu();
 			}
 		}
-		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("attach_location", false)) {
+		if (PreferenceManager.getDefaultSharedPreferences(
+				getApplicationContext()).getBoolean("attach_location", false)) {
 			getLocation();
 		}
 		Button spinner = (Button) findViewById(R.id.upload_with);
@@ -253,123 +275,155 @@ public class ComposerScreen extends Activity {
 			}
 		});
 
-		String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("upload_service", "twitter").toLowerCase();
+		String pref = PreferenceManager.getDefaultSharedPreferences(this)
+				.getString("upload_service", "twitter").toLowerCase();
 		setUploadWith(pref);
 		initializeAccountSwitcher(true);
 		setProgressBarIndeterminateVisibility(false);
 		setupAutocomplete();
 		content.requestFocus();
 	}
-	
-	public void appendText(String a){
-		EditText editor = (EditText)findViewById(R.id.tweetContent);
-		
+
+	public void appendText(String a) {
+		EditText editor = (EditText) findViewById(R.id.tweetContent);
+
 		a = editor.getText().toString() + a;
-		if(editor.getText().charAt(editor.getText().length()-1) != ' '){
+		if (editor.getText().charAt(editor.getText().length() - 1) != ' ') {
 			a = " " + a;
 		}
-		
+
 		editor.setText(a);
 	}
-	
+
 	HashMap<String, String> autocomplete;
 	Timer timer;
 
 	public void setupAutocomplete() {
 
-		final EditText editor = (EditText)findViewById(R.id.tweetContent);
-		final LinearLayout l = (LinearLayout)findViewById(R.id.autocompletion);
+		final EditText editor = (EditText) findViewById(R.id.tweetContent);
+		final LinearLayout l = (LinearLayout) findViewById(R.id.autocompletion);
 		// final ScrollView sc = (ScrollView)findViewById(R.id.scroll);
 		l.removeAllViews();
 		autocomplete = new HashMap<String, String>();
-		JSONObject ja = AutocompleteService.readAutocompleteFile(this, stt.from.getId());
-		if(ja == null) return;
+		JSONObject ja = AutocompleteService.readAutocompleteFile(this,
+				stt.from.getId());
+		if (ja == null)
+			return;
 
 		try {
 			@SuppressWarnings("rawtypes")
 			Iterator i = ja.keys();
-			while(i.hasNext()) {
+			while (i.hasNext()) {
 				String key = (String) i.next();
 				autocomplete.put(key, ja.getString(key));
 			}
-		} catch(Exception e) { e.printStackTrace(); }
-		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		timer = new Timer();
 		editor.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void afterTextChanged(Editable arg0) { }
+			public void afterTextChanged(Editable arg0) {
+			}
+
 			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {
+			}
+
 			@Override
-			public void onTextChanged(CharSequence text, int s, int before, int count) {
+			public void onTextChanged(CharSequence text, int s, int before,
+					int count) {
 				timer.cancel();
 				timer = new Timer();
 				l.removeAllViews();
 
 				timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        final boolean b = doRun();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                l.setVisibility(b ? View.VISIBLE : View.GONE);
-                            }
-                        });
-                    }
+					@Override
+					public void run() {
+						final boolean b = doRun();
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								l.setVisibility(b ? View.VISIBLE : View.GONE);
+							}
+						});
+					}
 
-                    public boolean doRun() {
-                        String text = editor.getText().toString();
-                        int start = editor.getSelectionStart();
+					public boolean doRun() {
+						String text = editor.getText().toString();
+						int start = editor.getSelectionStart();
 
-                        final int p = text.toString().lastIndexOf(" ", start);
-                        if ((p + 2) >= text.length()) return false;
-                        Log.d("autocomplete", text.charAt(p + 1) + "");
+						final int p = text.toString().lastIndexOf(" ", start);
+						if ((p + 2) >= text.length())
+							return false;
+						Log.d("autocomplete", text.charAt(p + 1) + "");
 
-                        if (text.charAt(p + 1) == '@') {
-                            // We are typing @someone
-                            String typed = text.subSequence(p + 1, start).toString().toLowerCase();
-                            if (typed.length() <= 2) return false;
-                            if (typed.charAt(0) == '@') typed = typed.substring(1);
-                            Log.d("autocomplete", "[" + (p + 1) + "," + start + "]: " + typed);
+						if (text.charAt(p + 1) == '@') {
+							// We are typing @someone
+							String typed = text.subSequence(p + 1, start)
+									.toString().toLowerCase();
+							if (typed.length() <= 2)
+								return false;
+							if (typed.charAt(0) == '@')
+								typed = typed.substring(1);
+							Log.d("autocomplete", "[" + (p + 1) + "," + start
+									+ "]: " + typed);
 
-                            boolean r = false;
-                            for (final String u : autocomplete.keySet()) {
-                                if (u.toLowerCase().contains(typed)) {
-                                    r = true;
-                                    final LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.autocomplete_item, null);
-                                    item.setOnClickListener(new OnClickListener() {
-                                        @Override
-                                        public void onClick(View arg0) {
-                                            int start = editor.getSelectionStart();
-                                            EditText editor = (EditText) findViewById(R.id.tweetContent);
-                                            String r = "@" + autocomplete.get(u) + " ";
-                                            editor.getText().replace(p + 1, start, r);
-                                            editor.setSelection(p + 1 + r.length());
-                                        }
-                                    });
+							boolean r = false;
+							for (final String u : autocomplete.keySet()) {
+								if (u.toLowerCase().contains(typed)) {
+									r = true;
+									final LinearLayout item = (LinearLayout) getLayoutInflater()
+											.inflate(
+													R.layout.autocomplete_item,
+													null);
+									item.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View arg0) {
+											int start = editor
+													.getSelectionStart();
+											EditText editor = (EditText) findViewById(R.id.tweetContent);
+											String r = "@"
+													+ autocomplete.get(u) + " ";
+											editor.getText().replace(p + 1,
+													start, r);
+											editor.setSelection(p + 1
+													+ r.length());
+										}
+									});
 
-                                    final RemoteImageView riv = (RemoteImageView) item.findViewById(R.id.image);
-                                    final TextView t = (TextView) item.findViewById(R.id.name);
-                                    SpannableString s = new SpannableString(u);
-                                    int selStart = u.toLowerCase().indexOf(typed);
-                                    s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-                                    t.setText(s);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            riv.setImageURL(Utilities.getUserImage(autocomplete.get(u), ComposerScreen.this));
-                                            l.addView(item);
-                                        }
-                                    });
-                                }
-                            }
-                            return r;
-                        }
-                        return false;
-                    }
+									final RemoteImageView riv = (RemoteImageView) item
+											.findViewById(R.id.image);
+									final TextView t = (TextView) item
+											.findViewById(R.id.name);
+									SpannableString s = new SpannableString(u);
+									int selStart = u.toLowerCase().indexOf(
+											typed);
+									s.setSpan(
+											new StyleSpan(Typeface.BOLD),
+											selStart,
+											selStart + typed.length(),
+											SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+									t.setText(s);
+									runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											riv.setImageURL(Utilities.getUserImage(
+													autocomplete.get(u),
+													ComposerScreen.this));
+											l.addView(item);
+										}
+									});
+								}
+							}
+							return r;
+						}
+						return false;
+					}
 
-                }, 400L);
+				}, 400L);
 			}
 		});
 	}
@@ -571,12 +625,12 @@ public class ComposerScreen extends Activity {
 			locate.setIcon(getTheme().obtainStyledAttributes(
 					new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
 		}
-        MenuItem draftsMenu = menu.findItem(R.id.draftAction);
-        if(_drafts != null) {
-            for(SendTweetTask draft : _drafts) {
-                draftsMenu.getSubMenu().add(draft.contents);
-            }
-        }
+		MenuItem draftsMenu = menu.findItem(R.id.draftAction);
+		if (_drafts != null) {
+			for (SendTweetTask draft : _drafts) {
+				draftsMenu.getSubMenu().add(draft.contents);
+			}
+		}
 		return true;
 	}
 
@@ -718,9 +772,11 @@ public class ComposerScreen extends Activity {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (resultCode == RESULT_OK) {
-			if (requestCode == GALLERY_SELECT_INTENT || requestCode == CAMERA_SELECT_INTENT) {
+			if (requestCode == GALLERY_SELECT_INTENT
+					|| requestCode == CAMERA_SELECT_INTENT) {
 				if (getFileSize(new File(stt.attachedImage)) == 0) {
-					Log.d("e", "Empty File. Using " + intent.getData().toString());
+					Log.d("e", "Empty File. Using "
+							+ intent.getData().toString());
 					stt.attachedImageUri = intent.getData();
 				}
 			} else if (resultCode == SELECT_MEDIA) {

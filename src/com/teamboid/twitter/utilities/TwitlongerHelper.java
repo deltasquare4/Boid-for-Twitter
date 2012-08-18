@@ -51,7 +51,7 @@ public class TwitlongerHelper {
 	 * @throws Exception
 	 */
 	public TwitlongerPostResponse post(String message, long inReplyTo, String inReplyToName) throws Exception {
-		ArrayList<NameValuePair> args = new ArrayList<NameValuePair>(2);
+		ArrayList<NameValuePair> args = new ArrayList<NameValuePair>();
 	    args.add(new BasicNameValuePair("application", _app));
 	    args.add(new BasicNameValuePair("api_key", _key));
 	    args.add(new BasicNameValuePair("username", _user));
@@ -151,7 +151,7 @@ public class TwitlongerHelper {
 		private String id;
 		
 		/**
-		 * Gets the content of the Twitlonge post, which is the shortened version of your over-140-character tweet.
+		 * Gets the content of the Twitlonger post, which is the shortened version of your over-140-character tweet.
 		 * @return Twitlonger post content
 		 */
 		public String getContent() { return content; }

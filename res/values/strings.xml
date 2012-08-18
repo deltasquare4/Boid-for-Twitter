@@ -491,4 +491,5 @@
     <string name="camera_str">Camera</string>
     <string name="gallery_str">Gallery</string>
     <string name="bio_str">Bio</string>
+    <string name="no_cropapp_str">No apps found for cropping your image!</string>
 </resources>
