@@ -9,7 +9,6 @@ import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
-import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -286,40 +285,29 @@ public class AccountManager extends PreferenceActivity {
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                Toast.makeText(AccountManager.this, R.string.swipe_to_delete_accounts, Toast.LENGTH_LONG).show();
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
+            	final Account acc = (Account)adapter.getItem(pos);
+                AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this)
+                        .setTitle(R.string.remove_account)
+                        .setMessage(getString(R.string.confirm_remove_account).replace("{account}", acc.getUser().getScreenName()))
+                        .setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                AccountService.removeAccount(AccountManager.this, acc);
+                                adapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                ab.create().show();
                 return false;
             }
         });
-        SwipeDismissListViewTouchListener touchListener =
-                new SwipeDismissListViewTouchListener(listView,
-                        new SwipeDismissListViewTouchListener.OnDismissCallback() {
-                            @Override
-                            public void onDismiss(ListView listView, final int[] pos) {
-
-                                final Account acc = (Account) adapter.getItem(pos[0]);
-                                AlertDialog.Builder ab = new AlertDialog.Builder(AccountManager.this)
-                                        .setTitle(R.string.remove_account)
-                                        .setMessage(getString(R.string.confirm_remove_account).replace("{account}", acc.getUser().getScreenName()))
-                                        .setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                AccountService.removeAccount(AccountManager.this, acc);
-                                                adapter.notifyDataSetChanged();
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                ab.create().show();
-                            }
-                        });
-        listView.setOnTouchListener(touchListener);
-        listView.setOnScrollListener(touchListener.makeScrollListener());
     }
 
     @Override

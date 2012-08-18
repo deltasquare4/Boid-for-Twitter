@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.TimerTask;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
@@ -53,11 +52,9 @@ import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewStub;
 import android.view.Window;
 
