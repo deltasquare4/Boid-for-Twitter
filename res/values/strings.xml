@@ -414,6 +414,7 @@
 		teenagers of Team Boid!
 	</string>
 
+	<string name="syncing">Boid is syncing</string>
 	<string-array name="sync_types">
 		<item>Following</item>
 		<item>Followers</item>

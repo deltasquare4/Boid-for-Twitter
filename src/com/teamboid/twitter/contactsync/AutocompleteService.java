@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import org.json.JSONObject;
 
+import android.R;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
@@ -59,46 +60,33 @@ public class AutocompleteService extends Service {
 		public SyncAdapterImpl(Service contactSyncAdapterService) {
 			super(contactSyncAdapterService);
 		}
+		
+		JSONObject ja;
 
 		@Override
-		public void onPerformSync(Account account, Bundle extras,
-				String authority, ContentProviderClient provider,
-				SyncResult syncResult) {
-			this.account = account;
-			JSONObject ja = new JSONObject();
+		Integer whatAmI() {
+			return com.teamboid.twitter.R.string.autocomplete;
+		}
 
-			int total = getTotalNumber();
-			int got = 0;
-
-			// Step 1: Start downloading users
-			Log.d("autocomplete", "Starting with a total of " + got
-					+ " out of " + total);
-			while (got < total) {
-				Log.d("autocomplete", "Downloading more users...");
-				User[] users = getTimeline();
-
-				if (users == null) {
-					Log.d("autocomplete", "Could not download users?");
-					syncResult.delayUntil = 60 * 60 * 2; // sync again in 2
-															// hours
-					return;
-				}
-
-				for (User user : users) {
-					try {
-						ja.put(user.getScreenName(), user.getScreenName());
-						ja.put(user.getName(), user.getScreenName());
-					} catch (Exception e) { // Should never happen
-						e.printStackTrace();
-					}
-				}
-				got += users.length;
-
-				Log.d("autocopmlete", "At a total of " + got + " out of "
-						+ total);
+		@Override
+		void processUser(User user) {
+			try {
+				ja.put(user.getScreenName(), user.getScreenName());
+				ja.put(user.getName(), user.getScreenName());
+			} catch (Exception e) { // Should never happen
+				e.printStackTrace();
 			}
+		}
 
-			// Step 2: Save to disk
+		@Override
+		void preSync() {
+			ja = new JSONObject();
+		}
+		
+		int getNotificationId(){return 38924;}
+
+		@Override
+		void postSync(SyncResult syncResult) {
 			try {
 				FileOutputStream fos = this.mContext.openFileOutput(
 						"autocomplete-" + getId() + ".json",
@@ -110,8 +98,6 @@ public class AutocompleteService extends Service {
 				Log.d("autocomplete", "Failed to save sync result to disk");
 				syncResult.delayUntil = 60 * 60 * 2;
 			}
-
-			// And we're done
 		}
 	}
 }
