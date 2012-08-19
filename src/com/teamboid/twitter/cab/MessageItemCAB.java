@@ -85,7 +85,7 @@ public class MessageItemCAB {
 				int index = 0;
 				for (final DirectMessage msg : selMessages) {
 					if(index > 0) toSet += "\n";
-					toSet += msg;
+					toSet += msg.getText();
 					index++;
 				}
 				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
