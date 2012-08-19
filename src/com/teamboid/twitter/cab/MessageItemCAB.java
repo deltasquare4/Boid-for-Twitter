@@ -3,6 +3,9 @@ package com.teamboid.twitter.cab;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -13,7 +16,6 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TweetListActivity;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.services.AccountService;
 
@@ -30,7 +32,7 @@ public class MessageItemCAB {
 
 	public static DirectMessage[] getSelectedMessages() {
 		ArrayList<DirectMessage> toReturn = new ArrayList<DirectMessage>();
-		if(context instanceof TweetListActivity) {
+		if(context instanceof ConversationScreen) {
 			ConversationScreen activity = (ConversationScreen)context;
 			SparseBooleanArray checkedItems = activity.getListView().getCheckedItemPositions();
 			if (checkedItems != null) {
@@ -50,9 +52,9 @@ public class MessageItemCAB {
 
 		private void updateTitle(int selectedConvoLength) {
 			if (selectedConvoLength == 1) {
-				actionMode.setTitle(R.string.one_convo_selected);
+				actionMode.setTitle(R.string.one_msg_selected);
 			} else {
-				actionMode.setTitle(context.getString(R.string.x_convos_selected).replace("{X}", Integer.toString(selectedConvoLength)));
+				actionMode.setTitle(context.getString(R.string.x_msg_selected).replace("{X}", Integer.toString(selectedConvoLength)));
 			}
 		}
 
@@ -78,6 +80,18 @@ public class MessageItemCAB {
 			mode.finish();
 
 			switch (item.getItemId()) {
+			case R.id.copyAction: {
+				String toSet = "";
+				int index = 0;
+				for (final DirectMessage msg : selMessages) {
+					if(index > 0) toSet += "\n";
+					toSet += msg;
+					index++;
+				}
+				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+				clipboard.setPrimaryClip(ClipData.newPlainText("Boid_DM", toSet));
+				Toast.makeText(context, context.getString(R.string.clipboard_str), Toast.LENGTH_SHORT).show();
+			}
 			case R.id.deleteAction: {
 				new Thread(new Runnable() {
 					public void run() {

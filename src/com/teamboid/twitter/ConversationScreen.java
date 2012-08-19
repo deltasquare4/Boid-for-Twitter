@@ -88,16 +88,10 @@ public class ConversationScreen extends ListActivity {
 				getLengthIndicator();
 				invalidateOptionsMenu();
 			}
-
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 		});
 		adapt = new MessageItemAdapter(this);
 		setListAdapter(adapt);
@@ -119,6 +113,7 @@ public class ConversationScreen extends ListActivity {
 			lastTheme = Utilities.getTheme(getApplicationContext());
 			recreate();
 		}
+		MessageItemCAB.context = this;
 	}
 
 	private void loadCachedMessages() {
@@ -131,8 +126,7 @@ public class ConversationScreen extends ListActivity {
 	}
 
 	public void reloadMessages() {
-		if (isLoading)
-			return;
+		if (isLoading) return;
 		isLoading = true;
 		showProgress(true);
 		final String screenName = getIntent().getStringExtra("screen_name");

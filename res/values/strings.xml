@@ -33,7 +33,8 @@
 	<string name="draft_str">Draft</string>
 	<string name="draft_prompt">Do you want to save this Tweet as a draft?</string>
 	<string name="always_attach_loc">Always Attach Location</string>
-	<string name="always_attach_loc_desc">Whether the composer will attach your location by default.</string>
+	<string name="always_attach_loc_desc">Whether the composer will attach your location by
+		default.</string>
 	<string name="display_real_name">Display Real Name</string>
 	<string name="display_real_name_desc">The full name of users are displayed in feeds, as
 		opposed to screen names.
@@ -71,6 +72,8 @@
 		post!
 	</string>
 	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!
+	</string>
+	<string name="clipboard_str">Copied to your clipboard!
 	</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
@@ -149,7 +152,8 @@
 
 	<string name="search_str">Search</string>
 	<string name="manage_accounts_str">Accounts</string>
-	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access push notification settings.</string>
+	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access push
+		notification settings.</string>
 	<string name="remove_account">Remove Account</string>
 	<string name="confirm_remove_account">Are you sure you want to remove @{account}?
 	</string>
@@ -166,7 +170,8 @@
 	<string name="delete_str">Delete</string>
 
 	<string name="help_title">Help</string>
-	<string name="help_description">Send feedback, donate, and view version/build information.</string>
+	<string name="help_description">Send feedback, donate, and view version/build
+		information.</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
 		Macphee, Philip Oakley, and Federico Zubani.
@@ -202,13 +207,15 @@
 		Tweets while viewing a Tweet.
 	</string>
 	<string name="enable_drafts_title">Drafts</string>
-	<string name="enable_drafts_desc">When disabled, a prompt will not be shown asking you whether you want to save an unsent tweet as a draft.</string>
+	<string name="enable_drafts_desc">When disabled, a prompt will not be shown asking
+		you whether you want to save an unsent tweet as a draft.</string>
 	<string name="clear_searchhistory_title">Clear Search History</string>
 	<string name="clear_searchhistory_desc">Clears your search history (that\'s accessed from
 		the timeline screen\'s search interface).
 	</string>
 	<string name="appearance_category">Appearance</string>
-	<string name="appearance_category_desc">Themes, font sizing, and other UI element settings.</string>
+	<string name="appearance_category_desc">Themes, font sizing, and other UI element settings.
+	</string>
 	<string name="enable_textual_list_title">Textual User Lists</string>
 	<string name="enable_textual_list_desc">User list columns display their name, even with
 		iconic tabs.
@@ -316,10 +323,12 @@
 
 	<string name="photo_service_title">Upload Service</string>
 	<string name="confirm_send_setting_title">Send Prompt</string>
-	<string name="confirm_send_setting_desc">Whether a prompt will be shown before sending a Tweet.</string>
+	<string name="confirm_send_setting_desc">Whether a prompt will be shown before sending a
+		Tweet.</string>
 	<string name="confirm_send_prompt">Send this tweet as @{account}?</string>
 	<string name="composer_str">Composer</string>
-	<string name="composer_desc_str">Enable drafts, attaching location by default, and other composer options.</string>
+	<string name="composer_desc_str">Enable drafts, attaching location by default, and
+		other composer options.</string>
 	<string name="users_and_tweets">Users and tweets</string>
 	<string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.
 	</string>
@@ -344,11 +353,14 @@
 	<string name="clear_str">Clear</string>
 	<string name="backup_str">Backup</string>
 	<string name="restore_str">Restore</string>
-	<string name="backed_up_muting">Your muting filters were successfully backed up for this account!
+	<string name="backed_up_muting">Your muting filters were successfully backed up for
+		this account!
 	</string>
-	<string name="restored_muting">Your muting filters were successfully restored for this account!
+	<string name="restored_muting">Your muting filters were successfully restored for
+		this account!
 	</string>
-	<string name="no_muting_backup">No muting filters backup file was found for this account!</string>
+	<string name="no_muting_backup">No muting filters backup file was found for this
+		account!</string>
 	<string name="loading_str">Loading…</string>
 	<string name="enable_ssl_str">Enable SSL</string>
 	<string name="disable_ssl_str">Disable SSL</string>
@@ -436,7 +448,8 @@
 		with @{user}!
 	</string>
 	<string name="night_mode">Night Mode</string>
-	<string name="night_mode_desc">Automatically switch themes or disable push notifications when the night falls.
+	<string name="night_mode_desc">Automatically switch themes or disable push
+		notifications when the night falls.
 	</string>
 	<string name="start_time_str">Start Time</string>
 	<string name="end_time_str">End Time</string>
@@ -471,11 +484,14 @@
 	<string name="no_location_str">No Location</string>
 
 	<string name="please_wait">Please wait…</string>
-	<string name="no_column_backup">No column backup file was found for this account!</string>
-	<string name="reset_str">Reset</string>
-	<string name="backed_up_columns">Your columns were successfully backed up for this account!
+	<string name="no_column_backup">No column backup file was found for this account!
 	</string>
-	<string name="restored_columns">Your columns were successfully restored for this account!
+	<string name="reset_str">Reset</string>
+	<string name="backed_up_columns">Your columns were successfully backed up for this
+		account!
+	</string>
+	<string name="restored_columns">Your columns were successfully restored for this
+		account!
 	</string>
 	<string name="screen_name_str">Screen name</string>
 	<string name="please_readd_accounts">Please re-add your accounts!</string>
@@ -487,13 +503,14 @@
 	<string name="email">Email Address</string>
 	<string name="password">Password</string>
 	<string name="autocomplete">Nickname Auto-completion</string>
-    <string name="timeline_widget_str">Timeline widget</string>
-    <string name="done_str">Done</string>
-    <string name="name_str">Name</string>
-    <string name="failed_get_accountinfo">Failed to get your most up to date account info, the last know info will be used.</string>
-    <string name="camera_str">Camera</string>
-    <string name="gallery_str">Gallery</string>
-    <string name="bio_str">Bio</string>
-    <string name="no_cropapp_str">No apps found for cropping your image!</string>
-    <string name="verified_str">Verified</string>
+	<string name="timeline_widget_str">Timeline widget</string>
+	<string name="done_str">Done</string>
+	<string name="name_str">Name</string>
+	<string name="failed_get_accountinfo">Failed to get your most up to date account info,
+		the last know info will be used.</string>
+	<string name="camera_str">Camera</string>
+	<string name="gallery_str">Gallery</string>
+	<string name="bio_str">Bio</string>
+	<string name="no_cropapp_str">No apps found for cropping your image!</string>
+	<string name="verified_str">Verified</string>
 </resources>

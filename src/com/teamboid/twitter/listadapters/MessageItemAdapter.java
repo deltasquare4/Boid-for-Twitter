@@ -15,7 +15,6 @@ import com.teamboid.twitterapi.dm.DirectMessage;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +91,7 @@ public class MessageItemAdapter extends BaseAdapter {
 		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		FeedListAdapter.ApplyFontSize(msgTxt, context, true);
 		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));
-		msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
+		//msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
 		return toReturn;
 	}
 }
