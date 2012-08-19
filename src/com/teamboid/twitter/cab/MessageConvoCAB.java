@@ -70,8 +70,6 @@ public class MessageConvoCAB {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            item.setEnabled(false);
-            item.setTitle(R.string.deleting_str);
             final DMConversation[] selConvos = getSelectedConvos();
             mode.finish();
 

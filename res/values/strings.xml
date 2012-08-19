@@ -409,6 +409,8 @@
 	<string name="x_users_selected">{X} Users Selected</string>
 	<string name="one_convo_selected">1 Conversation Selected</string>
 	<string name="x_convos_selected">{X} Conversations Selected</string>
+	<string name="one_msg_selected">1 Message Selected</string>
+	<string name="x_msg_selected">{X} Messages Selected</string>
 	<string name="donate_str">Donate</string>
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!
@@ -493,4 +495,5 @@
     <string name="gallery_str">Gallery</string>
     <string name="bio_str">Bio</string>
     <string name="no_cropapp_str">No apps found for cropping your image!</string>
+    <string name="verified_str">Verified</string>
 </resources>

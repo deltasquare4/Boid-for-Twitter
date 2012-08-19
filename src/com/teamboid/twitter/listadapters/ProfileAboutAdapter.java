@@ -111,6 +111,10 @@ public class ProfileAboutAdapter extends BaseAdapter {
 		NumberFormat nf = NumberFormat.getNumberInstance();
 		DecimalFormat df = (DecimalFormat)nf;
 		df.applyPattern("###,###,###,###,###.###");
+		
+		if(user.isVerified()) {
+			values.add(new BasicNameValuePair(mContext.getString(R.string.verified_str), null));
+		}
 		String desc = user.getDescription().replace("\n", " ").trim();
 		if(!desc.isEmpty()) {
 			values.add(new BasicNameValuePair(mContext.getString(R.string.bio_str), desc));
@@ -199,10 +203,14 @@ public class ProfileAboutAdapter extends BaseAdapter {
 			title.setText(curItem.getName());
 			FeedListAdapter.ApplyFontSize(title, mContext, true);
 			TextView body = (TextView)toReturn.findViewById(R.id.infoListItemBody);
-			if(curItem.getName().equals(mContext.getString(R.string.bio_str))) {
-				body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
-				body.setMovementMethod(LinkMovementMethod.getInstance());
-			} else body.setText(curItem.getValue());
+			if(curItem.getValue() == null || curItem.getValue().length() == 0) {
+				body.setVisibility(View.GONE);
+			} else {
+				if(curItem.getName().equals(mContext.getString(R.string.bio_str))) {
+					body.setText(Utilities.twitterifyText(mContext, curItem.getValue(), null, null, true));
+					body.setMovementMethod(LinkMovementMethod.getInstance());
+				} else body.setText(curItem.getValue());
+			}
 			FeedListAdapter.ApplyFontSize(body, mContext, true);
 		}
 		return toReturn;

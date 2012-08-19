@@ -3,6 +3,7 @@ package com.teamboid.twitter;
 import android.app.*;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,9 +16,9 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.user.User;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -170,24 +171,9 @@ PopupMenu.OnMenuItemClickListener {
 			@Override
 			public void run() {
 
-				InputStream input = null;
 				try {
-					if (newProfileUri != null) {
-						input = getContentResolver().openAssetFileDescriptor(
-								newProfileUri, "r").createInputStream();
-					} else
-						input = new FileInputStream(newProfileImg);
-				} catch (IOException e) {
-					e.printStackTrace();
-					Toast.makeText(getApplicationContext(),
-							e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-					return;
-				}
-
-				try {
-					toSet.getClient().updateProfileImage(input);
-					// TODO Update account cache and icon in timeline account
-					// switcher
+					toSet.getClient().updateProfileImage(newProfileImg);
+					// TODO Update account cache and icon in timeline account switcher
 				} catch (final Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -244,12 +230,13 @@ PopupMenu.OnMenuItemClickListener {
 			return;
 		}
 		intent.setData(imageUri);
+		intent.putExtra("crop", "true");
 		intent.putExtra("outputX", 70);
 		intent.putExtra("outputY", 70);
-		intent.putExtra("aspectX", 70);
-		intent.putExtra("aspectY", 70);
+		intent.putExtra("aspectX", 1);
+		intent.putExtra("aspectY", 1);
 		intent.putExtra("scale", true);
-		intent.putExtra("return-data", true);
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 		startActivityForResult(intent, CROP_RESULT);
 	}
 
@@ -305,29 +292,21 @@ PopupMenu.OnMenuItemClickListener {
 				newProfileImg = null;
 				newProfileUri = intent.getData();
 			}
-
 			if (newProfileUri != null) {
 				crop(newProfileUri);
 			} else crop(Uri.fromFile(newProfileImg));
-
-
-			//				try {
-			//					InputStream input = null;
-			//					if (newProfileUri != null) {
-			//						input = getContentResolver().openAssetFileDescriptor(
-			//								newProfileUri, "r").createInputStream();
-			//					} else {
-			//						input = new FileInputStream(newProfileImg);
-			//					}
-			//					toSet.getClient().updateProfileImage(input);
-			//				} catch(Exception e) {
-			//					e.printStackTrace();
-			//					Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-			//				}
 		}
 		if(requestCode == CROP_RESULT) {
-			((RemoteImageView) findViewById(R.id.profilePic)).setImageBitmap((Bitmap)intent.getExtras().getParcelable("data"));
-			//Toast.makeText(getApplicationContext(), intent.getData().toString(), Toast.LENGTH_LONG).show();
+			if (newProfileImg != null && newProfileImg.exists()) newProfileImg.delete();
+			newProfileUri = null;
+			Bitmap img = (Bitmap)intent.getExtras().getParcelable("data");
+			try {
+				newProfileImg = new File(Utilities.generateImageFileName(this));
+				img.compress(CompressFormat.PNG, 100, new FileOutputStream(Utilities.generateImageFileName(this)));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			((RemoteImageView)findViewById(R.id.profilePic)).setImageBitmap(img);
 		}
 	}
 
