@@ -175,11 +175,8 @@ public class ProfileEditor extends Activity implements
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-
 				try {
 					toSet.getClient().updateProfileImage(cropResultImg);
-					// TODO Update account cache and icon in timeline account
-					// switcher
 				} catch (final Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -192,6 +189,16 @@ public class ProfileEditor extends Activity implements
 						}
 					});
 					return;
+				}
+				if (cropResultImg != null) {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (cropResultImg.exists())
+								cropResultImg.delete();
+							cropResultImg = null;
+						}
+					});
 				}
 
 				try {
@@ -250,6 +257,7 @@ public class ProfileEditor extends Activity implements
 	private void captureImage() {
 		newProfileImg = null;
 		newProfileUri = null;
+		cropResultImg = null;
 		if (!Utilities.isIntentAvailable(this, MediaStore.ACTION_IMAGE_CAPTURE)) {
 			Toast.makeText(getApplicationContext(), R.string.no_camera_app,
 					Toast.LENGTH_SHORT).show();
@@ -265,6 +273,7 @@ public class ProfileEditor extends Activity implements
 	private void selectImage() {
 		newProfileImg = null;
 		newProfileUri = null;
+		cropResultImg = null;
 		try {
 			newProfileImg = Utilities.createImageFile(this);
 			Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null)
@@ -287,8 +296,13 @@ public class ProfileEditor extends Activity implements
 				if (newProfileImg.exists())
 					newProfileImg.delete();
 			}
+			if (cropResultImg != null) {
+				if (cropResultImg.exists())
+					cropResultImg.delete();
+			}
 			newProfileImg = null;
 			newProfileUri = null;
+			cropResultImg = null;
 			return;
 		}
 		if (requestCode == GALLERY_SELECT_INTENT
