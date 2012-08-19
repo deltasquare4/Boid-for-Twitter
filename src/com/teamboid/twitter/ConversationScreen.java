@@ -98,8 +98,9 @@ public class ConversationScreen extends ListActivity {
 		if (getIntent().getExtras() != null
 				&& getIntent().getExtras().containsKey("notification")) {
 			reloadMessages();
-		} else
+		} else {
 			loadCachedMessages();
+		}
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		getListView().setMultiChoiceModeListener(MessageItemCAB.choiceListener);
 	}
@@ -253,11 +254,7 @@ public class ConversationScreen extends ListActivity {
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// startActivity(new Intent(this, TimelineScreen.class));
-			// finish();
-
-			super.onBackPressed(); // Back button should go back, not restart a
-									// new activity
+			super.onBackPressed();
 			return true;
 		case R.id.refreshAction:
 			reloadMessages();
@@ -285,6 +282,7 @@ public class ConversationScreen extends ListActivity {
 								list.add(new DirectMessage[] { sentMsg });
 								adapt.add(sentMsg);
 								content.setText("");
+								getListView().smoothScrollToPosition(adapt.getCount() - 1);
 							}
 						});
 					} catch (final Exception e) {

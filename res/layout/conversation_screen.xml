@@ -9,7 +9,7 @@
 			android:layout_alignParentTop="true" />
 		<EditText android:id="@+id/messageInput" android:hint="@string/what_you_wanna_say"
 			android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
-			android:layout_marginTop="10dp" android:layout_marginBottom="15dp"
+			android:layout_marginTop="5dp" android:layout_marginBottom="5dp"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:layout_centerInParent="true" android:maxHeight="100dp"
 			android:inputType="textMultiLine|textCapSentences|textAutoCorrect">
@@ -20,8 +20,8 @@
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:layout_above="@+id/messageInputFrame">
 		<ListView android:id="@android:id/list" android:layout_width="fill_parent"
-			android:smoothScrollbar="true" android:transcriptMode="alwaysScroll"
-			android:fastScrollEnabled="true" android:layout_height="fill_parent" />
+			android:smoothScrollbar="true" android:fastScrollEnabled="true"
+			android:layout_height="fill_parent" />
 		<TextView android:id="@android:id/empty"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:text="@string/no_messages" android:layout_centerInParent="true"
