@@ -107,13 +107,14 @@ public class MessageConvoAdapter extends BaseAdapter {
 			return toReturn;
 		}
 		
-		public void remove(long id) {
+		public void remove(long id, MessageConvoAdapter adapt) {
 			for(int i = 0; i < messages.size(); i++) {
 				if(messages.get(i).getId() == id) {
 					messages.remove(i);
 					break;
 				}
 			}
+			adapt.notifyDataSetChanged();
 		}
 	}
 

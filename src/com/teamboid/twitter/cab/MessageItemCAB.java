@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
+import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 
 import com.teamboid.twitterapi.dm.DirectMessage;
@@ -85,7 +86,7 @@ public class MessageItemCAB {
 				int index = 0;
 				for (final DirectMessage msg : selMessages) {
 					if(index > 0) toSet += "\n";
-					toSet += msg.getText();
+					toSet += "@" + msg.getSenderScreenName() + ": " + msg.getText();
 					index++;
 				}
 				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -102,7 +103,7 @@ public class MessageItemCAB {
 								context.runOnUiThread(new Runnable() {
 									@Override
 									public void run() { 
-										adapt.find(((ConversationScreen)context).toScreenName).remove(msg.getId());
+										adapt.find(((ConversationScreen)context).toScreenName).remove(msg.getId(), adapt);
 									}
 								});
 							} catch (final Exception e) {
@@ -116,7 +117,14 @@ public class MessageItemCAB {
 							}
 							context.runOnUiThread(new Runnable() {
 								public void run() {
-									adapt.add(new DirectMessage[] { msg });
+									DMConversation convo = adapt.find(((ConversationScreen)context).toScreenName);
+									if(convo.getMessages().size() == 0) {
+										adapt.remove(convo);
+										((ConversationScreen)context).adapt.clear();
+									} else {
+										((ConversationScreen)context).adapt.setConversation(
+												adapt.find(((ConversationScreen)context).toScreenName));
+									}
 								}
 							});
 						}
