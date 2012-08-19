@@ -3,7 +3,7 @@ package com.teamboid.twitter;
 import android.app.*;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,8 +16,6 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.user.User;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,7 +25,7 @@ import java.util.ArrayList;
  * @author Aidan Follestad
  */
 public class ProfileEditor extends Activity implements
-PopupMenu.OnMenuItemClickListener {
+		PopupMenu.OnMenuItemClickListener {
 
 	private int lastTheme;
 	private boolean showProgress;
@@ -35,6 +33,7 @@ PopupMenu.OnMenuItemClickListener {
 	private int index;
 	private File newProfileImg;
 	private Uri newProfileUri;
+	private File cropResultImg;
 
 	public static final int CROP_RESULT = 400;
 	public static final int CAMERA_SELECT_INTENT = 500;
@@ -89,9 +88,11 @@ PopupMenu.OnMenuItemClickListener {
 		showProgress(true);
 		final ArrayList<Account> accs = AccountService.getAccounts();
 
-		// Load the account's user object again to make 100% sure the
-		// information is up to date, after the accounts been
-		// cached in local preferences and everything.
+		/*
+		 * Load the account's user object again to make 100% sure the
+		 * information is up to date, after the accounts been cached in local
+		 * preferences and everything.
+		 */
 		for (int i = 0; i < accs.size(); i++) {
 			if (accs.get(i).getUser().getScreenName()
 					.equals(getIntent().getStringExtra("screen_name"))) {
@@ -119,9 +120,11 @@ PopupMenu.OnMenuItemClickListener {
 											getApplicationContext(),
 											getString(R.string.failed_get_accountinfo),
 											Toast.LENGTH_LONG).show();
-									// Display the last known local account
-									// information if it fails to re-get the
-									// information.
+									/*
+									 * Display the last known local account
+									 * information if it fails to re-get the
+									 * information.
+									 */
 									displayAccount();
 								}
 							});
@@ -144,15 +147,17 @@ PopupMenu.OnMenuItemClickListener {
 		((EditText) findViewById(R.id.nameTxt)).setText(toSet.getUser()
 				.getName());
 		((EditText) findViewById(R.id.urlTxt))
-		.setText(toSet.getUser().getUrl());
+				.setText(toSet.getUser().getUrl());
 		((EditText) findViewById(R.id.locationTxt)).setText(toSet.getUser()
 				.getLocation());
 		((EditText) findViewById(R.id.bioTxt)).setText(toSet.getUser()
 				.getDescription());
 		((RemoteImageView) findViewById(R.id.profilePic)).setImageURL(toSet
 				.getUser().getProfileImageUrl());
-		// Update the account's information in the account service. This
-		// function also updates the account in the local preferences cache.
+		/*
+		 * Update the account's information in the account service. This
+		 * function also updates the account in the local preferences cache.
+		 */
 		AccountService.setAccount(this, index, toSet);
 	}
 
@@ -172,8 +177,9 @@ PopupMenu.OnMenuItemClickListener {
 			public void run() {
 
 				try {
-					toSet.getClient().updateProfileImage(newProfileImg);
-					// TODO Update account cache and icon in timeline account switcher
+					toSet.getClient().updateProfileImage(cropResultImg);
+					// TODO Update account cache and icon in timeline account
+					// switcher
 				} catch (final Exception e) {
 					e.printStackTrace();
 					runOnUiThread(new Runnable() {
@@ -224,19 +230,20 @@ PopupMenu.OnMenuItemClickListener {
 
 	private void crop(Uri imageUri) {
 		Intent intent = new Intent("com.android.camera.action.CROP");
-		intent.setType("image/*");
-		if(!Utilities.isIntentAvailable(this, intent)) {
-			Toast.makeText(getApplicationContext(), R.string.no_cropapp_str, Toast.LENGTH_LONG).show();
+		intent.setDataAndType(imageUri, "image/*");
+		if (!Utilities.isIntentAvailable(this, intent)) {
+			Toast.makeText(getApplicationContext(), R.string.no_cropapp_str,
+					Toast.LENGTH_LONG).show();
 			return;
 		}
-		intent.setData(imageUri);
 		intent.putExtra("crop", "true");
 		intent.putExtra("outputX", 70);
 		intent.putExtra("outputY", 70);
 		intent.putExtra("aspectX", 1);
 		intent.putExtra("aspectY", 1);
 		intent.putExtra("scale", true);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+		cropResultImg = new File(Utilities.generateImageFileName(this));
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(cropResultImg));
 		startActivityForResult(intent, CROP_RESULT);
 	}
 
@@ -261,9 +268,9 @@ PopupMenu.OnMenuItemClickListener {
 		try {
 			newProfileImg = Utilities.createImageFile(this);
 			Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null)
-			.setType("image/*")
-			.putExtra(MediaStore.EXTRA_OUTPUT,
-					Uri.fromFile(newProfileImg))
+					.setType("image/*")
+					.putExtra(MediaStore.EXTRA_OUTPUT,
+							Uri.fromFile(newProfileImg))
 					.putExtra("outputFormat", Bitmap.CompressFormat.PNG.name());
 			startActivityForResult(galleryIntent, GALLERY_SELECT_INTENT);
 		} catch (IOException e) {
@@ -287,26 +294,24 @@ PopupMenu.OnMenuItemClickListener {
 		if (requestCode == GALLERY_SELECT_INTENT
 				|| requestCode == CAMERA_SELECT_INTENT) {
 			if (ComposerScreen.getFileSize(newProfileImg) == 0) {
-				Log.d("e", "Empty File. Using "
-						+ intent.getData().toString());
+				Log.d("e", "Empty File. Using " + intent.getData().toString());
 				newProfileImg = null;
 				newProfileUri = intent.getData();
 			}
 			if (newProfileUri != null) {
 				crop(newProfileUri);
-			} else crop(Uri.fromFile(newProfileImg));
-		}
-		if(requestCode == CROP_RESULT) {
-			if (newProfileImg != null && newProfileImg.exists()) newProfileImg.delete();
-			newProfileUri = null;
-			Bitmap img = (Bitmap)intent.getExtras().getParcelable("data");
-			try {
-				newProfileImg = new File(Utilities.generateImageFileName(this));
-				img.compress(CompressFormat.PNG, 100, new FileOutputStream(Utilities.generateImageFileName(this)));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+			} else {
+				crop(Uri.fromFile(newProfileImg));
 			}
-			((RemoteImageView)findViewById(R.id.profilePic)).setImageBitmap(img);
+		} else if (requestCode == CROP_RESULT) {
+			if (newProfileImg != null && newProfileImg.exists()) {
+				newProfileImg.delete();
+				newProfileImg = null;
+			}
+			newProfileUri = null;
+			((RemoteImageView) findViewById(R.id.profilePic))
+					.setImageBitmap(BitmapFactory.decodeFile(cropResultImg
+							.getPath()));
 		}
 	}
 
