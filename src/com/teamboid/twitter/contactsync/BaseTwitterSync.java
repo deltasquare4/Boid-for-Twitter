@@ -134,6 +134,7 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 		}
 		
 		nm.cancel(getNotificationId());
+		syncResult.delayUntil = 60 * 60 * 60 * 12; // 12 hours
 		
 		postSync(syncResult);
 	}

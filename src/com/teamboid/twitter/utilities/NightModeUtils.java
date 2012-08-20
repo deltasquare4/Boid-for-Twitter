@@ -5,6 +5,7 @@ import java.util.Calendar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class NightModeUtils {
 	public static Calendar parseTimePreference(String input) {
@@ -32,10 +33,11 @@ public class NightModeUtils {
 				"00:00"));
 		Calendar end = parseTimePreference(prefs.getString("night_mode_endtime",
 				"00:00"));
-		if(start.get(Calendar.HOUR) >= 12 && now.get(Calendar.HOUR) < 12){
+		if(now.get(Calendar.HOUR) < start.get(Calendar.HOUR) && end.get(Calendar.HOUR) > now.get(Calendar.HOUR)){
 			start.roll(Calendar.DAY_OF_YEAR, -1);
 		}
 		
+		Log.d("night", start.toString() + " < " + now.toString() + " < " + end.toString());
 		if (now.after(start)) { // We have passed the begining of the night time
 			if (now.before(end)) { // We are actually inside night time now
 				return true;
