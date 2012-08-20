@@ -232,10 +232,8 @@ public class ComposerScreen extends Activity {
 			if (savedInstanceState.containsKey("lastTheme")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");
 				setTheme(lastTheme);
-			} else
-				setTheme(Utilities.getTheme(getApplicationContext()));
-		} else
-			setTheme(Utilities.getTheme(getApplicationContext()));
+			} else setTheme(Utilities.getTheme(getApplicationContext()));
+		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
 		lengthIndic = 140;
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
