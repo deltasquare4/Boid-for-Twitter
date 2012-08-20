@@ -106,10 +106,10 @@ public class MessageConvoAdapter extends BaseAdapter {
 			}
 			return toReturn;
 		}
-		
+
 		public void remove(long id, MessageConvoAdapter adapt) {
-			for(int i = 0; i < messages.size(); i++) {
-				if(messages.get(i).getId() == id) {
+			for (int i = 0; i < messages.size(); i++) {
+				if (messages.get(i).getId() == id) {
 					messages.remove(i);
 					break;
 				}
@@ -302,8 +302,14 @@ public class MessageConvoAdapter extends BaseAdapter {
 			messageTxt.setLayoutParams(layoutParams);
 		}
 		FeedListAdapter.ApplyFontSize(messageTxt, context);
-		((TextView) toReturn.findViewById(R.id.dmConvoScreenNameTxt))
-				.setText(curItem.getToName());
+		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+				"show_real_names", false)) {
+			((TextView) toReturn.findViewById(R.id.dmConvoScreenNameTxt))
+					.setText(curItem.getToName());
+		} else {
+			((TextView) toReturn.findViewById(R.id.dmConvoScreenNameTxt))
+					.setText("@" + curItem.getToScreenName());
+		}
 		messageTxt.setText(Utilities.twitterifyText(context, curItem
 				.getLastMessage().getText().replace("\n", " ").trim(), null,
 				null, true));
