@@ -257,7 +257,7 @@ public class FeedListAdapter extends BaseAdapter {
 		}
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
 			userNameTxt.setText(tweet.getUser().getName());
-		} else userNameTxt.setText(tweet.getUser().getScreenName());
+		} else userNameTxt.setText("@" + tweet.getUser().getScreenName());
 		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("enable_profileimg_download", true)) {
 			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser().getScreenName(), mContext));

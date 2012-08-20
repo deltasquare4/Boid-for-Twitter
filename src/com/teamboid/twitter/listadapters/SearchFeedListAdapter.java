@@ -164,10 +164,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         FeedListAdapter.ApplyFontSize(itemTxt, mContext);
         FeedListAdapter.ApplyFontSize(userNameTxt, mContext);
-
-        if(prefs.getBoolean("show_real_names", false)) {
-            userNameTxt.setText(tweet.getFromUser());
-        } else userNameTxt.setText(tweet.getFromUser());
+        userNameTxt.setText("@" + tweet.getFromUser());
         if(prefs.getBoolean("enable_profileimg_download", true)) {
             profilePic.setImageResource(R.drawable.sillouette);
             profilePic.setImageURL(Utilities.getUserImage(tweet.getFromUser(), mContext));

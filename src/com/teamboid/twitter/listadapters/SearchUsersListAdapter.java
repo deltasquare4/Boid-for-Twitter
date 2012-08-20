@@ -7,6 +7,7 @@ import com.teamboid.twitter.R;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,7 +103,11 @@ public class SearchUsersListAdapter extends BaseAdapter {
 		FeedListAdapter.ApplyFontSize(userName, mContext);
 		TextView userDesc = (TextView)toReturn.findViewById(R.id.userItemDescription);
 		FeedListAdapter.ApplyFontSize(userDesc, mContext);
-		userName.setText(user.getName());
+		if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("show_real_names", false)) {
+			userName.setText(user.getName());
+		} else {
+			userName.setText("@" + user.getScreenName());
+		}
 		if(user.getDescription() != null && !user.getDescription().trim().isEmpty()) {
 			userDesc.setText(Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, false));
 		} else userDesc.setText(mContext.getApplicationContext().getString(R.string.nodescription_str)); 
