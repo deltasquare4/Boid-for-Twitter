@@ -606,7 +606,7 @@ public class ComposerScreen extends Activity {
 		}
 
 		if (lengthIndic < 0) {
-			menu.findItem(R.id.cameraAction).setEnabled(false);
+			menu.findItem(R.id.captureAction).setEnabled(false);
 			menu.findItem(R.id.galleryAction).setEnabled(false);
 			findViewById(R.id.upload_with).setVisibility(View.GONE);
 			findViewById(R.id.upload_with_label).setVisibility(View.GONE);
@@ -627,10 +627,6 @@ public class ComposerScreen extends Activity {
 					new int[] { R.attr.galleryAttachedIcon }).getDrawable(0));
 		}
 
-		findViewById(R.id.upload_with).setVisibility(
-				stt.hasMedia() ? View.VISIBLE : View.GONE);
-		findViewById(R.id.upload_with_label).setVisibility(
-				stt.hasMedia() ? View.VISIBLE : View.GONE);
 		final EditText content = (EditText) findViewById(R.id.tweetContent);
 		if (stt.attachedImage == null
 				&& content.getText().toString().trim().length() == 0) {

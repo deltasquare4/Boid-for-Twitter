@@ -20,6 +20,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -33,11 +34,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.utilities.MediaUtilities;
+import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.media.ExternalMediaService;
 import com.teamboid.twitterapi.media.ExternalMediaService.AuthorizationNeeded;
 import com.teamboid.twitterapi.media.MediaServices;
 
 public class SelectMediaScreen extends PreferenceActivity {
+	
 	public class MediaPreference extends Preference {
 		public boolean checked;
 		public boolean needsConfig;
@@ -257,6 +260,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		}
 	}
 	
+	private int lastTheme;
 	private static Token requestToken;
 
 	@Override
@@ -345,9 +349,33 @@ public class SelectMediaScreen extends PreferenceActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			if (savedInstanceState.containsKey("lastTheme")) {
+				lastTheme = savedInstanceState.getInt("lastTheme");
+				setTheme(lastTheme);
+			} else setTheme(Utilities.getTheme(getApplicationContext()));
+		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		//TODO this function is deprecated and needs to be replaced.
 		addPreferencesFromResource(R.xml.select_media);
 		setupPreferences();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putInt("lastTheme", lastTheme);
+		super.onSaveInstanceState(outState);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			super.onBackPressed();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 }
