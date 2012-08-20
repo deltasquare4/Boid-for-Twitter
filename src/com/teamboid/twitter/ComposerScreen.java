@@ -232,8 +232,10 @@ public class ComposerScreen extends Activity {
 			if (savedInstanceState.containsKey("lastTheme")) {
 				lastTheme = savedInstanceState.getInt("lastTheme");
 				setTheme(lastTheme);
-			} else setTheme(Utilities.getTheme(getApplicationContext()));
-		} else setTheme(Utilities.getTheme(getApplicationContext()));
+			} else
+				setTheme(Utilities.getTheme(getApplicationContext()));
+		} else
+			setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
 		lengthIndic = 140;
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -322,9 +324,8 @@ public class ComposerScreen extends Activity {
 		spinner.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Intent i = new Intent(ComposerScreen.this,
-						SelectMediaScreen.class);
-				startActivityForResult(i, SELECT_MEDIA);
+				startActivityForResult(new Intent(ComposerScreen.this,
+						SelectMediaScreen.class), SELECT_MEDIA);
 			}
 		});
 
@@ -851,7 +852,7 @@ public class ComposerScreen extends Activity {
 							+ intent.getData().toString());
 					stt.attachedImageUri = intent.getData();
 				}
-			} else if (resultCode == SELECT_MEDIA) {
+			} else if (requestCode == SELECT_MEDIA) {
 				setUploadWith(intent.getStringExtra("service"));
 			}
 			getLengthIndicator();
