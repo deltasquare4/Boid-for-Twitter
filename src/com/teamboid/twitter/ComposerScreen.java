@@ -72,7 +72,7 @@ public class ComposerScreen extends Activity {
 	private float locationAccuracy;
 	private Place[] places;
 	private boolean isGettingLocation;
-	private int lengthIndic;
+	private int lengthIndic = 140;
 	private int draftIndex = -1;
 
 	/**
