@@ -104,7 +104,7 @@ public class AccountService extends Service {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		prefs.edit().remove(Long.toString(acc.getId()) + "_columns").commit();
 		prefs.edit().remove(Long.toString(acc.getId()) + "_muting").commit();
-		activity.getSharedPreferences("profiles", 0).edit().remove(acc.getToken()).commit();
+		activity.getSharedPreferences("profiles-v2", 0).edit().remove(acc.getUser().getId() + "").commit();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts.get(i).getToken().equals(acc.getToken())) {
 				accounts.remove(i);
