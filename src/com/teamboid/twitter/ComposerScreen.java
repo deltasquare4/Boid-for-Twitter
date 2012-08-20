@@ -605,7 +605,7 @@ public class ComposerScreen extends Activity {
 							+ Integer.toString(lengthIndic) + ")");
 		}
 
-		if (getLengthIndicator() < 0) {
+		if (lengthIndic < 0) {
 			menu.findItem(R.id.cameraAction).setEnabled(false);
 			menu.findItem(R.id.galleryAction).setEnabled(false);
 			findViewById(R.id.upload_with).setVisibility(View.GONE);
