@@ -50,7 +50,7 @@ public class SearchUsersListAdapter extends BaseAdapter {
 		for(User user : toAdd) {
 			if(add(user)) added++;
 		}
-		if(before == 0) return 0;
+		if(before == 0) return added;
 		else if(added == before) return 0;
 		else return (users.size() - before);
 	}

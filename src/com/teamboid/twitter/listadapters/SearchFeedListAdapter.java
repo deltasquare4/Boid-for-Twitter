@@ -82,7 +82,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		for(Tweet tweet : toAdd) {
 			if(add(tweet)) added++;
 		}
-		if(before == 0) return 0;
+		if(before == 0) return added;
 		else if(added == before) return 0;
 		else return (tweets.size() - before);
 	}

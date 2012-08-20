@@ -199,7 +199,6 @@ public class TimelineCAB {
 							public void run() {
 								try {
 									final Status unfavorited = cl.destroyFavorite(tweet.getId());
-									unfavorited.setFavorited(false);
 									TimelineCAB.context.runOnUiThread(new Runnable() {
 										public void run() {
 											TimelineCAB.reinsertStatus(unfavorited);
@@ -220,7 +219,6 @@ public class TimelineCAB {
 							public void run() {
 								try {
 									final Status favorited = cl.createFavorite(tweet.getId());
-									favorited.setFavorited(true);
 									TimelineCAB.context.runOnUiThread(new Runnable() {
 										public void run() {
 											TimelineCAB.reinsertStatus(favorited);
