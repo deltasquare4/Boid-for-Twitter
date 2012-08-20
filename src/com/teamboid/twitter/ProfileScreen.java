@@ -35,7 +35,6 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -149,34 +148,22 @@ public class ProfileScreen extends Activity {
 	private String mScreenName;
 
 	private void initializeTabs(Bundle savedInstanceState, String screenName) {
-		Log.d("boid", "Showing " + screenName);
 		mScreenName = screenName;
 		setTitle("@" + screenName);
-		mTabsAdapter = new TabsAdapter(this,
-				(ViewPager) findViewById(R.id.pager));
+		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
 		final ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if (iconic) {
-			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.timelineTab })
-									.getDrawable(0)),
-					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.aboutTab }).getDrawable(
-									0)), ProfileAboutFragment.class, 1,
-					screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.mediaTab }).getDrawable(
-									0)), MediaTimelineFragment.class, 2,
-					screenName, false);
+			mTabsAdapter.addTab(bar.newTab().setIcon(
+				getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)),
+				PaddedProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(bar.newTab().setIcon(
+				getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)),
+				ProfileAboutFragment.class, 1, screenName);
+			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { 
+					R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
 		} else {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str),
 					PaddedProfileTimelineFragment.class, 0, screenName);
@@ -185,9 +172,10 @@ public class ProfileScreen extends Activity {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title),
 					MediaTimelineFragment.class, 2, screenName, false);
 		}
-		if (savedInstanceState != null)
+		if (savedInstanceState != null) {
 			getActionBar().setSelectedNavigationItem(
 					savedInstanceState.getInt("lastTab", 0));
+		}
 	}
 
 	public void loadFollowingInfo() {

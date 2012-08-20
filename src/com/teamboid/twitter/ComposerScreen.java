@@ -4,7 +4,6 @@ import java.io.File;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.TimerTask;
 import java.util.*;
 
 import android.widget.*;
@@ -55,6 +54,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewStub;
 import android.view.Window;
 
@@ -73,7 +73,7 @@ public class ComposerScreen extends Activity {
 	private Place[] places;
 	private boolean isGettingLocation;
 	private int lengthIndic;
-	private ArrayList<SendTweetTask> _drafts;
+	private int draftIndex = -1;
 
 	/**
 	 * Ensures the UI is loaded with the correct information from stt
@@ -86,41 +86,72 @@ public class ComposerScreen extends Activity {
 	}
 
 	private void loadDrafts() {
-		if (!PreferenceManager.getDefaultSharedPreferences(
-				getApplicationContext()).getBoolean("enable_drafts", true)) {
+		if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("enable_drafts", true)) {
 			return;
 		}
-		if (getIntent().getExtras() != null)
-			return;
-		final SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		if (getIntent().getExtras() != null) return;
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (prefs.contains(stt.from.getId() + "_stt_draft")) {
 			EditText content = (EditText) findViewById(R.id.tweetContent);
 			if (content.getText().toString().trim().length() > 0) {
 				return; // Don't override if user is tweeting something already!
 			}
-			ArrayList<String> draftStore = Utilities.jsonToArray(prefs
-					.getString(stt.from.getId() + "_stt_draft", null));
-			_drafts = new ArrayList<SendTweetTask>();
-			for (String d : draftStore) {
+			findViewById(R.id.draftsTitle).setVisibility(View.VISIBLE);
+			final LinearLayout draftsArea = (LinearLayout) findViewById(R.id.draftsArea);
+			draftsArea.setVisibility(View.VISIBLE);
+			draftsArea.removeAllViews();
+			for(int i = 0; i < Utilities.jsonToArray(prefs.getString(stt.from.getId() + "_stt_draft", null)).size(); i++) {
 				try {
-					_drafts.add(SendTweetTask.fromJSONObject(new JSONObject(d)));
+					final SendTweetTask dt = SendTweetTask
+							.fromJSONObject(new JSONObject(Utilities.jsonToArray(
+									prefs.getString(stt.from.getId() + "_stt_draft", null)).get(i)));
+					final RelativeLayout item = (RelativeLayout) getLayoutInflater()
+							.inflate(R.layout.draft_item, null);
+					((TextView)item.findViewById(R.id.text)).setText(dt.contents);
+					if(dt.hasMedia()) {
+						((ImageView)item.findViewById(R.id.image)).setVisibility(View.VISIBLE);	
+					}
+					final int index = i;
+					item.setOnLongClickListener(new OnLongClickListener() {
+						@Override
+						public boolean onLongClick(View v) {
+							final ArrayList<String> draftStore = Utilities.jsonToArray(prefs
+									.getString(stt.from.getId() + "_stt_draft", null));
+							draftsArea.removeView(v);
+							draftStore.remove(index);
+							draftsArea.requestLayout();
+							if(draftStore.size() == 0) {
+								findViewById(R.id.draftsTitle).setVisibility(View.GONE);
+								draftsArea.setVisibility(View.GONE);
+								prefs.edit().remove(stt.from.getId() + "_stt_draft").commit();
+							} else {
+								prefs.edit().putString(stt.from.getId() + "_stt_draft", 
+										Utilities.arrayToJson(draftStore)).commit();
+							}
+							return true;
+						}
+					});
+					item.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View arg0) {
+							draftIndex = index;
+							stt = dt;
+							loadTask();
+						}
+					});
+					draftsArea.addView(item);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			invalidateOptionsMenu();
-			// loadTask();
 		}
 		invalidateOptionsMenu();
 	}
 
 	private void saveDraft() {
-		if (stt.from == null
-				|| !PreferenceManager.getDefaultSharedPreferences(
-						getApplicationContext()).getBoolean("enable_drafts",
-						true) || stt.in_reply_to > 0) {
+		if (stt.from == null || !PreferenceManager.getDefaultSharedPreferences(
+				getApplicationContext()).getBoolean("enable_drafts", true) || stt.in_reply_to > 0) {
 			finish();
 			return;
 		}
@@ -135,37 +166,34 @@ public class ComposerScreen extends Activity {
 		prompt.setMessage(R.string.draft_prompt);
 		prompt.setPositiveButton(R.string.yes_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						stt.contents = content;
-						SharedPreferences prefs = PreferenceManager
-								.getDefaultSharedPreferences(getApplicationContext());
-						ArrayList<String> draftStore = Utilities
-								.jsonToArray(prefs.getString(stt.from.getId()
-										+ "_stt_draft", null));
-						try {
-							draftStore.add(stt.toJSONObject().toString());
-							prefs.edit()
-									.putString(stt.from.getId() + "_stt_draft",
-											Utilities.arrayToJson(draftStore))
-									.commit();
-							// _stt_draft is so we don't get any issues with
-							// upgrading
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						dialog.dismiss();
-						finish();
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				stt.contents = content;
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				ArrayList<String> draftStore = Utilities.jsonToArray(prefs.getString(stt.from.getId() + "_stt_draft", null));
+				try {
+					if(draftIndex > -1) {
+						draftStore.set(draftIndex, stt.toJSONObject().toString());
+					} else {
+						draftStore.add(stt.toJSONObject().toString());
 					}
-				});
+					prefs.edit().putString(stt.from.getId() + "_stt_draft",
+							Utilities.arrayToJson(draftStore)).commit();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				dialog.dismiss();
+				finish();
+			}
+		});
 		prompt.setNegativeButton(R.string.no_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						finish();
-					}
-				});
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				finish();
+			}
+		});
 		prompt.create().show();
 	}
 
@@ -368,17 +396,14 @@ public class ComposerScreen extends Activity {
 								return false;
 							if (typed.charAt(0) == '@')
 								typed = typed.substring(1);
-							Log.d("autocomplete", "[" + (p + 1) + "," + start
-									+ "]: " + typed);
+							Log.d("autocomplete", "[" + (p + 1) + "," + start + "]: " + typed);
 
 							boolean r = false;
 							for (final String u : autocomplete.keySet()) {
 								if (u.toLowerCase().contains(typed)) {
 									r = true;
 									final LinearLayout item = (LinearLayout) getLayoutInflater()
-											.inflate(
-													R.layout.autocomplete_item,
-													null);
+											.inflate(R.layout.autocomplete_item, null);
 									item.setOnClickListener(new OnClickListener() {
 										@Override
 										public void onClick(View arg0) {
@@ -394,18 +419,12 @@ public class ComposerScreen extends Activity {
 										}
 									});
 
-									final RemoteImageView riv = (RemoteImageView) item
-											.findViewById(R.id.image);
-									final TextView t = (TextView) item
-											.findViewById(R.id.name);
+									final RemoteImageView riv = (RemoteImageView)item.findViewById(R.id.image);
+									final TextView t = (TextView)item.findViewById(R.id.name);
 									SpannableString s = new SpannableString(u);
-									int selStart = u.toLowerCase().indexOf(
-											typed);
-									s.setSpan(
-											new StyleSpan(Typeface.BOLD),
-											selStart,
-											selStart + typed.length(),
-											SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+									int selStart = u.toLowerCase().indexOf(typed);
+									s.setSpan(new StyleSpan(Typeface.BOLD), selStart, selStart + 
+											typed.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
 									t.setText(s);
 									runOnUiThread(new Runnable() {
 										@Override
@@ -422,7 +441,6 @@ public class ComposerScreen extends Activity {
 						}
 						return false;
 					}
-
 				}, 400L);
 			}
 		});
@@ -606,15 +624,15 @@ public class ComposerScreen extends Activity {
 			} else {
 				for (Place p : places) {
 					locate.getSubMenu().add(p.getFullName())
-							.setIcon(R.drawable.locate_blue);
+					.setIcon(R.drawable.locate_blue);
 				}
 				locate.getSubMenu()
-						.add(R.string.no_location_str)
-						.setIcon(
-								getTheme()
-										.obtainStyledAttributes(
-												new int[] { R.attr.locationDetachedIcon })
-										.getDrawable(0));
+				.add(R.string.no_location_str)
+				.setIcon(
+						getTheme()
+						.obtainStyledAttributes(
+								new int[] { R.attr.locationDetachedIcon })
+								.getDrawable(0));
 				if (stt.placeId == null) {
 					stt.placeId = places[0].getId();
 					Toast.makeText(getApplicationContext(),
@@ -624,12 +642,6 @@ public class ComposerScreen extends Activity {
 		} else {
 			locate.setIcon(getTheme().obtainStyledAttributes(
 					new int[] { R.attr.locationDetachedIcon }).getDrawable(0));
-		}
-		MenuItem draftsMenu = menu.findItem(R.id.draftAction);
-		if (_drafts != null) {
-			for (SendTweetTask draft : _drafts) {
-				draftsMenu.getSubMenu().add(draft.contents);
-			}
 		}
 		return true;
 	}
@@ -648,7 +660,7 @@ public class ComposerScreen extends Activity {
 		case R.id.sendAction:
 			if (PreferenceManager.getDefaultSharedPreferences(
 					getApplicationContext()).getBoolean("confirm_send_prompt",
-					false)) {
+							false)) {
 				AlertDialog.Builder diag = new AlertDialog.Builder(this);
 				diag.setTitle(R.string.tweet_str);
 				diag.setMessage(getString(R.string.confirm_send_prompt)
@@ -656,24 +668,25 @@ public class ComposerScreen extends Activity {
 								stt.from.getUser().getScreenName()));
 				diag.setPositiveButton(R.string.yes_str,
 						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								dialog.dismiss();
-								performSend();
-							}
-						});
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						dialog.dismiss();
+						performSend();
+					}
+				});
 				diag.setNegativeButton(R.string.no_str,
 						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								dialog.dismiss();
-							}
-						});
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						dialog.dismiss();
+					}
+				});
 				diag.create().show();
-			} else
+			} else {
 				performSend();
+			}
 			return true;
 		case R.id.captureAction:
 			if (stt.attachedImage != null) {
@@ -743,14 +756,21 @@ public class ComposerScreen extends Activity {
 	}
 
 	private void performSend() {
-		if (getLengthIndicator() < 0)
-			stt.twtlonger = true;
-		stt.contents = ((EditText) findViewById(R.id.tweetContent)).getText()
-				.toString();
-		// stt.in_reply_to = getIntent().getLongExtra("reply_to", 0);
+		if (getLengthIndicator() < 0) stt.twtlonger = true;
+		stt.contents = ((EditText) findViewById(R.id.tweetContent)).getText().toString();
 		stt.replyToName = getIntent().getStringExtra("reply_to_name");
-
 		SendTweetService.addTweet(stt);
+		if(draftIndex > -1) {
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			final ArrayList<String> draftStore = Utilities.jsonToArray(prefs.getString(stt.from.getId() + "_stt_draft", null));
+			draftStore.remove(draftIndex);
+			if(draftStore.size() > 0) {
+				prefs.edit().putString(stt.from.getId() + "_stt_draft", 
+						Utilities.arrayToJson(draftStore)).commit();
+			} else {
+				prefs.edit().remove(stt.from.getId() + "_stt_draft").commit();
+			}
+		}
 		finish();
 	}
 
@@ -813,9 +833,9 @@ public class ComposerScreen extends Activity {
 			stt.attachedImage = Utilities.createImageFile(this)
 					.getAbsolutePath();
 			Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null)
-					.setType("image/*")
-					.putExtra(MediaStore.EXTRA_OUTPUT,
-							Uri.parse(stt.attachedImage))
+			.setType("image/*")
+			.putExtra(MediaStore.EXTRA_OUTPUT,
+					Uri.parse(stt.attachedImage))
 					.putExtra("outputFormat", Bitmap.CompressFormat.PNG.name());
 			startActivityForResult(galleryIntent, GALLERY_SELECT_INTENT);
 		} catch (IOException e) {
