@@ -322,14 +322,13 @@ public class ProfileScreen extends Activity {
 			return true;
 		case R.id.refreshAction:
 			Fragment frag = getFragmentManager().findFragmentByTag(
-					"page:"
-							+ Integer.toString(getActionBar()
-									.getSelectedNavigationIndex()));
+					"page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
 			if (frag != null) {
-				if (frag instanceof BaseListFragment)
+				if (frag instanceof BaseListFragment) {
 					((BaseListFragment) frag).performRefresh(false);
-				else if (frag instanceof BaseGridFragment)
+				} else if (frag instanceof BaseGridFragment) {
 					((BaseGridFragment) frag).performRefresh(false);
+				}
 			}
 			return true;
 		case R.id.addToListAction:

@@ -117,7 +117,8 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 					try {
 						User temp = null;
 						if (screenName.equals(acc.getUser().getScreenName())) {
-							temp = acc.getUser();
+							temp = acc.getClient().verifyCredentials();
+							AccountService.setAccount(context, temp);
 						} else temp = acc.getClient().showUser(screenName);
 						final User user = temp;
 						context.runOnUiThread(new Runnable() {

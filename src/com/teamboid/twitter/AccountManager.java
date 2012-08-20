@@ -455,13 +455,10 @@ public class AccountManager extends PreferenceActivity {
 							prefs.edit().putBoolean("enable_ssl", newValue)
 									.commit();
 							invalidateOptionsMenu();
-							int index = 0;
 							for (Account acc : AccountService.getAccounts()) {
 								acc.setClient(acc.getClient().setSslEnabled(
 										newValue));
-								AccountService.setAccount(
-										getApplicationContext(), index, acc);
-								index++;
+								AccountService.setAccount(getApplicationContext(), acc);
 							}
 						}
 					});

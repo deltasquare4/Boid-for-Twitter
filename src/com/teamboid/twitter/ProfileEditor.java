@@ -30,7 +30,6 @@ public class ProfileEditor extends Activity implements
 	private int lastTheme;
 	private boolean showProgress;
 	private Account toSet;
-	private int index;
 	private File newProfileImg;
 	private Uri newProfileUri;
 	private File cropResultImg;
@@ -96,7 +95,7 @@ public class ProfileEditor extends Activity implements
 		for (int i = 0; i < accs.size(); i++) {
 			if (accs.get(i).getUser().getScreenName()
 					.equals(getIntent().getStringExtra("screen_name"))) {
-				index = i;
+				final int index = i;
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
@@ -158,7 +157,7 @@ public class ProfileEditor extends Activity implements
 		 * Update the account's information in the account service. This
 		 * function also updates the account in the local preferences cache.
 		 */
-		AccountService.setAccount(this, index, toSet);
+		AccountService.setAccount(this, toSet);
 	}
 
 	private void commitChanges() {
@@ -224,9 +223,15 @@ public class ProfileEditor extends Activity implements
 					});
 					return;
 				}
+				
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						/*
+						 * Update the account's information in the account service. This
+						 * function also updates the account in the local preferences cache.
+						 */
+						AccountService.setAccount(ProfileEditor.this, toSet);
 						showProgress(false);
 						finish();
 					}

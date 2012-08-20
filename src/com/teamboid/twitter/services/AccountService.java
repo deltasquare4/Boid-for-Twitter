@@ -81,9 +81,35 @@ public class AccountService extends Service {
 		return found;
 	}
 
-	public static void setAccount(Context context, int index, Account acc) {
-		if (accounts == null) accounts = new ArrayList<Account>();
-		accounts.set(index, acc);
+	public static void setAccount(Context context, User user) {
+		if (accounts == null) return;
+		else {
+			Account toSet = null;
+			for(int i = 0; i < accounts.size(); i++) {
+				if(accounts.get(i).getUser().getId() == user.getId()) {
+					toSet = accounts.get(i).setUser(user);
+					accounts.set(i, toSet);
+					break;
+				}
+			}
+			context.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
+            	.putString(toSet.getUser().getId() + "", Utils.serializeObject(toSet)).commit();
+		}
+	}
+
+
+	public static void setAccount(Context context, Account acc) {
+		if (accounts == null) {
+			accounts = new ArrayList<Account>();
+			accounts.add(acc);
+		} else {
+			for(int i = 0; i < accounts.size(); i++) {
+				if(accounts.get(i).getId() == acc.getId()) {
+					accounts.set(i, acc);
+					break;
+				}
+			}
+		}
         context.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
                 .putString(acc.getUser().getId() + "", Utils.serializeObject(acc)).commit();
 	}

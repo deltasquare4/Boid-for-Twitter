@@ -129,11 +129,9 @@ public class SettingsScreen extends PreferenceActivity  {
 			findPreference("enable_ssl").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					int index = 0;
 					for(Account acc : AccountService.getAccounts()) {
 						acc.setClient(acc.getClient().setSslEnabled((Boolean)newValue));
-						AccountService.setAccount(getActivity(), index, acc);
-						index++;
+						AccountService.setAccount(getActivity(), acc);
 					}
 					return true;
 				}
