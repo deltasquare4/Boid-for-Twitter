@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.contactsync.AutocompleteService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -255,6 +256,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 						});
 						return;
 					}
+					AutocompleteService.removeItem(user, mContext, AccountService.getCurrentAccount().getId());
 					mContext.runOnUiThread(new Runnable() {
 						public void run() { 
 							isFollowing = false;
@@ -273,6 +275,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 						});
 						return;
 					}
+					AutocompleteService.addItem(user, mContext, AccountService.getCurrentAccount().getId());
 					mContext.runOnUiThread(new Runnable() {
 						public void run() { 
 							isFollowing = true;

@@ -27,6 +27,22 @@ import com.teamboid.twitterapi.user.User;
  */
 public class AutocompleteService extends Service {
 	public static final String AUTHORITY = "com.teamboid.twitter.autocomplete";
+	
+	public static void removeItem(User user, Context c, long accId){
+		JSONObject jo = readAutocompleteFile(c, accId);
+		jo.remove(user.getName());
+		jo.remove(user.getScreenName());
+		saveAutocompleteFile(c, accId, jo);
+	}
+	
+	public static void addItem(User user, Context c, long accId){
+		JSONObject jo = readAutocompleteFile(c, accId);
+		try{
+			jo.put(user.getName(), user.getScreenName());
+			jo.put(user.getScreenName(), user.getScreenName());
+		} catch(Exception e){}
+		saveAutocompleteFile(c, accId, jo);
+	}
 
 	public static JSONObject readAutocompleteFile(Context c, long accId) {
 		try {
@@ -41,6 +57,21 @@ public class AutocompleteService extends Service {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static boolean saveAutocompleteFile(Context c, long accId, JSONObject ja){
+		try {
+			FileOutputStream fos = c.openFileOutput(
+					"autocomplete-" + accId + ".json",
+					Context.MODE_PRIVATE);
+			fos.write(ja.toString().getBytes());
+			fos.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d("autocomplete", "Failed to save sync result to disk");
+		}
+		return false;
 	}
 
 	@Override
@@ -87,15 +118,7 @@ public class AutocompleteService extends Service {
 
 		@Override
 		void postSync(SyncResult syncResult) {
-			try {
-				FileOutputStream fos = this.mContext.openFileOutput(
-						"autocomplete-" + getId() + ".json",
-						Context.MODE_PRIVATE);
-				fos.write(ja.toString().getBytes());
-				fos.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-				Log.d("autocomplete", "Failed to save sync result to disk");
+			if(!saveAutocompleteFile(mContext, getId(), ja)){
 				syncResult.delayUntil = 60 * 60 * 2;
 			}
 		}

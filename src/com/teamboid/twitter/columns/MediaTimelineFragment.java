@@ -21,12 +21,18 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
+import com.teamboid.twitter.listadapters.MediaFeedListAdapter.MediaFeedItem;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.Utilities;
+import com.teamboid.twitterapi.client.Paging;
+import com.teamboid.twitterapi.client.TwitterException;
+import com.teamboid.twitterapi.status.Status;
 
 /**
  * Represents the column that acts like the {@link TimelineFragment}, but pulls media out and displays the pictures in tiles.
@@ -40,6 +46,10 @@ public class MediaTimelineFragment extends BaseGridFragment {
     public static final String ID = "COLUMNTYPE:MEDIATIMELINE";
     private String screenName;
     private boolean manualRefresh;
+    
+    public MediaFeedListAdapter getAdapter(){
+    	return adapt;
+    }
 
     @Override
     public void onAttach(Activity act) {
@@ -93,49 +103,6 @@ public class MediaTimelineFragment extends BaseGridFragment {
                         .getItem(position);
                 if (tweet.tweet_id != -1) {
                     viewTweet(tweet.tweet_id);
-                } else {
-                    final ProgressDialog pd = new ProgressDialog(context);
-                    pd.setMessage(context.getString(R.string.loading_str));
-                    pd.show();
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                HttpClient httpclient = new DefaultHttpClient();
-                                String url = "http://api.twicsy.com/pic/"
-                                        + Uri.encode(tweet.twicsy_id)
-                                        + "?max=1";
-                                HttpGet g = new HttpGet(url);
-                                HttpResponse r = httpclient.execute(g);
-                                if (r.getStatusLine().getStatusCode() == 200) {
-                                    final long tweetId = Long
-                                            .parseLong(new JSONObject(
-                                                    EntityUtils.toString(r
-                                                            .getEntity()))
-                                                    .getJSONArray("results")
-                                                    .getJSONObject(0)
-                                                    .getString(
-                                                            "twitterStatusId"));
-                                    context.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            viewTweet(tweetId);
-                                        }
-                                    });
-                                } else {
-                                    throw new Exception("Non 200 response");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Toast.makeText(context, R.string.error_str,
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                            pd.dismiss();
-
-                        }
-
-                    }).start();
                 }
             }
         });
@@ -165,82 +132,84 @@ public class MediaTimelineFragment extends BaseGridFragment {
         super.onPause();
         savePosition();
     }
+    
+    boolean haveNotified = false;
+    int pageSkips = 0;
 
     @Override
     public void performRefresh(final boolean paginate) {
-//      TODO
-//      if (context == null || isLoading || adapt == null)
-//			return;
-//		isLoading = true;
-//		if (getView() != null && adapt != null) {
-//			adapt.setLastViewed(getGridView());
-//			if (adapt.getCount() == 0)
-//				setListShown(false);
-//		}
-//		if (!paginate)
-//			pageSkips = 0;
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				Paging paging = new Paging(50);
-//				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
-//				final Account acc = AccountService.getCurrentAccount();
-//				if (acc != null) {
-//					Status[] tweets = null;
-//					try {
-//						if (screenName != null) {
-//							tweets = acc.getClient().getUserMediaTimeline(screenName, paging);
-//						} else {
-//							tweets = acc.getClient().getHomeTimeline(paging);
-//						}
-//
-//						for (final Status p : tweets) {
-//							if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
-//								context.runOnUiThread(new Runnable() {
-//									@Override
-//									public void run() {
-//										MediaFeedItem m = new MediaFeedItem();
-//										m.imgurl = Utilities
-//												.getTweetYFrogTwitpicMedia(p);
-//										m.tweet_id = p.getId();
-//										adapt.add(
-//												new MediaFeedItem[] { m },
-//												MediaTimelineFragment.this);
-//									}
-//								});
-//								if(haveNotified == false){
-//									if(context instanceof ProfileScreen){
-//										((ProfileScreen)context).setupMediaView();
-//										haveNotified = true;
-//									}
-//								}
-//							}
-//						}
-//					} catch (final TwitterException e) {
-//						e.printStackTrace();
-//						context.runOnUiThread(new Runnable() {
-//							@Override
-//							public void run() {
-//								setEmptyText(context
-//										.getString(R.string.error_str));
-//								Toast.makeText(context,
-//										e.getErrorMessage(),
-//										Toast.LENGTH_SHORT).show();
-//							}
-//						});
-//					}
-//					if (pageSkips <= 5)
-//						return;
-//				}
-//				context.runOnUiThread(new Runnable() {
-//					@Override
-//					public void run() {
-//						isLoading = false;
-//						setListShown(true);
-//					}
-//				});
-//			}
-//		}).start();
+      if (context == null || isLoading || adapt == null)
+			return;
+		isLoading = true;
+		if (getView() != null && adapt != null) {
+			adapt.setLastViewed(getGridView());
+			if (adapt.getCount() == 0)
+				setListShown(false);
+		}
+		if (!paginate)
+			pageSkips = 0;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Paging paging = new Paging(50);
+				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				final Account acc = AccountService.getCurrentAccount();
+				if (acc != null) {
+					Status[] tweets = null;
+					try {
+						if (screenName != null) {
+							tweets = acc.getClient().getUserMediaTimeline(screenName, paging);
+						} else {
+							tweets = acc.getClient().getHomeTimeline(paging);
+						}
+
+						for (final Status p : tweets) {
+							if (Utilities.getTweetYFrogTwitpicMedia(p) != null) {
+								context.runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										MediaFeedItem m = new MediaFeedItem();
+										m.imgurl = Utilities
+												.getTweetYFrogTwitpicMedia(p);
+										m.tweet_id = p.getId();
+										adapt.add(
+												new MediaFeedItem[] { m },
+												MediaTimelineFragment.this);
+									}
+								});
+								if(haveNotified == false){
+									if(context instanceof ProfileScreen){
+										((ProfileScreen)context).setupMediaView();
+										haveNotified = true;
+									}
+								}
+							}
+						}
+					} catch (final Exception e) {
+						e.printStackTrace();
+						context.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								setEmptyText(context
+										.getString(R.string.error_str));
+								Toast.makeText(context,
+										e.getMessage(),
+										Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+					if (pageSkips <= 5)
+						return;
+				}
+				context.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						isLoading = false;
+						setListShown(true);
+					}
+				});
+			}
+		}).start();
     }
 
     @Override
@@ -249,12 +218,9 @@ public class MediaTimelineFragment extends BaseGridFragment {
             if (adapt != null && !firstInitialize && getView() != null)
                 adapt.setLastViewed(getGridView());
             if (screenName != null && !screenName.trim().isEmpty()) {
-                if (((ProfileScreen) context).mediaAdapter == null) {
-                    ((ProfileScreen) context).mediaAdapter = new MediaFeedListAdapter(
-                            context, null, AccountService
-                            .getCurrentAccount().getId());
-                }
-                adapt = ((ProfileScreen) context).mediaAdapter;
+            	adapt = new MediaFeedListAdapter(
+                        context, null, AccountService
+                        .getCurrentAccount().getId());
             } else {
                 adapt = AccountService.getMediaFeedAdapter(context,
                         MediaTimelineFragment.ID, AccountService

@@ -63,7 +63,6 @@ public class ProfileScreen extends Activity {
 	private int lastTheme;
 	private boolean showProgress;
 	public FeedListAdapter adapter;
-	public MediaFeedListAdapter mediaAdapter;
 	public User user;
 
 	public void showProgress(boolean visible) {
@@ -504,6 +503,10 @@ public class ProfileScreen extends Activity {
 		return (ProfileAboutFragment) getFragmentManager().findFragmentByTag(
 				"page:1");
 	}
+	public MediaTimelineFragment getMediaFragment() {
+		return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
+				"page:2");
+	}
 
 	/**
 	 * Sets up our own views for this
@@ -555,7 +558,7 @@ public class ProfileScreen extends Activity {
 						mTabsAdapter.onPageSelected(position);
 					}
 				});
-		setHeaderBackground(user.getProfileBackgroundImageUrl());
+		// setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {
@@ -618,6 +621,17 @@ public class ProfileScreen extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
 			getAboutFragment().performRefresh(false);
+		}
+	}
+
+	public void setupMediaView() {
+		try{
+			MediaFeedListAdapter.MediaFeedItem m = getMediaFragment().getAdapter().get(0);
+			setHeaderBackground(m.imgurl);
+		} catch(Exception e){
+			e.printStackTrace();
+			// Here we should divert to profile bg?
+			setHeaderBackground(user.getProfileBackgroundImageUrl());
 		}
 	}
 }
