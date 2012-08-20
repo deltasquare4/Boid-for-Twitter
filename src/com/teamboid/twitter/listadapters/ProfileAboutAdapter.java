@@ -100,20 +100,20 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	public boolean isFollowedBy() { return isFollowedBy; }
 
 	public static double round(double unrounded, int precision, int roundingMode) {
-	    BigDecimal bd = new BigDecimal(unrounded);
-	    BigDecimal rounded = bd.setScale(precision, roundingMode);
-	    return rounded.doubleValue();
+		BigDecimal bd = new BigDecimal(unrounded);
+		BigDecimal rounded = bd.setScale(precision, roundingMode);
+		return rounded.doubleValue();
 	}
-	
+
 	public void setUser(User _user) {
 		user = _user;
 		values.clear();
 		NumberFormat nf = NumberFormat.getNumberInstance();
 		DecimalFormat df = (DecimalFormat)nf;
 		df.applyPattern("###,###,###,###,###.###");
-		
+
 		if(user.isVerified()) {
-			values.add(new BasicNameValuePair(mContext.getString(R.string.verified_str), null));
+			values.add(new BasicNameValuePair("[VERIFIED]", null));
 		}
 		String desc = user.getDescription().replace("\n", " ").trim();
 		if(!desc.isEmpty()) {
@@ -188,17 +188,21 @@ public class ProfileAboutAdapter extends BaseAdapter {
 				public void onClick(View v) { performFollowClick(followBtn); }
 			});
 		} else {
-			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
-            if(position == 0) {
-                //If the position is 0 here that means the follow button isn't visible
-                int fiveDp = Utilities.convertDpToPx(mContext, 5);
-                int tenDp = Utilities.convertDpToPx(mContext, 10);
-                toReturn.setPadding(tenDp, tenDp, tenDp, fiveDp);
-            }
 			BasicNameValuePair curItem = null;
 			if(AccountService.getCurrentAccount().getUser().getId() == user.getId()) {
 				curItem = values.get(position);
 			} else curItem = values.get(position - 1);
+			if(curItem.getName().equals("[VERIFIED]")) {
+				return LayoutInflater.from(mContext).inflate(R.layout.verified_imageview, null);
+			}
+
+			toReturn = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.info_list_item, null);
+			if(position == 0) {
+				//If the position is 0 here that means the follow button isn't visible
+				int fiveDp = Utilities.convertDpToPx(mContext, 5);
+				int tenDp = Utilities.convertDpToPx(mContext, 10);
+				toReturn.setPadding(tenDp, tenDp, tenDp, fiveDp);
+			}
 			TextView title = (TextView)toReturn.findViewById(R.id.infoListItemTitle);
 			title.setText(curItem.getName());
 			FeedListAdapter.ApplyFontSize(title, mContext, true);
@@ -228,7 +232,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
 								Toast.makeText(mContext, mContext.getString(R.string.failed_unblock_str)
-                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
+										.replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;
@@ -246,7 +250,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
 								Toast.makeText(mContext, mContext.getString(R.string.failed_unfollow_str)
-                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
+										.replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;
@@ -264,7 +268,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 						mContext.runOnUiThread(new Runnable() {
 							public void run() { 
 								Toast.makeText(mContext, mContext.getString(R.string.failed_follow_str)
-                                        .replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
+										.replace("{user}", user.getScreenName()) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
 							}
 						});
 						return;
