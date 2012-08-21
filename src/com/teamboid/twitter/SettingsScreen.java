@@ -1,5 +1,6 @@
 package com.teamboid.twitter;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.robotmedia.billing.BillingController;
@@ -9,7 +10,6 @@ import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
-import com.teamboid.twitter.views.TimePreference;
 import com.teamboid.twitterapi.media.MediaServices;
 
 import android.app.Dialog;
@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 
+import android.preference.ListPreference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -242,19 +243,9 @@ public class SettingsScreen extends PreferenceActivity  {
     public static class NightModeFragment extends PreferenceFragment {
 		
 		private void displayTime(String time, String prefName, int summaryResId) {
-			TimePreference pref = (TimePreference)findPreference(prefName);
-			String toDisplay = null;
-			int minute = TimePreference.getMinute(time);
-			if(minute < 10) toDisplay = ":0" + Integer.toString(minute);
-			else toDisplay = ":" + Integer.toString(minute);
-			int hour = TimePreference.getHour(time);
-			if(hour == 0) {
-				toDisplay = "12" + toDisplay + " AM";
-			} else if(hour > 12) {
-				hour -= 12;
-				toDisplay = Integer.toString(hour) + toDisplay + " PM";
-			} else toDisplay = Integer.toString(hour) + toDisplay + " AM";
-			pref.setSummary(getString(summaryResId).replace("{time}", toDisplay));
+			ListPreference pref = (ListPreference)findPreference(prefName);
+			int index = Arrays.asList(pref.getEntryValues()).indexOf(pref.getValue());
+			pref.setSummary(getString(summaryResId).replace("{time}", pref.getEntries()[index].toString()));
 		}
 		
 		public void displayThemeText(String theme) {

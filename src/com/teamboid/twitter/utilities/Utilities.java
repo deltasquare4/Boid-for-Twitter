@@ -39,7 +39,6 @@ import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.views.NoUnderlineClickableSpan;
-import com.teamboid.twitter.views.TimePreference;
 
 import java.io.File;
 import java.io.IOException;
