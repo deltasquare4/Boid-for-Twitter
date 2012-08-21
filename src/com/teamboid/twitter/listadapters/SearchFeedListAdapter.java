@@ -76,6 +76,11 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	private boolean shouldFilter(Context context, Tweet tweet) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (!prefs.getBoolean("enable_muting", false) || !prefs.getBoolean("mute_search_enabled", false)) {
+			return false;
+		}
+		
 		final String[] filter = Utilities.getMuteFilters(context);
 		if (filter == null || filter.length == 0) {
 			return false;
@@ -196,10 +201,12 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(mContext);
 		if (prefs.getBoolean("enable_muting", false)) {
-			if (!prefs.getBoolean("mute_search_enabled", false))
+			if (!prefs.getBoolean("mute_search_enabled", false)) {
 				return;
-		} else
+			}
+		} else {
 			return;
+		}
 
 		setLastViewed(list);
 		for (int i = 0; i < tweets.size(); i++) {
