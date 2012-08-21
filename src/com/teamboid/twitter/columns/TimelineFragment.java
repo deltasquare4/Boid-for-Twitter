@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -115,9 +114,7 @@ public class TimelineFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = adapt.getCount() - 1;
-								final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-								int addedCount = adapt.add(feed,
-                                        prefs.getBoolean("enable_muting", true));
+								int addedCount = adapt.add(feed);
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
@@ -192,11 +189,10 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public void filter() {
-		if (getListView() == null || adapt == null)
+		if (getView() == null || adapt == null) {
 			return;
-		AccountService.clearFeedAdapter(context, TimelineFragment.ID,
-				AccountService.getCurrentAccount().getId());
-		performRefresh(false);
+		}
+		adapt.filter(getListView());
 	}
 
 	@Override

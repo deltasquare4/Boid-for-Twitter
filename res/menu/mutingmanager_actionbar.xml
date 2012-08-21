@@ -4,4 +4,13 @@
 	<item android:id="@+id/clearBtn" android:showAsAction="never" android:title="@string/clear_str" />
 	<item android:id="@+id/backupBtn" android:showAsAction="never" android:title="@string/backup_str" />
 	<item android:id="@+id/restoreBtn" android:showAsAction="never" android:title="@string/restore_str" />
+	
+	<group android:checkableBehavior="all">
+        <item android:id="@+id/muteTimelineCheck"
+              android:title="@string/mute_timeline_str" android:checked="true" />
+        <item android:id="@+id/muteMentionsCheck"
+              android:title="@string/mute_mentions_str" />
+        <item android:id="@+id/muteSearchCheck"
+              android:title="@string/mute_search_str" />
+    </group>
 </menu>

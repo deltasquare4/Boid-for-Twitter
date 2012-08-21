@@ -149,20 +149,31 @@ public class ProfileScreen extends Activity {
 	private void initializeTabs(Bundle savedInstanceState, String screenName) {
 		mScreenName = screenName;
 		setTitle("@" + screenName);
-		mTabsAdapter = new TabsAdapter(this, (ViewPager)findViewById(R.id.pager));
+		mTabsAdapter = new TabsAdapter(this,
+				(ViewPager) findViewById(R.id.pager));
 		final ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if (iconic) {
-			mTabsAdapter.addTab(bar.newTab().setIcon(
-				getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0)),
-				PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(bar.newTab().setIcon(
-				getTheme().obtainStyledAttributes(new int[] { R.attr.aboutTab }).getDrawable(0)),
-				ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setIcon(getTheme().obtainStyledAttributes(new int[] { 
-					R.attr.mediaTab }).getDrawable(0)), MediaTimelineFragment.class, 2, screenName, false);
+			mTabsAdapter.addTab(
+					bar.newTab().setIcon(
+							getTheme().obtainStyledAttributes(
+									new int[] { R.attr.timelineTab })
+									.getDrawable(0)),
+					PaddedProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(
+					bar.newTab().setIcon(
+							getTheme().obtainStyledAttributes(
+									new int[] { R.attr.aboutTab }).getDrawable(
+									0)), ProfileAboutFragment.class, 1,
+					screenName);
+			mTabsAdapter.addTab(
+					bar.newTab().setIcon(
+							getTheme().obtainStyledAttributes(
+									new int[] { R.attr.mediaTab }).getDrawable(
+									0)), MediaTimelineFragment.class, 2,
+					screenName, false);
 		} else {
 			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str),
 					PaddedProfileTimelineFragment.class, 0, screenName);
@@ -321,7 +332,9 @@ public class ProfileScreen extends Activity {
 			return true;
 		case R.id.refreshAction:
 			Fragment frag = getFragmentManager().findFragmentByTag(
-					"page:" + Integer.toString(getActionBar().getSelectedNavigationIndex()));
+					"page:"
+							+ Integer.toString(getActionBar()
+									.getSelectedNavigationIndex()));
 			if (frag != null) {
 				if (frag instanceof BaseListFragment) {
 					((BaseListFragment) frag).performRefresh(false);
@@ -503,6 +516,7 @@ public class ProfileScreen extends Activity {
 		return (ProfileAboutFragment) getFragmentManager().findFragmentByTag(
 				"page:1");
 	}
+
 	public MediaTimelineFragment getMediaFragment() {
 		return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
 				"page:2");
@@ -625,10 +639,11 @@ public class ProfileScreen extends Activity {
 	}
 
 	public void setupMediaView() {
-		try{
-			MediaFeedListAdapter.MediaFeedItem m = getMediaFragment().getAdapter().get(0);
+		try {
+			MediaFeedListAdapter.MediaFeedItem m = getMediaFragment()
+					.getAdapter().get(0);
 			setHeaderBackground(m.imgurl);
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			// Here we should divert to profile bg?
 			setHeaderBackground(user.getProfileBackgroundImageUrl());

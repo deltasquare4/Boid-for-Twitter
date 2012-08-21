@@ -72,6 +72,17 @@
 	<attr name="aboutTab" format="reference" />
 	<attr name="userFeedTab" format="reference" />
 	
+	<attr name="colManagerTimeline" format="reference" />
+	<attr name="colManagerMentions" format="reference" />
+	<attr name="colManagerMessages" format="reference" />
+	<attr name="colManagerTrends" format="reference" />
+	<attr name="colManagerFavorites" format="reference" />
+	<attr name="colManagerSavedSearch" format="reference" />
+	<attr name="colManagerUserList" format="reference" />
+	<attr name="colManagerNearby" format="reference" />
+	<attr name="colManagerMedia" format="reference" />
+	<attr name="colManagerUserFeedTab" format="reference" />
+	
 	<declare-styleable name="DragSortListView">
 		<attr name="collapsed_height" format="dimension" />
 		<attr name="drag_scroll_start" format="float" />

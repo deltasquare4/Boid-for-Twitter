@@ -22,6 +22,17 @@
 		<item name="spinnerActionBarDropDownColor">@color/black</item>
 		<item name="android:actionBarTabBarStyle">@style/customTabBar</item>
 		
+		<item name="colManagerTimeline">@drawable/home_tab_dark</item>
+		<item name="colManagerMentions">@drawable/mentions_tab_dark</item>
+		<item name="colManagerMessages">@drawable/messages_tab_dark</item>
+		<item name="colManagerTrends">@drawable/trends_tab_dark</item>
+		<item name="colManagerFavorites">@drawable/favorites_tab_dark</item>
+		<item name="colManagerSavedSearch">@drawable/savedsearch_tab_dark</item> 
+		<item name="colManagerUserList">@drawable/userlist_tab_dark</item>
+		<item name="colManagerNearby">@drawable/nearby_tab_dark</item>
+		<item name="colManagerMedia">@drawable/media_tab_dark</item>
+		<item name="colManagerUserFeedTab">@drawable/userfeed_dark</item>
+		
 		<item name="sendQueueEdit">@drawable/edit_action_dark</item>
 		<item name="sendQueueRefresh">@drawable/refresh_action_dark</item>
 		<item name="sendQueueDelete">@drawable/delete_dark</item>

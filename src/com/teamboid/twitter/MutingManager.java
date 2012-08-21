@@ -14,7 +14,6 @@ import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
 import android.app.ListActivity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -167,8 +166,22 @@ public class MutingManager extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			finish();
-			startActivity(new Intent(this, TimelineScreen.class).putExtra("filter", true));
+			super.onBackPressed();
+			return true;
+		case R.id.muteTimelineCheck:
+			item.setChecked(!item.isChecked());
+			PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+				.putBoolean("mute_timeline_enabled", item.isChecked()).commit();
+			return true;
+		case R.id.muteMentionsCheck:
+			item.setChecked(!item.isChecked());
+			PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+				.putBoolean("mute_mentions_enabled", item.isChecked()).commit();
+			return true;
+		case R.id.muteSearchCheck:
+			item.setChecked(!item.isChecked());
+			PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+				.putBoolean("mute_search_enabled", item.isChecked()).commit();
 			return true;
 		case R.id.backupBtn:
 			backup();
@@ -182,12 +195,6 @@ public class MutingManager extends ListActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		finish();
-		startActivity(new Intent(this, TimelineScreen.class).putExtra("filter", true));
 	}
 	
 	public void backup() {

@@ -54,11 +54,17 @@ import java.util.*;
  */
 public class Utilities {
 
+	public static String[] getMuteFilters(Context context) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String prefName = Long.toString(AccountService.getCurrentAccount().getId()) + "_muting";
+		return Utilities.jsonToArray(prefs.getString(prefName, "")).toArray(new String[0]);
+	}
+	
 	public static void recreateFeedAdapter(Activity context, FeedListAdapter adapt) {
 		Status[] before = null;
 		if(adapt.getCount() > 0) before = adapt.toArray();
 		adapt = new FeedListAdapter(context, adapt.ID, adapt.account);
-		if(before != null) adapt.add(before, true);
+		if(before != null) adapt.add(before);
 		int index = 0;
 		for(FeedListAdapter a : AccountService.feedAdapters) {
 			if(a.ID.equals(adapt.ID) && a.account == adapt.account) {

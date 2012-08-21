@@ -118,8 +118,8 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 			public void run() {
 				Paging paging = new Paging(50);
 				if (paginate)
-					paging.setMaxId(context.adapter.getItemId(
-							context.adapter.getCount() - 1));
+					paging.setMaxId(context.adapter.getItemId(context.adapter
+							.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
@@ -138,8 +138,8 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 												beforeLast + 1);
 									} else if (getView() != null
 											&& context.adapter != null) {
-										context.adapter.restoreLastViewed(
-												getListView());
+										context.adapter
+												.restoreLastViewed(getListView());
 									}
 								}
 								if (!PreferenceManager
@@ -193,7 +193,8 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	@Override
 	public void reloadAdapter(boolean firstInitialize) {
 		if (AccountService.getCurrentAccount() != null) {
-			if (context.adapter != null && !firstInitialize && getView() != null) {
+			if (context.adapter != null && !firstInitialize
+					&& getView() != null) {
 				context.adapter.setLastViewed(getListView());
 			}
 			if (context.adapter == null) {

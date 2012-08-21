@@ -199,6 +199,10 @@ public class SavedSearchFragment extends BaseListFragment {
 
     @Override
     public void filter() {
+    	if (getView() == null || adapt == null) {
+			return;
+		}
+		adapt.filter(getListView());
     }
 
     @Override

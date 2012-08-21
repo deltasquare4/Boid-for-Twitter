@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import com.teamboid.twitter.R;
 import com.teamboid.twitterapi.user.User;
-import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
@@ -14,7 +13,6 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.BaseColumns;

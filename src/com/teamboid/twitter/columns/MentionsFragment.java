@@ -27,7 +27,8 @@ import com.teamboid.twitterapi.user.User;
 import com.teamboid.twitterapi.utilities.Utils;
 
 /**
- * Represents the column that displays the current user's mentions. 
+ * Represents the column that displays the current user's mentions.
+ * 
  * @author Aidan Follestad
  */
 public class MentionsFragment extends BaseListFragment {
@@ -45,36 +46,47 @@ public class MentionsFragment extends BaseListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int index, long id) {
 		super.onListItemClick(l, v, index, id);
-		Status tweet = (Status)adapt.getItem(index);
-		if (tweet.isRetweet()) tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class)
-			.putExtra("sr_tweet", Utils.serializeObject(tweet))
-			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		Status tweet = (Status) adapt.getItem(index);
+		if (tweet.isRetweet())
+			tweet = tweet.getRetweetedStatus();
+		context.startActivity(new Intent(context, TweetViewer.class).putExtra(
+				"sr_tweet", Utils.serializeObject(tweet)).addFlags(
+				Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
-		getListView().setOnScrollListener(
-				new AbsListView.OnScrollListener() {
-					@Override
-					public void onScrollStateChanged(AbsListView view, int scrollState) { }
-					@Override
-					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-						if (totalItemCount > 0 && (firstVisibleItem + visibleItemCount) >= totalItemCount && totalItemCount > visibleItemCount) {
-							performRefresh(true);
-						}
-						if (firstVisibleItem == 0 && context.getActionBar().getTabCount() > 0) {
-							if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText(R.string.mentions_str);
-							} else {
-								context.getActionBar().getTabAt(getArguments().getInt("tab_index")).setText("");
-							}
-						}
+		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+		getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
+		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				if (totalItemCount > 0
+						&& (firstVisibleItem + visibleItemCount) >= totalItemCount
+						&& totalItemCount > visibleItemCount) {
+					performRefresh(true);
+				}
+				if (firstVisibleItem == 0
+						&& context.getActionBar().getTabCount() > 0) {
+					if (!PreferenceManager.getDefaultSharedPreferences(context)
+							.getBoolean("enable_iconic_tabs", true)) {
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText(R.string.mentions_str);
+					} else {
+						context.getActionBar()
+								.getTabAt(getArguments().getInt("tab_index"))
+								.setText("");
 					}
-				});
+				}
+			}
+		});
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_mentions));
 		reloadAdapter(true);
@@ -105,31 +117,52 @@ public class MentionsFragment extends BaseListFragment {
 			@Override
 			public void run() {
 				Paging paging = new Paging(50);
-				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
+				if (paginate)
+					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
 					try {
-						final Status[] feed = acc.getClient().getMentions(paging);
+						final Status[] feed = acc.getClient().getMentions(
+								paging);
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context.getString(R.string.no_mentions));
+								setEmptyText(context
+										.getString(R.string.no_mentions));
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
-											getListView().smoothScrollToPosition(beforeLast + 1);
-										} else if (getView() != null && adapt != null) {
+											getListView()
+													.smoothScrollToPosition(
+															beforeLast + 1);
+										} else if (getView() != null
+												&& adapt != null) {
 											adapt.restoreLastViewed(getListView());
 										}
 									}
-									if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_iconic_tabs", true)) {
-										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
-											.setText(context.getString(R.string.mentions_str) + " (" + Integer.toString(addedCount) + ")");
+									if (!PreferenceManager
+											.getDefaultSharedPreferences(
+													context).getBoolean(
+													"enable_iconic_tabs", true)) {
+										context.getActionBar()
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
+												.setText(
+														context.getString(R.string.mentions_str)
+																+ " ("
+																+ Integer
+																		.toString(addedCount)
+																+ ")");
 									} else {
-										context.getActionBar().getTabAt(getArguments().getInt("tab_index"))
-											.setText(Integer.toString(addedCount));
+										context.getActionBar()
+												.getTabAt(
+														getArguments().getInt(
+																"tab_index"))
+												.setText(
+														Integer.toString(addedCount));
 									}
 								}
 							}
@@ -139,8 +172,10 @@ public class MentionsFragment extends BaseListFragment {
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+								setEmptyText(context
+										.getString(R.string.error_str));
+								Toast.makeText(context, e.getMessage(),
+										Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
@@ -148,7 +183,8 @@ public class MentionsFragment extends BaseListFragment {
 				context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (getView() != null) setListShown(true);
+						if (getView() != null)
+							setListShown(true);
 						isLoading = false;
 					}
 				});
@@ -163,10 +199,13 @@ public class MentionsFragment extends BaseListFragment {
 		if (AccountService.getCurrentAccount() != null) {
 			if (adapt != null && !firstInitialize && getView() != null)
 				adapt.setLastViewed(getListView());
-			adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID, AccountService.getCurrentAccount().getId());
+			adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID,
+					AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0) performRefresh(false);
-			else if (getView() != null && adapt != null) adapt.restoreLastViewed(getListView());
+			if (adapt.getCount() == 0)
+				performRefresh(false);
+			else if (getView() != null && adapt != null)
+				adapt.restoreLastViewed(getListView());
 		}
 	}
 
@@ -189,31 +228,44 @@ public class MentionsFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void filter() { }
-
-	@Override
-	public Status[] getSelectedStatuses() {
-        if (adapt == null && getView() == null) {
-            Log.d("BOID CAB", "Adapter or view is null, getSelectedStatuses() cancelled...");
-            return null;
-        }
-        ArrayList<Status> toReturn = new ArrayList<Status>();
-        SparseBooleanArray choices = getListView().getCheckedItemPositions();
-        for (int i = 0; i < choices.size(); i++) {
-            if(choices.valueAt(i)) {
-                toReturn.add((Status)adapt.getItem(choices.keyAt(i)));
-            }
-        }
-        Log.d("BOID CAB", "getSelectedStatuses() returning " + toReturn.size() + " items!");
-        return toReturn.toArray(new Status[0]);
+	public void filter() {
+		if (getView() == null || adapt == null) {
+			return;
+		}
+		adapt.filter(getListView());
 	}
 
 	@Override
-	public User[] getSelectedUsers() { return null; }
+	public Status[] getSelectedStatuses() {
+		if (adapt == null && getView() == null) {
+			Log.d("BOID CAB",
+					"Adapter or view is null, getSelectedStatuses() cancelled...");
+			return null;
+		}
+		ArrayList<Status> toReturn = new ArrayList<Status>();
+		SparseBooleanArray choices = getListView().getCheckedItemPositions();
+		for (int i = 0; i < choices.size(); i++) {
+			if (choices.valueAt(i)) {
+				toReturn.add((Status) adapt.getItem(choices.keyAt(i)));
+			}
+		}
+		Log.d("BOID CAB", "getSelectedStatuses() returning " + toReturn.size()
+				+ " items!");
+		return toReturn.toArray(new Status[0]);
+	}
 
 	@Override
-	public Tweet[] getSelectedTweets() { return null; }
+	public User[] getSelectedUsers() {
+		return null;
+	}
 
 	@Override
-	public DMConversation[] getSelectedMessages() { return null; }
+	public Tweet[] getSelectedTweets() {
+		return null;
+	}
+
+	@Override
+	public DMConversation[] getSelectedMessages() {
+		return null;
+	}
 }

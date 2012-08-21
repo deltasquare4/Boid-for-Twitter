@@ -104,38 +104,38 @@ public class ColumnManagerAdapter extends BaseAdapter {
 		Drawable image = null;
 		if(c.equals(TimelineFragment.ID)) {
 			c = _context.getString(R.string.timeline_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.timelineTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerTimeline }).getDrawable(0);
 		} else if(c.equals(MentionsFragment.ID)) {
 			c = _context.getString(R.string.mentions_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.mentionsTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerMentions }).getDrawable(0);
 		} else if(c.equals(MessagesFragment.ID)) {
 			c = _context.getString(R.string.messages_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.messagesTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerMessages }).getDrawable(0);
 		} else if(c.equals(TrendsFragment.ID)) {
 			c = _context.getString(R.string.trends_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.trendsTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerTrends }).getDrawable(0);
 		} else if(c.equals(FavoritesFragment.ID)) {
 			c = _context.getString(R.string.favorites_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.favoritesTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerFavorites }).getDrawable(0);
 		} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
 			c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.savedSearchTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerSavedSearch }).getDrawable(0);
 		} else if(c.startsWith(UserListFragment.ID + "@")) {
 			c = c.substring(UserListFragment.ID.length() + 1);
 			c = c.substring(0, c.indexOf("@")).replace("%40", "@");
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerUserList }).getDrawable(0);
 		} else if(c.equals(NearbyFragment.ID)) {
 			c = _context.getString(R.string.nearby_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.nearbyTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerNearby }).getDrawable(0);
 		} else if(c.equals(MediaTimelineFragment.ID)) {
 			c = _context.getString(R.string.media_timeline_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.mediaTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerMedia }).getDrawable(0);
 		} else if(c.equals(MyListsFragment.ID)) {
 			c = _context.getString(R.string.my_lists_str);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.userListTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerUserList }).getDrawable(0);
 		} else if(c.startsWith(ProfileTimelineFragment.ID + "@")) {
 			c = "@" + c.substring(ProfileTimelineFragment.ID.length() + 1);
-			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.userFeedTab }).getDrawable(0);
+			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerUserFeedTab }).getDrawable(0);
 		} else {
 			c = "Invalid Column";
 			image = null;

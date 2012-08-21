@@ -115,7 +115,7 @@ public class TweetViewer extends MapActivity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
                 startActivity(new Intent(getApplicationContext(), TweetViewer.class)
-                        .putExtra("sr_tweet", Utils.serializeObject(binder.getTweet(pos)))
+                        .putExtra("sr_tweet", Utils.serializeObject((Status)binder.getItem(pos)))
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
