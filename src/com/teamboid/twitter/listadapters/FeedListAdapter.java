@@ -96,6 +96,19 @@ public class FeedListAdapter extends BaseAdapter {
 	}
 
 	private boolean shouldFilter(Context context, Status tweet) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (prefs.getBoolean("enable_muting", false)) {
+			if(this.ID != null) {
+				boolean filteringDisabled = false;
+				if(this.ID.equals(TimelineFragment.ID)) {
+					filteringDisabled = !prefs.getBoolean("mute_timeline_enabled", true);
+				} else if(this.ID.equals(MentionsFragment.ID)) {
+					filteringDisabled = !prefs.getBoolean("mute_mentions_enabled", false);
+				}
+				if(filteringDisabled) return false;
+			}
+		} else return false;
+		
 		final String[] filter = Utilities.getMuteFilters(context);
 		if (filter == null || filter.length == 0) {
 			return false;
