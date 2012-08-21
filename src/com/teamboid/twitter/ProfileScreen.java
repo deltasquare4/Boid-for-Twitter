@@ -532,8 +532,7 @@ public class ProfileScreen extends Activity {
 				new OnImageReceivedListener() {
 					@Override
 					public void onImageReceived(String arg0, Bitmap bitmap) {
-						profileImg.setImageBitmap(Utilities.getRoundedImage(
-								bitmap, 90F));
+						profileImg.setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
 					}
 				});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
@@ -572,7 +571,7 @@ public class ProfileScreen extends Activity {
 						mTabsAdapter.onPageSelected(position);
 					}
 				});
-		// setHeaderBackground(user.getProfileBackgroundImageUrl());
+		setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {
