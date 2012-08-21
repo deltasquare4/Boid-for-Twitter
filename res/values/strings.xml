@@ -516,4 +516,51 @@
 	<string name="mute_timeline_str">Mute Timeline</string>
 	<string name="mute_mentions_str">Mute Mentions</string>
 	<string name="mute_search_str">Mute Search</string>
+	
+	<string-array name="nightmode_starttimes">
+		<item>4PM</item>
+		<item>5PM</item>
+		<item>6PM</item>
+		<item>7PM</item>
+		<item>8PM</item>
+		<item>9PM</item>
+		<item>10PM</item>
+		<item>11PM</item>
+		<item>12AM (Midnight)</item>
+	</string-array>
+	<string-array name="nightmode_endtimes">
+	    <item>4AM</item>
+	    <item>5AM</item>
+	    <item>6AM</item>
+	    <item>7AM</item>
+	    <item>8AM</item>
+	    <item>9AM</item>
+	    <item>10AM</item>
+	    <item>11AM</item>
+	    <item>12PM (Noon)</item>
+	</string-array>
+	
+	<string-array name="nightmode_startvalues">
+	    <item>4</item>
+	    <item>5</item>
+	    <item>6</item>
+	    <item>7</item>
+	    <item>8</item>
+	    <item>9</item>
+	    <item>10</item>
+	    <item>11</item>
+	    <item>12</item>
+	</string-array>
+	<string-array name="nightmode_endvalues">
+	    <item>16</item>
+	    <item>17</item>
+	    <item>18</item>
+	    <item>19</item>
+	    <item>20</item>
+	    <item>21</item>
+	    <item>22</item>
+	    <item>23</item>
+	    <item>24</item>
+	</string-array>
+	
 </resources>

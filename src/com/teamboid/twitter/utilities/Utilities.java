@@ -127,36 +127,15 @@ public class Utilities {
 		try { return Integer.toString(context.getPackageManager().getPackageInfo(context.getPackageName(), 0 ).versionCode); }
 		catch (NameNotFoundException e) { return "Unknown"; }
 	}
-
-	public static Calendar getNightModeStart(Context context) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String startTime = prefs.getString("night_mode_time", "00:00");
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(startTime) + 1);
-		cal.set(Calendar.MINUTE, TimePreference.getMinute(startTime));
-		return cal;
-	}
-	public static Calendar getNightModeEnd(Context context) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String endTime = prefs.getString("night_mode_endtime", "00:00");
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, TimePreference.getHour(endTime) + 1);
-		cal.set(Calendar.MINUTE, TimePreference.getMinute(endTime));
-		Calendar now = Calendar.getInstance();
-		//FIGURE OUT THE ALGORITHM TO USE HERE
-		//A GOOD EXAMPLE OF TIMING WOULD BE 3AM IN THE MORNING WHEN THE START TIME WAS 8PM AND THE END TIME IS 7AM 
-		if(cal.before(now) && getNightModeStart(context).before(now)) {
-			cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
-		}
-		return cal;
-	}
 	
 	public static int getTheme(Context context) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String curTheme = null;
 		if(prefs.getBoolean("night_mode", false)) {
-			Calendar now = Calendar.getInstance();
-			if(now.after(getNightModeStart(context)) && now.before(getNightModeEnd(context))) {
+			int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+			int startHour = Integer.parseInt(prefs.getString("night_mode_time", "20"));
+			int endHour = Integer.parseInt(prefs.getString("night_mode_endtime", "7"));
+			if((nowHour < endHour) || (nowHour > startHour)) {
 				curTheme = prefs.getString("night_mode_theme", "3");
 			}
 		}
