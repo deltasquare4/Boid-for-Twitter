@@ -198,21 +198,19 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		return toReturn;
 	}
 
-	public void filter(ListView list) {
+	public void filter() {
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(mContext);
 		if ((prefs.getBoolean("enable_muting", false) == false) || (prefs.getBoolean("mute_search_enabled", false) == false)) {
 			return;
 		}
 
-		setLastViewed(list);
 		for (int i = 0; i < tweets.size(); i++) {
 			if (shouldFilter(mContext, tweets.get(i))) {
 				tweets.remove(i);
 			}
 		}
 		notifyDataSetChanged();
-		restoreLastViewed(list);
 	}
 
 	public int find(long statusId) {

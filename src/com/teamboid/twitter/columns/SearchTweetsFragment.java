@@ -241,7 +241,7 @@ public class SearchTweetsFragment extends BaseListFragment {
 		if (getView() == null || context.tweetAdapter == null) {
 			return;
 		}
-		context.tweetAdapter.filter(getListView());
+		context.tweetAdapter.filter();
 	}
 
 	@Override

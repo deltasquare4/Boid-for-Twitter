@@ -202,7 +202,7 @@ public class SavedSearchFragment extends BaseListFragment {
     	if (getView() == null || adapt == null) {
 			return;
 		}
-		adapt.filter(getListView());
+		adapt.filter();
     }
 
     @Override

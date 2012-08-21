@@ -81,6 +81,7 @@ public class FeedListAdapter extends BaseAdapter {
 		lastViewedTweet = t.getId();
 		View v = list.getChildAt(0);
 		lastViewedTopMargin = (v == null) ? 0 : v.getTop();
+		System.out.println("SetLastViewed(lastViewedID=" + lastViewedTweet + ", topMargin=" + lastViewedTopMargin + ") [" + this.ID + "]"); 
 	}
 
 	public void restoreLastViewed(ListView list) {
@@ -93,6 +94,7 @@ public class FeedListAdapter extends BaseAdapter {
 		if (index > -1) {
 			list.setSelectionFromTop(index, lastViewedTopMargin);
 		}
+		System.out.println("RestoreLastViewed(lastViewedID=" + lastViewedTweet + ", index=" + index + ", topMargin=" + lastViewedTopMargin + ") [" + this.ID + "]");
 	}
 
 	private boolean shouldFilter(Context context, Status tweet) {
@@ -207,7 +209,7 @@ public class FeedListAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
-	public void filter(ListView list) {
+	public void filter() {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		if (prefs.getBoolean("enable_muting", false)) {
 			if(this.ID != null) {
@@ -221,14 +223,12 @@ public class FeedListAdapter extends BaseAdapter {
 			}
 		} else return;
 		
-		setLastViewed(list);
 		for (int i = 0; i < tweets.size(); i++) {
 			if (shouldFilter(mContext, tweets.get(i))) {
 				tweets.remove(i);
 			}
 		}
 		notifyDataSetChanged();
-		restoreLastViewed(list);
 	}
 
 	public int find(long statusId) {

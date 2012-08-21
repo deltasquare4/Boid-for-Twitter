@@ -192,7 +192,7 @@ public class TimelineFragment extends BaseListFragment {
 		if (getView() == null || adapt == null) {
 			return;
 		}
-		adapt.filter(getListView());
+		adapt.filter();
 	}
 
 	@Override
