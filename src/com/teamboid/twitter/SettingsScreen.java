@@ -287,11 +287,13 @@ public class SettingsScreen extends PreferenceActivity  {
 			if(prefs.contains("night_mode_time")) {
 				ListPreference pref = (ListPreference)findPreference("night_mode_time");
 				int index = pref.findIndexOfValue(pref.getValue());
+				if(index == -1) index = 7;
 				pref.setSummary(getString(R.string.night_mode_enabled_at).replace("{time}", pref.getEntries()[index].toString()));
 			}
 			if(prefs.contains("night_mode_endtime")) {
 				ListPreference pref = (ListPreference)findPreference("night_mode_endtime");
 				int index = pref.findIndexOfValue(pref.getValue());
+				if(index == -1) index = 6;
 				pref.setSummary(getString(R.string.night_mode_disabled_at).replace("{time}", pref.getEntries()[index].toString()));
 			}
 			if(prefs.contains("night_mode_theme")) {

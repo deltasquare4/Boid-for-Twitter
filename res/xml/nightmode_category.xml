@@ -9,16 +9,16 @@
 		android:entryValues="@array/theme_values" android:defaultValue="3" />
 	<SwitchPreference android:key="night_mode_pause_notifications"
 		android:summary="@string/pause_notifications_desc" android:title="@string/pause_notifications"
-		android:persistent="true" />	
+		android:persistent="true" />
 	<ListPreference android:key="night_mode_time"
 		android:persistent="true" android:layout="@layout/boid_preference"
-		android:title="@string/start_time_str" android:summary="@string/night_mode_time_desc"		 
+		android:title="@string/start_time_str" android:summary="@string/night_mode_time_desc"
 		android:dialogTitle="@string/theme_title" android:entries="@array/nightmode_starttimes"
-		android:entryValues="@array/nightmode_startvalues" android:defaultValue="20"/>	
+		android:entryValues="@array/nightmode_startvalues"
+		android:defaultValue="20" />
 	<ListPreference android:key="night_mode_endtime"
 		android:persistent="true" android:layout="@layout/boid_preference"
 		android:title="@string/end_time_str" android:summary="@string/night_mode_endtime_desc"
 		android:dialogTitle="@string/end_time_str" android:entries="@array/nightmode_endtimes"
-		android:entryValues="@array/nightmode_endvalues" android:defaultValue="7"/>
-	
+		android:entryValues="@array/nightmode_endvalues" android:defaultValue="7" />
 </PreferenceScreen>
