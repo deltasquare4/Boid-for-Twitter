@@ -34,7 +34,8 @@
 	<string name="draft_prompt">Do you want to save this Tweet as a draft?</string>
 	<string name="always_attach_loc">Always Attach Location</string>
 	<string name="always_attach_loc_desc">Whether the composer will attach your location by
-		default.</string>
+		default.
+	</string>
 	<string name="display_real_name">Display Real Name</string>
 	<string name="display_real_name_desc">The full name of users are displayed in feeds, as
 		opposed to screen names.
@@ -153,7 +154,8 @@
 	<string name="search_str">Search</string>
 	<string name="manage_accounts_str">Accounts</string>
 	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access push
-		notification settings.</string>
+		notification settings.
+	</string>
 	<string name="remove_account">Remove Account</string>
 	<string name="confirm_remove_account">Are you sure you want to remove @{account}?
 	</string>
@@ -171,7 +173,8 @@
 
 	<string name="help_title">Help</string>
 	<string name="help_description">Send feedback, donate, and view version/build
-		information.</string>
+		information.
+	</string>
 	<string name="about_title">About</string>
 	<string name="about_description">Created by Aidan Follestad, Joe Simpson, Graham
 		Macphee, Philip Oakley, and Federico Zubani.
@@ -207,8 +210,10 @@
 		Tweets while viewing a Tweet.
 	</string>
 	<string name="enable_drafts_title">Drafts</string>
-	<string name="enable_drafts_desc">When disabled, a prompt will not be shown asking
-		you whether you want to save an unsent tweet as a draft.</string>
+	<string name="enable_drafts_desc">Whether a prompt will be shown asking
+		you to save an
+		unsent tweet as a draft.
+	</string>
 	<string name="clear_searchhistory_title">Clear Search History</string>
 	<string name="clear_searchhistory_desc">Clears your search history (that\'s accessed from
 		the timeline screen\'s search interface).
@@ -324,11 +329,13 @@
 	<string name="photo_service_title">Upload Service</string>
 	<string name="confirm_send_setting_title">Send Prompt</string>
 	<string name="confirm_send_setting_desc">Whether a prompt will be shown before sending a
-		Tweet.</string>
+		Tweet.
+	</string>
 	<string name="confirm_send_prompt">Send this tweet as @{account}?</string>
 	<string name="composer_str">Composer</string>
 	<string name="composer_desc_str">Enable drafts, attaching location by default, and
-		other composer options.</string>
+		other composer options.
+	</string>
 	<string name="users_and_tweets">Users and tweets</string>
 	<string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.
 	</string>
@@ -360,7 +367,8 @@
 		this account!
 	</string>
 	<string name="no_muting_backup">No muting filters backup file was found for this
-		account!</string>
+		account!
+	</string>
 	<string name="loading_str">Loading…</string>
 	<string name="enable_ssl_str">Enable SSL</string>
 	<string name="disable_ssl_str">Disable SSL</string>
@@ -507,7 +515,8 @@
 	<string name="done_str">Done</string>
 	<string name="name_str">Name</string>
 	<string name="failed_get_accountinfo">Failed to get your most up to date account info,
-		the last know info will be used.</string>
+		the last know info will be used.
+	</string>
 	<string name="camera_str">Camera</string>
 	<string name="gallery_str">Gallery</string>
 	<string name="bio_str">Bio</string>
@@ -516,11 +525,11 @@
 	<string name="mute_timeline_str">Mute Timeline</string>
 	<string name="mute_mentions_str">Mute Mentions</string>
 	<string name="mute_search_str">Mute Search</string>
-	
+
 	<string-array name="nightmode_starttimes">
-	    <item>1PM</item>
-	    <item>2PM</item>
-	    <item>3PM</item>
+		<item>1PM</item>
+		<item>2PM</item>
+		<item>3PM</item>
 		<item>4PM</item>
 		<item>5PM</item>
 		<item>6PM</item>
@@ -532,47 +541,47 @@
 		<item>12AM (Midnight)</item>
 	</string-array>
 	<string-array name="nightmode_endtimes">
-	    <item>1AM</item>
-	    <item>2AM</item>
-	    <item>3AM</item>
-	    <item>4AM</item>
-	    <item>5AM</item>
-	    <item>6AM</item>
-	    <item>7AM</item>
-	    <item>8AM</item>
-	    <item>9AM</item>
-	    <item>10AM</item>
-	    <item>11AM</item>
-	    <item>12PM (Noon)</item>
+		<item>1AM</item>
+		<item>2AM</item>
+		<item>3AM</item>
+		<item>4AM</item>
+		<item>5AM</item>
+		<item>6AM</item>
+		<item>7AM</item>
+		<item>8AM</item>
+		<item>9AM</item>
+		<item>10AM</item>
+		<item>11AM</item>
+		<item>12PM (Noon)</item>
 	</string-array>
-	
+
 	<string-array name="nightmode_startvalues">
-	    <item>13</item>
-	    <item>14</item>
-	    <item>15</item>
-	    <item>16</item>
-	    <item>17</item>
-	    <item>18</item>
-	    <item>19</item>
-	    <item>20</item>
-	    <item>21</item>
-	    <item>22</item>
-	    <item>23</item>
-	    <item>24</item>
+		<item>13</item>
+		<item>14</item>
+		<item>15</item>
+		<item>16</item>
+		<item>17</item>
+		<item>18</item>
+		<item>19</item>
+		<item>20</item>
+		<item>21</item>
+		<item>22</item>
+		<item>23</item>
+		<item>24</item>
 	</string-array>
 	<string-array name="nightmode_endvalues">
-	    <item>1</item>	    
-	    <item>2</item>
-	    <item>3</item>
-	    <item>4</item>
-	    <item>5</item>
-	    <item>6</item>
-	    <item>7</item>
-	    <item>8</item>
-	    <item>9</item>
-	    <item>10</item>
-	    <item>11</item>
-	    <item>12</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+		<item>12</item>
 	</string-array>
-	
+
 </resources>

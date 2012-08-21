@@ -263,7 +263,7 @@ public class SettingsScreen extends PreferenceActivity  {
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					ListPreference pref = (ListPreference)findPreference("night_mode_time");
 					int index = pref.findIndexOfValue(pref.getValue());
-					pref.setSummary(getString(R.string.night_mode_enabled_at).replace("{time}", pref.getEntryValues()[index].toString()));
+					pref.setSummary(getString(R.string.night_mode_enabled_at).replace("{time}", pref.getEntries()[index].toString()));
 					return true;
 				}
 			});
@@ -272,7 +272,7 @@ public class SettingsScreen extends PreferenceActivity  {
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					ListPreference pref = (ListPreference)findPreference("night_mode_endtime");
 					int index = pref.findIndexOfValue(pref.getValue());
-					pref.setSummary(getString(R.string.night_mode_disabled_at).replace("{time}", pref.getEntryValues()[index].toString()));
+					pref.setSummary(getString(R.string.night_mode_disabled_at).replace("{time}", pref.getEntries()[index].toString()));
 					return true;
 				}
 			});
