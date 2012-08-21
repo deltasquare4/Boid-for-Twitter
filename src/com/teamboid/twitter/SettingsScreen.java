@@ -1,6 +1,5 @@
 package com.teamboid.twitter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import net.robotmedia.billing.BillingController;
@@ -242,12 +241,6 @@ public class SettingsScreen extends PreferenceActivity  {
 
     public static class NightModeFragment extends PreferenceFragment {
 		
-		private void displayTime(String time, String prefName, int summaryResId) {
-			ListPreference pref = (ListPreference)findPreference(prefName);
-			int index = Arrays.asList(pref.getEntryValues()).indexOf(pref.getValue());
-			pref.setSummary(getString(summaryResId).replace("{time}", pref.getEntries()[index].toString()));
-		}
-		
 		public void displayThemeText(String theme) {
 			final Preference pref = findPreference("night_mode_theme");
 			if(theme.equals("0")) {
@@ -268,14 +261,18 @@ public class SettingsScreen extends PreferenceActivity  {
 			findPreference("night_mode_time").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					displayTime((String)newValue, "night_mode_time", R.string.night_mode_enabled_at);
+					ListPreference pref = (ListPreference)findPreference("night_mode_time");
+					int index = pref.findIndexOfValue(pref.getValue());
+					pref.setSummary(getString(R.string.night_mode_enabled_at).replace("{time}", pref.getEntryValues()[index].toString()));
 					return true;
 				}
 			});
 			findPreference("night_mode_endtime").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					displayTime((String)newValue, "night_mode_endtime", R.string.night_mode_disabled_at);
+					ListPreference pref = (ListPreference)findPreference("night_mode_endtime");
+					int index = pref.findIndexOfValue(pref.getValue());
+					pref.setSummary(getString(R.string.night_mode_disabled_at).replace("{time}", pref.getEntryValues()[index].toString()));
 					return true;
 				}
 			});
@@ -288,10 +285,14 @@ public class SettingsScreen extends PreferenceActivity  {
 			});
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 			if(prefs.contains("night_mode_time")) {
-				displayTime(prefs.getString("night_mode_time", "00:00"), "night_mode_time", R.string.night_mode_enabled_at);
+				ListPreference pref = (ListPreference)findPreference("night_mode_time");
+				int index = pref.findIndexOfValue(pref.getValue());
+				pref.setSummary(getString(R.string.night_mode_enabled_at).replace("{time}", pref.getEntries()[index].toString()));
 			}
 			if(prefs.contains("night_mode_endtime")) {
-				displayTime(prefs.getString("night_mode_endtime", "00:00"), "night_mode_endtime", R.string.night_mode_disabled_at);
+				ListPreference pref = (ListPreference)findPreference("night_mode_endtime");
+				int index = pref.findIndexOfValue(pref.getValue());
+				pref.setSummary(getString(R.string.night_mode_disabled_at).replace("{time}", pref.getEntries()[index].toString()));
 			}
 			if(prefs.contains("night_mode_theme")) {
 				displayThemeText(prefs.getString("night_mode_theme", "0"));
