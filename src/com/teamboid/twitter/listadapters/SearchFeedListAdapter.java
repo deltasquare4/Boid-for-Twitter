@@ -128,6 +128,9 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	private boolean add(Tweet tweet) {
+		if (shouldFilter(mContext, tweet)) {
+			return false;
+		}
 		boolean added = false;
 		if (!update(tweet)) {
 			tweets.add(findAppropIndex(tweet), tweet);
