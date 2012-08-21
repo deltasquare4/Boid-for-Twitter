@@ -90,37 +90,35 @@ public class ComposerScreen extends Activity {
 				getApplicationContext()).getBoolean("enable_drafts", true)) {
 			return;
 		}
-		if (getIntent().getExtras() != null)
+		if (getIntent().getExtras() != null) {
 			return;
-		final SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		}
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+		final LinearLayout draftsArea = (LinearLayout) findViewById(R.id.draftsArea);
+		draftsArea.removeAllViews();
+		draftsArea.setVisibility(View.GONE);
+		findViewById(R.id.draftsTitle).setVisibility(View.GONE);
+		
 		if (prefs.contains(stt.from.getId() + "_stt_draft")) {
+			draftsArea.setVisibility(View.VISIBLE);
+			findViewById(R.id.draftsTitle).setVisibility(View.VISIBLE);
+			
 			EditText content = (EditText) findViewById(R.id.tweetContent);
 			if (content.getText().toString().trim().length() > 0) {
 				return; // Don't override if user is tweeting something already!
 			}
-			findViewById(R.id.draftsTitle).setVisibility(View.VISIBLE);
-			final LinearLayout draftsArea = (LinearLayout) findViewById(R.id.draftsArea);
-			draftsArea.setVisibility(View.VISIBLE);
-			draftsArea.removeAllViews();
 			for (int i = 0; i < Utilities.jsonToArray(
-					prefs.getString(stt.from.getId() + "_stt_draft", null))
-					.size(); i++) {
+					prefs.getString(stt.from.getId() + "_stt_draft", null)).size(); i++) {
 				try {
 					final SendTweetTask dt = SendTweetTask
-							.fromJSONObject(new JSONObject(Utilities
-									.jsonToArray(
-											prefs.getString(stt.from.getId()
-													+ "_stt_draft", null)).get(
-											i)));
+							.fromJSONObject(new JSONObject(Utilities.jsonToArray(
+							prefs.getString(stt.from.getId()+ "_stt_draft", null)).get(i)));
 					final RelativeLayout item = (RelativeLayout) getLayoutInflater()
 							.inflate(R.layout.draft_item, null);
-					((TextView) item.findViewById(R.id.text))
-							.setText(dt.contents);
+					((TextView) item.findViewById(R.id.text)).setText(dt.contents);
 					if (dt.hasMedia()) {
-						((ImageView) item.findViewById(R.id.image))
-								.setVisibility(View.VISIBLE);
+						((ImageView) item.findViewById(R.id.image)).setVisibility(View.VISIBLE);
 					}
 					final int index = i;
 					item.setOnLongClickListener(new OnLongClickListener() {

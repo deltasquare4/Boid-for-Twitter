@@ -159,6 +159,11 @@ public class MutingManager extends ListActivity {
 			}
 		});
 		menu.findItem(R.id.toggleBtn).setActionView(s);
+		
+		menu.findItem(R.id.muteTimelineCheck).setChecked(prefs.getBoolean("mute_timeline_enabled", true));
+		menu.findItem(R.id.muteMentionsCheck).setChecked(prefs.getBoolean("mute_mentions_enabled", false));
+		menu.findItem(R.id.muteSearchCheck).setChecked(prefs.getBoolean("mute_search_enabled", false));
+		
 		return true;
 	}
 	
