@@ -101,9 +101,9 @@ public class FeedListAdapter extends BaseAdapter {
 			if(this.ID != null) {
 				boolean filteringDisabled = false;
 				if(this.ID.equals(TimelineFragment.ID)) {
-					filteringDisabled = !prefs.getBoolean("mute_timeline_enabled", true);
+					filteringDisabled = (prefs.getBoolean("mute_timeline_enabled", true) == false);
 				} else if(this.ID.equals(MentionsFragment.ID)) {
-					filteringDisabled = !prefs.getBoolean("mute_mentions_enabled", false);
+					filteringDisabled = (prefs.getBoolean("mute_mentions_enabled", false) == false);
 				}
 				if(filteringDisabled) return false;
 			}
@@ -213,9 +213,9 @@ public class FeedListAdapter extends BaseAdapter {
 			if(this.ID != null) {
 				boolean filteringDisabled = false;
 				if(this.ID.equals(TimelineFragment.ID)) {
-					filteringDisabled = !prefs.getBoolean("mute_timeline_enabled", true);
+					filteringDisabled = (prefs.getBoolean("mute_timeline_enabled", true) == false);
 				} else if(this.ID.equals(MentionsFragment.ID)) {
-					filteringDisabled = !prefs.getBoolean("mute_mentions_enabled", false);
+					filteringDisabled = (prefs.getBoolean("mute_mentions_enabled", false) == false);
 				}
 				if(filteringDisabled) return;
 			}
