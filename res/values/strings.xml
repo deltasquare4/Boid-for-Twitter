@@ -518,6 +518,9 @@
 	<string name="mute_search_str">Mute Search</string>
 	
 	<string-array name="nightmode_starttimes">
+	    <item>1PM</item>
+	    <item>2PM</item>
+	    <item>3PM</item>
 		<item>4PM</item>
 		<item>5PM</item>
 		<item>6PM</item>
@@ -529,6 +532,9 @@
 		<item>12AM (Midnight)</item>
 	</string-array>
 	<string-array name="nightmode_endtimes">
+	    <item>1AM</item>
+	    <item>2AM</item>
+	    <item>3AM</item>
 	    <item>4AM</item>
 	    <item>5AM</item>
 	    <item>6AM</item>
@@ -541,6 +547,9 @@
 	</string-array>
 	
 	<string-array name="nightmode_startvalues">
+		<item>1</item>	    
+	    <item>2</item>
+	    <item>3</item>
 	    <item>4</item>
 	    <item>5</item>
 	    <item>6</item>
@@ -552,6 +561,9 @@
 	    <item>12</item>
 	</string-array>
 	<string-array name="nightmode_endvalues">
+	    <item>13</item>
+	    <item>14</item>
+	    <item>15</item>
 	    <item>16</item>
 	    <item>17</item>
 	    <item>18</item>
