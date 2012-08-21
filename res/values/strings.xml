@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">Boid Beta</string>
+	<string name="no_accounts">No accounts, please add one!</string>
 	<string name="account_service_name">Boid Account Service</string>
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
@@ -583,5 +584,4 @@
 		<item>11</item>
 		<item>12</item>
 	</string-array>
-
 </resources>

@@ -416,7 +416,7 @@ public class ComposerScreen extends Activity {
 							// We are typing @someone
 							String typed = text.subSequence(p + 1, start)
 									.toString().toLowerCase();
-							if (typed.length() <= 2)
+							if (typed.length() < 2)
 								return false;
 							if (typed.charAt(0) == '@')
 								typed = typed.substring(1);
@@ -474,7 +474,7 @@ public class ComposerScreen extends Activity {
 						}
 						return false;
 					}
-				}, 400L);
+				}, 500L);
 			}
 		});
 	}

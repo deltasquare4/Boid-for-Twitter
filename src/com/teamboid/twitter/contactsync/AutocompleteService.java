@@ -23,20 +23,25 @@ import com.teamboid.twitterapi.user.User;
  */
 public class AutocompleteService extends Service {
 	public static final String AUTHORITY = "com.teamboid.twitter.autocomplete";
-	
-	public static void removeItem(User user, Context c, long accId){
+
+	public static void removeItem(User user, Context c, long accId) {
 		JSONObject jo = readAutocompleteFile(c, accId);
+		if (jo == null)
+			return;
 		jo.remove(user.getName());
 		jo.remove(user.getScreenName());
 		saveAutocompleteFile(c, accId, jo);
 	}
-	
-	public static void addItem(User user, Context c, long accId){
+
+	public static void addItem(User user, Context c, long accId) {
 		JSONObject jo = readAutocompleteFile(c, accId);
-		try{
+		if (jo == null)
+			return;
+		try {
 			jo.put(user.getName(), user.getScreenName());
 			jo.put(user.getScreenName(), user.getScreenName());
-		} catch(Exception e){}
+		} catch (Exception e) {
+		}
 		saveAutocompleteFile(c, accId, jo);
 	}
 
@@ -54,12 +59,12 @@ public class AutocompleteService extends Service {
 		}
 		return null;
 	}
-	
-	public static boolean saveAutocompleteFile(Context c, long accId, JSONObject ja){
+
+	public static boolean saveAutocompleteFile(Context c, long accId,
+			JSONObject ja) {
 		try {
-			FileOutputStream fos = c.openFileOutput(
-					"autocomplete-" + accId + ".json",
-					Context.MODE_PRIVATE);
+			FileOutputStream fos = c.openFileOutput("autocomplete-" + accId
+					+ ".json", Context.MODE_PRIVATE);
 			fos.write(ja.toString().getBytes());
 			fos.close();
 			return true;
@@ -87,7 +92,7 @@ public class AutocompleteService extends Service {
 		public SyncAdapterImpl(Service contactSyncAdapterService) {
 			super(contactSyncAdapterService);
 		}
-		
+
 		JSONObject ja;
 
 		@Override
@@ -109,12 +114,14 @@ public class AutocompleteService extends Service {
 		void preSync() {
 			ja = new JSONObject();
 		}
-		
-		int getNotificationId(){return 38924;}
+
+		int getNotificationId() {
+			return 38924;
+		}
 
 		@Override
 		void postSync(SyncResult syncResult) {
-			if(!saveAutocompleteFile(mContext, getId(), ja)){
+			if (!saveAutocompleteFile(mContext, getId(), ja)) {
 				syncResult.delayUntil = 60 * 60 * 2;
 			}
 		}

@@ -323,6 +323,9 @@ public class AccountManager extends PreferenceActivity {
 		ifilter.addAction(END_LOAD);
 		registerReceiver(receiver, ifilter);
 		adapter = new AccountListAdapter(this);
+		if(adapter.getCount() == 0) {
+			Toast.makeText(getApplicationContext(), R.string.no_accounts, Toast.LENGTH_LONG).show();
+		}
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		final ListView listView = getListView();
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
