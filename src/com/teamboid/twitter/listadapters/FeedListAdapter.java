@@ -80,8 +80,7 @@ public class FeedListAdapter extends BaseAdapter {
 			return;
 		lastViewedTweet = t.getId();
 		View v = list.getChildAt(0);
-		lastViewedTopMargin = (v == null) ? 0 : v.getTop();
-		System.out.println("SetLastViewed(lastViewedID=" + lastViewedTweet + ", topMargin=" + lastViewedTopMargin + ") [" + this.ID + "]"); 
+		lastViewedTopMargin = (v == null) ? 0 : v.getTop(); 
 	}
 
 	public void restoreLastViewed(ListView list) {
@@ -94,7 +93,6 @@ public class FeedListAdapter extends BaseAdapter {
 		if (index > -1) {
 			list.setSelectionFromTop(index, lastViewedTopMargin);
 		}
-		System.out.println("RestoreLastViewed(lastViewedID=" + lastViewedTweet + ", index=" + index + ", topMargin=" + lastViewedTopMargin + ") [" + this.ID + "]");
 	}
 
 	private boolean shouldFilter(Context context, Status tweet) {
