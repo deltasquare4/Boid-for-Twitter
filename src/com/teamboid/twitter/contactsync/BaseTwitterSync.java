@@ -118,6 +118,7 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 				Log.d("sync", "Could not download users?");
 				syncResult.delayUntil = 60 * 60 * 2; // sync again in 2
 														// hours
+				nm.cancel(getNotificationId());
 				return;
 			}
 

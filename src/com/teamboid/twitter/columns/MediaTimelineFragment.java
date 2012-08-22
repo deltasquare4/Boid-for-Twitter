@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
+import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
@@ -121,6 +122,7 @@ public class MediaTimelineFragment extends BaseGridFragment {
 	}
 
 	int pageSkips = 0;
+	boolean haveNotified = false;
 
 	@Override
 	public void performRefresh(final boolean paginate) {
@@ -167,6 +169,20 @@ public class MediaTimelineFragment extends BaseGridFragment {
 								});
 							}
 						}
+						context.runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								if(haveNotified == false){
+									if(context instanceof ProfileScreen){
+										((ProfileScreen)context).setupMediaView();
+										haveNotified = true;
+									}
+								}
+							}
+							
+						});
+						
 					} catch (final Exception e) {
 						e.printStackTrace();
 						context.runOnUiThread(new Runnable() {

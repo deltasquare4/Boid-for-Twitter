@@ -22,6 +22,7 @@ import com.teamboid.twitter.contactsync.AutocompleteService;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Extractor;
 
 import com.teamboid.twitter.utilities.Utilities;
@@ -223,6 +224,7 @@ public class ComposerScreen extends Activity {
 	}
 
 	public static int SELECT_MEDIA = 2939;
+	BoidActivity boid;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -256,6 +258,24 @@ public class ComposerScreen extends Activity {
 					int count) {
 			}
 		});
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			@Override
+			public void done() {
+				finishInit();
+			}
+		};
+		boid.onCreate();
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
+	
+	public void finishInit(){
+		final EditText content = (EditText) findViewById(R.id.tweetContent);
 		if (getIntent().getExtras() != null) {
 			if (getIntent().hasExtra("reply_to")) {
 				Status replyTo = (Status) getIntent().getSerializableExtra(

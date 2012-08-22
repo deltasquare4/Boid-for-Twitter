@@ -579,10 +579,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	public void accountsLoaded() {
-		if (Intent.ACTION_SEND.equals(getIntent().getAction())) {
-			startActivity(getIntent().setClass(this, ComposerScreen.class));
-			finish();
-		} else if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
 			if (getIntent().getData().getPath().contains("/status/")) {
 				startActivity(getIntent().setClass(this, TweetViewer.class));
 				finish();
