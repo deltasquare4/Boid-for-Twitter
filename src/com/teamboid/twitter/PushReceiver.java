@@ -34,6 +34,10 @@ import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.status.StatusJSON;
 
 public class PushReceiver extends BroadcastReceiver {
+	public static void setReadMentions(long lastId, long accId, Context c){
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+		sp.edit().putLong("mentions-" + accId + "-lastread", lastId).commit();
+	}
 	
 	public static final String SENDER_EMAIL = "107821281305";
 	public static int pushForId = 0;
@@ -131,6 +135,8 @@ public class PushReceiver extends BroadcastReceiver {
 						JSONObject json = new JSONObject(b.getString("tweet"));
 						final DirectMessage dm = new DirectMessageJSON(json);
 						Api11.displayDirectMessageNotification(accId, PushWorker.this, dm);
+					} else if(type.endsWith("multiReply")){
+						// TODO: This
 					}
 				} catch(Exception e) { e.printStackTrace(); }
 			}

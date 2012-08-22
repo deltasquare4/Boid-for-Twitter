@@ -28,8 +28,12 @@ public class AndroidAccountHelper {
 		am.setUserData(toAdd, "accId", a.getId() + "");
 		ContentResolver.setSyncAutomatically(toAdd, ContactsContract.AUTHORITY,
 				AUTO_SYNC_CONTACTS);
+		if(AUTO_SYNC_CONTACTS)
+			ContentResolver.requestSync(toAdd, ContactsContract.AUTHORITY, new Bundle());
 		ContentResolver.setSyncAutomatically(toAdd,
 				AutocompleteService.AUTHORITY, AUTO_SYNC_CONTACTS);
+		if(AUTO_SYNC_CONTACTS)
+			ContentResolver.requestSync(toAdd, AutocompleteService.AUTHORITY, new Bundle());
 	}
 
 	public static HashMap<String, android.accounts.Account> getAccounts(
