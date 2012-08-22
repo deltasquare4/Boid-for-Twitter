@@ -133,7 +133,7 @@ public class MentionsFragment extends BaseListFragment {
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
 								if (addedCount > 0 || beforeLast > 0) {
-									PushReceiver.setReadMentions(feed[feed.length].getId(), acc.getId(), context);
+									PushReceiver.setReadMentions(feed[feed.length - 1].getId(), acc.getId(), context);
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
 											getListView()
