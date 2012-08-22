@@ -14,6 +14,7 @@ package com.teamboid.twitter.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -263,7 +264,7 @@ public class SideNavigationLayout extends FrameLayout {
 			int childBottom = contentView.getBottom();
 			contentView.layout(childLeft, childTop, childRight, childBottom);
 			
-			getChildAt(0).setAlpha( childLeft / getNavigationViewWidth() );
+			getChildAt(0).setAlpha( (float)childLeft / (float)getNavigationViewWidth() );
 		}
 	}
 

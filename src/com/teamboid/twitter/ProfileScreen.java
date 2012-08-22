@@ -13,6 +13,7 @@ import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.columns.ProfileAboutFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
+import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -501,6 +502,24 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		}
 		super.onSaveInstanceState(outState);
 	}
+	
+	public void setupMediaView() {
+		runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				try{
+					MediaFeedListAdapter.MediaFeedItem m = getMediaFragment().getAdapter().get(0);
+					setHeaderBackground(m.imgurl);
+				} catch(Exception e){
+					e.printStackTrace();
+					// Here we should divert to profile bg?
+					setHeaderBackground(user.getProfileBackgroundImageUrl());
+				}
+			}
+			
+		});
+	}
 
 	void setHeaderBackground(String url) {
 		if (url.startsWith("http")) {
@@ -579,7 +598,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				getActionBar().setSelectedNavigationItem(position);
 			}
 		});
-		setHeaderBackground(user.getProfileBackgroundImageUrl());
+		// setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {
