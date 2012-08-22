@@ -163,7 +163,7 @@ public class AccountService extends Service {
 							return;
 						}
 					}
-					Account profile = new Account(activity, toAdd).setUser(toAddUser);
+					Account profile = new Account(toAdd).setUser(toAddUser);
 					accounts.add(profile);
 					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
 					.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();

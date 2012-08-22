@@ -14,7 +14,7 @@ public class Account implements Serializable {
 	private static final long serialVersionUID = 5774596574060143207L;
 
 	public Account() { }
-	public Account(Context context, Twitter client) {
+	public Account(Twitter client) {
 		_client = client;
 		try {
 			_accessToken = client.getAccessToken();
