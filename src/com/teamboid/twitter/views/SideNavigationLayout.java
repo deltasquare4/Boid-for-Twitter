@@ -262,6 +262,8 @@ public class SideNavigationLayout extends FrameLayout {
 			int childRight = contentView.getRight() + mOffsetX;
 			int childBottom = contentView.getBottom();
 			contentView.layout(childLeft, childTop, childRight, childBottom);
+			
+			getChildAt(0).setAlpha( childLeft / getNavigationViewWidth() );
 		}
 	}
 

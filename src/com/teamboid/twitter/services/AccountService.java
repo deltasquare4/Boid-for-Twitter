@@ -414,11 +414,17 @@ public class AccountService extends Service {
 		super.onStartCommand(intent, flags, startId);
 		loadTwitterConfig();
 		loadAccounts();
+		// TODO: move to NON_STICKY
 		return START_STICKY;
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) { return null; }
+	public IBinder onBind(Intent intent) {
+		if(accounts.size() > 0){
+			getApplicationContext().sendBroadcast(new Intent(AccountManager.END_LOAD));
+		}
+		return null;
+	}
 
 	public static Account getAccount(long accId) {
 		Account result = null;
