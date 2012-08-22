@@ -6,20 +6,22 @@ import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.columns.ProfileAboutFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
-import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,7 +57,7 @@ import com.teamboid.twitterapi.user.User;
  * 
  * @author Aidan Follestad
  */
-public class ProfileScreen extends Activity {
+public class ProfileScreen extends Activity implements ActionBar.TabListener {
 
 	public static final int LOAD_CONTACT_ID = 1;
 	public static final int EDITOR_REQUEST_CODE = 700;
@@ -64,6 +66,7 @@ public class ProfileScreen extends Activity {
 	private boolean showProgress;
 	public FeedListAdapter adapter;
 	public User user;
+	private ViewPager mViewPager;
 
 	public void showProgress(boolean visible) {
 		if (showProgress == visible)
@@ -103,7 +106,7 @@ public class ProfileScreen extends Activity {
 			} catch (Exception e) {
 				e.printStackTrace();
 				Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT)
-						.show();
+				.show();
 				finish();
 			}
 		} else if (getIntent().hasExtra("screen_name")) {
@@ -114,31 +117,31 @@ public class ProfileScreen extends Activity {
 			getLoaderManager().initLoader(LOAD_CONTACT_ID, null,
 					new LoaderManager.LoaderCallbacks<Cursor>() {
 
-						@Override
-						public Loader<Cursor> onCreateLoader(int arg0,
-								Bundle arg1) {
-							return new CursorLoader(
-									ProfileScreen.this,
-									getIntent().getData(),
-									new String[] { ContactsContract.Data.DATA1 },
-									null, null, null);
-						}
+				@Override
+				public Loader<Cursor> onCreateLoader(int arg0,
+						Bundle arg1) {
+					return new CursorLoader(
+							ProfileScreen.this,
+							getIntent().getData(),
+							new String[] { ContactsContract.Data.DATA1 },
+							null, null, null);
+				}
 
-						@Override
-						public void onLoadFinished(Loader<Cursor> arg0,
-								Cursor cursor) {
-							cursor.moveToNext();
-							initializeTabs(
-									savedInstanceState,
-									cursor.getString(cursor
-											.getColumnIndex(ContactsContract.Data.DATA1)));
-						}
+				@Override
+				public void onLoadFinished(Loader<Cursor> arg0,
+						Cursor cursor) {
+					cursor.moveToNext();
+					initializeTabs(
+							savedInstanceState,
+							cursor.getString(cursor
+									.getColumnIndex(ContactsContract.Data.DATA1)));
+				}
 
-						@Override
-						public void onLoaderReset(Loader<Cursor> arg0) {
-						}
+				@Override
+				public void onLoaderReset(Loader<Cursor> arg0) {
+				}
 
-					});
+			});
 			setTitle(R.string.please_wait);
 		}
 	}
@@ -149,39 +152,43 @@ public class ProfileScreen extends Activity {
 	private void initializeTabs(Bundle savedInstanceState, String screenName) {
 		mScreenName = screenName;
 		setTitle("@" + screenName);
-		mTabsAdapter = new TabsAdapter(this,
-				(ViewPager) findViewById(R.id.pager));
+		mTabsAdapter = new TabsAdapter(this);
 		final ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		boolean iconic = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if (iconic) {
 			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
+					bar.newTab().setTabListener(this).setIcon(
 							getTheme().obtainStyledAttributes(
 									new int[] { R.attr.timelineTab })
 									.getDrawable(0)),
-					PaddedProfileTimelineFragment.class, 0, screenName);
+									PaddedProfileTimelineFragment.class, 0, screenName);
 			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
+					bar.newTab().setTabListener(this).setIcon(
 							getTheme().obtainStyledAttributes(
 									new int[] { R.attr.aboutTab }).getDrawable(
-									0)), ProfileAboutFragment.class, 1,
-					screenName);
+											0)), ProfileAboutFragment.class, 1,
+											screenName);
 			mTabsAdapter.addTab(
-					bar.newTab().setIcon(
+					bar.newTab().setTabListener(this).setIcon(
 							getTheme().obtainStyledAttributes(
 									new int[] { R.attr.mediaTab }).getDrawable(
-									0)), MediaTimelineFragment.class, 2,
-					screenName, false);
+											0)), MediaTimelineFragment.class, 2,
+											screenName, false);
 		} else {
-			mTabsAdapter.addTab(bar.newTab().setText(R.string.tweets_str),
+			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.tweets_str),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(bar.newTab().setText(R.string.about_str),
+			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.about_str),
 					ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setText(R.string.media_title),
+			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.media_title),
 					MediaTimelineFragment.class, 2, screenName, false);
 		}
+
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setOffscreenPageLimit(4);
+		mViewPager.setAdapter(mTabsAdapter);
+
 		if (savedInstanceState != null) {
 			getActionBar().setSelectedNavigationItem(
 					savedInstanceState.getInt("lastTab", 0));
@@ -204,7 +211,7 @@ public class ProfileScreen extends Activity {
 							public void run() {
 								getActionBar().setSelectedNavigationItem(1);
 								getAboutFragment().getAdapter()
-										.notifyDataSetChanged();
+								.notifyDataSetChanged();
 								invalidateOptionsMenu();
 							}
 						});
@@ -226,7 +233,7 @@ public class ProfileScreen extends Activity {
 											R.string.failed_check_relationship)
 											.replace("{user}",
 													user.getScreenName()),
-									Toast.LENGTH_SHORT).show();
+													Toast.LENGTH_SHORT).show();
 							getAboutFragment().getAdapter().setIsError(true);
 						}
 					});
@@ -264,7 +271,7 @@ public class ProfileScreen extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		if (AccountService.getCurrentAccount() != null
 				&& AccountService.getCurrentAccount().getUser().getScreenName()
-						.equals(mScreenName)) {
+				.equals(mScreenName)) {
 			inflater.inflate(R.menu.profile_self_actionbar, menu);
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
@@ -297,19 +304,19 @@ public class ProfileScreen extends Activity {
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra(
 					"append", "@" + mScreenName).addFlags(
-					Intent.FLAG_ACTIVITY_CLEAR_TOP));
+							Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:
 			final SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext());
+			.getDefaultSharedPreferences(getApplicationContext());
 			ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
 					Long.toString(AccountService.getCurrentAccount().getId())
-							+ "_columns", ""));
+					+ "_columns", ""));
 			cols.add(ProfileTimelineFragment.ID + "@" + mScreenName);
 			prefs.edit()
-					.putString(
-							Long.toString(AccountService.getCurrentAccount()
-									.getId()) + "_columns",
+			.putString(
+					Long.toString(AccountService.getCurrentAccount()
+							.getId()) + "_columns",
 							Utilities.arrayToJson(cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra(
 					"new_column", true));
@@ -318,7 +325,7 @@ public class ProfileScreen extends Activity {
 		case R.id.messageAction:
 			startActivity(new Intent(getApplicationContext(),
 					ConversationScreen.class).putExtra("screen_name",
-					mScreenName));
+							mScreenName));
 			return true;
 		case R.id.blockAction:
 			if (user == null)
@@ -383,52 +390,52 @@ public class ProfileScreen extends Activity {
 		diag.setMessage(R.string.confirm_block_str);
 		diag.setPositiveButton(R.string.yes_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						final Toast toast = Toast.makeText(ProfileScreen.this,
-								R.string.blocking_str, Toast.LENGTH_LONG);
-						toast.show();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									AccountService.getCurrentAccount()
-											.getClient()
-											.createBlock(user.getId());
-								} catch (Exception e) {
-									e.printStackTrace();
-									runOnUiThread(new Runnable() {
-										public void run() {
-											Toast.makeText(
-													getApplicationContext(),
-													R.string.failed_block_str,
-													Toast.LENGTH_LONG).show();
-										}
-									});
-									return;
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				final Toast toast = Toast.makeText(ProfileScreen.this,
+						R.string.blocking_str, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							AccountService.getCurrentAccount()
+							.getClient()
+							.createBlock(user.getId());
+						} catch (Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() {
+									Toast.makeText(
+											getApplicationContext(),
+											R.string.failed_block_str,
+											Toast.LENGTH_LONG).show();
 								}
-								runOnUiThread(new Runnable() {
-									public void run() {
-										toast.cancel();
-										Toast.makeText(ProfileScreen.this,
-												R.string.success_blocked_str,
-												Toast.LENGTH_SHORT).show();
-										recreate(); // TODO Recreation doesn't
-													// seem to update the screen
-													// with blocked info for
-													// some reason
-									}
-								});
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(ProfileScreen.this,
+										R.string.success_blocked_str,
+										Toast.LENGTH_SHORT).show();
+								recreate(); // TODO Recreation doesn't
+								// seem to update the screen
+								// with blocked info for
+								// some reason
 							}
-						}).start();
+						});
 					}
-				});
+				}).start();
+			}
+		});
 		diag.setNegativeButton(R.string.no_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
 		diag.create().show();
 	}
 
@@ -438,49 +445,49 @@ public class ProfileScreen extends Activity {
 		diag.setMessage(R.string.confirm_report_str);
 		diag.setPositiveButton(R.string.yes_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						final Toast toast = Toast.makeText(ProfileScreen.this,
-								R.string.reporting_str, Toast.LENGTH_LONG);
-						toast.show();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									AccountService.getCurrentAccount()
-											.getClient()
-											.reportSpam(user.getId());
-								} catch (Exception e) {
-									e.printStackTrace();
-									runOnUiThread(new Runnable() {
-										public void run() {
-											Toast.makeText(
-													getApplicationContext(),
-													R.string.failed_report_str,
-													Toast.LENGTH_LONG).show();
-										}
-									});
-									return;
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				final Toast toast = Toast.makeText(ProfileScreen.this,
+						R.string.reporting_str, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							AccountService.getCurrentAccount()
+							.getClient()
+							.reportSpam(user.getId());
+						} catch (Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() {
+									Toast.makeText(
+											getApplicationContext(),
+											R.string.failed_report_str,
+											Toast.LENGTH_LONG).show();
 								}
-								runOnUiThread(new Runnable() {
-									public void run() {
-										toast.cancel();
-										Toast.makeText(ProfileScreen.this,
-												R.string.reported_str,
-												Toast.LENGTH_SHORT).show();
-										recreate();
-									}
-								});
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(ProfileScreen.this,
+										R.string.reported_str,
+										Toast.LENGTH_SHORT).show();
+								recreate();
 							}
-						}).start();
+						});
 					}
-				});
+				}).start();
+			}
+		});
 		diag.setNegativeButton(R.string.no_str,
 				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
 		diag.create().show();
 	}
 
@@ -499,16 +506,16 @@ public class ProfileScreen extends Activity {
 		if (url.startsWith("http")) {
 			ImageManager.getInstance(this).get(url,
 					new OnImageReceivedListener() {
-						@Override
-						public void onImageReceived(String arg0, Bitmap bitmap) {
-							((ImageView) findViewById(R.id.img))
-									.setImageBitmap(bitmap);
-						}
-					});
+				@Override
+				public void onImageReceived(String arg0, Bitmap bitmap) {
+					((ImageView) findViewById(R.id.img))
+					.setImageBitmap(bitmap);
+				}
+			});
 		} else if (user.getProfileBackgroundColor() != null) {
 			((ImageView) findViewById(R.id.img))
-					.setImageDrawable(new ColorDrawable(Color.parseColor("#"
-							+ user.getProfileBackgroundColor())));
+			.setImageDrawable(new ColorDrawable(Color.parseColor("#"
+					+ user.getProfileBackgroundColor())));
 		}
 	}
 
@@ -532,45 +539,46 @@ public class ProfileScreen extends Activity {
 				new OnImageReceivedListener() {
 					@Override
 					public void onImageReceived(String arg0, Bitmap bitmap) {
-						profileImg.setImageBitmap(Utilities.getRoundedImage(bitmap, 90F));
+						profileImg.setImageBitmap(Utilities.getRoundedImage(
+								bitmap, 90F));
 					}
 				});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
 		((ViewPager) findViewById(R.id.pager))
-				.setOnPageChangeListener(new OnPageChangeListener() {
-					int lastPage = -1;
+		.setOnPageChangeListener(new OnPageChangeListener() {
+			int lastPage = -1;
 
-					@Override
-					public void onPageScrollStateChanged(int state) {
-						if (state != ViewPager.SCROLL_STATE_DRAGGING
-								&& lastPage == 2) {
-							findViewById(R.id.profileHeader).setVisibility(
-									View.GONE);
-						} else
-							findViewById(R.id.profileHeader).setVisibility(
-									View.VISIBLE);
-						if (state == ViewPager.SCROLL_STATE_IDLE) {
-							findViewById(R.id.profileHeader).setX(0);
-						}
-					}
+			@Override
+			public void onPageScrollStateChanged(int state) {
+				if (state != ViewPager.SCROLL_STATE_DRAGGING
+						&& lastPage == 2) {
+					findViewById(R.id.profileHeader).setVisibility(
+							View.GONE);
+				} else
+					findViewById(R.id.profileHeader).setVisibility(
+							View.VISIBLE);
+				if (state == ViewPager.SCROLL_STATE_IDLE) {
+					findViewById(R.id.profileHeader).setX(0);
+				}
+			}
 
-					@Override
-					public void onPageScrolled(int position, float offset,
-							int offsetPixels) {
-						lastPage = position;
-						if (position == 2 && offset >= 0)
-							return;
-						if (position >= 1)
-							findViewById(R.id.profileHeader)
-									.setX(-offsetPixels);
-					}
+			@Override
+			public void onPageScrolled(int position, float offset,
+					int offsetPixels) {
+				lastPage = position;
+				if (position == 2 && offset >= 0)
+					return;
+				if (position >= 1)
+					findViewById(R.id.profileHeader)
+					.setX(-offsetPixels);
+			}
 
-					@Override
-					public void onPageSelected(int position) {
-						mTabsAdapter.onPageSelected(position);
-					}
-				});
+			@Override
+			public void onPageSelected(int position) {
+				getActionBar().setSelectedNavigationItem(position);
+			}
+		});
 		setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
@@ -588,45 +596,45 @@ public class ProfileScreen extends Activity {
 			items.add(l.getFullName());
 		builder.setItems(items.toArray(new String[0]),
 				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						final UserList curList = lists[item];
-						final Toast toast = Toast.makeText(
-								getApplicationContext(),
-								R.string.adding_user_list, Toast.LENGTH_LONG);
-						toast.show();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									AccountService
-											.getCurrentAccount()
-											.getClient()
-											.createListMembers(curList.getId(),
-													new long[] { user.getId() });
-								} catch (final Exception e) {
-									e.printStackTrace();
-									runOnUiThread(new Runnable() {
-										public void run() {
-											toast.cancel();
-											Toast.makeText(
-													getApplicationContext(),
-													e.getMessage(),
-													Toast.LENGTH_SHORT).show();
-										}
-									});
-									return;
+			public void onClick(DialogInterface dialog, int item) {
+				final UserList curList = lists[item];
+				final Toast toast = Toast.makeText(
+						getApplicationContext(),
+						R.string.adding_user_list, Toast.LENGTH_LONG);
+				toast.show();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							AccountService
+							.getCurrentAccount()
+							.getClient()
+							.createListMembers(curList.getId(),
+									new long[] { user.getId() });
+						} catch (final Exception e) {
+							e.printStackTrace();
+							runOnUiThread(new Runnable() {
+								public void run() {
+									toast.cancel();
+									Toast.makeText(
+											getApplicationContext(),
+											e.getMessage(),
+											Toast.LENGTH_SHORT).show();
 								}
-								runOnUiThread(new Runnable() {
-									public void run() {
-										toast.cancel();
-										Toast.makeText(getApplicationContext(),
-												R.string.added_user_list,
-												Toast.LENGTH_SHORT).show();
-									}
-								});
+							});
+							return;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								toast.cancel();
+								Toast.makeText(getApplicationContext(),
+										R.string.added_user_list,
+										Toast.LENGTH_SHORT).show();
 							}
-						}).start();
+						});
 					}
-				});
+				}).start();
+			}
+		});
 		builder.create().show();
 	}
 
@@ -637,15 +645,28 @@ public class ProfileScreen extends Activity {
 		}
 	}
 
-	public void setupMediaView() {
-		try {
-			MediaFeedListAdapter.MediaFeedItem m = getMediaFragment()
-					.getAdapter().get(0);
-			setHeaderBackground(m.imgurl);
-		} catch (Exception e) {
-			e.printStackTrace();
-			// Here we should divert to profile bg?
-			setHeaderBackground(user.getProfileBackgroundImageUrl());
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		boolean selected = mTabsAdapter.mTabs.get(tab.getPosition()).aleadySelected;
+		if (selected) {
+			Fragment frag = getFragmentManager().findFragmentByTag(
+					"page:" + tab.getPosition());
+			if (frag != null) {
+				if (frag instanceof BaseListFragment)
+					((BaseListFragment) frag).jumpTop();
+				else if (frag instanceof BaseSpinnerFragment)
+					((BaseSpinnerFragment) frag).jumpTop();
+				else if (frag instanceof BaseGridFragment)
+					((BaseGridFragment) frag).jumpTop();
+			}
 		}
+	}
+
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
 }

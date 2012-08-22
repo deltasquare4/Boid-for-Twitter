@@ -400,6 +400,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void setupPreferences() {
 		String pref = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getString("upload_service", "twitter");
@@ -427,6 +428,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {

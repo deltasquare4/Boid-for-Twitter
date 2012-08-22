@@ -3,20 +3,15 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
-import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.user.User;
 
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,19 +21,16 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-
 /**
  * The adapter used for columns in the TimelineScreen.
  * 
  * @author Aidan Follestad
  */
-public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
+public class TabsAdapter extends TaggedFragmentAdapter {
 
 	private final Activity mContext;
 	private final ActionBar mActionBar;
-	private final ViewPager mViewPager;
-	private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
-	public boolean filterDefaultColumnSelection = true;
+	public final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 
 	static final class TabInfo {
 		private final Class<?> clss;
@@ -51,14 +43,10 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		}
 	}
 
-	public TabsAdapter(Activity activity, ViewPager pager) {
+	public TabsAdapter(Activity activity) {
 		super(activity.getFragmentManager());
 		mContext = activity;
 		mActionBar = activity.getActionBar();
-		mViewPager = pager;
-		mViewPager.setOffscreenPageLimit(4);
-		mViewPager.setAdapter(this);
-		mViewPager.setOnPageChangeListener(this);
 	}
 
 	public void addTab(ActionBar.Tab tab, Class<?> clss, int index) {
@@ -66,7 +54,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		args.putInt("tab_index", index);
 		TabInfo info = new TabInfo(clss, args);
 		tab.setTag(info);
-		tab.setTabListener(this);
 		mTabs.add(info);
 		mActionBar.addTab(tab);
 		notifyDataSetChanged();
@@ -79,7 +66,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			args.putString("query", query);
 		TabInfo info = new TabInfo(clss, args);
 		tab.setTag(info);
-		tab.setTabListener(this);
 		mTabs.add(info);
 		mActionBar.addTab(tab);
 		notifyDataSetChanged();
@@ -94,7 +80,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 		args.putBoolean("manualRefresh", manualRefresh);
 		TabInfo info = new TabInfo(clss, args);
 		tab.setTag(info);
-		tab.setTabListener(this);
 		mTabs.add(info);
 		mActionBar.addTab(tab);
 		notifyDataSetChanged();
@@ -110,7 +95,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 			args.putInt("list_id", listId);
 		TabInfo info = new TabInfo(clss, args);
 		tab.setTag(info);
-		tab.setTabListener(this);
 		mTabs.add(info);
 		mActionBar.addTab(tab);
 		notifyDataSetChanged();
@@ -137,66 +121,6 @@ public class TabsAdapter extends TaggedFragmentAdapter implements ActionBar.TabL
 	public Fragment getItem(int position) {
 		TabInfo info = mTabs.get(position);
 		return Fragment.instantiate(mContext, info.clss.getName(), info.args);
-	}
-
-	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
-	}
-
-	@Override
-	public void onPageSelected(int position) {
-		mActionBar.setSelectedNavigationItem(position);
-		mContext.invalidateOptionsMenu();
-	}
-
-	@Override
-	public void onPageScrollStateChanged(int state) {
-	}
-
-	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		if (!filterDefaultColumnSelection) {
-			final String prefName = Long.toString(AccountService
-					.getCurrentAccount().getId()) + "_default_column";
-			PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-			.putInt(prefName, tab.getPosition()).apply();
-		}
-		TabInfo curInfo = mTabs.get(tab.getPosition());
-		mViewPager.setCurrentItem(tab.getPosition());
-		curInfo.aleadySelected = true;
-		mTabs.set(tab.getPosition(), curInfo);
-		mContext.invalidateOptionsMenu();
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		if (mTabs.size() == 0 || tab.getPosition() > mTabs.size())
-			return;
-		TabInfo curInfo = mTabs.get(tab.getPosition());
-		curInfo.aleadySelected = false;
-		mTabs.set(tab.getPosition(), curInfo);
-	}
-
-	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		boolean selected = mTabs.get(tab.getPosition()).aleadySelected;
-		if (selected) {
-			Fragment frag = mContext.getFragmentManager().findFragmentByTag(
-					"page:" + tab.getPosition());
-			if (frag != null) {
-				if (frag instanceof BaseListFragment)
-					((BaseListFragment) frag).jumpTop();
-				else if (frag instanceof BaseSpinnerFragment)
-					((BaseSpinnerFragment) frag).jumpTop();
-				else if (frag instanceof BaseGridFragment)
-					((BaseGridFragment) frag).jumpTop();
-			}
-		}
-	}
-	
-	public Fragment getCurrentFragment(){
-		return mContext.getFragmentManager().findFragmentByTag("page:" + mViewPager.getCurrentItem());
 	}
 	
 	public interface IBoidFragment{

@@ -14,6 +14,7 @@ import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.cab.UserListCAB;
@@ -43,6 +44,7 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -70,13 +72,16 @@ import android.widget.Toast;
  * 
  * @author Aidan Follestad
  */
-public class TimelineScreen extends Activity {
+public class TimelineScreen extends Activity implements ActionBar.TabListener {
 
 	private int lastTheme;
 	private boolean lastDisplayReal;
 	private boolean lastIconic;
+
 	private TabsAdapter mTabsAdapter;
 	private boolean newColumn;
+	public boolean filterDefaultColumnSelection = true;
+	private ViewPager mViewPager;
 
 	private SendTweetArrayAdapter sentTweetBinder;
 
@@ -266,11 +271,10 @@ public class TimelineScreen extends Activity {
 			}
 		}
 		if (mTabsAdapter == null) {
-			mTabsAdapter = new TabsAdapter(this,
-					(ViewPager) findViewById(R.id.pager));
-			mTabsAdapter.filterDefaultColumnSelection = true;
+			mTabsAdapter = new TabsAdapter(this);
+			filterDefaultColumnSelection = true;
 		} else {
-			mTabsAdapter.filterDefaultColumnSelection = true;
+			filterDefaultColumnSelection = true;
 			mTabsAdapter.clear();
 		}
 		final SharedPreferences prefs = PreferenceManager
@@ -295,7 +299,7 @@ public class TimelineScreen extends Activity {
 		for (int i = 0; i < cols.size(); i++) {
 			String c = cols.get(i);
 			if (c.equals(TimelineFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.timelineTab }).getDrawable(0);
@@ -304,7 +308,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.timeline_str);
 				mTabsAdapter.addTab(toAdd, TimelineFragment.class, index);
 			} else if (c.equals(MentionsFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.mentionsTab }).getDrawable(0);
@@ -313,7 +317,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.mentions_str);
 				mTabsAdapter.addTab(toAdd, MentionsFragment.class, index);
 			} else if (c.equals(MessagesFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.messagesTab }).getDrawable(0);
@@ -322,7 +326,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.messages_str);
 				mTabsAdapter.addTab(toAdd, MessagesFragment.class, index);
 			} else if (c.equals(TrendsFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.trendsTab }).getDrawable(0);
@@ -331,7 +335,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.trends_str);
 				mTabsAdapter.addTab(toAdd, TrendsFragment.class, index);
 			} else if (c.equals(FavoritesFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.favoritesTab }).getDrawable(0);
@@ -359,7 +363,7 @@ public class TimelineScreen extends Activity {
 					String query = c.substring(
 							SavedSearchFragment.ID.length() + 1).replace("%40",
 							"@");
-					Tab toAdd = getActionBar().newTab();
+					Tab toAdd = getActionBar().newTab().setTabListener(this);
 					if (iconic) {
 						Drawable icon = getTheme().obtainStyledAttributes(
 								new int[] { R.attr.savedSearchTab })
@@ -384,7 +388,7 @@ public class TimelineScreen extends Activity {
 								.getScreenName())) {
 					name = name.substring(name.indexOf("/") + 1);
 				}
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.userListTab }).getDrawable(0);
@@ -396,7 +400,7 @@ public class TimelineScreen extends Activity {
 				mTabsAdapter.addTab(toAdd, UserListFragment.class, index, name,
 						id);
 			} else if (c.equals(NearbyFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.nearbyTab }).getDrawable(0);
@@ -405,7 +409,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.nearby_str);
 				mTabsAdapter.addTab(toAdd, NearbyFragment.class, index);
 			} else if (c.equals(MediaTimelineFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.mediaTab }).getDrawable(0);
@@ -414,7 +418,7 @@ public class TimelineScreen extends Activity {
 					toAdd.setText(R.string.media_title);
 				mTabsAdapter.addTab(toAdd, MediaTimelineFragment.class, index);
 			} else if (c.equals(MyListsFragment.ID)) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				if (iconic) {
 					Drawable icon = getTheme().obtainStyledAttributes(
 							new int[] { R.attr.userListTab }).getDrawable(0);
@@ -427,7 +431,7 @@ public class TimelineScreen extends Activity {
 				mTabsAdapter.addTab(toAdd, MyListsFragment.class, index);
 			}
 			if (c.startsWith(ProfileTimelineFragment.ID + "@")) {
-				Tab toAdd = getActionBar().newTab();
+				Tab toAdd = getActionBar().newTab().setTabListener(this);
 				String screenName = c.substring(ProfileTimelineFragment.ID
 						.length() + 1);
 				if (iconic) {
@@ -444,6 +448,18 @@ public class TimelineScreen extends Activity {
 			}
 			index++;
 		}
+
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setOffscreenPageLimit(4);
+		mViewPager.setAdapter(mTabsAdapter);
+		mViewPager
+				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+					@Override
+					public void onPageSelected(int position) {
+						getActionBar().setSelectedNavigationItem(position);
+					}
+				});
+
 		if (newColumn) {
 			newColumn = false;
 			getActionBar().setSelectedNavigationItem(
@@ -464,7 +480,7 @@ public class TimelineScreen extends Activity {
 			pager.setAdapter(mTabsAdapter);
 			pager.setCurrentItem(defaultColumn);
 		}
-		mTabsAdapter.filterDefaultColumnSelection = false;
+		filterDefaultColumnSelection = false;
 		invalidateOptionsMenu();
 	}
 
@@ -727,10 +743,11 @@ public class TimelineScreen extends Activity {
 						.get(0).getId();
 				loadColumns(false);
 			} else {
-				for(int i = 0; i < getActionBar().getTabCount(); i++) {
-					Fragment frag = getFragmentManager().findFragmentByTag("page:" + i);
-					if(frag != null && frag instanceof BaseListFragment) {
-						((BaseListFragment)frag).filter();
+				for (int i = 0; i < getActionBar().getTabCount(); i++) {
+					Fragment frag = getFragmentManager().findFragmentByTag(
+							"page:" + i);
+					if (frag != null && frag instanceof BaseListFragment) {
+						((BaseListFragment) frag).filter();
 					}
 				}
 			}
@@ -771,7 +788,11 @@ public class TimelineScreen extends Activity {
 		final ArrayList<Account> accs = AccountService.getAccounts();
 		// Loading
 		try {
-			if (((TabsAdapter.IBoidFragment) mTabsAdapter.getCurrentFragment())
+			if (((TabsAdapter.IBoidFragment) getFragmentManager()
+					.findFragmentByTag(
+							"page:"
+									+ getActionBar()
+											.getSelectedNavigationIndex()))
 					.isRefreshing()) {
 				ProgressBar p = new ProgressBar(this, null,
 						android.R.attr.progressBarStyleSmall);
@@ -915,5 +936,45 @@ public class TimelineScreen extends Activity {
 			}
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction arg1) {
+		boolean selected = mTabsAdapter.mTabs.get(tab.getPosition()).aleadySelected;
+		if (selected) {
+			Fragment frag = getFragmentManager().findFragmentByTag(
+					"page:" + tab.getPosition());
+			if (frag != null) {
+				if (frag instanceof BaseListFragment)
+					((BaseListFragment) frag).jumpTop();
+				else if (frag instanceof BaseSpinnerFragment)
+					((BaseSpinnerFragment) frag).jumpTop();
+				else if (frag instanceof BaseGridFragment)
+					((BaseGridFragment) frag).jumpTop();
+			}
+		}
+	}
+
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+		if (!filterDefaultColumnSelection) {
+			final String prefName = Long.toString(AccountService
+					.getCurrentAccount().getId()) + "_default_column";
+			PreferenceManager.getDefaultSharedPreferences(this).edit()
+					.putInt(prefName, tab.getPosition()).apply();
+		}
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = true;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		if (mTabsAdapter.mTabs.size() == 0
+				|| tab.getPosition() > mTabsAdapter.mTabs.size())
+			return;
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = false;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
 	}
 }
