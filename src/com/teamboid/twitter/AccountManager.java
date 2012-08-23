@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.google.android.gcm.GCMRegistrar;
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
@@ -45,27 +46,7 @@ import android.widget.Toast;
  */
 public class AccountManager extends PreferenceActivity {
 
-	public static void unregisterFromPush(final long accountId,
-			final Activity a, final Runnable after, final Runnable onError) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					DefaultHttpClient dhc = new DefaultHttpClient();
-					HttpGet get = new HttpGet(PushReceiver.SERVER + "/remove/"
-							+ accountId);
-					org.apache.http.HttpResponse r = dhc.execute(get);
-					if (r.getStatusLine().getStatusCode() == 200) {
-						a.runOnUiThread(after);
-					} else
-						throw new Exception("NON 200 RESPONSE ;__;");
-				} catch (Exception e) {
-					e.printStackTrace();
-					a.runOnUiThread(onError);
-				}
-			}
-		});
-	}
+	
 
 	public static class AccountFragment extends PreferenceFragment {
 
@@ -118,7 +99,7 @@ public class AccountManager extends PreferenceActivity {
 
 			};
 			IntentFilter i = new IntentFilter();
-			i.addAction("com.teamboid.twitter.PUSH_PROGRESS");
+			i.addAction(GCMIntentService.BROADCAST);
 			getActivity().registerReceiver(pupdater, i);
 
 			setKey("c2dm", accountId);
@@ -154,62 +135,26 @@ public class AccountManager extends PreferenceActivity {
 				}
 			});
 
-			((SwitchPreference) findPreference(accountId + "_c2dm"))
-					.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-						@Override
-						public boolean onPreferenceChange(
-								final Preference preference, Object newValue) {
-							if (realChange == true)
-								return true;
-							if ((Boolean) newValue == true) {
-								PushReceiver.pushForId = accountId;
-								// Register!
-								Intent registrationIntent = new Intent(
-										"com.google.android.c2dm.intent.REGISTER");
-								registrationIntent.putExtra("app",
-										PendingIntent.getBroadcast(
-												getActivity(), 0, new Intent(
-														getActivity(),
-														PushReceiver.class), 0));
-								registrationIntent.putExtra("sender",
-										PushReceiver.SENDER_EMAIL);
-								getActivity().startService(registrationIntent);
-								pd.setProgress(0);
-								pd.show();
-							} else {
-								// Unregister
-								pd.setProgress(0);
-								pd.show();
-								unregisterFromPush(accountId, getActivity(),
-										new Runnable() {
-											@Override
-											public void run() {
-												pd.dismiss();
-												// Update Switch
-												realChange = true;
-												((SwitchPreference) preference)
-														.setChecked(false);
-												realChange = false;
-												Toast.makeText(getActivity(),
-														R.string.push_updated,
-														Toast.LENGTH_SHORT)
-														.show();
-											}
-
-										}, new Runnable() {
-											@Override
-											public void run() {
-												pd.dismiss();
-												Toast.makeText(getActivity(),
-														R.string.push_error,
-														Toast.LENGTH_LONG)
-														.show();
-											}
-										});
-							}
-							return false;
-						}
-					});
+			GCMRegistrar.checkDevice(getActivity());
+			GCMRegistrar.checkManifest(getActivity());
+			final String regId = GCMRegistrar.getRegistrationId(getActivity());
+			SwitchPreference c2dmPref = ((SwitchPreference) findPreference(accountId + "_c2dm"));
+			c2dmPref.setChecked( !regId.equals("") );
+			c2dmPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(
+						final Preference preference, Object newValue) {
+					GCMIntentService.setRegisteringFor(getActivity(), accountId);
+					if((Boolean)newValue == true){ // Register
+						GCMRegistrar.register(getActivity(), GCMIntentService.SENDER_ID);
+					} else{ // Unregister
+						GCMRegistrar.unregister(getActivity());
+					}
+					pd.show();
+					
+					return true;
+				}
+			});
 		}
 
 		void setKey(String key, int accountId) {
@@ -237,7 +182,7 @@ public class AccountManager extends PreferenceActivity {
 					public void run() {
 						try {
 							DefaultHttpClient dhc = new DefaultHttpClient();
-							HttpGet get = new HttpGet(PushReceiver.SERVER
+							HttpGet get = new HttpGet(GCMIntentService.SERVER
 									+ "/edit/" + accountId + "/"
 									+ remote_setting + "/"
 									+ ((Boolean) newValue ? "on" : "off"));

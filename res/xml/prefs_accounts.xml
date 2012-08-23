@@ -5,7 +5,7 @@
 		<SwitchPreference android:key="{user}_c2dm"
 			android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/enable_push" android:title="@string/push_title"
-			android:persistent="false" />
+			android:persistent="true" />
 		<SwitchPreference android:key="{user}_c2dm_mentions"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
