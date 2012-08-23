@@ -13,10 +13,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
-import com.teamboid.twitter.PushReceiver;
+import com.teamboid.twitter.GCMIntentService;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
+import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
@@ -133,7 +133,7 @@ public class MentionsFragment extends BaseListFragment {
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
 								if (addedCount > 0 || beforeLast > 0) {
-									PushReceiver.setReadMentions(feed[feed.length - 1].getId(), acc.getId(), context);
+									GCMIntentService.setReadMentions(acc.getId(), context);
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
 											getListView()

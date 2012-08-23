@@ -1,5 +1,8 @@
 package com.teamboid.twitter.compat;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
@@ -16,6 +19,11 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.style.StyleSpan;
 
 /**
  * Api level 16 (Jellybean) only methods!
@@ -56,7 +64,7 @@ public class Api16 {
 					.setSummaryText(s.getText())
 					.build(),
 					context);
-					nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
+					nm.notify(s.getId() + "", Api11.MENTIONS, noti);
 				}
 			});
 		} else {
@@ -65,7 +73,7 @@ public class Api16 {
 			.bigText(s.getText())
 			.build(),
 			context);
-			nm.notify(s.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
+			nm.notify(s.getId() + "", Api11.MENTIONS, noti);
 		}
 	}
 
@@ -78,10 +86,44 @@ public class Api16 {
 		.bigText(text)
 		.build(),
 		context);
-		nm.notify(msg.getId() + "", Api11.SINGLE_NOTIFCATION, noti);
+		nm.notify(msg.getId() + "", Api11.DM, noti);
 	}
 
 	public static void setLowPirority(Builder nb) {
 		nb.setPriority(Notification.PRIORITY_LOW);
+	}
+	
+	static int getQueueMessage(int queue){
+		if(queue == Api11.MENTIONS)
+			return R.string.mention_str;
+		else if(queue == Api11.DM)
+			return R.string.directmessage_str;
+		
+		return 0;
+	}
+
+	public static void displayMany(long accId, int queue, Context c,
+			JSONArray ja) {
+		try{
+			Notification.Builder nb = new Notification.Builder(c)
+						.setContentTitle(c.getString(getQueueMessage(queue)))
+						.setContentText("")
+						.setSmallIcon(R.drawable.statusbar_icon);
+			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
+			int m = 5;
+			if(ja.length() < 5){ m = ja.length(); }
+			for(int i = 0; i <= m; i++){
+				JSONObject jo = ja.getJSONObject(i);
+				String user = jo.getString("user") + ": ";
+				SpannableStringBuilder sp = new SpannableStringBuilder(user + jo.getString("content"));
+				sp.setSpan(new StyleSpan(Typeface.BOLD), 0, user.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+				inbox.addLine(sp);
+			}
+			
+			NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+			nm.notify(accId + "", queue, inbox.build());
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }

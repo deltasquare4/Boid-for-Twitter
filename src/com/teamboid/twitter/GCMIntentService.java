@@ -10,20 +10,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.android.gcm.GCMBaseIntentService;
-import com.teamboid.twitter.cab.TimelineCAB;
-import com.teamboid.twitter.columns.MentionsFragment;
-import com.teamboid.twitter.compat.Api11;
-import com.teamboid.twitter.listadapters.FeedListAdapter;
-import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitterapi.dm.DirectMessage;
-import com.teamboid.twitterapi.dm.DirectMessageJSON;
-import com.teamboid.twitterapi.status.Status;
-import com.teamboid.twitterapi.status.StatusJSON;
-
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +22,18 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
+
+import com.google.android.gcm.GCMBaseIntentService;
+import com.teamboid.twitter.cab.TimelineCAB;
+import com.teamboid.twitter.columns.MentionsFragment;
+import com.teamboid.twitter.compat.Api11;
+import com.teamboid.twitter.listadapters.FeedListAdapter;
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.NightModeUtils;
+import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.dm.DirectMessageJSON;
+import com.teamboid.twitterapi.status.Status;
+import com.teamboid.twitterapi.status.StatusJSON;
 
 /**
  * Push
@@ -51,6 +54,20 @@ public class GCMIntentService extends GCMBaseIntentService {
 	public static void setRegisteringFor(Context c, long id){
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 		sp.edit().putLong("c2dm_for", id).commit();
+	}
+	
+	/**
+	 * Set all mentions to be read and remove all existing notifications for mentions
+	 * 
+	 * How this works: We have a queue "c2dm_mention_queue_{{ACID}}" which is added to, and removed from
+	 * @param id
+	 * @param c
+	 */
+	public static void setReadMentions(long id, Context c) {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+		sp.edit().remove("c2dm_mention_queue_" + id).commit();
+		NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(id + "", Api11.MENTIONS);
 	}
 	
 	public static final String BROADCAST = "com.teamboid.twitter.PUSH_PROGRESS";
@@ -100,7 +117,6 @@ public class GCMIntentService extends GCMBaseIntentService {
 				JSONObject status = new JSONObject(intent.getStringExtra("tweet"));
 				status.put("id", Long.parseLong(status.getString("id_str")));
 				final Status s = new StatusJSON(status);
-				Api11.displayReplyNotification(accId, context, s);
 				TimelineCAB.context.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -109,12 +125,78 @@ public class GCMIntentService extends GCMBaseIntentService {
 						if(adapt != null) adapt.add(new Status[] { s });
 					}
 				});
+				addMessageToQueue("mention", accId, s.getUser().getScreenName(), s.getText());
+				showQueue("mention", accId, s);
 			} else if(type.equals("dm")) {
 				JSONObject json = new JSONObject(intent.getStringExtra("tweet"));
 				final DirectMessage dm = new DirectMessageJSON(json);
-				Api11.displayDirectMessageNotification(accId, context, dm);
-			} else if(type.endsWith("multiReply")){
-				// TODO: This
+				addMessageToQueue("dm", accId, dm.getSenderScreenName(), dm.getText());
+				showQueue("dm", accId, dm);
+			} else if(type.equals("manyReply")){
+				addMultiple("mention", accId, intent);
+				showQueue("mention", accId, null);
+			} else if(type.equals("manyDM")){
+				addMultiple("dm", accId, intent);
+				showQueue("dm", accId, null);
+			}
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void addMultiple(String queue, long accId, Intent intent){
+		for(int i = 0; i <= 5; i++){
+			if(intent.hasExtra("message." + i + ".message")){
+				addMessageToQueue(
+						queue, accId,
+						intent.getStringExtra("message." + i + ".user"),
+						intent.getStringExtra("message." + i + ".message")
+				);
+			} else{
+				break;
+			}
+		}
+	}
+	
+	public void addMessageToQueue(String queue, long accId, String user, String value){
+		try{
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue + "_queue_" + accId, "[]"));
+			JSONObject jo = new JSONObject();
+			jo.put("user", user);
+			jo.put("content", value);
+			ja.put(jo);
+			sp.edit().putString("c2dm_" + queue + "_queue_" + accId, ja.toString());
+		} catch(Exception e){ // Should never happen
+			e.printStackTrace();
+		}
+	}
+	
+	public void showQueue(String queue, long accId, Object single){
+		try{
+			if(NightModeUtils.isNightMode(this)){
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+				if(prefs.getBoolean("night_mode_pause_notifications", false) == true){
+					return;
+				}
+			}
+			NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			nm.cancel(accId + "", queue.equals("mention") ? Api11.MENTIONS : Api11.DM);
+			
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue + "_queue_" + accId, "[]"));
+			if(ja.length() == 1 && single != null){
+				if(queue.equals("mention")){
+					Api11.displayReplyNotification((int) accId, this, (Status)single);
+				} else if(queue.equals("dm")){
+					Api11.displayDirectMessageNotification((int) accId, this, (DirectMessage)single);
+				}
+			} else{
+				if(queue.equals("mention")){
+					Api11.displayMany(accId, Api11.MENTIONS, this, ja);
+				} else if(queue.equals("dm")){
+					Api11.displayMany(accId, Api11.DM, this, ja);
+				}
 			}
 		} catch(Exception e){
 			e.printStackTrace();

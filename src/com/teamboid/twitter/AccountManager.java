@@ -173,8 +173,10 @@ public class AccountManager extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(final Preference preference,
 					final Object newValue) {
-				if (real_change == true)
+				if (real_change == true){
+					real_change = false;
 					return true;
+				}
 				pd.setProgress(0);
 				pd.show();
 				new Thread(new Runnable() {
@@ -211,7 +213,6 @@ public class AccountManager extends PreferenceActivity {
 									real_change = true;
 									((SwitchPreference) preference)
 											.setChecked(!(Boolean) newValue);
-									real_change = false;
 								}
 							});
 						}
