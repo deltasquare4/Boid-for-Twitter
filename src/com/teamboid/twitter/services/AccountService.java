@@ -9,6 +9,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.crittercism.app.Crittercism;
 import com.teamboid.twitterapi.client.Authorizer;
 import com.teamboid.twitterapi.client.Twitter;
 
@@ -406,6 +408,7 @@ public class AccountService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Crittercism.init(getApplicationContext(), "503a15912cd9524709000002");
 		accounts = new ArrayList<Account>();
 	}
 
