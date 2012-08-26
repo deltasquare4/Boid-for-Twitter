@@ -14,6 +14,7 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
 
 	<!-- Contact Sync Required. Yeah, annoying as hell -->
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -292,6 +293,8 @@
 			<meta-data android:name="android.content.SyncAdapter"
 				android:resource="@xml/sync_autocomplete" />
 		</service>
+		
+		<activity android:name="com.crittercism.NotificationActivity"/>
 	</application>
 
 </manifest>

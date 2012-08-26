@@ -260,11 +260,11 @@ public class AccountManager extends PreferenceActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		setProgressBarIndeterminateVisibility(false);
 		if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) {
 			Log.d("acc", "Showing frag");
 			return;
 		}
-		setProgressBarIndeterminateVisibility(false);
 		IntentFilter ifilter = new IntentFilter();
 		ifilter.addAction(END_LOAD);
 		registerReceiver(receiver, ifilter);

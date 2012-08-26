@@ -109,11 +109,11 @@ public class MediaFeedListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		RelativeLayout toReturn = null;
+		View toReturn = null;
 		if (convertView != null)
-			toReturn = (RelativeLayout) convertView;
+			toReturn = convertView;
 		else
-			toReturn = (RelativeLayout) LayoutInflater.from(mContext).inflate(
+			toReturn = LayoutInflater.from(mContext).inflate(
 					R.layout.media_list_item, null);
 		final ImageView img = (ImageView) toReturn
 				.findViewById(R.id.mediaItemImage);

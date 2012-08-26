@@ -42,8 +42,8 @@ import com.teamboid.twitterapi.status.StatusJSON;
  *
  */
 public class GCMIntentService extends GCMBaseIntentService {
-	protected GCMIntentService(String senderId) {
-		super(senderId);
+	public GCMIntentService() {
+		super(SENDER_ID);
 	}
 	public Handler handler = new Handler();
 	
@@ -66,6 +66,12 @@ public class GCMIntentService extends GCMBaseIntentService {
 	public static void setReadMentions(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 		sp.edit().remove("c2dm_mention_queue_" + id).commit();
+		NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(id + "", Api11.MENTIONS);
+	}
+	public static void setReadDMs(long id, Context c) {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+		sp.edit().remove("c2dm_dm_queue_" + id).commit();
 		NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.MENTIONS);
 	}
@@ -268,7 +274,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 				}
 			}
 			
-		});	
+		}).start();	
 	}
 
 	@Override
@@ -308,7 +314,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 					});
 				}
 			}
-		});
+		}).start();
 	}
 
 }

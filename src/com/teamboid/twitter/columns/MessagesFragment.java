@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ConversationScreen;
+import com.teamboid.twitter.GCMIntentService;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.cab.MessageConvoCAB;
@@ -98,6 +99,7 @@ public class MessagesFragment extends BaseListFragment {
                         });
                     }
                 }
+                GCMIntentService.setReadDMs(acc.getId(), context);
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
