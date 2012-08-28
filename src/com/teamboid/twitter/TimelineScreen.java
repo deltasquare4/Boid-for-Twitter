@@ -34,6 +34,7 @@ import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
@@ -183,6 +184,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	SendTweetUpdater receiver = new SendTweetUpdater();
+	BoidActivity boid;
 
 	private void initialize(Bundle savedInstanceState) {
 		// This callback must stay here, otherwise in-app billing doesn't work
@@ -533,6 +535,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		boid = new BoidActivity(this);
+		boid.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey("lastTheme")
 					|| savedInstanceState.containsKey("lastDisplayReal")) {
@@ -767,6 +771,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		boid.onDestroy();
 	}
 
 	@Override

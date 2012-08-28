@@ -194,6 +194,12 @@ public class ProfileAboutAdapter extends BaseAdapter {
 				curItem = values.get(position);
 			} else curItem = values.get(position - 1);
 			if(curItem.getName().equals("[VERIFIED]")) {
+				if(convertView != null){
+					if(convertView.getTag() != null){
+						if(convertView.getTag().equals("verified"))
+							return convertView;
+					}
+				}
 				return LayoutInflater.from(mContext).inflate(R.layout.verified_imageview, null);
 			}
 

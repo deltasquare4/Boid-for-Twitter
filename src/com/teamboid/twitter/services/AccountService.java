@@ -142,9 +142,9 @@ public class AccountService extends Service {
 	}
 
 	public static void verifyAccount(final Activity activity, final String verifier) {
-		final Toast act = Toast.makeText(activity, activity
-				.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
-		act.show();
+		//final Toast act = Toast.makeText(activity, activity
+		//		.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
+		// act.show();
 		new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -157,7 +157,7 @@ public class AccountService extends Service {
 							activity.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									act.cancel();
+									//act.cancel();
 									Toast.makeText(activity, activity.getString(R.string.account_already_added), Toast.LENGTH_LONG).show();
 									activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
 								}
@@ -173,7 +173,7 @@ public class AccountService extends Service {
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							act.cancel();
+							//act.cancel();
 							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
 						}
 					});
@@ -182,7 +182,7 @@ public class AccountService extends Service {
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							act.cancel();
+							//act.cancel();
 							Toast.makeText(activity, activity.getString(R.string.authorization_error) + " "
 									+ e.getMessage(), Toast.LENGTH_LONG).show();
 							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));

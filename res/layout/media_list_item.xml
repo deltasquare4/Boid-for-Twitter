@@ -4,6 +4,8 @@
 	<ImageView android:visibility="gone" android:id="@+id/mediaItemImage"
 		android:layout_width="fill_parent" android:layout_height="160dp"
 		android:scaleType="centerCrop" />
-	<ProgressBar android:id="@+id/mediaItemProgress" android:layout_height="160dp"
+	<TextView android:id="@+id/mediaItemProgress" android:layout_height="160dp"
+	    android:text="@string/dots"
+	    android:gravity="center"
 		android:padding="20dp" android:layout_width="fill_parent" />
 </FrameLayout>

@@ -9,6 +9,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.Activity;
@@ -251,12 +252,8 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey("lastTheme")) {
-			lastTheme = savedInstanceState.getInt("lastTheme");
-			setTheme(lastTheme);
-		} else
-			setTheme(Utilities.getTheme(getApplicationContext()));
+		boid = new BoidActivity(this);
+		boid.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -329,7 +326,7 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("lastTheme", lastTheme);
+		boid.onSaveInstanceState(outState);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -451,10 +448,13 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public void onDestroy() {
+		boid.onDestroy();
 		super.onDestroy();
 		try {
 			unregisterReceiver(receiver);
 		} catch (Exception e) {
 		}
 	}
+	
+	BoidActivity boid;
 }

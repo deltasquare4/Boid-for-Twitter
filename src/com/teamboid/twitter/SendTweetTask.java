@@ -41,10 +41,14 @@ import android.util.Log;
 public class SendTweetTask {
 
 	public static HashMap<String, String> MEDIA_API_KEYS = new HashMap<String, String>();
+	public static HashMap<String, String> MEDIA_API_SECRETS = new HashMap<String, String>();
 	static {
 		MEDIA_API_KEYS.put("plixi", "10b6f8fd-c373-44cb-bd35-bbeb61a199f3");
 		MEDIA_API_KEYS.put("twitpic", "10c80e3453f27d3b34cb0bba320a17b3");
 		MEDIA_API_KEYS.put("yfrog", "e1f3d4d1625ec410a79b573dbbfe0570");
+		MEDIA_API_KEYS.put("drop.lr", "9f1ccb0cc8169661276a6e4a1525cf27ff4f3ff8");
+		
+		MEDIA_API_SECRETS.put("drop.lr", "ba93398fa49e9e646617d1fb5849efbd7a95cdc3");
 	}
 
 	public static class Result {
@@ -133,6 +137,7 @@ public class SendTweetTask {
 				ExternalMediaService ems = MediaServices.services.get(prefValue
 						.toLowerCase());
 				ems.setAPIKey(MEDIA_API_KEYS.get(prefValue.toLowerCase()));
+				ems.setAPISecret(MEDIA_API_SECRETS.get(prefValue.toLowerCase()));
 				ems.setAttribution("Uploaded via Boid for Android. Download for free -- http://boidapp.com");
 
 				SharedPreferences sp;
@@ -160,7 +165,7 @@ public class SendTweetTask {
 						.uploadFile(update, from.getClient(), input);
 				if (!prefValue.equals("twitter")) { // Only twitter doesn't
 													// respond the same
-					if (contents.length() > 1) {
+					if (contents.length() >= 1) {
 						contents = contents
 								+ (contents.charAt(contents.length() - 1) == ' ' ? ""
 										: " ") + me.getExpandedUrl();

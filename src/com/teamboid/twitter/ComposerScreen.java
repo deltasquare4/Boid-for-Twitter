@@ -228,17 +228,26 @@ public class ComposerScreen extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey("lastTheme")) {
-				lastTheme = savedInstanceState.getInt("lastTheme");
-				setTheme(lastTheme);
-			} else
-				setTheme(Utilities.getTheme(getApplicationContext()));
-		} else
-			setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
 		lengthIndic = 140;
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			@Override
+			public void done() {
+				finishInit();
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
+	
+	public void finishInit(){
 		setContentView(R.layout.composer_screen);
 		final EditText content = (EditText) findViewById(R.id.tweetContent);
 		content.addTextChangedListener(new TextWatcher() {
@@ -258,24 +267,7 @@ public class ComposerScreen extends Activity {
 					int count) {
 			}
 		});
-		boid = new BoidActivity(this);
-		boid.AccountsReady = new BoidActivity.OnAction() {
-			@Override
-			public void done() {
-				finishInit();
-			}
-		};
-		boid.onCreate();
-	}
-	
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		boid.onDestroy();
-	}
-	
-	public void finishInit(){
-		final EditText content = (EditText) findViewById(R.id.tweetContent);
+		//final EditText content = (EditText) findViewById(R.id.tweetContent);
 		if (getIntent().getExtras() != null) {
 			if (getIntent().hasExtra("reply_to")) {
 				Status replyTo = (Status) getIntent().getSerializableExtra(
@@ -605,7 +597,7 @@ public class ComposerScreen extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("lastTheme", lastTheme);
+		boid.onSaveInstanceState(outState);
 		super.onSaveInstanceState(outState);
 	}
 

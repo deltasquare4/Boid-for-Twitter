@@ -117,8 +117,7 @@ public class MediaFeedListAdapter extends BaseAdapter {
 					R.layout.media_list_item, null);
 		final ImageView img = (ImageView) toReturn
 				.findViewById(R.id.mediaItemImage);
-		final ProgressBar prog = (ProgressBar) toReturn
-				.findViewById(R.id.mediaItemProgress);
+		final View prog = toReturn.findViewById(R.id.mediaItemProgress);
 		img.setVisibility(View.GONE);
 		prog.setVisibility(View.VISIBLE);
 		ImageManager downloader = ImageManager.getInstance(mContext);
