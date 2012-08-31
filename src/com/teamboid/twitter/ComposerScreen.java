@@ -603,6 +603,8 @@ public class ComposerScreen extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
+		if(findViewById(R.id.tweetContent) == null) return true;
+		
 		getMenuInflater().inflate(R.menu.composer_actionbar, menu);
 		if (stt.in_reply_to > 0) {
 			menu.findItem(R.id.sendAction).setTitle(

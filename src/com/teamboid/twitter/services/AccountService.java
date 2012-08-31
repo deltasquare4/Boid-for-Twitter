@@ -215,7 +215,7 @@ public class AccountService extends Service {
 		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
 
 		final int lastAccountCount = getAccounts().size();
-		Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
+		// Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
 		for(final String token : accountStore.keySet()) {
 			boolean skip = false;
 			for (int i = 0; i < accounts.size(); i++) {
@@ -227,15 +227,23 @@ public class AccountService extends Service {
 			}
 			if(skip) continue;
 
-			final Account toAdd = (Account)Utils.deserializeObject((String)accountStore.get(token));
-			final Twitter client = getAuthorizer().getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
-			client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-					.getBoolean("enable_ssl", false));
-			accounts.add(toAdd.setClient(client));
-			if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
-				androidAccounts.remove(toAdd.getUser().getId() + "");
-			} else{
-				AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+			try{
+				final Account toAdd = (Account)Utils.deserializeObject((String)accountStore.get(token));
+				final Twitter client = getAuthorizer().getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
+				client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+						.getBoolean("enable_ssl", false));
+				toAdd.setClient(client);
+				toAdd.refreshUserIfNeeded();
+				accounts.add(toAdd);
+				if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
+					androidAccounts.remove(toAdd.getUser().getId() + "");
+				} else{
+					AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+				}
+			} catch(Exception e){
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
+					" " + e.getMessage(), Toast.LENGTH_LONG).show();
 			}
 
 			//			try {

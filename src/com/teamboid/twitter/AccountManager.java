@@ -2,20 +2,13 @@ package com.teamboid.twitter;
 
 import java.util.List;
 
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.google.android.gcm.GCMRegistrar;
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -46,22 +39,16 @@ import android.widget.Toast;
  * @author Aidan Follestad
  */
 public class AccountManager extends PreferenceActivity {
-
 	
-
 	public static class AccountFragment extends PreferenceFragment {
 
 		@Override
 		public void onDestroy() {
 			super.onDestroy();
-			getActivity().unregisterReceiver(pupdater);
 		}
 
-		boolean realChange = false;
 		int accountId;
-		ProgressDialog pd;
-		BroadcastReceiver pupdater;
-
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -69,54 +56,15 @@ public class AccountManager extends PreferenceActivity {
 			addPreferencesFromResource(R.xml.prefs_accounts);
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 			accountId = this.getArguments().getInt("accountId");
-			pd = new ProgressDialog(getActivity());
-			pd.setMessage(getText(R.string.push_wait));
-			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-
-			pupdater = new BroadcastReceiver() {
-				@Override
-				public void onReceive(Context arg0, Intent arg1) {
-					pd.setProgress(arg1.getIntExtra("progress", 1000));
-					if (arg1.getIntExtra("progress", 0) == 1000) {
-						pd.dismiss();
-						if (arg1.getBooleanExtra("error", false)) {
-							Toast.makeText(getActivity(), R.string.push_error,
-									Toast.LENGTH_LONG).show();
-						} else {
-							Toast.makeText(getActivity(),
-									R.string.push_registered,
-									Toast.LENGTH_SHORT).show();
-							findPreference(accountId + "_c2dm")
-									.getSharedPreferences().edit()
-									.putBoolean(accountId + "_c2dm", true)
-									.commit();
-							realChange = true;
-							((SwitchPreference) findPreference(accountId
-									+ "_c2dm")).setChecked(true);
-							realChange = false;
-						}
-					}
-				}
-
-			};
-			IntentFilter i = new IntentFilter();
-			i.addAction(GCMIntentService.BROADCAST);
-			getActivity().registerReceiver(pupdater, i);
 
 			setKey("c2dm", accountId);
+			setKey("c2dm_period", accountId);
 			setKey("c2dm_mentions", accountId);
 			setKey("c2dm_messages", accountId);
 			setKey("c2dm_vibrate", accountId);
 			setKey("c2dm_ringtone", accountId);
 			setKey("c2dm_messages_priv", accountId);
 			setKey("contactsync_on", accountId);
-
-			findPreference(accountId + "_c2dm_mentions")
-					.setOnPreferenceChangeListener(
-							new RemotePushSettingChange("replies"));
-			findPreference(accountId + "_c2dm_messages")
-					.setOnPreferenceChangeListener(
-							new RemotePushSettingChange("dm"));
 
 			SwitchPreference syncPref = ((SwitchPreference) findPreference(accountId
 					+ "_contactsync_on"));
@@ -135,23 +83,13 @@ public class AccountManager extends PreferenceActivity {
 					return true;
 				}
 			});
-
-			GCMRegistrar.checkDevice(getActivity());
-			GCMRegistrar.checkManifest(getActivity());
-			final String regId = GCMRegistrar.getRegistrationId(getActivity());
+			
 			SwitchPreference c2dmPref = ((SwitchPreference) findPreference(accountId + "_c2dm"));
-			c2dmPref.setChecked( !regId.equals("") );
 			c2dmPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(
 						final Preference preference, Object newValue) {
-					GCMIntentService.setRegisteringFor(getActivity(), accountId);
-					if((Boolean)newValue == true){ // Register
-						GCMRegistrar.register(getActivity(), GCMIntentService.SENDER_ID);
-					} else{ // Unregister
-						GCMRegistrar.unregister(getActivity());
-					}
-					pd.show();
+					// TODO: Ask to resechedule. Cannot access developers :(
 					
 					return true;
 				}
@@ -160,67 +98,6 @@ public class AccountManager extends PreferenceActivity {
 
 		void setKey(String key, int accountId) {
 			findPreference("{user}_" + key).setKey(accountId + "_" + key);
-		}
-
-		public class RemotePushSettingChange implements
-				Preference.OnPreferenceChangeListener {
-			String remote_setting;
-			Boolean real_change = false;
-
-			public RemotePushSettingChange(String remote_setting) {
-				this.remote_setting = remote_setting;
-			}
-
-			@Override
-			public boolean onPreferenceChange(final Preference preference,
-					final Object newValue) {
-				if (real_change == true){
-					real_change = false;
-					return true;
-				}
-				pd.setProgress(0);
-				pd.show();
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							DefaultHttpClient dhc = new DefaultHttpClient();
-							HttpGet get = new HttpGet(GCMIntentService.SERVER
-									+ "/edit/" + accountId + "/"
-									+ remote_setting + "/"
-									+ ((Boolean) newValue ? "on" : "off"));
-							org.apache.http.HttpResponse r = dhc.execute(get);
-							if (r.getStatusLine().getStatusCode() == 200) {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										pd.dismiss();
-										Toast.makeText(getActivity(),
-												R.string.push_updated,
-												Toast.LENGTH_SHORT).show();
-									}
-								});
-							} else
-								throw new Exception("NON 200 RESPONSE ;__;");
-						} catch (Exception e) {
-							e.printStackTrace();
-							getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									pd.dismiss();
-									Toast.makeText(getActivity(),
-											R.string.push_error,
-											Toast.LENGTH_LONG).show();
-									real_change = true;
-									((SwitchPreference) preference)
-											.setChecked(!(Boolean) newValue);
-								}
-							});
-						}
-					}
-				}).start();
-				return true;
-			}
 		}
 	}
 

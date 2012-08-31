@@ -220,5 +220,10 @@ public class ContactSyncAdapterService extends Service {
 				deleteContact(acc.id);
 			}
 		}
+
+		@Override
+		String whatAmIString() {
+			return "contactsync";
+		}
 	}
 }

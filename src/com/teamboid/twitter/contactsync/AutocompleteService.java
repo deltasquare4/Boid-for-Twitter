@@ -125,5 +125,10 @@ public class AutocompleteService extends Service {
 				syncResult.delayUntil = 60 * 60 * 2;
 			}
 		}
+
+		@Override
+		String whatAmIString() {
+			return "autocomplete";
+		}
 	}
 }

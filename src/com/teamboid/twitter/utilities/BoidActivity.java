@@ -65,6 +65,14 @@ public class BoidActivity {
 	 * Call this when the Activity is inside `onCreate()`
 	 */
 	public void onCreate(Bundle savedInstanceState){
+		// Theme
+		if (savedInstanceState != null
+				&& savedInstanceState.containsKey("lastTheme")) {
+			lastTheme = savedInstanceState.getInt("lastTheme");
+			mContext.setTheme(lastTheme);
+		} else
+			mContext.setTheme(Utilities.getTheme(mContext));
+		
 		// Register for when service is ready
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AccountManager.END_LOAD);
@@ -83,14 +91,6 @@ public class BoidActivity {
 		} catch(Exception e){
 			e.printStackTrace();
 		}
-		
-		// Theme
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey("lastTheme")) {
-			lastTheme = savedInstanceState.getInt("lastTheme");
-			mContext.setTheme(lastTheme);
-		} else
-			mContext.setTheme(Utilities.getTheme(mContext));
 	}
 	
 	public void onSaveInstanceState(Bundle out){
