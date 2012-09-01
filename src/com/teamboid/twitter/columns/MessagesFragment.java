@@ -12,13 +12,13 @@ import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ConversationScreen;
-import com.teamboid.twitter.GCMIntentService;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -99,7 +99,7 @@ public class MessagesFragment extends BaseListFragment {
                         });
                     }
                 }
-                GCMIntentService.setReadDMs(acc.getId(), context);
+                NotificationService.setReadDMs(acc.getId(), context);
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

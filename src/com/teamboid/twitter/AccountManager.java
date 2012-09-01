@@ -1,14 +1,18 @@
 package com.teamboid.twitter;
 
+import java.util.Calendar;
 import java.util.List;
 
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -59,8 +63,8 @@ public class AccountManager extends PreferenceActivity {
 
 			setKey("c2dm", accountId);
 			setKey("c2dm_period", accountId);
-			setKey("c2dm_mentions", accountId);
-			setKey("c2dm_messages", accountId);
+			setKey("c2dm_mention", accountId);
+			setKey("c2dm_dm", accountId);
 			setKey("c2dm_vibrate", accountId);
 			setKey("c2dm_ringtone", accountId);
 			setKey("c2dm_messages_priv", accountId);
@@ -89,7 +93,21 @@ public class AccountManager extends PreferenceActivity {
 				@Override
 				public boolean onPreferenceChange(
 						final Preference preference, Object newValue) {
-					// TODO: Ask to resechedule. Cannot access developers :(
+					
+					Intent intent = new Intent(getActivity(), NotificationService.class);
+					intent.putExtra("account", accountId);
+					PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+					
+					AlarmManager alm = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+					
+					if(newValue.equals(true)){
+						Calendar calendar = Calendar.getInstance();
+						calendar.setTimeInMillis(System.currentTimeMillis());
+						calendar.add(Calendar.SECOND, 30);
+						alm.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+								AlarmManager.INTERVAL_HOUR, pendingIntent);
+					} else
+						alm.cancel(pendingIntent);
 					
 					return true;
 				}

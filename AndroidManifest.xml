@@ -28,7 +28,6 @@
 		android:protectionLevel="signature" />
 
 	<uses-permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE" />
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<uses-permission android:name="com.android.vending.BILLING" />
 
 	<supports-screens android:anyDensity="true"
@@ -283,6 +282,9 @@
 			<meta-data android:name="android.content.SyncAdapter"
 				android:resource="@xml/sync_autocomplete" />
 		</service>
+		
+		<receiver android:name="com.teamboid.twitter.NotificationService"></receiver>
+		<service android:name="com.teamboid.twitter.NotificationService$ActualService"></service>
 		
 		<activity android:name="com.crittercism.NotificationActivity"/>
 	</application>

@@ -6,6 +6,10 @@
 			android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/notifications_enable" android:title="@string/notifications"
 			android:persistent="true" />
+		<SwitchPreference android:key="{user}_c2dm_mention"
+            android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
+            android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
+            android:persistent="true" />
 		<ListPreference android:title="@string/notification_period" android:key="{user}_c2dm_period"/><SwitchPreference android:key="{user}_c2dm_mentions"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
@@ -20,7 +24,7 @@
 		
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/messages_str">
-		<SwitchPreference android:key="{user}_c2dm_messages"
+		<SwitchPreference android:key="{user}_c2dm_dm"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
 			android:persistent="true" />
