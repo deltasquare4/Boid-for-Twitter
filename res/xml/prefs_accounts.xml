@@ -10,7 +10,7 @@
             android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
             android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
             android:persistent="true" />
-		<ListPreference android:title="@string/notification_period" android:key="{user}_c2dm_period"/><SwitchPreference android:key="{user}_c2dm_mentions"
+		<ListPreference android:title="@string/notification_period" android:key="{user}_c2dm_period" android:defaultValue="15" android:entryValues="@array/nearby_distance_values" android:entries="@array/notifications_period_name"/><SwitchPreference android:key="{user}_c2dm_mentions"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 			android:persistent="true" />

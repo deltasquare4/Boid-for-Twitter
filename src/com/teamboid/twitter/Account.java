@@ -28,7 +28,7 @@ public class Account implements Serializable {
 	/**
 	 * Stores a long of when we last actually got our user
 	 */
-	private Long lastRefreshed;
+	private Long lastRefreshed = -1L;
 	private transient Twitter _client;
 
 	public Twitter getClient() { return _client; }
@@ -48,6 +48,7 @@ public class Account implements Serializable {
 	}
 	
 	public void refreshUserIfNeeded() throws Exception{
+		if(lastRefreshed == null){ lastRefreshed = System.currentTimeMillis(); return; }
 		if(lastRefreshed <= (System.currentTimeMillis() / 1000) - (60*60*12)){
 			// Account is older than 12 hours, request in the background to reload
 			new Thread(new Runnable(){
