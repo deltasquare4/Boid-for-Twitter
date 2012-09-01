@@ -2,19 +2,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="@string/notifications"
 		android:key="push">
-		<SwitchPreference android:key="{user}_c2dm"
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm"
 			android:enabled="true" android:layout="@layout/boid_preference"
+			android:defaultValue="true"
 			android:summary="@string/notifications_enable" android:title="@string/notifications"
 			android:persistent="true" />
-		<SwitchPreference android:key="{user}_c2dm_mention"
-            android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
-            android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
-            android:persistent="true" />
-		<ListPreference android:title="@string/notification_period" android:key="{user}_c2dm_period" android:defaultValue="15" android:entryValues="@array/nearby_distance_values" android:entries="@array/notifications_period_name"/><SwitchPreference android:key="{user}_c2dm_mentions"
+		<ListPreference
+		    android:title="@string/notification_period"
+		    android:key="{user}_c2dm_period"
+		    android:defaultValue="15"
+		    android:entryValues="@array/nearby_distance_values"
+		    android:entries="@array/notifications_period_name"/>
+		
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm_mention"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 			android:persistent="true" />
-		<SwitchPreference android:key="{user}_c2dm_vibrate"
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm_vibrate"
 			android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/vibrate_str_desc" android:title="@string/vibrate_str"
 			android:persistent="true" />
@@ -24,17 +28,17 @@
 		
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/messages_str">
-		<SwitchPreference android:key="{user}_c2dm_dm"
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm_dm"
 			android:defaultValue="true" android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
 			android:persistent="true" />
-		<SwitchPreference android:key="{user}_c2dm_messages_priv"
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm_messages_priv"
 			android:defaultValue="false" android:enabled="true"
 			android:layout="@layout/boid_preference" android:summary="@string/messages_priv_desc"
 			android:title="@string/messages_priv" android:persistent="true" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/contact_sync">
-		<SwitchPreference android:key="{user}_contactsync_on"
+		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_contactsync_on"
 		    android:summaryOn="@string/contact_sync_on"
 		    android:defaultValue="false" android:summaryOff="@string/contact_sync_off"
 		    android:title="@string/contact_sync"/>

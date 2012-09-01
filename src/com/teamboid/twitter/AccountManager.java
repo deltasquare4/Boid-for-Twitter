@@ -21,10 +21,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -52,14 +54,18 @@ public class AccountManager extends PreferenceActivity {
 		}
 
 		int accountId;
+		SharedPreferences sp;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 
 			addPreferencesFromResource(R.xml.prefs_accounts);
+			
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActivity().setTitle(getArguments().getString("accName"));
 			accountId = this.getArguments().getInt("accountId");
+			sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 			setKey("c2dm", accountId);
 			setKey("c2dm_period", accountId);
@@ -89,25 +95,14 @@ public class AccountManager extends PreferenceActivity {
 			});
 			
 			SwitchPreference c2dmPref = ((SwitchPreference) findPreference(accountId + "_c2dm"));
+			c2dmPref.setChecked(sp.getBoolean(accountId + "_c2dm", true));
 			c2dmPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(
 						final Preference preference, Object newValue) {
 					
-					Intent intent = new Intent(getActivity(), NotificationService.class);
-					intent.putExtra("account", accountId);
-					PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
-					
-					AlarmManager alm = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-					
-					if(newValue.equals(true)){
-						Calendar calendar = Calendar.getInstance();
-						calendar.setTimeInMillis(System.currentTimeMillis());
-						calendar.add(Calendar.SECOND, 30);
-						alm.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-								AlarmManager.INTERVAL_HOUR, pendingIntent);
-					} else
-						alm.cancel(pendingIntent);
+					Log.d("boid", "notification switched");
+					NotificationService.setupAlarm(getActivity(), accountId, (Boolean)newValue);
 					
 					return true;
 				}
@@ -115,7 +110,13 @@ public class AccountManager extends PreferenceActivity {
 		}
 
 		void setKey(String key, int accountId) {
-			findPreference("{user}_" + key).setKey(accountId + "_" + key);
+			Preference p = findPreference("{user}_" + key);
+			p.setKey(accountId + "_" + key);
+			if(p instanceof SwitchPreference){
+				((SwitchPreference)p).setChecked(sp.getBoolean(accountId + "_" + key, ((SwitchPreference) p).isChecked()));
+			} //else if(p instanceof ListPreference){
+			//	((ListPreference)p).setValue(((ListPreference)p).getValue());
+			//}
 		}
 	}
 
@@ -178,6 +179,7 @@ public class AccountManager extends PreferenceActivity {
 						.getName();
 				Bundle b = new Bundle();
 				b.putInt("accountId", (int) id);
+				b.putString("accName", h.title.toString());
 				h.fragmentArguments = b;
 				onHeaderClick(h, pos);
 			}
@@ -258,6 +260,7 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
+		if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) return true;
 		getMenuInflater().inflate(R.menu.accountmanager_actionbar, menu);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());

@@ -1,8 +1,12 @@
 package com.teamboid.twitter.services;
 
+import java.util.Calendar;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.teamboid.twitter.Account;
 import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.utilities.NightModeUtils;
 import com.teamboid.twitterapi.client.Authorizer;
@@ -12,12 +16,15 @@ import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.utilities.Utils;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -25,16 +32,59 @@ import android.util.Log;
 
 /**
  * Processes notifications
+ * 
+ * Note: You cannot use the AccountService. We are in a completely different process
+ * so that we are not chugging it's weight around at boot-time
  * @author kennydude
  *
  */
 public class NotificationService extends BroadcastReceiver {
+	public static void setupAlarm(Context c, long accId, boolean on){
+		Intent intent = new Intent();
+		intent.setData(Uri.parse("boid:notify/"+accId));
+		intent.setPackage("com.teamboid.twitter");
+		//intent.putExtra("account", accId);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(c, 0, intent, Intent.FILL_IN_DATA);
+		
+		AlarmManager alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+		
+		if(on == true){
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			calendar.add(Calendar.SECOND, 10);
+			int period = Integer.parseInt((PreferenceManager.getDefaultSharedPreferences(c)).getString(accId + "_c2dm_period", "15"));
+			alm.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+					period * (1000 * 60), pendingIntent);
+		} else
+			alm.cancel(pendingIntent);
+	}
 
 	@Override
 	public void onReceive(Context cntxt, Intent intent) {
-		Intent service = new Intent(cntxt, ActualService.class);
-		service.putExtra("account", intent.getLongExtra("account", -1));
-		cntxt.startService(service);
+		Log.d("nf", "NotificationService");
+		Log.d("nf", intent.toUri(0));
+		if(intent.getData() != null){
+			Log.d("nf", intent.getDataString());
+			if(!intent.getDataString().startsWith("boid:notify")) return;
+			Intent service = new Intent(cntxt, ActualService.class);
+			service.putExtra("account", Long.parseLong(intent.getData().getPath()));
+			cntxt.startService(service);
+		} else if(intent.hasExtra("account")){ 
+			Intent service = new Intent(cntxt, ActualService.class);
+			service.putExtra("account", intent.getLongExtra("account", -1));
+			cntxt.startService(service);
+		} else if(intent.getAction() != null){
+			if(!intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED))return;
+			Map<String, ?> sp = cntxt.getSharedPreferences("profiles-v2",
+					Context.MODE_PRIVATE).getAll();
+			SharedPreferences def = PreferenceManager.getDefaultSharedPreferences(cntxt);
+			for(final String token : sp.keySet()) {
+				 
+				 final Account toAdd = (Account)Utils.deserializeObject((String)sp.get(token));
+				 setupAlarm(cntxt, toAdd.getId(), def.getBoolean(toAdd.getId() + "_c2dm", true));
+				 
+			}
+		}
 	}
 	
 	/**
@@ -66,7 +116,9 @@ public class NotificationService extends BroadcastReceiver {
 		sp.edit().putLong("c2dm_for", id).commit();
 	}
 	
-	public class ActualService extends Service{
+	public static class ActualService extends Service{
+		public ActualService(){ super(); }
+		
 		public Handler handler = new Handler();
 		
 		public void addMessageToQueue(String queue, long accId, String user, String value){
@@ -159,10 +211,12 @@ public class NotificationService extends BroadcastReceiver {
 					Twitter client = getTwitter(accId);
 					
 					if(columnEnabled(accId, "mention")){
+						Log.d("boid", "mention check");
 						try{
 							long since_id = getSinceId(accId, "mention");
 							Paging paging = new Paging(5);
-							paging.setSinceId(since_id);
+							if(since_id != -1)
+								paging.setSinceId(since_id);
 							
 							Status[] m = client.getMentions(paging);
 							if(m.length > 0){
@@ -178,10 +232,12 @@ public class NotificationService extends BroadcastReceiver {
 					}
 					
 					if(columnEnabled(accId, "dm")){
+						Log.d("boid", "dm check");
 						try{
 							long since_id = getSinceId(accId, "dm");
 							Paging paging = new Paging(5);
-							paging.setSinceId(since_id);
+							if(since_id != -1)
+								paging.setSinceId(since_id);
 							
 							DirectMessage[] m = client.getDirectMessages(paging);
 							if(m.length > 0){
