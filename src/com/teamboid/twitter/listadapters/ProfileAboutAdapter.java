@@ -101,6 +101,9 @@ public class ProfileAboutAdapter extends BaseAdapter {
 	public boolean isFollowedBy() { return isFollowedBy; }
 
 	public static double round(double unrounded, int precision, int roundingMode) {
+		if(unrounded == 0.0) {
+			return 0.0;
+		}
 		BigDecimal bd = new BigDecimal(unrounded);
 		BigDecimal rounded = bd.setScale(precision, roundingMode);
 		return rounded.doubleValue();

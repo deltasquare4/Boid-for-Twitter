@@ -504,6 +504,9 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	}
 	
 	public void setupMediaView() {
+		if(user == null) {
+			return;
+		}
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
@@ -583,7 +586,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 
 			@Override
 			public void onPageSelected(int position) {
-				getActionBar().setSelectedNavigationItem(position);
+				getActionBar().getTabAt(position).select();
 			}
 		});
 		// setHeaderBackground(user.getProfileBackgroundImageUrl());
