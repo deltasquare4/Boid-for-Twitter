@@ -62,7 +62,6 @@ public class NotificationService extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context cntxt, Intent intent) {
 		Log.d("nf", "NotificationService");
-		Log.d("nf", intent.toUri(0));
 		if(intent.getData() != null){
 			Log.d("nf", intent.getDataString());
 			if(!intent.getDataString().startsWith("boid:notify")) return;
@@ -70,11 +69,13 @@ public class NotificationService extends BroadcastReceiver {
 			service.putExtra("account", Long.parseLong(intent.getData().getPath()));
 			cntxt.startService(service);
 		} else if(intent.hasExtra("account")){ 
+			Log.d("nf", "acc");
 			Intent service = new Intent(cntxt, ActualService.class);
 			service.putExtra("account", intent.getLongExtra("account", -1));
 			cntxt.startService(service);
 		} else if(intent.getAction() != null){
 			if(!intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED))return;
+			Log.d("nf", "setup");
 			Map<String, ?> sp = cntxt.getSharedPreferences("profiles-v2",
 					Context.MODE_PRIVATE).getAll();
 			SharedPreferences def = PreferenceManager.getDefaultSharedPreferences(cntxt);
@@ -129,38 +130,50 @@ public class NotificationService extends BroadcastReceiver {
 				jo.put("user", user);
 				jo.put("content", value);
 				ja.put(jo);
-				sp.edit().putString("c2dm_" + queue + "_queue_" + accId, ja.toString());
+				sp.edit().putString("c2dm_" + queue + "_queue_" + accId, ja.toString()).commit();
 			} catch(Exception e){ // Should never happen
 				e.printStackTrace();
 			}
 		}
 		
-		public void showQueue(String queue, long accId, Object single){
+		public void showQueue(final String queue, final long accId,final Object single){
 			try{
-				if(NightModeUtils.isNightMode(this)){
-					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-					if(prefs.getBoolean("night_mode_pause_notifications", false) == true){
-						return;
+				handler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						try{
+							if(NightModeUtils.isNightMode(ActualService.this)){
+								SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ActualService.this);
+								if(prefs.getBoolean("night_mode_pause_notifications", false) == true){
+									return;
+								}
+							}
+							NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+							nm.cancel(accId + "", queue.equals("mention") ? Api11.MENTIONS : Api11.DM);
+							
+							SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ActualService.this);
+							JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue + "_queue_" + accId, "[]"));
+							Log.d("boid", ja.length() + "");
+							if(ja.length() == 1 && single != null){
+								if(queue.equals("mention")){
+									Api11.displayReplyNotification((int) accId, ActualService.this, (Status)single);
+								} else if(queue.equals("dm")){
+									Api11.displayDirectMessageNotification((int) accId, ActualService.this, (DirectMessage)single);
+								}
+							} else{
+								if(queue.equals("mention")){
+									Api11.displayMany(accId, Api11.MENTIONS, ActualService.this, ja);
+								} else if(queue.equals("dm")){
+									Api11.displayMany(accId, Api11.DM, ActualService.this, ja);
+								}
+							}
+						} catch(Exception e){
+							e.printStackTrace();
+						}
 					}
-				}
-				NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				nm.cancel(accId + "", queue.equals("mention") ? Api11.MENTIONS : Api11.DM);
-				
-				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-				JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue + "_queue_" + accId, "[]"));
-				if(ja.length() == 1 && single != null){
-					if(queue.equals("mention")){
-						Api11.displayReplyNotification((int) accId, this, (Status)single);
-					} else if(queue.equals("dm")){
-						Api11.displayDirectMessageNotification((int) accId, this, (DirectMessage)single);
-					}
-				} else{
-					if(queue.equals("mention")){
-						Api11.displayMany(accId, Api11.MENTIONS, this, ja);
-					} else if(queue.equals("dm")){
-						Api11.displayMany(accId, Api11.DM, this, ja);
-					}
-				}
+					
+				});
 			} catch(Exception e){
 				e.printStackTrace();
 			}
@@ -200,6 +213,7 @@ public class NotificationService extends BroadcastReceiver {
 		public int onStartCommand(Intent intent, int flags, int startId) {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			if(prefs.getBoolean("notifications_global", true) == false){
+				Log.d("nf", "Globally off");
 				return Service.START_NOT_STICKY;
 			}
 			
@@ -219,6 +233,7 @@ public class NotificationService extends BroadcastReceiver {
 								paging.setSinceId(since_id);
 							
 							Status[] m = client.getMentions(paging);
+							Log.d("boid", m.length + " m");
 							if(m.length > 0){
 								setSinceId(accId, "mention", m[0].getId());
 								for(Status status : m){
@@ -240,6 +255,7 @@ public class NotificationService extends BroadcastReceiver {
 								paging.setSinceId(since_id);
 							
 							DirectMessage[] m = client.getDirectMessages(paging);
+							Log.d("boid", m.length + " m");
 							if(m.length > 0){
 								setSinceId(accId, "dm", m[0].getId());
 								for(DirectMessage message : m){
@@ -253,7 +269,7 @@ public class NotificationService extends BroadcastReceiver {
 					}
 				}
 				
-			});
+			}).start();
 			return Service.START_NOT_STICKY;
 		}
 
