@@ -1,8 +1,12 @@
 package com.teamboid.twitter.compat;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TimelineScreen;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -30,7 +34,8 @@ import com.teamboid.twitterapi.utilities.Utils;
  */
 @TargetApi(14)
 public class Api11 { //We don't support API 11, we only support API 14-16
-    public static int SINGLE_NOTIFCATION = 100;
+    public static int MENTIONS = 100;
+    public static int DM = 200;
 
     /**
      * Applies settings
@@ -81,7 +86,7 @@ public class Api11 { //We don't support API 11, we only support API 14-16
                 } else {
                     @SuppressWarnings("deprecation")
 					Notification n = setupNotification(accId, nb.getNotification(), context);
-                    nm.notify(accId + "_MENTIONS", 100, n);
+                    nm.notify(accId+"", MENTIONS, n);
                 }
             }
         });
@@ -119,9 +124,51 @@ public class Api11 { //We don't support API 11, we only support API 14-16
                     Api16.displayDMNotification(accId, c, profileImg, dm, nb, nm, text);
                 } else {
                     Notification n = setupNotification(accId, nb.getNotification(), c);
-                    nm.notify(accId + "_MESSAGES", 100, n);
+                    nm.notify(accId +"", DM, n);
                 }
             }
         });
     }
+
+	public static void displayMany(final long accId, final int queue, final Context c, final JSONArray ja) {
+		try{
+			if(ja.length() == 0){return;}
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+				Api16.displayMany(accId, queue, c, ja);
+				return;
+			}
+			final JSONObject first = ja.getJSONObject(ja.length() - 1);
+			final String imageURL = Utilities.getUserImage(first.getString("user"),c);
+			ImageManager.getInstance(c).get(imageURL, new ImageManager.OnImageReceivedListener() {
+
+				@SuppressWarnings("deprecation")
+				@Override
+				public void onImageReceived(String source, Bitmap bitmap) {
+					try{
+						Intent content = new Intent(c, TimelineScreen.class)
+			                     .putExtra("switch", "mentions")
+			                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			            PendingIntent pi = PendingIntent.getActivity(c, 0, content, PendingIntent.FLAG_ONE_SHOT);
+						NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+						Notification.Builder nb = new Notification.Builder(c)
+									.setContentTitle(first.getString("user"))
+									.setContentText(first.getString("content"))
+									.setAutoCancel(true)
+									.setContentIntent(pi)
+									.setSmallIcon(R.drawable.statusbar_icon)
+									.setLargeIcon(bitmap)
+									.setNumber(ja.length());
+						Notification n = setupNotification((int)accId, nb.getNotification(), c);
+						nm.notify(accId + "", queue, n);
+					} catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+				 
+			});
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 }

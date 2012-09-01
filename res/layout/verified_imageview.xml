@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="wrap_content"
-	android:background="@drawable/autocomplete_selector"
-	android:paddingTop="20dp" android:paddingLeft="20dp">
-	<ImageView android:id="@+id/img" android:layout_width="15dp"
-		android:layout_alignParentLeft="true" android:layout_height="15dp"
-		android:src="@drawable/verified" />
-</RelativeLayout>
+<TextView
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/verified" android:layout_width="match_parent"
+	    android:text="@string/verified_str"
+	    android:padding="5dp"
+	    android:gravity="center_vertical"
+	    android:tag="verified"
+		android:layout_alignParentLeft="true" android:layout_height="wrap_content"
+		android:drawableLeft="@drawable/verified" />

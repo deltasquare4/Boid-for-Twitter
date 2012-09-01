@@ -18,6 +18,7 @@ import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -98,6 +99,7 @@ public class MessagesFragment extends BaseListFragment {
                         });
                     }
                 }
+                NotificationService.setReadDMs(acc.getId(), context);
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

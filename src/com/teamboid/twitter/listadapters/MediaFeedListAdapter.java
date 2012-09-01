@@ -109,16 +109,15 @@ public class MediaFeedListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		RelativeLayout toReturn = null;
+		View toReturn = null;
 		if (convertView != null)
-			toReturn = (RelativeLayout) convertView;
+			toReturn = convertView;
 		else
-			toReturn = (RelativeLayout) LayoutInflater.from(mContext).inflate(
+			toReturn = LayoutInflater.from(mContext).inflate(
 					R.layout.media_list_item, null);
 		final ImageView img = (ImageView) toReturn
 				.findViewById(R.id.mediaItemImage);
-		final ProgressBar prog = (ProgressBar) toReturn
-				.findViewById(R.id.mediaItemProgress);
+		final View prog = toReturn.findViewById(R.id.mediaItemProgress);
 		img.setVisibility(View.GONE);
 		prog.setVisibility(View.VISIBLE);
 		ImageManager downloader = ImageManager.getInstance(mContext);

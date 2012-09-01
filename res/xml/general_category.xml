@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference 
+        android:key="notifications_global"
+        android:defaultValue="true"
+        android:persistent="true" android:title="@string/notifications" android:summary="@string/notifications_global"/>
 	<Preference android:key="clear_search_history"
 		android:summary="@string/clear_searchhistory_desc" android:title="@string/clear_searchhistory_title" />
 	<SwitchPreference android:key="enable_ssl"

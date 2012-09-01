@@ -9,6 +9,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.crittercism.app.Crittercism;
 import com.teamboid.twitterapi.client.Authorizer;
 import com.teamboid.twitterapi.client.Twitter;
 
@@ -140,9 +142,9 @@ public class AccountService extends Service {
 	}
 
 	public static void verifyAccount(final Activity activity, final String verifier) {
-		final Toast act = Toast.makeText(activity, activity
-				.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
-		act.show();
+		//final Toast act = Toast.makeText(activity, activity
+		//		.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
+		// act.show();
 		new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -155,7 +157,7 @@ public class AccountService extends Service {
 							activity.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									act.cancel();
+									//act.cancel();
 									Toast.makeText(activity, activity.getString(R.string.account_already_added), Toast.LENGTH_LONG).show();
 									activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
 								}
@@ -171,7 +173,7 @@ public class AccountService extends Service {
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							act.cancel();
+							//act.cancel();
 							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
 						}
 					});
@@ -180,7 +182,7 @@ public class AccountService extends Service {
 					activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							act.cancel();
+							//act.cancel();
 							Toast.makeText(activity, activity.getString(R.string.authorization_error) + " "
 									+ e.getMessage(), Toast.LENGTH_LONG).show();
 							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
@@ -213,7 +215,7 @@ public class AccountService extends Service {
 		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
 
 		final int lastAccountCount = getAccounts().size();
-		Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
+		// Toast.makeText(getApplicationContext(), R.string.loading_accounts, Toast.LENGTH_LONG).show();
 		for(final String token : accountStore.keySet()) {
 			boolean skip = false;
 			for (int i = 0; i < accounts.size(); i++) {
@@ -225,15 +227,23 @@ public class AccountService extends Service {
 			}
 			if(skip) continue;
 
-			final Account toAdd = (Account)Utils.deserializeObject((String)accountStore.get(token));
-			final Twitter client = getAuthorizer().getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
-			client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-					.getBoolean("enable_ssl", false));
-			accounts.add(toAdd.setClient(client));
-			if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
-				androidAccounts.remove(toAdd.getUser().getId() + "");
-			} else{
-				AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+			try{
+				final Account toAdd = (Account)Utils.deserializeObject((String)accountStore.get(token));
+				final Twitter client = getAuthorizer().getAuthorizedInstance(toAdd.getToken(), toAdd.getSecret());
+				client.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+						.getBoolean("enable_ssl", false));
+				toAdd.setClient(client);
+				toAdd.refreshUserIfNeeded();
+				accounts.add(toAdd);
+				if(androidAccounts.containsKey(toAdd.getUser().getId() + "")){
+					androidAccounts.remove(toAdd.getUser().getId() + "");
+				} else{
+					AndroidAccountHelper.addAccount(getApplicationContext(), toAdd);
+				}
+			} catch(Exception e){
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.failed_load_account) +
+					" " + e.getMessage(), Toast.LENGTH_LONG).show();
 			}
 
 			//			try {
@@ -406,6 +416,7 @@ public class AccountService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Crittercism.init(getApplicationContext(), "503a15912cd9524709000002");
 		accounts = new ArrayList<Account>();
 	}
 

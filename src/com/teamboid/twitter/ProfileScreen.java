@@ -37,6 +37,7 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -562,33 +563,22 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
-		((ViewPager) findViewById(R.id.pager))
-		.setOnPageChangeListener(new OnPageChangeListener() {
-			int lastPage = -1;
-
+		((ViewPager) findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
+			
 			@Override
-			public void onPageScrollStateChanged(int state) {
-				if (state != ViewPager.SCROLL_STATE_DRAGGING
-						&& lastPage == 2) {
-					findViewById(R.id.profileHeader).setVisibility(
-							View.GONE);
-				} else
-					findViewById(R.id.profileHeader).setVisibility(
-							View.VISIBLE);
-				if (state == ViewPager.SCROLL_STATE_IDLE) {
-					findViewById(R.id.profileHeader).setX(0);
-				}
-			}
+			public void onPageScrollStateChanged(int state) { }
 
 			@Override
 			public void onPageScrolled(int position, float offset,
 					int offsetPixels) {
-				lastPage = position;
-				if (position == 2 && offset >= 0)
-					return;
-				if (position >= 1)
-					findViewById(R.id.profileHeader)
-					.setX(-offsetPixels);
+				Log.d("profile", position + ", " + offset + ", "+ offsetPixels);
+				if (position == 2 && offset <= 1){
+					findViewById(R.id.profileHeader).setVisibility(View.GONE);
+					Log.d("profile", "GONE");
+				} else if (position >= 1){
+					findViewById(R.id.profileHeader).setX(-offsetPixels);
+					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
+				}
 			}
 
 			@Override

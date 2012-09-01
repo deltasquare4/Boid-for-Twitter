@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.teamboid.twitter.R;
@@ -28,12 +29,13 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 	public Context mContext;
 	public Account account;
 
-	String getWhatToSync() { // TODO: Actually make this return something the
-								// user wants
-		return "following";
+	String getWhatToSync() {
+		return PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+				getId() + "_" + whatAmIString() + "_what", "following");
 	}
 	
 	abstract Integer whatAmI();
+	abstract String whatAmIString();
 
 	// Notes:
 	// This works by having a queue `idQueue` which contains up to 1000 ids

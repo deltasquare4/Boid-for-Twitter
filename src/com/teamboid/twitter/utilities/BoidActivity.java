@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -24,6 +25,11 @@ public class BoidActivity {
 		public void done(){}
 	}
 	
+	void callAccountsReady(){
+		AccountsReady.done();
+		AccountsReady = new NullOnAction(); // reset
+	}
+	
 	public OnAction AccountsReady = new NullOnAction();
 	
 	public BoidActivity(Context c){
@@ -33,7 +39,12 @@ public class BoidActivity {
 	
 	public ServiceConnection accConn = new ServiceConnection(){
 		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {}
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			if(AccountService.getAccounts().size() > 0){
+				Log.d("Boid", "Accounts are ready");
+				callAccountsReady();
+			}
+		}
 		@Override
 		public void onServiceDisconnected(ComponentName name) {}
 	};
@@ -43,15 +54,25 @@ public class BoidActivity {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			Log.d("Boid", "Accounts are ready");
-			AccountsReady.done();
+			callAccountsReady();
 		}
 		
 	};
 	
+	int lastTheme;
+	
 	/**
 	 * Call this when the Activity is inside `onCreate()`
 	 */
-	public void onCreate(){
+	public void onCreate(Bundle savedInstanceState){
+		// Theme
+		if (savedInstanceState != null
+				&& savedInstanceState.containsKey("lastTheme")) {
+			lastTheme = savedInstanceState.getInt("lastTheme");
+			mContext.setTheme(lastTheme);
+		} else
+			mContext.setTheme(Utilities.getTheme(mContext));
+		
 		// Register for when service is ready
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AccountManager.END_LOAD);
@@ -61,6 +82,19 @@ public class BoidActivity {
 		Intent intent = new Intent(mContext, AccountService.class);
 		mContext.startService(intent);
 		mContext.bindService(intent, accConn, Context. BIND_AUTO_CREATE);
+		
+		try{
+			Log.d("boid", AccountService.getAccounts().size() + "");
+			if(AccountService.getAccounts().size() > 0){
+				callAccountsReady();
+			}
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void onSaveInstanceState(Bundle out){
+		out.putInt("lastTheme", lastTheme);
 	}
 	
 	/**

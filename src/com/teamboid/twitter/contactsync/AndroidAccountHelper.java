@@ -12,7 +12,8 @@ import android.provider.ContactsContract;
 
 public class AndroidAccountHelper {
 	public static final String ACCOUNT_TYPE = "com.teamboid.twitter.account";
-	public static final Boolean AUTO_SYNC_CONTACTS = true;
+	public static final Boolean AUTO_SYNC_CONTACTS = false;
+	public static final Boolean AUTO_SYNC_NAMES = true;
 
 	public static void addAccount(Context c, Account a) {
 		if (accountExists(c, a))
@@ -26,13 +27,17 @@ public class AndroidAccountHelper {
 		android.accounts.Account toAdd = _getAccount(a);
 		am.addAccountExplicitly(toAdd, "TRY.HARDER.HACKER", userdata);
 		am.setUserData(toAdd, "accId", a.getId() + "");
+		
+		// Contacts
 		ContentResolver.setSyncAutomatically(toAdd, ContactsContract.AUTHORITY,
 				AUTO_SYNC_CONTACTS);
 		if(AUTO_SYNC_CONTACTS)
 			ContentResolver.requestSync(toAdd, ContactsContract.AUTHORITY, new Bundle());
+		
+		// Autocomplete
 		ContentResolver.setSyncAutomatically(toAdd,
-				AutocompleteService.AUTHORITY, AUTO_SYNC_CONTACTS);
-		if(AUTO_SYNC_CONTACTS)
+				AutocompleteService.AUTHORITY, AUTO_SYNC_NAMES);
+		if(AUTO_SYNC_NAMES)
 			ContentResolver.requestSync(toAdd, AutocompleteService.AUTHORITY, new Bundle());
 	}
 

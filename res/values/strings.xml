@@ -6,17 +6,11 @@
 	<string name="account_service_desc">Handles loading, adding, maintaining, and removing
 		your accounts. Stopping the service will disable Boid.
 	</string>
-	<string name="push_error">There was a problem with push, the servers may be
-		down. Please try again later.
-	</string>
-	<string name="push_updated">Your push settings have been updated</string>
-	<string name="push_registered">Push is now registered!</string>
 	<string name="messages_priv">Show Content</string>
 	<string name="message_recv">{user} sent you a Direct Message</string>
 	<string name="messages_priv_desc">Show the content of direct messages in
 		notifications.
 	</string>
-	<string name="push_wait">Contacting push servers… Hold on!</string>
 	<string name="messaging_str">Messaging</string>
 	<string name="failed_check_relationship">Failed to get your relationship to {user}!</string>
 	<string name="google_url">https://www.google.com/search?q=</string>
@@ -154,7 +148,7 @@
 
 	<string name="search_str">Search</string>
 	<string name="manage_accounts_str">Accounts</string>
-	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access push
+	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access
 		notification settings.
 	</string>
 	<string name="remove_account">Remove Account</string>
@@ -314,11 +308,6 @@
 
 	<string name="local_trend_with_place">Local - {place}</string>
 
-	<string name="push_title">Push Notifications</string>
-	<string name="enable_push">Enabling push notifications will push you updates
-		in near real-time
-	</string>
-
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="imgur_note">Images will be uploaded using the same
@@ -457,7 +446,7 @@
 		with @{user}!
 	</string>
 	<string name="night_mode">Night Mode</string>
-	<string name="night_mode_desc">Automatically switch themes or disable push
+	<string name="night_mode_desc">Automatically switch themes or disable
 		notifications when the night falls.
 	</string>
 	<string name="start_time_str">Start Time</string>
@@ -489,7 +478,7 @@
 
 	<string name="contactsync_what">What to sync</string>
 	<string name="contact_sync_on">Contact Sync is turned on</string>
-	<string name="contact_sync_off">Contact sync is turned off</string>
+	<string name="contact_sync_off">Contact sync is turned off. Please note: Contact sync is experimental</string>
 	<string name="no_location_str">No Location</string>
 
 	<string name="please_wait">Please wait…</string>
@@ -526,6 +515,27 @@
 	<string name="mute_timeline_str">Mute Timeline</string>
 	<string name="mute_mentions_str">Mute Mentions</string>
 	<string name="mute_search_str">Mute Search</string>
+	<string name="dots">…</string>
+	
+	<string name="notifications_refresh_every">Notifications will refresh every {x}</string>
+	<string-array name="notifications_period_name">
+	    <item>5 minutes</item>
+	    <item>15 minutes</item>
+	    <item>Half hour</item>
+	    <item>Hour</item>
+	    <item>2 hours</item>
+	    <item>5 hours</item>
+	    <item>Half a day</item>
+	</string-array>
+	<string-array name="notifications_period_values">
+	    <item>5</item>
+	    <item>15</item>
+	    <item>30</item>
+	    <item>60</item>
+	    <item>120</item>
+	    <item>360</item>
+	    <item>720</item>
+	</string-array>
 
 	<string-array name="nightmode_starttimes">
 		<item>1PM</item>
@@ -584,4 +594,8 @@
 		<item>11</item>
 		<item>12</item>
 	</string-array>
+		<string name="notifications">Notifications</string>
+		<string name="notifications_global">Globally turns on/off notifications</string>
+		<string name="notifications_enable">Enable Notifications for this account</string>
+		<string name="notification_period">Notification refresh period</string>
 </resources>
