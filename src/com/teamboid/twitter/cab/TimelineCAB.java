@@ -220,12 +220,8 @@ public class TimelineCAB {
 						.putExtra("reply_to", toReply)
 						.putExtra("reply_to_name",
 								toReply.getUser().getScreenName())
-						.putExtra(
-								"append",
-								Utilities.getAllMentions(toReply.getUser()
-										.getScreenName(), toReply.getText(),
-										(int) AccountService
-												.getCurrentAccount().getId()))
+						.putExtra("append", Utilities.getAllMentions(toReply.getUser()
+								.getScreenName(), toReply.getText()))
 						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 				return true;
 			}

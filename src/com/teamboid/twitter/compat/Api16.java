@@ -37,7 +37,7 @@ public class Api16 {
 		Intent replyIntent = new Intent(context, ComposerScreen.class)
 				.putExtra("account", accId).putExtra("reply_to", s.getId())
 				.putExtra("reply_to_name", s.getUser().getScreenName())
-				.putExtra("append", Utilities.getAllMentions(s, accId))
+				.putExtra("append", Utilities.getAllMentions(s))
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent replyPi = PendingIntent.getActivity(context, 0,
 				replyIntent, PendingIntent.FLAG_ONE_SHOT);

@@ -110,12 +110,7 @@ public class NearbyFragment extends BaseSpinnerFragment {
 								ComposerScreen.class)
 								.putExtra("reply_to", item.getId())
 								.putExtra("reply_to_name", item.getFromUser())
-								.putExtra(
-										"append",
-										Utilities.getAllMentions(item,
-												(int) AccountService
-														.getCurrentAccount()
-														.getId()))
+								.putExtra("append", Utilities.getAllMentions(item))
 								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 						return false;
 					}

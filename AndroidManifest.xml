@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.teamboid.twitter" android:versionCode="81"
-	android:versionName="0.8.4 Beta">
+	package="com.teamboid.twitter" android:versionCode="82"
+	android:versionName="0.8.5 Beta">
 
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
 
@@ -143,8 +143,9 @@
 		<service android:name="com.teamboid.twitter.services.SendTweetService"
 			android:exported="false" android:permission="com.teamboid.twitter.permission.C2D_MESSAGE" />
 
-		<activity android:name=".SelectMediaScreen" android:exported="true"
-			android:label="@string/photo_service_title" android:launchMode="singleTop">
+		<activity android:name="com.teamboid.twitter.SelectMediaScreen"
+			android:exported="true" android:label="@string/photo_service_title"
+			android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 
@@ -282,7 +283,7 @@
 			<meta-data android:name="android.content.SyncAdapter"
 				android:resource="@xml/sync_autocomplete" />
 		</service>
-		
+
 		<!-- Notifications -->
 		<provider android:name="com.teamboid.twitter.notifications.NotificationsProvider"
 			android:authorities="com.teamboid.twitter.notifications"
@@ -297,8 +298,8 @@
 			<meta-data android:name="android.content.SyncAdapter"
 				android:resource="@xml/sync_notifications" />
 		</service>
-		
-		<activity android:name="com.crittercism.NotificationActivity"/>
+
+		<activity android:name="com.crittercism.NotificationActivity" />
 	</application>
 
 </manifest>

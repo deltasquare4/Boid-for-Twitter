@@ -320,7 +320,9 @@ public class ComposerScreen extends Activity {
 			if (getIntent().hasExtra("text"))
 				content.setText(getIntent().getStringExtra("text"));
 			else if (getIntent().hasExtra("append"))
-				content.append(getIntent().getStringExtra("append") + " ");
+				content.append(getIntent().getStringExtra("append").replace("@" + 
+						AccountService.getCurrentAccount().getUser().getScreenName(), "")
+						.replace("  ", " ").trim() + " ");
 			if (getIntent().hasExtra("image")) {
 				stt.attachedImage = getIntent().getStringExtra("image");
 				invalidateOptionsMenu();

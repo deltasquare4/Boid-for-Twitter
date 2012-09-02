@@ -108,16 +108,9 @@ public class SavedSearchFragment extends BaseListFragment {
 						context.startActivity(new Intent(context,
 								ComposerScreen.class)
 								.putExtra("reply_to_tweet", toReply)
-								.putExtra("reply_to_name",
-										toReply.getFromUser())
-								.putExtra(
-										"append",
-										Utilities.getAllMentions(toReply
-												.getFromUser(), toReply
-												.getText(),
-												(int) AccountService
-														.getCurrentAccount()
-														.getId()))
+								.putExtra("reply_to_name", toReply.getFromUser())
+								.putExtra("append", Utilities.getAllMentions(toReply.getFromUser(),
+										toReply.getText()))
 								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 						return false;
 					}

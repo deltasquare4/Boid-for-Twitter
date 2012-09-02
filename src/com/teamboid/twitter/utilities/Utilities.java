@@ -28,7 +28,6 @@ import com.teamboid.twitterapi.status.entity.mention.MentionEntity;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
 import com.teamboid.twitterapi.user.User;
 
-import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
@@ -653,28 +652,23 @@ public class Utilities {
 		return (int) (dp * scale + 0.5f);
 	}
 
-	public static String getAllMentions(Tweet tweet, int accId) {
-		return getAllMentions(tweet.getFromUser(), tweet.getMentionEntities(), accId);
+	public static String getAllMentions(Tweet tweet) {
+		return getAllMentions(tweet.getFromUser(), tweet.getMentionEntities());
 	}
 
-	public static String getAllMentions(Status tweet, int accId) {
+	public static String getAllMentions(Status tweet) {
 		return getAllMentions(tweet.getUser().getScreenName(),
-				tweet.getMentionEntities(), accId);
+				tweet.getMentionEntities());
 	}
 
 	public static String getAllMentions(String initScreenname,
-			String tweetText, int accId) {
-		Account curAccount = AccountService.getAccount((long) accId);
+			String tweetText) {
 		String toReturn = "@" + initScreenname;
 		Extractor extract = new Extractor();
 		List<String> mentions = extract.extractMentionedScreennames(tweetText);
 		if (mentions != null) {
-			int index = 0;
 			for (String mention : mentions) {
-				if (index == 0
-						&& mention.equals(curAccount.getUser().getScreenName())) {
-					continue;
-				} else if (mention.equals(initScreenname))
+				if (mention.equals(initScreenname))
 					continue;
 				toReturn += " @" + mention;
 			}
@@ -683,15 +677,11 @@ public class Utilities {
 	}
 
 	public static String getAllMentions(String initScreenname,
-			MentionEntity[] mentions, int accId) {
-		Account curAccount = AccountService.getAccount((long) accId);
+			MentionEntity[] mentions) {
 		String toReturn = "@" + initScreenname;
 		if (mentions != null) {
-			int index = 0;
 			for (MentionEntity mention : mentions) {
-				if (index == 0
-						&& mention.getScreenName().equals(
-								curAccount.getUser().getScreenName()))
+				if (mention.getScreenName().equals(initScreenname))
 					continue;
 				toReturn += " @" + mention.getScreenName();
 			}
