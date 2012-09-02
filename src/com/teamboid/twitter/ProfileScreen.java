@@ -587,6 +587,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			@Override
 			public void onPageSelected(int position) {
 				getActionBar().getTabAt(position).select();
+				((TabsAdapter.IBoidFragment)mTabsAdapter.getItem(position)).onDisplay();
 			}
 		});
 		// setHeaderBackground(user.getProfileBackgroundImageUrl());

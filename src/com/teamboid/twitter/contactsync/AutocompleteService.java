@@ -88,7 +88,7 @@ public class AutocompleteService extends Service {
 		return instance;
 	}
 
-	private static class SyncAdapterImpl extends BaseTwitterSync {
+	private static class SyncAdapterImpl extends BaseTwitterUserSync {
 		public SyncAdapterImpl(Service contactSyncAdapterService) {
 			super(contactSyncAdapterService);
 		}

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +98,6 @@ public class MediaTimelineFragment extends BaseGridFragment {
 		setRetainInstance(true);
 		screenName = (String) getArguments().get("screenName");
 		manualRefresh = getArguments().getBoolean("manualRefresh", false);
-		reloadAdapter(true);
 	}
 
 	@Override
@@ -253,4 +253,10 @@ public class MediaTimelineFragment extends BaseGridFragment {
 
 	@Override
 	public void filter() { }
+
+	@Override
+	public void onDisplay() {
+		Log.d("boid", "MEDIA IS ON SHOW");
+		reloadAdapter(true);
+	}
 }

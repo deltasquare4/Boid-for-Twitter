@@ -168,7 +168,7 @@ public class SendTweetTask {
 					if (contents.length() >= 1) {
 						contents = contents
 								+ (contents.charAt(contents.length() - 1) == ' ' ? ""
-										: " ") + me.getExpandedUrl();
+										: " ") + me.getExpandedUrl().toString();
 					} else {
 						contents = me.getExpandedUrl();
 					}

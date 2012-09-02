@@ -1,18 +1,15 @@
 package com.teamboid.twitter;
 
-import java.util.Calendar;
 import java.util.List;
 
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -21,12 +18,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -86,10 +81,8 @@ public class AccountManager extends PreferenceActivity {
 				@Override
 				public boolean onPreferenceChange(final Preference preference,
 						Object newValue) {
-					ContentResolver.setSyncAutomatically(AndroidAccountHelper
-							.getAccount(getActivity(),
-									AccountService.getAccount(accountId)),
-							ContactsContract.AUTHORITY, (Boolean) newValue);
+					AndroidAccountHelper.setServiceSync(ContactsContract.AUTHORITY, (Boolean)newValue,
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)));
 					return true;
 				}
 			});
@@ -102,7 +95,8 @@ public class AccountManager extends PreferenceActivity {
 						final Preference preference, Object newValue) {
 					
 					Log.d("boid", "notification switched");
-					NotificationService.setupAlarm(getActivity(), accountId, (Boolean)newValue);
+					AndroidAccountHelper.setServiceSync(NotificationService.AUTHORITY, (Boolean)newValue,
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)));
 					
 					return true;
 				}

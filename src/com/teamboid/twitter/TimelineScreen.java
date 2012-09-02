@@ -455,11 +455,12 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		mViewPager.setOffscreenPageLimit(4);
 		mViewPager.setAdapter(mTabsAdapter);
 		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-					@Override
-					public void onPageSelected(int position) {
-						getActionBar().getTabAt(position).select();
-					}
-				});
+			@Override
+			public void onPageSelected(int position) {
+				getActionBar().getTabAt(position).select();
+				((TabsAdapter.IBoidFragment)mTabsAdapter.getItem(position)).onDisplay();
+			}
+		});
 
 		if (newColumn) {
 			newColumn = false;

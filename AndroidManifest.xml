@@ -23,8 +23,6 @@
 	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
 	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-	
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 	<permission android:name="com.teamboid.twitter.permission.C2D_MESSAGE"
 		android:protectionLevel="signature" />
@@ -285,17 +283,20 @@
 				android:resource="@xml/sync_autocomplete" />
 		</service>
 		
-		<receiver android:name="com.teamboid.twitter.services.NotificationService"
-		    android:process=":notifications">
-		    <intent-filter>
-		        <action android:name="android.intent.action.BOOT_COMPLETED" />
-		    </intent-filter>
-		    <intent-filter>
-		        <data android:host="notify" android:scheme="boid"/>
-		    </intent-filter>
-		</receiver>
-		<service android:name="com.teamboid.twitter.services.NotificationService$ActualService"
-		    android:process=":notifications"></service>
+		<!-- Notifications -->
+		<provider android:name="com.teamboid.twitter.notifications.NotificationsProvider"
+			android:authorities="com.teamboid.twitter.notifications"
+			android:exported="false" android:label="@string/notifications"
+			android:process=":contacts" android:syncable="true" />
+		<service android:name="com.teamboid.twitter.notifications.NotificationService"
+			android:exported="false" android:process=":contacts">
+			<intent-filter>
+				<action android:name="android.content.SyncAdapter" />
+			</intent-filter>
+
+			<meta-data android:name="android.content.SyncAdapter"
+				android:resource="@xml/sync_notifications" />
+		</service>
 		
 		<activity android:name="com.crittercism.NotificationActivity"/>
 	</application>

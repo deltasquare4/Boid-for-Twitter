@@ -125,9 +125,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	
 	public interface IBoidFragment{
 		public boolean isRefreshing();
+		public void onDisplay();
 	}
 
 	public static abstract class BaseListFragment extends ListFragment implements IBoidFragment {
+		public void onDisplay(){};
 
 		public boolean isLoading;
 		@Override
@@ -167,7 +169,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	}
 
 	public static abstract class BaseSpinnerFragment extends ListFragment implements IBoidFragment {
-
+		public void onDisplay(){};
+		
 		public boolean isLoading;
 		private boolean isShown;
 		@Override

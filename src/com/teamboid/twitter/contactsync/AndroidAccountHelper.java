@@ -3,6 +3,7 @@ package com.teamboid.twitter.contactsync;
 import java.util.HashMap;
 
 import com.teamboid.twitter.Account;
+import com.teamboid.twitter.notifications.NotificationService;
 
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
@@ -12,8 +13,10 @@ import android.provider.ContactsContract;
 
 public class AndroidAccountHelper {
 	public static final String ACCOUNT_TYPE = "com.teamboid.twitter.account";
+	
 	public static final Boolean AUTO_SYNC_CONTACTS = false;
 	public static final Boolean AUTO_SYNC_NAMES = true;
+	public static final Boolean AUTO_SYNC_NOTIFICATIONS = true;
 
 	public static void addAccount(Context c, Account a) {
 		if (accountExists(c, a))
@@ -29,16 +32,20 @@ public class AndroidAccountHelper {
 		am.setUserData(toAdd, "accId", a.getId() + "");
 		
 		// Contacts
-		ContentResolver.setSyncAutomatically(toAdd, ContactsContract.AUTHORITY,
-				AUTO_SYNC_CONTACTS);
-		if(AUTO_SYNC_CONTACTS)
-			ContentResolver.requestSync(toAdd, ContactsContract.AUTHORITY, new Bundle());
+		setServiceSync(ContactsContract.AUTHORITY, AUTO_SYNC_CONTACTS, toAdd);
 		
 		// Autocomplete
-		ContentResolver.setSyncAutomatically(toAdd,
-				AutocompleteService.AUTHORITY, AUTO_SYNC_NAMES);
-		if(AUTO_SYNC_NAMES)
-			ContentResolver.requestSync(toAdd, AutocompleteService.AUTHORITY, new Bundle());
+		setServiceSync(AutocompleteService.AUTHORITY, AUTO_SYNC_NAMES, toAdd);
+		
+		// Notifications
+		setServiceSync(NotificationService.AUTHORITY, AUTO_SYNC_NOTIFICATIONS, toAdd);
+	}
+	
+	public static void setServiceSync(String Authority, boolean on, android.accounts.Account account){
+		ContentResolver.setSyncAutomatically(account,
+				Authority, on);
+		if(on)
+			ContentResolver.requestSync(account, Authority, new Bundle());
 	}
 
 	public static HashMap<String, android.accounts.Account> getAccounts(
