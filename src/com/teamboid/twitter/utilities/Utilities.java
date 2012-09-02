@@ -28,6 +28,7 @@ import com.teamboid.twitterapi.status.entity.mention.MentionEntity;
 import com.teamboid.twitterapi.status.entity.url.UrlEntity;
 import com.teamboid.twitterapi.user.User;
 
+import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
@@ -104,7 +105,8 @@ public class Utilities {
 		if (adapt.getCount() > 0) {
 			before = adapt.toArray();
 		}
-		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account, adapt._query);
+		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account,
+				adapt._query);
 		if (before != null) {
 			adapt.add(before);
 		}
@@ -158,18 +160,11 @@ public class Utilities {
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		String curTheme = null;
-		if (prefs.getBoolean("night_mode", false)) {
-			int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-			int startHour = Integer.parseInt(prefs.getString("night_mode_time",
-					"20"));
-			int endHour = Integer.parseInt(prefs.getString(
-					"night_mode_endtime", "7"));
-			if ((nowHour < endHour) || (nowHour > startHour)) {
-				curTheme = prefs.getString("night_mode_theme", "3");
-			}
-		}
-		if (curTheme == null)
+		if (NightModeUtils.isNightMode(context)) {
+			curTheme = prefs.getString("night_mode_theme", "3");
+		} else {
 			curTheme = prefs.getString("boid_theme", "0");
+		}
 		switch (Integer.parseInt(curTheme)) {
 		default:
 			prefs.edit().putString("boid_theme", "0").commit();
@@ -302,9 +297,11 @@ public class Utilities {
 				status.getUrlEntities(), status.getMediaEntities(), false, null);
 	}
 
-	public static Spannable twitterifyText(final Context context, Tweet status, String query) {
+	public static Spannable twitterifyText(final Context context, Tweet status,
+			String query) {
 		return twitterifyText(context, status.getText(),
-				status.getUrlEntities(), status.getMediaEntities(), false, query);
+				status.getUrlEntities(), status.getMediaEntities(), false,
+				query);
 	}
 
 	public static Spannable twitterifyText(final Context context, String text,
@@ -411,14 +408,15 @@ public class Utilities {
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 		}
-		if(highlightQuery != null) {
+		if (highlightQuery != null) {
 			int index = -1;
-			while(true) {
+			while (true) {
 				index = text.toLowerCase().indexOf(highlightQuery, index + 1);
-				if(index == -1) {
+				if (index == -1) {
 					break;
 				}
-				rtSpan.setSpan(new StyleSpan(Typeface.BOLD), index, index + highlightQuery.length(), 
+				rtSpan.setSpan(new StyleSpan(Typeface.BOLD), index, index
+						+ highlightQuery.length(),
 						Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 		}
@@ -655,16 +653,18 @@ public class Utilities {
 		return (int) (dp * scale + 0.5f);
 	}
 
-	public static String getAllMentions(Tweet tweet) {
-		return getAllMentions(tweet.getFromUser(), tweet.getMentionEntities());
+	public static String getAllMentions(Tweet tweet, int accId) {
+		return getAllMentions(tweet.getFromUser(), tweet.getMentionEntities(), accId);
 	}
 
-	public static String getAllMentions(Status tweet) {
+	public static String getAllMentions(Status tweet, int accId) {
 		return getAllMentions(tweet.getUser().getScreenName(),
-				tweet.getMentionEntities());
+				tweet.getMentionEntities(), accId);
 	}
 
-	public static String getAllMentions(String initScreenname, String tweetText) {
+	public static String getAllMentions(String initScreenname,
+			String tweetText, int accId) {
+		Account curAccount = AccountService.getAccount((long) accId);
 		String toReturn = "@" + initScreenname;
 		Extractor extract = new Extractor();
 		List<String> mentions = extract.extractMentionedScreennames(tweetText);
@@ -672,8 +672,7 @@ public class Utilities {
 			int index = 0;
 			for (String mention : mentions) {
 				if (index == 0
-						&& mention.equals(AccountService.getCurrentAccount()
-								.getUser().getScreenName())) {
+						&& mention.equals(curAccount.getUser().getScreenName())) {
 					continue;
 				} else if (mention.equals(initScreenname))
 					continue;
@@ -684,15 +683,15 @@ public class Utilities {
 	}
 
 	public static String getAllMentions(String initScreenname,
-			MentionEntity[] mentions) {
+			MentionEntity[] mentions, int accId) {
+		Account curAccount = AccountService.getAccount((long) accId);
 		String toReturn = "@" + initScreenname;
 		if (mentions != null) {
 			int index = 0;
 			for (MentionEntity mention : mentions) {
 				if (index == 0
 						&& mention.getScreenName().equals(
-								AccountService.getCurrentAccount().getUser()
-										.getScreenName()))
+								curAccount.getUser().getScreenName()))
 					continue;
 				toReturn += " @" + mention.getScreenName();
 			}

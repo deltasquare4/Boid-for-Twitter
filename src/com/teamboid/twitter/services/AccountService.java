@@ -117,7 +117,13 @@ public class AccountService extends Service {
 	}
 
 	public static Account getCurrentAccount() {
-		if (selectedAccount == 0) return null;
+		if (selectedAccount == 0) {
+			if(getAccounts().size() > 0) {
+				selectedAccount = getAccounts().get(0).getId();
+			} else {
+				return null;
+			}
+		}
 		Account toReturn = null;
 		for (Account acc : getAccounts()) {
 			if (acc.getUser().getId() == selectedAccount) {

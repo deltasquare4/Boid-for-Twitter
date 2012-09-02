@@ -100,9 +100,12 @@ public class SearchTweetsFragment extends BaseListFragment {
 										toReply.getFromUser())
 								.putExtra(
 										"append",
-										Utilities.getAllMentions(
-												toReply.getFromUser(),
-												toReply.getText()))
+										Utilities.getAllMentions(toReply
+												.getFromUser(), toReply
+												.getText(),
+												(int) AccountService
+														.getCurrentAccount()
+														.getId()))
 								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 						return false;
 					}
