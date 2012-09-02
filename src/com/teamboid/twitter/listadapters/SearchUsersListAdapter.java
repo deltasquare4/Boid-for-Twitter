@@ -109,7 +109,7 @@ public class SearchUsersListAdapter extends BaseAdapter {
 			userName.setText("@" + user.getScreenName());
 		}
 		if(user.getDescription() != null && !user.getDescription().trim().isEmpty()) {
-			userDesc.setText(Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, false));
+			userDesc.setText(Utilities.twitterifyText(mContext, user.getDescription().replace("\n", " ").trim(), null, null, false, null));
 		} else userDesc.setText(mContext.getApplicationContext().getString(R.string.nodescription_str)); 
 		if(user.isVerified()) ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.VISIBLE);
 		else ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.GONE);

@@ -2,7 +2,6 @@ package com.teamboid.twitter;
 
 import java.io.Serializable;
 
-import android.content.Context;
 import com.teamboid.twitterapi.client.Twitter;
 import com.teamboid.twitterapi.user.User;
 

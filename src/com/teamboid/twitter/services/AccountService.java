@@ -387,8 +387,10 @@ public class AccountService extends Service {
 		return trendsAdapter;
 	}
 
-	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity, String id, long account) {
-		if (searchFeedAdapters == null) searchFeedAdapters = new ArrayList<SearchFeedListAdapter>();
+	public static SearchFeedListAdapter getSearchFeedAdapter(Activity activity, String id, long account, String query) {
+		if (searchFeedAdapters == null) {
+			searchFeedAdapters = new ArrayList<SearchFeedListAdapter>();
+		}
 		SearchFeedListAdapter toReturn = null;
 		for (SearchFeedListAdapter adapt : searchFeedAdapters) {
 			if (id.equals(adapt.ID) && account == adapt.account) {
@@ -397,14 +399,16 @@ public class AccountService extends Service {
 			}
 		}
 		if (toReturn == null) {
-			toReturn = new SearchFeedListAdapter(activity, id, account);
+			toReturn = new SearchFeedListAdapter(activity, id, account, query);
 			searchFeedAdapters.add(toReturn);
 		}
 		return toReturn;
 	}
 
 	public static SearchFeedListAdapter getNearbyAdapter(Activity activity) {
-		if (nearbyAdapter == null) nearbyAdapter = new SearchFeedListAdapter(activity, 0);
+		if (nearbyAdapter == null) {
+			nearbyAdapter = new SearchFeedListAdapter(activity, 0, null);
+		}
 		return nearbyAdapter;
 	}
 

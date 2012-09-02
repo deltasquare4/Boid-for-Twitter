@@ -174,7 +174,7 @@ public class SavedSearchFragment extends BaseListFragment {
                 adapt.setLastViewed(getListView());
             }
             adapt = AccountService.getSearchFeedAdapter(context, SavedSearchFragment.ID + "@" + query,
-                    AccountService.getCurrentAccount().getId());
+                    AccountService.getCurrentAccount().getId(), query);
             if (getView() != null) adapt.list = getListView();
             setListAdapter(adapt);
             if (adapt.getCount() == 0) performRefresh(false);

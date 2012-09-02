@@ -212,7 +212,7 @@ public class SearchTweetsFragment extends BaseListFragment {
 			if (context.tweetAdapter == null) {
 				context.tweetAdapter = new SearchFeedListAdapter(context,
 						SearchTweetsFragment.ID, AccountService
-								.getCurrentAccount().getId());
+								.getCurrentAccount().getId(), query);
 			}
 			if (getView() != null)
 				context.tweetAdapter.list = getListView();

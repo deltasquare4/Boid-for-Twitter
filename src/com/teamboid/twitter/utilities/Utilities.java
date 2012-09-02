@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -103,7 +104,7 @@ public class Utilities {
 		if (adapt.getCount() > 0) {
 			before = adapt.toArray();
 		}
-		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account);
+		adapt = new SearchFeedListAdapter(context, adapt.ID, adapt.account, adapt._query);
 		if (before != null) {
 			adapt.add(before);
 		}
@@ -298,17 +299,17 @@ public class Utilities {
 
 	public static Spannable twitterifyText(final Context context, Status status) {
 		return twitterifyText(context, status.getText(),
-				status.getUrlEntities(), status.getMediaEntities(), false);
+				status.getUrlEntities(), status.getMediaEntities(), false, null);
 	}
 
-	public static Spannable twitterifyText(final Context context, Tweet status) {
+	public static Spannable twitterifyText(final Context context, Tweet status, String query) {
 		return twitterifyText(context, status.getText(),
-				status.getUrlEntities(), status.getMediaEntities(), false);
+				status.getUrlEntities(), status.getMediaEntities(), false, query);
 	}
 
 	public static Spannable twitterifyText(final Context context, String text,
 			final UrlEntity[] urls, final MediaEntity[] pics,
-			final boolean expand) {
+			final boolean expand, String highlightQuery) {
 		if (urls != null) {
 			for (UrlEntity url : urls) {
 				if (expand && url.getExpandedUrl() != null) {
@@ -408,6 +409,17 @@ public class Utilities {
 						}
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			}
+		}
+		if(highlightQuery != null) {
+			int index = -1;
+			while(true) {
+				index = text.toLowerCase().indexOf(highlightQuery, index + 1);
+				if(index == -1) {
+					break;
+				}
+				rtSpan.setSpan(new StyleSpan(Typeface.BOLD), index, index + highlightQuery.length(), 
+						Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 		}
 		return rtSpan;

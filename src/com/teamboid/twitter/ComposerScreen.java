@@ -290,7 +290,7 @@ public class ComposerScreen extends Activity {
 				stt.in_reply_to = replyTo.getId();
 				ViewStub replyToL = (ViewStub) findViewById(R.id.replyTo);
 				View replyToV = replyToL.inflate();
-				SearchFeedListAdapter.createTweetView(replyTo, this, replyToV);
+				SearchFeedListAdapter.createTweetView(replyTo, this, replyToV, null);
 				TextView tv = (TextView) findViewById(R.id.feedItemText);
 				tv.setMovementMethod(new LinkMovementMethod());
 				tv = (TextView) findViewById(R.id.replyToText);

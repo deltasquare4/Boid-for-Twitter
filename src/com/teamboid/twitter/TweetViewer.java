@@ -204,7 +204,7 @@ public class TweetViewer extends MapActivity {
             }
         });
         TextView contents = (TextView) toReturn.findViewById(R.id.tweetContents);
-        contents.setText(Utilities.twitterifyText(this, getIntent().getStringExtra("content"), null, null, true));
+        contents.setText(Utilities.twitterifyText(this, getIntent().getStringExtra("content"), null, null, true, null));
         contents.setMovementMethod(LinkMovementMethod.getInstance());
         ((TextView) toReturn.findViewById(R.id.tweetTimer)).setText(
                 Utilities.friendlyTimeLong(new Date(getIntent().getLongExtra("timer", 0l))) +
@@ -321,7 +321,7 @@ public class TweetViewer extends MapActivity {
 		((TextView)findViewById(R.id.tweetUserName)).setText(status.getUser().getName());
 		((TextView)findViewById(R.id.tweetScreenName)).setText("@" + status.getUser().getScreenName());
 		TextView contents = (TextView)findViewById(R.id.tweetContents);
-		contents.setText(Utilities.twitterifyText(this, status.getText(), status.getUrlEntities(), status.getMediaEntities(), true));
+		contents.setText(Utilities.twitterifyText(this, status.getText(), status.getUrlEntities(), status.getMediaEntities(), true, null));
 		contents.setMovementMethod(LinkMovementMethod.getInstance());
 		((TextView)findViewById(R.id.tweetTimer)).setText(Utilities.friendlyTimeLong( status.getCreatedAt()) + " via " + Html.fromHtml(status.getSource()));
 		invalidateOptionsMenu();
@@ -612,7 +612,9 @@ public class TweetViewer extends MapActivity {
 				try {
 					final String content = helper.readPost(id);
 					txt.post(new Runnable() {
-						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), content, status.getUrlEntities(), status.getMediaEntities(), true)); }
+						public void run() { 
+							txt.setText(Utilities.twitterifyText(getApplicationContext(), content, status.getUrlEntities(), status.getMediaEntities(), true, null));
+						}
 					});
 				} catch(Exception e) {
 					e.printStackTrace();
@@ -642,7 +644,9 @@ public class TweetViewer extends MapActivity {
 					HttpResponse response = httpclient.execute(httpget);
 					final String responseStr = EntityUtils.toString(response.getEntity(), "UTF-8");
 					txt.post(new Runnable() {
-						public void run() { txt.setText(Utilities.twitterifyText(getApplicationContext(), responseStr, status.getUrlEntities(), status.getMediaEntities(), true)); }
+						public void run() { 
+							txt.setText(Utilities.twitterifyText(getApplicationContext(), responseStr, status.getUrlEntities(), status.getMediaEntities(), true, null));
+						}
 					});
 				} catch(Exception e) {
 					e.printStackTrace();

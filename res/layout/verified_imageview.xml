@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-	    xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:id="@+id/verified" android:layout_width="match_parent"
-	    android:text="@string/verified_str"
-	    android:padding="5dp"
-	    android:gravity="center_vertical"
-	    android:tag="verified"
-		android:layout_alignParentLeft="true" android:layout_height="wrap_content"
-		android:drawableLeft="@drawable/verified" />
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/verified" android:layout_width="match_parent"
+	android:text="@string/verified_str" android:padding="5dp"
+	android:gravity="center_vertical" android:tag="verified"
+	android:layout_alignParentLeft="true" android:layout_height="wrap_content"
+	android:drawablePadding="5dp" android:drawableLeft="@drawable/verified" />

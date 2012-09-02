@@ -10,6 +10,7 @@ import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
 import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
@@ -114,7 +115,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 				Toast.makeText(this, R.string.error_str, Toast.LENGTH_SHORT)
-				.show();
+						.show();
 				finish();
 			}
 		} else if (getIntent().hasExtra("screen_name")) {
@@ -125,31 +126,31 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			getLoaderManager().initLoader(LOAD_CONTACT_ID, null,
 					new LoaderManager.LoaderCallbacks<Cursor>() {
 
-				@Override
-				public Loader<Cursor> onCreateLoader(int arg0,
-						Bundle arg1) {
-					return new CursorLoader(
-							ProfileScreen.this,
-							getIntent().getData(),
-							new String[] { ContactsContract.Data.DATA1 },
-							null, null, null);
-				}
+						@Override
+						public Loader<Cursor> onCreateLoader(int arg0,
+								Bundle arg1) {
+							return new CursorLoader(
+									ProfileScreen.this,
+									getIntent().getData(),
+									new String[] { ContactsContract.Data.DATA1 },
+									null, null, null);
+						}
 
-				@Override
-				public void onLoadFinished(Loader<Cursor> arg0,
-						Cursor cursor) {
-					cursor.moveToNext();
-					initializeTabs(
-							savedInstanceState,
-							cursor.getString(cursor
-									.getColumnIndex(ContactsContract.Data.DATA1)));
-				}
+						@Override
+						public void onLoadFinished(Loader<Cursor> arg0,
+								Cursor cursor) {
+							cursor.moveToNext();
+							initializeTabs(
+									savedInstanceState,
+									cursor.getString(cursor
+											.getColumnIndex(ContactsContract.Data.DATA1)));
+						}
 
-				@Override
-				public void onLoaderReset(Loader<Cursor> arg0) {
-				}
+						@Override
+						public void onLoaderReset(Loader<Cursor> arg0) {
+						}
 
-			});
+					});
 			setTitle(R.string.please_wait);
 		}
 	}
@@ -167,29 +168,41 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				getApplicationContext()).getBoolean("enable_iconic_tabs", true);
 		if (iconic) {
 			mTabsAdapter.addTab(
-					bar.newTab().setTabListener(this).setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.timelineTab })
-									.getDrawable(0)),
-									PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setTabListener(this).setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.aboutTab }).getDrawable(
-											0)), ProfileAboutFragment.class, 1,
-											screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setTabListener(this).setIcon(
-							getTheme().obtainStyledAttributes(
-									new int[] { R.attr.mediaTab }).getDrawable(
-											0)), MediaTimelineFragment.class, 2,
-											screenName, false);
-		} else {
-			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.tweets_str),
+					bar.newTab()
+							.setTabListener(this)
+							.setIcon(
+									getTheme().obtainStyledAttributes(
+											new int[] { R.attr.timelineTab })
+											.getDrawable(0)),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.about_str),
+			mTabsAdapter.addTab(
+					bar.newTab()
+							.setTabListener(this)
+							.setIcon(
+									getTheme().obtainStyledAttributes(
+											new int[] { R.attr.aboutTab })
+											.getDrawable(0)),
 					ProfileAboutFragment.class, 1, screenName);
-			mTabsAdapter.addTab(bar.newTab().setTabListener(this).setText(R.string.media_title),
+			mTabsAdapter.addTab(
+					bar.newTab()
+							.setTabListener(this)
+							.setIcon(
+									getTheme().obtainStyledAttributes(
+											new int[] { R.attr.mediaTab })
+											.getDrawable(0)),
+					MediaTimelineFragment.class, 2, screenName, false);
+		} else {
+			mTabsAdapter.addTab(
+					bar.newTab().setTabListener(this)
+							.setText(R.string.tweets_str),
+					PaddedProfileTimelineFragment.class, 0, screenName);
+			mTabsAdapter.addTab(
+					bar.newTab().setTabListener(this)
+							.setText(R.string.about_str),
+					ProfileAboutFragment.class, 1, screenName);
+			mTabsAdapter.addTab(
+					bar.newTab().setTabListener(this)
+							.setText(R.string.media_title),
 					MediaTimelineFragment.class, 2, screenName, false);
 		}
 
@@ -220,7 +233,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 							public void run() {
 								getActionBar().setSelectedNavigationItem(1);
 								getAboutFragment().getAdapter()
-								.notifyDataSetChanged();
+										.notifyDataSetChanged();
 								invalidateOptionsMenu();
 							}
 						});
@@ -242,7 +255,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 											R.string.failed_check_relationship)
 											.replace("{user}",
 													user.getScreenName()),
-													Toast.LENGTH_SHORT).show();
+									Toast.LENGTH_SHORT).show();
 							getAboutFragment().getAdapter().setIsError(true);
 						}
 					});
@@ -280,7 +293,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		MenuInflater inflater = getMenuInflater();
 		if (AccountService.getCurrentAccount() != null
 				&& AccountService.getCurrentAccount().getUser().getScreenName()
-				.equals(mScreenName)) {
+						.equals(mScreenName)) {
 			inflater.inflate(R.menu.profile_self_actionbar, menu);
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
@@ -327,19 +340,19 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		case R.id.mentionAction:
 			startActivity(new Intent(this, ComposerScreen.class).putExtra(
 					"append", "@" + mScreenName).addFlags(
-							Intent.FLAG_ACTIVITY_CLEAR_TOP));
+					Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.pinAction:
 			final SharedPreferences prefs = PreferenceManager
-			.getDefaultSharedPreferences(getApplicationContext());
+					.getDefaultSharedPreferences(getApplicationContext());
 			ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
 					Long.toString(AccountService.getCurrentAccount().getId())
-					+ "_columns", ""));
+							+ "_columns", ""));
 			cols.add(ProfileTimelineFragment.ID + "@" + mScreenName);
 			prefs.edit()
-			.putString(
-					Long.toString(AccountService.getCurrentAccount()
-							.getId()) + "_columns",
+					.putString(
+							Long.toString(AccountService.getCurrentAccount()
+									.getId()) + "_columns",
 							Utilities.arrayToJson(cols)).commit();
 			startActivity(new Intent(this, TimelineScreen.class).putExtra(
 					"new_column", true));
@@ -348,7 +361,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		case R.id.messageAction:
 			startActivity(new Intent(getApplicationContext(),
 					ConversationScreen.class).putExtra("screen_name",
-							mScreenName));
+					mScreenName));
 			return true;
 		case R.id.blockAction:
 			if (user == null)
@@ -413,52 +426,52 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		diag.setMessage(R.string.confirm_block_str);
 		diag.setPositiveButton(R.string.yes_str,
 				new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				final Toast toast = Toast.makeText(ProfileScreen.this,
-						R.string.blocking_str, Toast.LENGTH_LONG);
-				toast.show();
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							AccountService.getCurrentAccount()
-							.getClient()
-							.createBlock(user.getId());
-						} catch (Exception e) {
-							e.printStackTrace();
-							runOnUiThread(new Runnable() {
-								public void run() {
-									Toast.makeText(
-											getApplicationContext(),
-											R.string.failed_block_str,
-											Toast.LENGTH_LONG).show();
-								}
-							});
-							return;
-						}
-						runOnUiThread(new Runnable() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						final Toast toast = Toast.makeText(ProfileScreen.this,
+								R.string.blocking_str, Toast.LENGTH_LONG);
+						toast.show();
+						new Thread(new Runnable() {
 							public void run() {
-								toast.cancel();
-								Toast.makeText(ProfileScreen.this,
-										R.string.success_blocked_str,
-										Toast.LENGTH_SHORT).show();
-								recreate(); // TODO Recreation doesn't
-								// seem to update the screen
-								// with blocked info for
-								// some reason
+								try {
+									AccountService.getCurrentAccount()
+											.getClient()
+											.createBlock(user.getId());
+								} catch (Exception e) {
+									e.printStackTrace();
+									runOnUiThread(new Runnable() {
+										public void run() {
+											Toast.makeText(
+													getApplicationContext(),
+													R.string.failed_block_str,
+													Toast.LENGTH_LONG).show();
+										}
+									});
+									return;
+								}
+								runOnUiThread(new Runnable() {
+									public void run() {
+										toast.cancel();
+										Toast.makeText(ProfileScreen.this,
+												R.string.success_blocked_str,
+												Toast.LENGTH_SHORT).show();
+										recreate(); // TODO Recreation doesn't
+										// seem to update the screen
+										// with blocked info for
+										// some reason
+									}
+								});
 							}
-						});
+						}).start();
 					}
-				}).start();
-			}
-		});
+				});
 		diag.setNegativeButton(R.string.no_str,
 				new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
 		diag.create().show();
 	}
 
@@ -468,49 +481,49 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		diag.setMessage(R.string.confirm_report_str);
 		diag.setPositiveButton(R.string.yes_str,
 				new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				final Toast toast = Toast.makeText(ProfileScreen.this,
-						R.string.reporting_str, Toast.LENGTH_LONG);
-				toast.show();
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							AccountService.getCurrentAccount()
-							.getClient()
-							.reportSpam(user.getId());
-						} catch (Exception e) {
-							e.printStackTrace();
-							runOnUiThread(new Runnable() {
-								public void run() {
-									Toast.makeText(
-											getApplicationContext(),
-											R.string.failed_report_str,
-											Toast.LENGTH_LONG).show();
-								}
-							});
-							return;
-						}
-						runOnUiThread(new Runnable() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						final Toast toast = Toast.makeText(ProfileScreen.this,
+								R.string.reporting_str, Toast.LENGTH_LONG);
+						toast.show();
+						new Thread(new Runnable() {
 							public void run() {
-								toast.cancel();
-								Toast.makeText(ProfileScreen.this,
-										R.string.reported_str,
-										Toast.LENGTH_SHORT).show();
-								recreate();
+								try {
+									AccountService.getCurrentAccount()
+											.getClient()
+											.reportSpam(user.getId());
+								} catch (Exception e) {
+									e.printStackTrace();
+									runOnUiThread(new Runnable() {
+										public void run() {
+											Toast.makeText(
+													getApplicationContext(),
+													R.string.failed_report_str,
+													Toast.LENGTH_LONG).show();
+										}
+									});
+									return;
+								}
+								runOnUiThread(new Runnable() {
+									public void run() {
+										toast.cancel();
+										Toast.makeText(ProfileScreen.this,
+												R.string.reported_str,
+												Toast.LENGTH_SHORT).show();
+										recreate();
+									}
+								});
 							}
-						});
+						}).start();
 					}
-				}).start();
-			}
-		});
+				});
 		diag.setNegativeButton(R.string.no_str,
 				new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
 		diag.create().show();
 	}
 
@@ -527,21 +540,22 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	
 	@Deprecated
 	public void setupMediaView() {
-		if(user == null) {
+		if (user == null) {
 			return;
 		}
-		runOnUiThread(new Runnable(){
+		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				setHeaderBackground(user.getProfileBackgroundImageUrl());
-//				try {
-//					MediaFeedListAdapter.MediaFeedItem m = getMediaFragment().getAdapter().get(0);
-//					setHeaderBackground(m.imgurl);
-//				} catch(Exception e){
-//					e.printStackTrace();
-//					// Here we should divert to profile bg?
-//					setHeaderBackground(user.getProfileBackgroundImageUrl());
-//				}
+				// try {
+				// MediaFeedListAdapter.MediaFeedItem m =
+				// getMediaFragment().getAdapter().get(0);
+				// setHeaderBackground(m.imgurl);
+				// } catch(Exception e){
+				// e.printStackTrace();
+				// // Here we should divert to profile bg?
+				// setHeaderBackground(user.getProfileBackgroundImageUrl());
+				// }
 			}
 		});
 	}
@@ -550,16 +564,16 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		if (url.startsWith("http")) {
 			ImageManager.getInstance(this).get(url,
 					new OnImageReceivedListener() {
-				@Override
-				public void onImageReceived(String arg0, Bitmap bitmap) {
-					((ImageView) findViewById(R.id.img))
-					.setImageBitmap(bitmap);
-				}
-			});
+						@Override
+						public void onImageReceived(String arg0, Bitmap bitmap) {
+							((ImageView) findViewById(R.id.img))
+									.setImageBitmap(bitmap);
+						}
+					});
 		} else if (user.getProfileBackgroundColor() != null) {
 			((ImageView) findViewById(R.id.img))
-			.setImageDrawable(new ColorDrawable(Color.parseColor("#"
-					+ user.getProfileBackgroundColor())));
+					.setImageDrawable(new ColorDrawable(Color.parseColor("#"
+							+ user.getProfileBackgroundColor())));
 		}
 	}
 
@@ -611,10 +625,8 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
-		((ViewPager) findViewById(R.id.pager)).setOnPageChangeListener(new OnPageChangeListener() {
-			
-			@Override
-			public void onPageScrollStateChanged(int state) { }
+		((ViewPager) findViewById(R.id.pager))
+				.setOnPageChangeListener(new OnPageChangeListener() {
 
 			@Override
 			public void onPageScrolled(int position, float offset,
@@ -635,6 +647,9 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				invalidateOptionsMenu();
 				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
 			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {}
 		});
 		setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
@@ -653,45 +668,45 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			items.add(l.getFullName());
 		builder.setItems(items.toArray(new String[0]),
 				new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				final UserList curList = lists[item];
-				final Toast toast = Toast.makeText(
-						getApplicationContext(),
-						R.string.adding_user_list, Toast.LENGTH_LONG);
-				toast.show();
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							AccountService
-							.getCurrentAccount()
-							.getClient()
-							.createListMembers(curList.getId(),
-									new long[] { user.getId() });
-						} catch (final Exception e) {
-							e.printStackTrace();
-							runOnUiThread(new Runnable() {
-								public void run() {
-									toast.cancel();
-									Toast.makeText(
-											getApplicationContext(),
-											e.getMessage(),
-											Toast.LENGTH_SHORT).show();
-								}
-							});
-							return;
-						}
-						runOnUiThread(new Runnable() {
+					public void onClick(DialogInterface dialog, int item) {
+						final UserList curList = lists[item];
+						final Toast toast = Toast.makeText(
+								getApplicationContext(),
+								R.string.adding_user_list, Toast.LENGTH_LONG);
+						toast.show();
+						new Thread(new Runnable() {
 							public void run() {
-								toast.cancel();
-								Toast.makeText(getApplicationContext(),
-										R.string.added_user_list,
-										Toast.LENGTH_SHORT).show();
+								try {
+									AccountService
+											.getCurrentAccount()
+											.getClient()
+											.createListMembers(curList.getId(),
+													new long[] { user.getId() });
+								} catch (final Exception e) {
+									e.printStackTrace();
+									runOnUiThread(new Runnable() {
+										public void run() {
+											toast.cancel();
+											Toast.makeText(
+													getApplicationContext(),
+													e.getMessage(),
+													Toast.LENGTH_SHORT).show();
+										}
+									});
+									return;
+								}
+								runOnUiThread(new Runnable() {
+									public void run() {
+										toast.cancel();
+										Toast.makeText(getApplicationContext(),
+												R.string.added_user_list,
+												Toast.LENGTH_SHORT).show();
+									}
+								});
 							}
-						});
+						}).start();
 					}
-				}).start();
-			}
-		});
+				});
 		builder.create().show();
 	}
 
@@ -703,7 +718,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	public void onTabReselected(Tab tab, FragmentTransaction arg1) {
 		boolean selected = mTabsAdapter.mTabs.get(tab.getPosition()).aleadySelected;
 		if (selected) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
@@ -720,10 +735,26 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+		final String prefName = Long.toString(AccountService
+				.getCurrentAccount().getId()) + "_default_column";
+		PreferenceManager.getDefaultSharedPreferences(this).edit()
+				.putInt(prefName, tab.getPosition()).apply();
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = true;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
+		if (mViewPager != null) {
+			mViewPager.setCurrentItem(tab.getPosition());
+		}
 	}
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		if (mTabsAdapter.mTabs.size() == 0
+				|| tab.getPosition() > mTabsAdapter.mTabs.size())
+			return;
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = false;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
 	}
 }

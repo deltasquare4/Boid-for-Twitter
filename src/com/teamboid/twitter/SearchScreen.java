@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.SearchTweetsFragment;
@@ -101,7 +102,7 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
-						getActionBar().setSelectedNavigationItem(position);
+						getActionBar().getTabAt(position).select();
 					}
 				});
 
@@ -191,7 +192,7 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	public void onTabReselected(Tab tab, FragmentTransaction arg1) {
 		boolean selected = mTabsAdapter.mTabs.get(tab.getPosition()).aleadySelected;
 		if (selected) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
@@ -208,10 +209,26 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+		final String prefName = Long.toString(AccountService
+				.getCurrentAccount().getId()) + "_default_column";
+		PreferenceManager.getDefaultSharedPreferences(this).edit()
+				.putInt(prefName, tab.getPosition()).apply();
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = true;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
+		if (mViewPager != null) {
+			mViewPager.setCurrentItem(tab.getPosition());
+		}
 	}
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		if (mTabsAdapter.mTabs.size() == 0
+				|| tab.getPosition() > mTabsAdapter.mTabs.size())
+			return;
+		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
+		curInfo.aleadySelected = false;
+		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
 	}
 }

@@ -34,17 +34,19 @@ import com.teamboid.twitterapi.status.Place;
  */
 public class SearchFeedListAdapter extends BaseAdapter {
 
-	public SearchFeedListAdapter(Context context, long _account) {
+	public SearchFeedListAdapter(Context context, long _account, String query ) {
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
 		account = _account;
+		_query = query;
 	}
 
-	public SearchFeedListAdapter(Context context, String _id, long _account) {
+	public SearchFeedListAdapter(Context context, String _id, long _account, String query) {
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
 		ID = _id;
 		account = _account;
+		_query = query;
 	}
 
 	private Context mContext;
@@ -54,6 +56,8 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	private long lastViewedTweet;
 	private int lastViewedTopMargin;
 	public long account;
+	public String _query;
+	
 
 	public void setLastViewed(ListView list) {
 		if (list == null)
@@ -245,7 +249,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	public static RelativeLayout createTweetView(final Tweet tweet,
-			final Context mContext, View convertView) {
+			final Context mContext, View convertView, String query) {
 		RelativeLayout toReturn = null;
 		if (convertView != null)
 			toReturn = (RelativeLayout) convertView;
@@ -294,7 +298,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		} else
 			profilePic.setVisibility(View.GONE);
 		itemTxt.setText(Utilities.twitterifyText(mContext, tweet.getText(),
-				tweet.getUrlEntities(), tweet.getMediaEntities(), false));
+				tweet.getUrlEntities(), tweet.getMediaEntities(), false, query));
 		itemTxt.setLinksClickable(false);
 		timerTxt.setText(Utilities.friendlyTimeShort(tweet.getCreatedAt()));
 		boolean hasMedia = false;
@@ -354,7 +358,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		return createTweetView(tweets.get(position), mContext, convertView);
+		return createTweetView(tweets.get(position), mContext, convertView, _query);
 	}
 
 	private static void hideInlineMedia(View toReturn) {
