@@ -1,6 +1,5 @@
 package com.teamboid.twitter;
 
-import java.util.Calendar;
 import java.util.List;
 
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
@@ -10,9 +9,7 @@ import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -21,12 +18,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.provider.ContactsContract;
 import android.util.Log;
