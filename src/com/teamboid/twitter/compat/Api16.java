@@ -77,7 +77,7 @@ public class Api16 {
 			Notification noti = Api11.setupNotification(accId,
 					new Notification.BigTextStyle(nb).bigText(s.getText())
 							.build(), context);
-			nm.notify(s.getId() + "", Api11.MENTIONS, noti);
+			nm.notify(accId + "", Api11.MENTIONS, noti);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class Api16 {
 		Notification noti = Api11.setupNotification(accId,
 				new Notification.BigTextStyle(nb).bigText(text).build(),
 				context);
-		nm.notify(msg.getId() + "", Api11.DM, noti);
+		nm.notify(accId + "", Api11.DM, noti);
 	}
 
 	public static void setLowPirority(Builder nb) {
@@ -140,10 +140,6 @@ public class Api16 {
 			
 			NotificationManager nm = (NotificationManager) c
 					.getSystemService(Context.NOTIFICATION_SERVICE);
-			if (queue == Api11.MENTIONS)
-				nm.cancel(tag, Api11.MENTIONS);
-			else if (queue == Api11.DM)
-				nm.cancel(id, Api11.DM);
 			nm.notify(accId + "", queue, inbox.build());
 		} catch (Exception e) {
 			e.printStackTrace();
