@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.notifications.NotificationService;
+import com.teamboid.twitter.services.AccountService;
 
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
@@ -39,6 +40,11 @@ public class AndroidAccountHelper {
 		
 		// Notifications
 		setServiceSync(NotificationService.AUTHORITY, AUTO_SYNC_NOTIFICATIONS, toAdd);
+		ContentResolver.addPeriodicSync(
+				AndroidAccountHelper.getAccount(c, toAdd, 
+				NotificationService.AUTHORITY,
+				new Bundle(),
+				15 * 60);
 	}
 	
 	public static void setServiceSync(String Authority, boolean on, android.accounts.Account account){
