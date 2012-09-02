@@ -8,6 +8,7 @@ import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TimelineScreen;
 import com.teamboid.twitter.TweetViewer;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.annotation.SuppressLint;
@@ -101,6 +102,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 							Notification n = setupNotification(accId,
 									nb.getNotification(), context);
 							nm.notify(accId + "", MENTIONS, n);
+							NotificationService.setReadMentions((long)accId, context);
 						}
 					}
 				});
@@ -145,6 +147,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 							Notification n = setupNotification(accId,
 									nb.getNotification(), c);
 							nm.notify(accId + "", DM, n);
+							NotificationService.setReadDMs((long)accId, c);
 						}
 					}
 				});
@@ -165,7 +168,6 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 					first.getString("user"), c);
 			ImageManager.getInstance(c).get(imageURL,
 					new ImageManager.OnImageReceivedListener() {
-
 						@SuppressWarnings("deprecation")
 						@Override
 						public void onImageReceived(String source, Bitmap bitmap) {
@@ -193,6 +195,11 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 								Notification n = setupNotification((int) accId,
 										nb.getNotification(), c);
 								nm.notify(accId + "", queue, n);
+								if(queue == Api11.MENTIONS) {
+									NotificationService.setReadMentions((long)accId, c);
+								} else {
+									NotificationService.setReadDMs((long)accId, c);
+								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}

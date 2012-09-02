@@ -42,14 +42,15 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			args = _args;
 		}
 	}
-	
+
 	/**
 	 * Get the Fragment that's live RIGHT NOW! :D
+	 * 
 	 * @author kennydude
 	 * @param pos
 	 * @return
 	 */
-	public Fragment getLiveItem(Integer pos){
+	public Fragment getLiveItem(Integer pos) {
 		return mContext.getFragmentManager().findFragmentByTag("page:" + pos);
 	}
 
@@ -132,18 +133,24 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		TabInfo info = mTabs.get(position);
 		return Fragment.instantiate(mContext, info.clss.getName(), info.args);
 	}
-	
-	public interface IBoidFragment{
+
+	public interface IBoidFragment {
 		public boolean isRefreshing();
+
 		public void onDisplay();
 	}
 
-	public static abstract class BaseListFragment extends ListFragment implements IBoidFragment {
-		public void onDisplay(){};
+	public static abstract class BaseListFragment extends ListFragment
+			implements IBoidFragment {
+		public void onDisplay() {
+		};
 
 		public boolean isLoading;
+
 		@Override
-		public boolean isRefreshing(){ return isLoading; }
+		public boolean isRefreshing() {
+			return isLoading;
+		}
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -178,13 +185,18 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 	}
 
-	public static abstract class BaseSpinnerFragment extends ListFragment implements IBoidFragment {
-		public void onDisplay(){};
-		
+	public static abstract class BaseSpinnerFragment extends ListFragment
+			implements IBoidFragment {
+		public void onDisplay() {
+		};
+
 		public boolean isLoading;
 		private boolean isShown;
+
 		@Override
-		public boolean isRefreshing(){ return isLoading; }
+		public boolean isRefreshing() {
+			return isLoading;
+		}
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -205,24 +217,30 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.spinner_list_fragment, container, false);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			return inflater.inflate(R.layout.spinner_list_fragment, container,
+					false);
 		}
 
 		public Spinner getSpinner() {
-			if (getView() == null) return null;
-			return (Spinner)getView().findViewById(R.id.fragSpinner);
+			if (getView() == null)
+				return null;
+			return (Spinner) getView().findViewById(R.id.fragSpinner);
 		}
 
 		@Override
 		public void setEmptyText(CharSequence text) {
-			if (getView() == null) return;
-			((TextView) getView().findViewById(android.R.id.empty)).setText(text);
+			if (getView() == null)
+				return;
+			((TextView) getView().findViewById(android.R.id.empty))
+					.setText(text);
 		}
 
 		@Override
 		public void setListShown(boolean visible) {
-			if (getView() == null) return;
+			if (getView() == null)
+				return;
 			isShown = visible;
 			getView().findViewById(android.R.id.progress).setVisibility(
 					(visible == false) ? View.VISIBLE : View.GONE);
@@ -235,13 +253,16 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 	}
 
-	public static abstract class BaseGridFragment extends Fragment implements IBoidFragment {
+	public static abstract class BaseGridFragment extends Fragment implements
+			IBoidFragment {
 
 		public boolean isLoading = false;
 		private boolean isShown;
-		
+
 		@Override
-		public boolean isRefreshing(){ return isLoading; }
+		public boolean isRefreshing() {
+			return isLoading;
+		}
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -289,14 +310,14 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			if (getView() == null)
 				return;
 			((TextView) getView().findViewById(android.R.id.empty))
-			.setText(text);
+					.setText(text);
 		}
 
 		public void setListAdapter(ListAdapter adapt) {
 			if (getView() == null)
 				return;
 			((ListView) getView().findViewById(android.R.id.list))
-			.setAdapter(adapt);
+					.setAdapter(adapt);
 		}
 	}
 
