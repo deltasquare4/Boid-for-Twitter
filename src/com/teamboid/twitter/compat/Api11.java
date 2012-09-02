@@ -34,6 +34,7 @@ import com.teamboid.twitterapi.utilities.Utils;
  */
 @TargetApi(14)
 public class Api11 { // We don't support API 11, we only support API 14-16
+
 	public static int MENTIONS = 100;
 	public static int DM = 200;
 
@@ -178,7 +179,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 							try {
 								Intent content = new Intent(c,
 										TimelineScreen.class).putExtra(
-										"switch", "mentions").addFlags(
+										"switch", queue).addFlags(
 										Intent.FLAG_ACTIVITY_CLEAR_TOP);
 								PendingIntent pi = PendingIntent
 										.getActivity(c, 0, content,

@@ -29,6 +29,7 @@ import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
+import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.SendTweetArrayAdapter;
 import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
@@ -90,7 +91,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
 			if (intent.getAction().equals(AccountManager.END_LOAD)) {
-				loadColumns(intent.getBooleanExtra("last_account_count", false));
+				loadColumns(
+						intent.getBooleanExtra("last_account_count", false),
+						null);
 				accountsLoaded();
 				invalidateOptionsMenu();
 				return;
@@ -238,6 +241,39 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		startService(new Intent(this, AccountService.class));
 	}
 
+	private void notificationSwitch(Intent intent) {
+		/**
+		 * Receives intent from stacked notifications, tells the timeline to
+		 * focus on the mentions/messages tab based on the notification clicked.
+		 */
+		if (intent == null) {
+			return;
+		}
+		if (intent.getExtras().containsKey("switch")) {
+			int switchIndex = -1;
+			for (int i = 0; i < getActionBar().getTabCount(); i++) {
+				Fragment frag = getFragmentManager().findFragmentByTag("page:" + i);
+				if (intent.getIntExtra("switch", -1) == Api11.MENTIONS) {
+					if(frag instanceof MentionsFragment) {
+						switchIndex = i;
+						((BaseListFragment)frag).performRefresh(false);
+						break;
+					}
+				} else {
+					if(frag instanceof MessagesFragment) {
+						switchIndex = i;
+						((BaseListFragment)frag).performRefresh(false);
+						break;
+					}
+				}
+			}
+			if(switchIndex > -1) {
+				getActionBar().setSelectedNavigationItem(switchIndex);
+			}
+		}
+
+	}
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		if (AccountService.getAccounts().size() > 0) {
@@ -252,10 +288,11 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			if (intent.getExtras().containsKey("restart")) {
 				restartActivity();
 			}
+			notificationSwitch(intent);
 		}
 	}
 
-	public void loadColumns(boolean firstLoad) {
+	public void loadColumns(boolean firstLoad, Intent intent) {
 		if (AccountService.getAccounts().size() == 0) {
 			return;
 		} else {
@@ -454,13 +491,15 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOffscreenPageLimit(4);
 		mViewPager.setAdapter(mTabsAdapter);
-		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(int position) {
-				getActionBar().getTabAt(position).select();
-				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
-			}
-		});
+		mViewPager
+				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+					@Override
+					public void onPageSelected(int position) {
+						getActionBar().getTabAt(position).select();
+						((TabsAdapter.IBoidFragment) mTabsAdapter
+								.getLiveItem(position)).onDisplay();
+					}
+				});
 
 		if (newColumn) {
 			newColumn = false;
@@ -483,6 +522,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			pager.setCurrentItem(defaultColumn);
 		}
 		filterDefaultColumnSelection = false;
+		notificationSwitch(intent);
 		invalidateOptionsMenu();
 	}
 
@@ -736,13 +776,13 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		MessageConvoCAB.context = this;
 		if (getActionBar().getTabCount() == 0
 				&& AccountService.getAccounts().size() > 0)
-			loadColumns(false);
+			loadColumns(false, null);
 		if (AccountService.selectedAccount > 0
 				&& AccountService.getAccounts().size() > 0) {
 			if (!AccountService.existsAccount(AccountService.selectedAccount)) {
 				AccountService.selectedAccount = AccountService.getAccounts()
 						.get(0).getId();
-				loadColumns(false);
+				loadColumns(false, null);
 			} else {
 				for (int i = 0; i < getActionBar().getTabCount(); i++) {
 					Fragment frag = getFragmentManager().findFragmentByTag(
@@ -791,11 +831,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		// Loading
 		try {
 			Fragment frag = getFragmentManager().findFragmentByTag(
-							"page:"
-									+ getActionBar()
-											.getSelectedNavigationIndex());
-			if(frag != null){
-				if (((TabsAdapter.IBoidFragment)frag).isRefreshing()) {
+					"page:" + getActionBar().getSelectedNavigationIndex());
+			if (frag != null) {
+				if (((TabsAdapter.IBoidFragment) frag).isRefreshing()) {
 					ProgressBar p = new ProgressBar(this, null,
 							android.R.attr.progressBarStyleSmall);
 					menu.findItem(R.id.refreshAction).setActionView(p)
@@ -932,7 +970,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 							.getDefaultSharedPreferences(
 									getApplicationContext()).edit()
 							.putLong("last_sel_account", acc.getId()).commit();
-					loadColumns(false);
+					loadColumns(false, null);
 					showFollowDialog(acc);
 					break;
 				}
@@ -969,7 +1007,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		TabInfo curInfo = mTabsAdapter.mTabs.get(tab.getPosition());
 		curInfo.aleadySelected = true;
 		mTabsAdapter.mTabs.set(tab.getPosition(), curInfo);
-		if(mViewPager != null) {
+		if (mViewPager != null) {
 			mViewPager.setCurrentItem(tab.getPosition());
 		}
 	}

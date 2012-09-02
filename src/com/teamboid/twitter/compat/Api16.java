@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TimelineScreen;
 import com.teamboid.twitter.utilities.Utilities;
 
 import com.teamboid.twitterapi.dm.DirectMessage;
@@ -110,12 +111,14 @@ public class Api16 {
 
 	static String getQueueContent(Context c, int queue, int length) {
 		if (queue == Api11.MENTIONS)
-			return c.getString(R.string.x_new_mentions).replace("{X}", "" + length);
+			return c.getString(R.string.x_new_mentions).replace("{X}",
+					"" + length);
 		else if (queue == Api11.DM)
-			return c.getString(R.string.x_new_messages).replace("{X}", "" + length);
+			return c.getString(R.string.x_new_messages).replace("{X}",
+					"" + length);
 		return null;
 	}
-	
+
 	public static void displayMany(long accId, int queue, Context c,
 			JSONArray ja) {
 		try {
@@ -123,6 +126,11 @@ public class Api16 {
 					.setContentTitle(c.getString(getQueueMessage(queue)))
 					.setContentText(getQueueContent(c, queue, ja.length()))
 					.setSmallIcon(R.drawable.statusbar_icon);
+			Intent content = new Intent(c, TimelineScreen.class).putExtra(
+					"switch", queue).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			PendingIntent pi = PendingIntent.getActivity(c, 0, content,
+					PendingIntent.FLAG_ONE_SHOT);
+			nb.setContentIntent(pi);
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
 			int m = 5;
 			if (ja.length() < 5) {
@@ -137,7 +145,7 @@ public class Api16 {
 						Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 				inbox.addLine(sp);
 			}
-			
+
 			NotificationManager nm = (NotificationManager) c
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			nm.notify(accId + "", queue, inbox.build());
