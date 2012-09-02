@@ -286,7 +286,7 @@
 		<!-- Notifications -->
 		<provider android:name="com.teamboid.twitter.notifications.NotificationsProvider"
 			android:authorities="com.teamboid.twitter.notifications"
-			android:exported="false" android:label="@string/notifications"
+			android:exported="true" android:label="@string/notifications"
 			android:process=":contacts" android:syncable="true" />
 		<service android:name="com.teamboid.twitter.notifications.NotificationService"
 			android:exported="false" android:process=":contacts">

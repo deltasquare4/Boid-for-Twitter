@@ -86,7 +86,7 @@ public abstract class BaseTwitterUserSync extends BaseTwitterSync {
 	public final void onPerformSync(Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		this.account = account;
+		setupSync(account);
 		
 		int total = getTotalNumber();
 		int got = 0;

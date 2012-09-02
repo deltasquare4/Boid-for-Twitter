@@ -458,7 +458,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			@Override
 			public void onPageSelected(int position) {
 				getActionBar().getTabAt(position).select();
-				((TabsAdapter.IBoidFragment)mTabsAdapter.getItem(position)).onDisplay();
+				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
 			}
 		});
 
@@ -790,16 +790,17 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		final ArrayList<Account> accs = AccountService.getAccounts();
 		// Loading
 		try {
-			if (((TabsAdapter.IBoidFragment) getFragmentManager()
-					.findFragmentByTag(
+			Fragment frag = getFragmentManager().findFragmentByTag(
 							"page:"
 									+ getActionBar()
-											.getSelectedNavigationIndex()))
-					.isRefreshing()) {
-				ProgressBar p = new ProgressBar(this, null,
-						android.R.attr.progressBarStyleSmall);
-				menu.findItem(R.id.refreshAction).setActionView(p)
-						.setEnabled(false);
+											.getSelectedNavigationIndex());
+			if(frag != null){
+				if (((TabsAdapter.IBoidFragment)frag).isRefreshing()) {
+					ProgressBar p = new ProgressBar(this, null,
+							android.R.attr.progressBarStyleSmall);
+					menu.findItem(R.id.refreshAction).setActionView(p)
+							.setEnabled(false);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

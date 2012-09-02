@@ -22,6 +22,10 @@ public abstract class BaseTwitterSync extends AbstractThreadedSyncAdapter {
 
 	long _id = -1;
 
+	public void setupSync(Account account){
+		this.account = account;
+	}
+	
 	public Long getId() {
 		if (_id != -1)
 			return _id;

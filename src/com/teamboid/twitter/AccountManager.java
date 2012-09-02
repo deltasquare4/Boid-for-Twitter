@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -88,7 +89,10 @@ public class AccountManager extends PreferenceActivity {
 			});
 			
 			SwitchPreference c2dmPref = ((SwitchPreference) findPreference(accountId + "_c2dm"));
-			c2dmPref.setChecked(sp.getBoolean(accountId + "_c2dm", true));
+			c2dmPref.setChecked(ContentResolver.getSyncAutomatically(
+					AndroidAccountHelper.getAccount(getActivity(),
+							AccountService.getAccount(accountId)),
+					NotificationService.AUTHORITY));
 			c2dmPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(
@@ -101,6 +105,22 @@ public class AccountManager extends PreferenceActivity {
 					return true;
 				}
 			});
+			
+			ListPreference c2dmPeriod = (ListPreference) findPreference(accountId + "_c2dm_period");
+			c2dmPeriod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					ContentResolver.addPeriodicSync(
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)), 
+							NotificationService.AUTHORITY,
+							new Bundle(),
+							Integer.parseInt((String)newValue) * 60);
+					preference.setSummary(getString(R.string.notification_every).replace("{x}", (String)newValue));
+					return true;
+				}
+			});
+			c2dmPeriod.setSummary(getString(R.string.notification_every).replace("{x}", c2dmPeriod.getValue() ));
 		}
 
 		void setKey(String key, int accountId) {

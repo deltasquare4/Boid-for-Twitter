@@ -3,6 +3,7 @@ package com.teamboid.twitter.notifications;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.teamboid.twitter.R;
 import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.contactsync.BaseTwitterSync;
 import com.teamboid.twitter.utilities.NightModeUtils;
@@ -150,6 +151,8 @@ public class NotificationService extends Service {
 		public void onPerformSync(Account account, Bundle extras,
 				String authority, ContentProviderClient provider,
 				SyncResult syncResult) {
+			setupSync(account);
+			
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			if(prefs.getBoolean("notifications_global", true) == false){
 				Log.d("nf", "Globally off");
@@ -186,6 +189,9 @@ public class NotificationService extends Service {
 			if(columnEnabled(accId, "dm")){
 				Log.d("boid", "dm check");
 				try{
+					SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(mContext);
+					boolean dm_priv = p.getBoolean(accId + "_c2dm_messages_priv", false);
+					
 					long since_id = getSinceId(accId, "dm");
 					Paging paging = new Paging(5);
 					if(since_id != -1)
@@ -196,7 +202,11 @@ public class NotificationService extends Service {
 					if(m.length > 0){
 						setSinceId(accId, "dm", m[0].getId());
 						for(DirectMessage message : m){
-							addMessageToQueue("dm", accId, message.getSenderScreenName(), message.getText());
+							String t = message.getText();
+							if(dm_priv){
+								t = mContext.getString(R.string.message_recv).replace("{user}", "");
+							}
+							addMessageToQueue("dm", accId, message.getSenderScreenName(), t);
 						}
 						showQueue("dm", accId, m[0]);
 					}

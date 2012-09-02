@@ -50,8 +50,11 @@ public class MediaTimelineFragment extends BaseGridFragment {
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
+	public void onActivityCreated(Bundle b) {
+		super.onActivityCreated(b);
+		Log.d("boid", "onActivityCreated()");
+		isLoading = false;
+		
 		GridView grid = getGridView();
 		grid.setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
@@ -98,6 +101,7 @@ public class MediaTimelineFragment extends BaseGridFragment {
 		setRetainInstance(true);
 		screenName = (String) getArguments().get("screenName");
 		manualRefresh = getArguments().getBoolean("manualRefresh", false);
+		reloadAdapter(true);
 	}
 
 	@Override
@@ -122,13 +126,14 @@ public class MediaTimelineFragment extends BaseGridFragment {
 	}
 
 	int pageSkips = 0;
-	boolean haveNotified = false;
 
 	@Override
 	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null)
+		if (context == null || isLoading == true || adapt == null)
 			return;
 		isLoading = true;
+		context.invalidateOptionsMenu();
+		
 		if (getView() != null && adapt != null) {
 			adapt.setLastViewed(getGridView());
 			if (adapt.getCount() == 0)
@@ -169,18 +174,12 @@ public class MediaTimelineFragment extends BaseGridFragment {
 								});
 							}
 						}
-						context.runOnUiThread(new Runnable(){
-
+						
+						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								if(haveNotified == false){
-									if(context instanceof ProfileScreen){
-										((ProfileScreen)context).setupMediaView();
-										haveNotified = true;
-									}
-								}
+								adapt.notifyDataSetChanged();
 							}
-							
 						});
 						
 					} catch (final Exception e) {
@@ -202,6 +201,7 @@ public class MediaTimelineFragment extends BaseGridFragment {
 					@Override
 					public void run() {
 						isLoading = false;
+						context.invalidateOptionsMenu();
 						setListShown(true);
 					}
 				});
@@ -232,8 +232,6 @@ public class MediaTimelineFragment extends BaseGridFragment {
 				} else {
 					getView().findViewById(android.R.id.empty).setVisibility(
 							View.VISIBLE);
-					if (!manualRefresh)
-						performRefresh(false);
 				}
 			}
 		}
@@ -254,9 +252,13 @@ public class MediaTimelineFragment extends BaseGridFragment {
 	@Override
 	public void filter() { }
 
+	Boolean firstSync = false;
+	
 	@Override
 	public void onDisplay() {
-		Log.d("boid", "MEDIA IS ON SHOW");
-		reloadAdapter(true);
+		if(!firstSync){
+			performRefresh(false);
+			firstSync = true;
+		}
 	}
 }
