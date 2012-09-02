@@ -105,16 +105,24 @@ public class Api16 {
 			return R.string.mention_str;
 		else if (queue == Api11.DM)
 			return R.string.directmessage_str;
-
 		return 0;
 	}
 
+	static String getQueueContent(Context c, int queue, int length) {
+		if (queue == Api11.MENTIONS)
+			return c.getString(R.string.x_new_mentions).replace("{X}", "" + length);
+		else if (queue == Api11.DM)
+			return c.getString(R.string.x_new_messages).replace("{X}", "" + length);
+		return null;
+	}
+	
 	public static void displayMany(long accId, int queue, Context c,
 			JSONArray ja) {
 		try {
 			Notification.Builder nb = new Notification.Builder(c)
 					.setContentTitle(c.getString(getQueueMessage(queue)))
-					.setContentText("").setSmallIcon(R.drawable.statusbar_icon);
+					.setContentText(getQueueContent(c, queue, ja.length()))
+					.setSmallIcon(R.drawable.statusbar_icon);
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
 			int m = 5;
 			if (ja.length() < 5) {

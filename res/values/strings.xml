@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
 	<string name="app_name">Boid Beta</string>
 	<string name="no_accounts">No accounts, please add one!</string>
 	<string name="account_service_name">Boid Account Service</string>
@@ -49,13 +50,11 @@
 	<string name="ringtone_str_desc">The optional ringtone played when a notification is
 		received.
 	</string>
-
 	<string name="muting_hint_keyword">Keyword or hashtag</string>
 	<string name="muting_hint_app">App name</string>
 	<string name="muting_hint_user">Screen name</string>
 	<string name="yes_str">Yes</string>
 	<string name="no_str">No</string>
-
 	<string name="links_shortened">Links will appear shortened when sent.</string>
 	<string name="will_use_twitlonger">Twitlonger will be used; media is disabled.
 	</string>
@@ -69,12 +68,10 @@
 	</string>
 	<string name="copied_str">\@{user}\'s Tweet copied to your clipboard!
 	</string>
-	<string name="clipboard_str">Copied to your clipboard!
-	</string>
+	<string name="clipboard_str">Copied to your clipboard!</string>
 	<string name="successfully_deleted_status">Your Tweet was deleted!</string>
 	<string name="failed_delete_status">Something happened while deleting your Tweet!
 	</string>
-
 	<string name="tweets_str">Tweets</string>
 	<string name="users_str">Users</string>
 	<string name="about_str">About</string>
@@ -88,7 +85,6 @@
 	<string name="nodescription_str">(No description)</string>
 	<string name="no_internet">Please connect to the internet.</string>
 	<string name="error_str">Error</string>
-
 	<string name="block_str">Block</string>
 	<string name="website_str">Website</string>
 	<string name="friends_str">Following</string>
@@ -106,13 +102,11 @@
 	<string name="failed_unfavorite">Something happened while unfavoriting @{user}\'s
 		Tweet!
 	</string>
-
 	<string name="edit_profile_str">Edit Profile</string>
 	<string name="pin_column_str">Pin as Column</string>
 	<string name="in_reply_to">In reply to @{user}</string>
 	<string name="search_query_hint_str">Search Twitter</string>
 	<string name="what_you_wanna_say">What\'s happening?</string>
-
 	<string name="loading_lists">Please wait, loading your lists…</string>
 	<string name="loading_savedsearches">Please wait, loading your saved searches…</string>
 	<string name="savedsearch_uploaded">Saved search successfully saved to Twitter!
@@ -124,19 +118,12 @@
 	<string name="failed_load_lists">Something happened while loading your lists!
 	</string>
 	<string name="lists_str">Lists</string>
-
 	<string name="switch_accounts">Switch Accounts</string>
-	<string name="loading_accounts">Loading your accounts…</string>
 	<string name="account_already_added">You\'ve already added this account!</string>
 	<string name="authorization_error">Failed to authorize your account!</string>
-	<string name="authorizing_account">Authorizing your account…</string>
 	<string name="failed_load_account">Failed to load an account!</string>
-	<string name="failed_fetch_config">Failed to fetch Twitter\'s current configuration;
-		defaults will be used. {reason}
-	</string>
 	<string name="failed_load_tweet">Something happened while loading this Tweet!
 	</string>
-
 	<string name="new_tweet_str">New Tweet</string>
 	<string name="favorite_str">Favorite</string>
 	<string name="unfavorite_str">Unfavorite</string>
@@ -145,7 +132,6 @@
 	<string name="reply_str">Reply</string>
 	<string name="share_str">Share</string>
 	<string name="copy_str">Copy</string>
-
 	<string name="search_str">Search</string>
 	<string name="manage_accounts_str">Accounts</string>
 	<string name="manage_accounts_str_desc">Add or remove your Twitter accounts and access
@@ -165,7 +151,6 @@
 	<string name="no_muting_str">No rules</string>
 	<string name="refresh_str">Refresh</string>
 	<string name="delete_str">Delete</string>
-
 	<string name="help_title">Help</string>
 	<string name="help_description">Send feedback, donate, and view version/build
 		information.
@@ -232,7 +217,6 @@
 	<string name="enable_inline_desc">Enabling allows Boid to display image previews of
 		the media contained in tweets of columns.
 	</string>
-
 	<string name="capture_str">Capture Image</string>
 	<string name="attach_image">Attach Image</string>
 	<string name="attach_location">Attach Location</string>
@@ -241,7 +225,6 @@
 	<string name="failed_send_message">Something happened while sending your message!
 	</string>
 	<string name="sent_tweet">Sent your Tweet!</string>
-
 	<string name="timeline_str">Timeline</string>
 	<string name="media_timeline_str">Media Timeline</string>
 	<string name="mention_str">Mention</string>
@@ -252,14 +235,12 @@
 	<string name="savedsearch_str">Saved Search</string>
 	<string name="list_timeline_str">List Timeline</string>
 	<string name="user_timeline_str">User Timeline</string>
-
 	<string name="load_widget">Loading {widget}…</string>
 	<string name="youtube_embed">YouTube Embed</string>
 	<string name="error_in_widget">There was a problem loading {widget}</string>
 	<string name="user_followers">{user}\'s Followers</string>
 	<string name="user_following">{user} is Following</string>
 	<string name="user_favorites">{user}\'s Favorites</string>
-
 	<string name="sending_tweet">Sending tweet…</string>
 	<string name="sending_tweets">Sending {sending} tweets…</string>
 	<string name="send_error_tweets">Sending {sending} tweets. Some did not send
@@ -307,7 +288,6 @@
 	</string-array>
 
 	<string name="local_trend_with_place">Local - {place}</string>
-
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="imgur_note">Images will be uploaded using the same
@@ -315,7 +295,6 @@
 		the moment and follow the default access settings
 	</string>
 	<string name="view_conversation_str">Toggle Conversation</string>
-
 	<string name="photo_service_title">Upload Service</string>
 	<string name="confirm_send_setting_title">Send Prompt</string>
 	<string name="confirm_send_setting_desc">Whether a prompt will be shown before sending a
@@ -327,9 +306,8 @@
 		other composer options.
 	</string>
 	<string name="users_and_tweets">Users and tweets</string>
-	<string name="swipe_to_delete_accounts">Swipe accounts off the screen to delete them.
-	</string>
 	<string name="swipe_to_delete_items">Swipe items off the screen to delete them.</string>
+
 	<string-array name="muting_types">
 		<item>Keyword</item>
 		<item>User</item>
@@ -346,7 +324,6 @@
 	</string>
 	<string name="failed_report_str">Something happened while reporting this user!
 	</string>
-
 	<string name="clear_str">Clear</string>
 	<string name="backup_str">Backup</string>
 	<string name="restore_str">Restore</string>
@@ -370,7 +347,6 @@
 	<string name="my_lists_str">My Lists</string>
 	<string name="add_to_list_str">Add to List</string>
 	<string name="deleting_list_str">Deleting list…</string>
-	<string name="deleting_str">Deleting…</string>
 	<string name="unsubscribing_list_str">Unsubscribing from list…</string>
 	<string name="deleted_list_str">Successfully deleted the list!</string>
 	<string name="unsubscribed_list_str">Unsubscribed from the list!</string>
@@ -398,11 +374,6 @@
 	<string name="font_size">Font Size</string>
 	<string name="font_size_desc">Changes the font size used in Tweets</string>
 	<string name="boid_is_awesome">Boid is Awesome!</string>
-	<string name="contextual_action_bar">Contextual Action Bar</string>
-	<string name="contextual_action_bar_desc">When off, the long-press action for Tweets returns
-		to replying.
-	</string>
-	<string name="description_str">Description</string>
 	<string name="unblock_str">unblock</string>
 	<string name="failed_unblock_str">Failed to unblock @{user}!</string>
 	<string name="failed_follow_str">Failed to follow @{user}!</string>
@@ -425,8 +396,8 @@
 	<string name="donations_appreciated">Your donations are much appreciated by the
 		teenagers of Team Boid!
 	</string>
-
 	<string name="syncing">Boid is syncing</string>
+
 	<string-array name="sync_types">
 		<item>Following</item>
 		<item>Followers</item>
@@ -437,8 +408,8 @@
 		<item>followers</item>
 		<item>mutual</item>
 	</string-array>
-	<string name="contact_sync">Contact Sync</string>
 
+	<string name="contact_sync">Contact Sync</string>
 	<string name="this_is_you">This is you</string>
 	<string name="failed_check_following">Failed to check if you\'re following @{user}!
 	</string>
@@ -471,16 +442,15 @@
 	</string>
 	<string name="columns_str">Columns</string>
 	<string name="manage_columns">Manage Columns</string>
-
 	<string name="mentioned_by">You were mentioned by @{user}</string>
 	<string name="messaged_by">New message from @{user}</string>
 	<string name="boid_browser">Boid Browser</string>
-
 	<string name="contactsync_what">What to sync</string>
 	<string name="contact_sync_on">Contact Sync is turned on</string>
-	<string name="contact_sync_off">Contact sync is turned off. Please note: Contact sync is experimental</string>
+	<string name="contact_sync_off">Contact sync is turned off. Please note: Contact
+		sync is experimental
+	</string>
 	<string name="no_location_str">No Location</string>
-
 	<string name="please_wait">Please wait…</string>
 	<string name="no_column_backup">No column backup file was found for this account!
 	</string>
@@ -493,7 +463,6 @@
 	</string>
 	<string name="screen_name_str">Screen name</string>
 	<string name="please_readd_accounts">Please re-add your accounts!</string>
-
 	<string name="not_logged_in">You are not logged in</string>
 	<string name="logged_in_as">You are logged in as {user}</string>
 	<string name="service_needs_config">{service} (needs logging in)</string>
@@ -501,7 +470,6 @@
 	<string name="email">Email Address</string>
 	<string name="password">Password</string>
 	<string name="autocomplete">Nickname Auto-completion</string>
-	<string name="timeline_widget_str">Timeline widget</string>
 	<string name="done_str">Done</string>
 	<string name="name_str">Name</string>
 	<string name="failed_get_accountinfo">Failed to get your most up to date account info,
@@ -516,27 +484,27 @@
 	<string name="mute_mentions_str">Mute Mentions</string>
 	<string name="mute_search_str">Mute Search</string>
 	<string name="dots">…</string>
-	
-	<string name="notifications_refresh_every">Notifications will refresh every {x}</string>
+	<string name="x_new_mentions">{X} new mentions!</string>
+	<string name="x_new_messages">{X} new messages!</string>
+
 	<string-array name="notifications_period_name">
-	    <item>5 minutes</item>
-	    <item>15 minutes</item>
-	    <item>Half hour</item>
-	    <item>Hour</item>
-	    <item>2 hours</item>
-	    <item>5 hours</item>
-	    <item>Half a day</item>
+		<item>5 minutes</item>
+		<item>15 minutes</item>
+		<item>Half hour</item>
+		<item>Hour</item>
+		<item>2 hours</item>
+		<item>5 hours</item>
+		<item>Half a day</item>
 	</string-array>
 	<string-array name="notifications_period_values">
-	    <item>5</item>
-	    <item>15</item>
-	    <item>30</item>
-	    <item>60</item>
-	    <item>120</item>
-	    <item>360</item>
-	    <item>720</item>
+		<item>5</item>
+		<item>15</item>
+		<item>30</item>
+		<item>60</item>
+		<item>120</item>
+		<item>360</item>
+		<item>720</item>
 	</string-array>
-
 	<string-array name="nightmode_starttimes">
 		<item>1PM</item>
 		<item>2PM</item>
@@ -565,7 +533,6 @@
 		<item>11AM</item>
 		<item>12PM (Noon)</item>
 	</string-array>
-
 	<string-array name="nightmode_startvalues">
 		<item>13</item>
 		<item>14</item>
@@ -594,9 +561,12 @@
 		<item>11</item>
 		<item>12</item>
 	</string-array>
-		<string name="notifications">Notifications</string>
-		<string name="notifications_global">Globally turns on/off notifications</string>
-		<string name="notifications_enable">Enable Notifications for this account</string>
-		<string name="notification_period">Notification refresh period</string>
-		<string name="notification_every">Notifications will refresh every {x} minutes</string>
+
+	<string name="notifications">Notifications</string>
+	<string name="notifications_global">Globally turns on/off notifications</string>
+	<string name="notifications_enable">Enable Notifications for this account</string>
+	<string name="notification_period">Notification refresh period</string>
+	<string name="notification_every">Notifications will refresh every {x} minutes
+	</string>
+
 </resources>
