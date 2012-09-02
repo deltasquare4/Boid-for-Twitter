@@ -312,7 +312,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 		}
 		messageTxt.setText(Utilities.twitterifyText(context, curItem
 				.getLastMessage().getText().replace("\n", " ").trim(), null,
-				null, true));
+				null, true, null));
 		return toReturn;
 	}
 }

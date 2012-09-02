@@ -22,7 +22,6 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.SpannedString;
 import android.text.style.StyleSpan;
 
 /**

@@ -90,7 +90,7 @@ public class MessageItemAdapter extends BaseAdapter {
                 Utilities.friendlyTimeLong(curItem.getCreatedAt()));
 		TextView msgTxt = (TextView)toReturn.findViewById(R.id.dmItemMessageTxt); 
 		FeedListAdapter.ApplyFontSize(msgTxt, context, true);
-		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true));
+		msgTxt.setText(Utilities.twitterifyText(context, curItem.getText(), null, null, true, null));
 		//msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
 		return toReturn;
 	}

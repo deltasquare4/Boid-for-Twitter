@@ -286,7 +286,7 @@ public class ProfileAboutAdapter extends BaseAdapter {
 				if (curItem.getName().equals(
 						mContext.getString(R.string.bio_str))) {
 					body.setText(Utilities.twitterifyText(mContext,
-							curItem.getValue(), null, null, true));
+							curItem.getValue(), null, null, true, null));
 					body.setMovementMethod(LinkMovementMethod.getInstance());
 				} else
 					body.setText(curItem.getValue());

@@ -46,8 +46,8 @@ public class AccountListAdapter extends BaseAdapter {
 		FeedListAdapter.ApplyFontSize(nameTxt, mContext);
 		TextView descTxt = (TextView)toReturn.findViewById(R.id.accountItemDescription); 
 		if(curUser.getDescription() != null && !curUser.getDescription().trim().isEmpty()) {
-			descTxt.setText(Utilities.twitterifyText(mContext, curUser.getDescription(), null, null, false));
-		} else descTxt.setText(mContext.getApplicationContext().getString(R.string.nodescription_str));
+			descTxt.setText(Utilities.twitterifyText(mContext, curUser.getDescription(), null, null, false, null));
+		} else descTxt.setText(mContext.getApplicationContext().getString(R.string.nodescription_str), null);
 		FeedListAdapter.ApplyFontSize(descTxt, mContext);
 		return toReturn;
 	}
