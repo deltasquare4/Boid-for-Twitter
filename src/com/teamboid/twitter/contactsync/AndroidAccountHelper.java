@@ -41,7 +41,7 @@ public class AndroidAccountHelper {
 		// Notifications
 		setServiceSync(NotificationService.AUTHORITY, AUTO_SYNC_NOTIFICATIONS, toAdd);
 		ContentResolver.addPeriodicSync(
-				AndroidAccountHelper.getAccount(c, toAdd, 
+				toAdd, 
 				NotificationService.AUTHORITY,
 				new Bundle(),
 				15 * 60);
