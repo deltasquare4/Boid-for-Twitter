@@ -108,13 +108,6 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 
 	public static void displayDirectMessageNotification(final int accId,
 			final Context c, final DirectMessage dm) {
-		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
-		String x = dm.getText();
-		if (!p.getBoolean(accId + "_c2dm_messages_priv", false)) {
-			x = c.getString(R.string.message_recv).replace("{user}",
-					dm.getSender().getName());
-		}
-		final String text = x;
 		final String imageURL = Utilities.getUserImage(
 				dm.getSenderScreenName(), c, dm.getSender());
 		ImageManager.getInstance(c).get(imageURL,
@@ -135,7 +128,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 						final Notification.Builder nb = new Notification.Builder(
 								c)
 								.setContentTitle(dm.getSender().getScreenName())
-								.setContentText(text)
+								.setContentText(dm.getText())
 								.setLargeIcon(profileImg)
 								.setContentIntent(pi)
 								.setAutoCancel(true)
@@ -147,7 +140,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 														dm.getSenderScreenName()));
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 							Api16.displayDMNotification(accId, c, profileImg,
-									dm, nb, nm, text);
+									dm, nb, nm, dm.getText());
 						} else {
 							Notification n = setupNotification(accId,
 									nb.getNotification(), c);

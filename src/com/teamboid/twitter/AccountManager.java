@@ -69,7 +69,6 @@ public class AccountManager extends PreferenceActivity {
 			setKey("c2dm_dm", accountId);
 			setKey("c2dm_vibrate", accountId);
 			setKey("c2dm_ringtone", accountId);
-			setKey("c2dm_messages_priv", accountId);
 			setKey("contactsync_on", accountId);
 
 			SwitchPreference syncPref = ((SwitchPreference) findPreference(accountId
