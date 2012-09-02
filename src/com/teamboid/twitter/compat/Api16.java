@@ -55,8 +55,6 @@ public class Api16 {
 		nb.addAction(R.drawable.reply_light,
 				context.getString(R.string.reply_str),
 				getReplyActionIntent(context, s, accId));
-		nb.addAction(R.drawable.retweet_light,
-				context.getString(R.string.retweet_str), null); // TODO
 
 		String media = Utilities.getTweetYFrogTwitpicMedia(s);
 		if (media != null && !media.isEmpty()) {
@@ -86,11 +84,6 @@ public class Api16 {
 			final Context context, final Bitmap profileImg,
 			final DirectMessage msg, final Builder nb,
 			final NotificationManager nm, final String text) {
-		nb.addAction(R.drawable.reply_light,
-				context.getString(R.string.reply_str), null); // TODO
-		nb.addAction(R.drawable.delete_light,
-				context.getString(R.string.delete_str), null); // TODO
-
 		Notification noti = Api11.setupNotification(accId,
 				new Notification.BigTextStyle(nb).bigText(text).build(),
 				context);
