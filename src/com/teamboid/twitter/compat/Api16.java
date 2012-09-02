@@ -102,9 +102,9 @@ public class Api16 {
 
 	static int getQueueMessage(int queue) {
 		if (queue == Api11.MENTIONS)
-			return R.string.mention_str;
+			return R.string.mentions_str;
 		else if (queue == Api11.DM)
-			return R.string.directmessage_str;
+			return R.string.messages_str;
 		return 0;
 	}
 
@@ -128,7 +128,7 @@ public class Api16 {
 			if (ja.length() < 5) {
 				m = ja.length();
 			}
-			for (int i = 0; i <= m; i++) {
+			for (int i = 0; i <= (m - 1); i++) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
@@ -137,9 +137,13 @@ public class Api16 {
 						Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 				inbox.addLine(sp);
 			}
-
+			
 			NotificationManager nm = (NotificationManager) c
 					.getSystemService(Context.NOTIFICATION_SERVICE);
+			if (queue == Api11.MENTIONS)
+				nm.cancel(tag, Api11.MENTIONS);
+			else if (queue == Api11.DM)
+				nm.cancel(id, Api11.DM);
 			nm.notify(accId + "", queue, inbox.build());
 		} catch (Exception e) {
 			e.printStackTrace();
