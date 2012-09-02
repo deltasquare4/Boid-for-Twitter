@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.notifications.NotificationService;
-import com.teamboid.twitter.services.AccountService;
 
 import android.accounts.AccountManager;
 import android.content.ContentResolver;

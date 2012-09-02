@@ -14,7 +14,6 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.teamboid.twitter.Account;
-import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetViewer;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
