@@ -11,7 +11,7 @@
 		    android:title="@string/notification_period"
 		    android:key="{user}_c2dm_period"
 		    android:defaultValue="15"
-		    android:entryValues="@array/nearby_distance_values"
+		    android:entryValues="@array/notifications_period_values"
 		    android:entries="@array/notifications_period_name"/>
 		
 		<com.teamboid.twitter.views.CustomSwitchPreference android:key="{user}_c2dm_mention"

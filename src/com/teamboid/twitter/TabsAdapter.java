@@ -42,6 +42,16 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			args = _args;
 		}
 	}
+	
+	/**
+	 * Get the Fragment that's live RIGHT NOW! :D
+	 * @author kennydude
+	 * @param pos
+	 * @return
+	 */
+	public Fragment getLiveItem(Integer pos){
+		return mContext.getFragmentManager().findFragmentByTag("page:" + pos);
+	}
 
 	public TabsAdapter(Activity activity) {
 		super(activity.getFragmentManager());
@@ -125,9 +135,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	
 	public interface IBoidFragment{
 		public boolean isRefreshing();
+		public void onDisplay();
 	}
 
 	public static abstract class BaseListFragment extends ListFragment implements IBoidFragment {
+		public void onDisplay(){};
 
 		public boolean isLoading;
 		@Override
@@ -167,7 +179,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	}
 
 	public static abstract class BaseSpinnerFragment extends ListFragment implements IBoidFragment {
-
+		public void onDisplay(){};
+		
 		public boolean isLoading;
 		private boolean isShown;
 		@Override
@@ -224,7 +237,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 	public static abstract class BaseGridFragment extends Fragment implements IBoidFragment {
 
-		public boolean isLoading;
+		public boolean isLoading = false;
 		private boolean isShown;
 		
 		@Override

@@ -1,5 +1,8 @@
 package com.teamboid.twitter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.ImageManager;
@@ -32,7 +35,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -43,8 +48,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.LoaderManager;
@@ -207,6 +214,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			getActionBar().setSelectedNavigationItem(
 					savedInstanceState.getInt("lastTab", 0));
 		}
+		invalidateOptionsMenu();
 	}
 
 	public void loadFollowingInfo() {
@@ -297,6 +305,20 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				menu.findItem(R.id.reportAction).setEnabled(true);
 			}
 		}
+		/* TODO: Uncomment when it's working.
+		Fragment frag = getFragmentManager().findFragmentByTag(
+						"page:"
+								+ getActionBar()
+										.getSelectedNavigationIndex());
+		if(frag != null){
+			if (((TabsAdapter.IBoidFragment)frag).isRefreshing()) {
+				ProgressBar p = new ProgressBar(this, null,
+						android.R.attr.progressBarStyleSmall);
+				menu.findItem(R.id.refreshAction).setActionView(p)
+						.setEnabled(false);
+			}
+		}
+		*/
 		if (showProgress) {
 			final MenuItem refreshAction = menu.findItem(R.id.refreshAction);
 			refreshAction.setEnabled(false);
@@ -515,7 +537,8 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		}
 		super.onSaveInstanceState(outState);
 	}
-
+	
+	@Deprecated
 	public void setupMediaView() {
 		if (user == null) {
 			return;
@@ -578,38 +601,57 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 								bitmap, 90F));
 					}
 				});
+		profileImg.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				ImageManager download = ImageManager.getInstance(getApplicationContext());
+				download.get("http://api.twitter.com/1/users/profile_image?screen_name="+user.getScreenName()+"&size=original", new ImageManager.OnImageReceivedListener() {
+					@Override
+					public void onImageReceived(String source, Bitmap bitmap) {
+						try {
+							String file = Utilities.generateImageFileName(ProfileScreen.this);
+							if(bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+								startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(new File(file)), "image/*"));
+							}
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+							Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+			}
+			
+		});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
 		((ViewPager) findViewById(R.id.pager))
 				.setOnPageChangeListener(new OnPageChangeListener() {
 
-					@Override
-					public void onPageScrollStateChanged(int state) {
-					}
+			@Override
+			public void onPageScrolled(int position, float offset,
+					int offsetPixels) {
+				// Log.d("profile", position + ", " + offset + ", "+ offsetPixels);
+				if (position == 2 && offset <= 1){
+					findViewById(R.id.profileHeader).setVisibility(View.GONE);
+					Log.d("profile", "GONE");
+				} else if (position >= 1){
+					findViewById(R.id.profileHeader).setX(-offsetPixels);
+					findViewById(R.id.profileHeader).setVisibility(View.VISIBLE);
+				}
+			}
 
-					@Override
-					public void onPageScrolled(int position, float offset,
-							int offsetPixels) {
-						Log.d("profile", position + ", " + offset + ", "
-								+ offsetPixels);
-						if (position == 2 && offset <= 1) {
-							findViewById(R.id.profileHeader).setVisibility(
-									View.GONE);
-							Log.d("profile", "GONE");
-						} else if (position >= 1) {
-							findViewById(R.id.profileHeader)
-									.setX(-offsetPixels);
-							findViewById(R.id.profileHeader).setVisibility(
-									View.VISIBLE);
-						}
-					}
+			@Override
+			public void onPageSelected(int position) {
+				getActionBar().getTabAt(position).select();
+				invalidateOptionsMenu();
+				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
+			}
 
-					@Override
-					public void onPageSelected(int position) {
-						getActionBar().getTabAt(position).select();
-					}
-				});
-		// setHeaderBackground(user.getProfileBackgroundImageUrl());
+			@Override
+			public void onPageScrollStateChanged(int arg0) {}
+		});
+		setHeaderBackground(user.getProfileBackgroundImageUrl());
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {

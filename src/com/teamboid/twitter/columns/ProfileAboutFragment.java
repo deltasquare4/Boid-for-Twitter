@@ -108,6 +108,7 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	public void performRefresh(final boolean paginate) {
 		if (context == null || isLoading || adapt == null) return;
 		isLoading = true;
+		context.invalidateOptionsMenu();
 		if (adapt.getCount() == 0 && getView() != null) setListShown(false);
 		new Thread(new Runnable() {
 			@Override
@@ -147,6 +148,7 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 					public void run() {
 						if (getView() != null) setListShown(true);
 						isLoading = false;
+						context.invalidateOptionsMenu();
 					}
 				});
 			}

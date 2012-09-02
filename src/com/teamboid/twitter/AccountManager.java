@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.AccountListAdapter;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
-import com.teamboid.twitter.services.NotificationService;
 import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -81,27 +81,45 @@ public class AccountManager extends PreferenceActivity {
 				@Override
 				public boolean onPreferenceChange(final Preference preference,
 						Object newValue) {
-					ContentResolver.setSyncAutomatically(AndroidAccountHelper
-							.getAccount(getActivity(),
-									AccountService.getAccount(accountId)),
-							ContactsContract.AUTHORITY, (Boolean) newValue);
+					AndroidAccountHelper.setServiceSync(ContactsContract.AUTHORITY, (Boolean)newValue,
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)));
 					return true;
 				}
 			});
 			
 			SwitchPreference c2dmPref = ((SwitchPreference) findPreference(accountId + "_c2dm"));
-			c2dmPref.setChecked(sp.getBoolean(accountId + "_c2dm", true));
+			c2dmPref.setChecked(ContentResolver.getSyncAutomatically(
+					AndroidAccountHelper.getAccount(getActivity(),
+							AccountService.getAccount(accountId)),
+					NotificationService.AUTHORITY));
 			c2dmPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(
 						final Preference preference, Object newValue) {
 					
 					Log.d("boid", "notification switched");
-					NotificationService.setupAlarm(getActivity(), accountId, (Boolean)newValue);
+					AndroidAccountHelper.setServiceSync(NotificationService.AUTHORITY, (Boolean)newValue,
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)));
 					
 					return true;
 				}
 			});
+			
+			ListPreference c2dmPeriod = (ListPreference) findPreference(accountId + "_c2dm_period");
+			c2dmPeriod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					ContentResolver.addPeriodicSync(
+							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)), 
+							NotificationService.AUTHORITY,
+							new Bundle(),
+							Integer.parseInt((String)newValue) * 60);
+					preference.setSummary(getString(R.string.notification_every).replace("{x}", (String)newValue));
+					return true;
+				}
+			});
+			c2dmPeriod.setSummary(getString(R.string.notification_every).replace("{x}", c2dmPeriod.getValue() ));
 		}
 
 		void setKey(String key, int accountId) {

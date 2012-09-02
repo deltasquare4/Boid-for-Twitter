@@ -1,5 +1,7 @@
 package com.teamboid.twitter.contactsync;
 
+import com.teamboid.twitter.utilities.EmptyContentProvider;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -11,37 +13,4 @@ import android.net.Uri;
  * @author kennydude
  * 
  */
-public class AutocompleteProvider extends ContentProvider {
-
-	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
-		return 0;
-	}
-
-	@Override
-	public String getType(Uri arg0) {
-		return null;
-	}
-
-	@Override
-	public Uri insert(Uri arg0, ContentValues arg1) {
-		return null;
-	}
-
-	@Override
-	public boolean onCreate() {
-		return true;
-	}
-
-	@Override
-	public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
-			String arg4) {
-		return null;
-	}
-
-	@Override
-	public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
-		return 0;
-	}
-
-}
+public class AutocompleteProvider extends EmptyContentProvider {}

@@ -123,6 +123,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 			return;
 		}
 		isLoading = true;
+		context.invalidateOptionsMenu();
 		if (getAdapter().getCount() == 0 && getView() != null)
 			setListShown(false);
 		getAdapter().setLastViewed(getListView());
@@ -199,6 +200,7 @@ public class ProfileTimelineFragment extends BaseListFragment {
 						if (getView() != null)
 							setListShown(true);
 						isLoading = false;
+						context.invalidateOptionsMenu();
 					}
 				});
 			}

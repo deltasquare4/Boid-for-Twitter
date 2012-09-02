@@ -36,7 +36,7 @@ public class ContactSyncAdapterService extends Service {
 		return instance;
 	}
 
-	private static class SyncAdapterImpl extends BaseTwitterSync {
+	private static class SyncAdapterImpl extends BaseTwitterUserSync {
 		public SyncAdapterImpl(
 				ContactSyncAdapterService contactSyncAdapterService) {
 			super(contactSyncAdapterService);
