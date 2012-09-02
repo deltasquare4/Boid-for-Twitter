@@ -30,6 +30,7 @@ public class ContactViewNotifyService extends IntentService {
 		Log.d("cv", intent.getDataString());
 	}
 
+	@SuppressWarnings("unused")
 	private static void saveBitmapToRawContact(Context context,
 			long rawContactId, byte[] photo) throws Exception {
 		Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI,
