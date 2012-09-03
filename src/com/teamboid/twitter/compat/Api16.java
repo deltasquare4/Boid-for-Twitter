@@ -42,7 +42,7 @@ public class Api16 {
 				.putExtra("isNotification", true)
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent replyPi = PendingIntent.getActivity(context, 0,
-				replyIntent, PendingIntent.FLAG_ONE_SHOT);
+				replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		return replyPi;
 	}
 
@@ -124,7 +124,7 @@ public class Api16 {
 					.putExtra("switch", queue).putExtra("account", accId)
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			PendingIntent pi = PendingIntent.getActivity(c, 0, content,
-					PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent.FLAG_UPDATE_CURRENT);
 			nb.setContentIntent(pi);
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
 			int m = 5;

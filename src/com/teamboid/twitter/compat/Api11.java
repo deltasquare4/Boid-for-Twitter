@@ -74,7 +74,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 								.putExtra("account", accId)
 								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						PendingIntent pi = PendingIntent.getActivity(context,
-								0, content, PendingIntent.FLAG_ONE_SHOT);
+								0, content, PendingIntent.FLAG_UPDATE_CURRENT);
 						final NotificationManager nm = (NotificationManager) context
 								.getSystemService(Context.NOTIFICATION_SERVICE);
 						final Notification.Builder nb = new Notification.Builder(
@@ -122,7 +122,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 								.putExtra("notification", true)
 								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						PendingIntent pi = PendingIntent.getActivity(c, 0,
-								content, PendingIntent.FLAG_ONE_SHOT);
+								content, PendingIntent.FLAG_UPDATE_CURRENT);
 						final NotificationManager nm = (NotificationManager) c
 								.getSystemService(Context.NOTIFICATION_SERVICE);
 						final Notification.Builder nb = new Notification.Builder(
@@ -177,7 +177,7 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 												Intent.FLAG_ACTIVITY_CLEAR_TOP);
 								PendingIntent pi = PendingIntent
 										.getActivity(c, 0, content,
-												PendingIntent.FLAG_ONE_SHOT);
+												PendingIntent.FLAG_UPDATE_CURRENT);
 								NotificationManager nm = (NotificationManager) c
 										.getSystemService(Context.NOTIFICATION_SERVICE);
 								Notification.Builder nb = new Notification.Builder(

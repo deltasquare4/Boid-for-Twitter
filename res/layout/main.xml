@@ -8,9 +8,8 @@
 	<SlidingDrawer android:visibility="gone"
 		android:layout_alignBottom="@+id/pager" android:id="@+id/progress"
 		android:layout_width="match_parent" android:layout_height="wrap_content"
-		android:handle="@+id/progress_handle" android:content="@+id/progress_content"
-		android:background="?sideNavColor">
-		<TextView android:textColor="?tweetColor"
+		android:handle="@+id/progress_handle" android:content="@+id/progress_content">
+		<TextView android:textColor="?tweetColor" android:background="?sideNavColor"
 			android:padding="10dp" android:layout_width="match_parent"
 			android:layout_height="wrap_content" android:id="@+id/progress_handle" />
 		<ListView android:background="?sideNavColor"
