@@ -274,16 +274,12 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						((BaseListFragment) frag).performRefresh(false);
 						break;
 					}
-					NotificationService.setReadMentions(AccountService
-							.getCurrentAccount().getId(), this);
 				} else {
 					if (frag instanceof MessagesFragment) {
 						switchIndex = i;
 						((BaseListFragment) frag).performRefresh(false);
 						break;
 					}
-					NotificationService.setReadDMs(AccountService
-							.getCurrentAccount().getId(), this);
 				}
 			}
 			if (switchIndex > -1) {

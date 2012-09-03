@@ -127,11 +127,11 @@ public class Api16 {
 					PendingIntent.FLAG_UPDATE_CURRENT);
 			nb.setContentIntent(pi);
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
-			int m = 5;
+			int m = ja.length() - 5;
 			if (ja.length() < 5) {
 				m = ja.length();
 			}
-			for (int i = 0; i <= (m - 1); i++) {
+			for (int i = m; i > (m - 1); i--) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
@@ -143,6 +143,7 @@ public class Api16 {
 
 			NotificationManager nm = (NotificationManager) c
 					.getSystemService(Context.NOTIFICATION_SERVICE);
+			nm.cancel(accId + "", queue);
 			nm.notify(accId + "", queue, inbox.build());
 		} catch (Exception e) {
 			e.printStackTrace();

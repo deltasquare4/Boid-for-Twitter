@@ -33,7 +33,7 @@ import com.teamboid.twitterapi.utilities.Utils;
  * @author kennydude
  */
 @TargetApi(14)
-public class Api11 { // We don't support API 11, we only support API 14-16
+public class Api11 {
 
 	public static int MENTIONS = 100;
 	public static int DM = 200;
