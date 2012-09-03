@@ -129,8 +129,7 @@ public class Api16 {
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
 
 			/**
-			 * Since it displays the top queued notification first, start at
-			 * index 4 (which is position 5).
+			 * Index 4 is equal to the 5th item
 			 */
 			int m = 4;
 			if (ja.length() < 5) {
@@ -140,7 +139,7 @@ public class Api16 {
 				 */
 				m = ja.length() - 1;
 			}
-			for (int i = m - 1; i > 0; i--) {
+			for (int i = 0; i < m; i++) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
