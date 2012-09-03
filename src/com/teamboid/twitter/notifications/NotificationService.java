@@ -33,6 +33,7 @@ import android.util.Log;
  * 
  */
 public class NotificationService extends Service {
+	
 	public static final String AUTHORITY = "com.teamboid.twitter.notifications";
 
 	/**
@@ -48,11 +49,17 @@ public class NotificationService extends Service {
 	public static void setReadMentions(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 		sp.edit().remove("c2dm_mention_queue_" + id).commit();
+		NotificationManager nm = (NotificationManager) c
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(id + "", Api11.MENTIONS);
 	}
 
 	public static void setReadDMs(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 		sp.edit().remove("c2dm_dm_queue_" + id).commit();
+		NotificationManager nm = (NotificationManager) c
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(id + "", Api11.DM);
 	}
 
 	@Override
@@ -95,7 +102,6 @@ public class NotificationService extends Service {
 				final Object single) {
 			try {
 				handler.post(new Runnable() {
-
 					@Override
 					public void run() {
 						try {
@@ -109,11 +115,6 @@ public class NotificationService extends Service {
 									return;
 								}
 							}
-							NotificationManager nm = (NotificationManager) mContext
-									.getSystemService(Context.NOTIFICATION_SERVICE);
-							nm.cancel(accId + "",
-									queue.equals("mention") ? Api11.MENTIONS
-											: Api11.DM);
 
 							SharedPreferences sp = PreferenceManager
 									.getDefaultSharedPreferences(mContext);
@@ -142,7 +143,6 @@ public class NotificationService extends Service {
 							e.printStackTrace();
 						}
 					}
-
 				});
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -253,9 +253,6 @@ public class NotificationService extends Service {
 					.getDefaultSharedPreferences(mContext)).getString(accId
 					+ "_c2dm_period", "15"));
 			syncResult.delayUntil = period * 60;
-
 		}
-
 	}
-
 }

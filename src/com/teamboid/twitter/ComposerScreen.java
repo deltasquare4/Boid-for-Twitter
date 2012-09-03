@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import com.teamboid.twitter.contactsync.AutocompleteService;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.BoidActivity;
@@ -319,10 +320,11 @@ public class ComposerScreen extends Activity {
 
 			if (getIntent().hasExtra("text"))
 				content.setText(getIntent().getStringExtra("text"));
-			else if (getIntent().hasExtra("append"))
+			else if (getIntent().hasExtra("append")) {
 				content.append(getIntent().getStringExtra("append").replace("@" + 
 						AccountService.getCurrentAccount().getUser().getScreenName(), "")
 						.replace("  ", " ").trim() + " ");
+			}
 			if (getIntent().hasExtra("image")) {
 				stt.attachedImage = getIntent().getStringExtra("image");
 				invalidateOptionsMenu();
@@ -542,6 +544,9 @@ public class ComposerScreen extends Activity {
 		} else if (firstLoad == true) {
 			stt.from = AccountService.getCurrentAccount();
 			loadDrafts();
+		}
+		if(getIntent().hasExtra("isNotification")) {
+			NotificationService.setReadMentions(stt.from.getId(), this);
 		}
 	}
 

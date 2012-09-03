@@ -7,6 +7,7 @@ import com.teamboid.twitter.cab.MessageItemCAB;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.listadapters.MessageItemAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Extractor;
 import com.teamboid.twitter.utilities.Utilities;
@@ -70,13 +71,12 @@ public class ConversationScreen extends ListActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.conversation_screen);
-		if (getIntent().getExtras() != null
-				&& getIntent().getExtras().containsKey("account")) {
+		if (getIntent().hasExtra("account")) {
 			long accId = getIntent().getIntExtra("account", 0);
 			AccountService.selectedAccount = (long) accId;
 			PreferenceManager
-			.getDefaultSharedPreferences(getApplicationContext())
-			.edit().putLong("last_sel_account", (long) accId).commit();
+					.getDefaultSharedPreferences(getApplicationContext())
+					.edit().putLong("last_sel_account", (long) accId).commit();
 		}
 		setProgressBarIndeterminateVisibility(false);
 		toScreenName = getIntent().getStringExtra("screen_name");
@@ -101,8 +101,9 @@ public class ConversationScreen extends ListActivity {
 		});
 		adapt = new MessageItemAdapter(this);
 		setListAdapter(adapt);
-		if (getIntent().getExtras() != null
-				&& getIntent().getExtras().containsKey("notification")) {
+		if (getIntent().hasExtra("notification")) {
+			NotificationService
+					.setReadDMs(AccountService.selectedAccount, this);
 			reloadMessages();
 		} else {
 			loadCachedMessages();
@@ -126,7 +127,7 @@ public class ConversationScreen extends ListActivity {
 	private void loadCachedMessages() {
 		DMConversation convo = AccountService.getMessageConvoAdapter(this,
 				AccountService.getCurrentAccount().getId()).find(
-						getIntent().getStringExtra("screen_name"));
+				getIntent().getStringExtra("screen_name"));
 		if (convo != null)
 			adapt.setConversation(convo);
 		getListView().smoothScrollToPosition(adapt.getCount() - 1);
@@ -162,8 +163,8 @@ public class ConversationScreen extends ListActivity {
 										.getMessageConvoAdapter(
 												ConversationScreen.this,
 												AccountService
-												.getCurrentAccount()
-												.getId());
+														.getCurrentAccount()
+														.getId());
 								list.add(messages.toArray(new DirectMessage[0]));
 								for (int i = 0; i < list.getCount(); i++) {
 									if (((DMConversation) list.getItem(i))
@@ -284,8 +285,8 @@ public class ConversationScreen extends ListActivity {
 										.getMessageConvoAdapter(
 												ConversationScreen.this,
 												AccountService
-												.getCurrentAccount()
-												.getId());
+														.getCurrentAccount()
+														.getId());
 								list.add(new DirectMessage[] { sentMsg });
 								adapt.add(sentMsg);
 								content.setText("");

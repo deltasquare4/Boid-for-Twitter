@@ -33,6 +33,7 @@ import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.SendTweetArrayAdapter;
 import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.BoidActivity;
@@ -249,29 +250,46 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		if (intent == null) {
 			return;
 		}
-		if (intent.getExtras().containsKey("switch")) {
+		if (intent.hasExtra("switch")) {
+			// Set the current account to the account the pressed notification
+			// was for.
+			Account acc = AccountService.getAccount(intent.getLongExtra(
+					"account", 0l));
+			if (acc.getId() != AccountService.selectedAccount) {
+				AccountService.selectedAccount = acc.getId();
+				PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext())
+						.edit().putLong("last_sel_account", acc.getId())
+						.commit();
+				loadColumns(false, intent);
+			}
+
 			int switchIndex = -1;
 			for (int i = 0; i < getActionBar().getTabCount(); i++) {
-				Fragment frag = getFragmentManager().findFragmentByTag("page:" + i);
+				Fragment frag = getFragmentManager().findFragmentByTag(
+						"page:" + i);
 				if (intent.getIntExtra("switch", -1) == Api11.MENTIONS) {
-					if(frag instanceof MentionsFragment) {
+					if (frag instanceof MentionsFragment) {
 						switchIndex = i;
-						((BaseListFragment)frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh(false);
 						break;
 					}
+					NotificationService.setReadMentions(AccountService
+							.getCurrentAccount().getId(), this);
 				} else {
-					if(frag instanceof MessagesFragment) {
+					if (frag instanceof MessagesFragment) {
 						switchIndex = i;
-						((BaseListFragment)frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh(false);
 						break;
 					}
+					NotificationService.setReadDMs(AccountService
+							.getCurrentAccount().getId(), this);
 				}
 			}
-			if(switchIndex > -1) {
+			if (switchIndex > -1) {
 				getActionBar().setSelectedNavigationItem(switchIndex);
 			}
 		}
-
 	}
 
 	@Override
@@ -279,6 +297,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		if (AccountService.getAccounts().size() > 0) {
 			setIntent(intent);
 			accountsLoaded();
+			notificationSwitch(intent);
 		}
 		if (intent.getExtras() != null) {
 			if (intent.getExtras().containsKey("new_column")) {
@@ -288,7 +307,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			if (intent.getExtras().containsKey("restart")) {
 				restartActivity();
 			}
-			notificationSwitch(intent);
 		}
 	}
 

@@ -7,7 +7,6 @@ import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TimelineScreen;
-import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.utilities.Utilities;
 
 import com.teamboid.twitterapi.dm.DirectMessage;
@@ -40,6 +39,7 @@ public class Api16 {
 				.putExtra("reply_to", s)
 				.putExtra("reply_to_name", s.getUser().getScreenName())
 				.putExtra("append", Utilities.getAllMentions(s))
+				.putExtra("isNotification", true)
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent replyPi = PendingIntent.getActivity(context, 0,
 				replyIntent, PendingIntent.FLAG_ONE_SHOT);
@@ -78,7 +78,6 @@ public class Api16 {
 					new Notification.BigTextStyle(nb).bigText(s.getText())
 							.build(), context);
 			nm.notify(accId + "", Api11.MENTIONS, noti);
-			NotificationService.setReadMentions((long)accId, context);
 		}
 	}
 
@@ -90,7 +89,6 @@ public class Api16 {
 				new Notification.BigTextStyle(nb).bigText(text).build(),
 				context);
 		nm.notify(accId + "", Api11.DM, noti);
-		NotificationService.setReadDMs((long)accId, context);
 	}
 
 	public static void setLowPirority(Builder nb) {
@@ -122,8 +120,9 @@ public class Api16 {
 					.setContentTitle(c.getString(getQueueMessage(queue)))
 					.setContentText(getQueueContent(c, queue, ja.length()))
 					.setSmallIcon(R.drawable.statusbar_icon);
-			Intent content = new Intent(c, TimelineScreen.class).putExtra(
-					"switch", queue).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			Intent content = new Intent(c, TimelineScreen.class)
+					.putExtra("switch", queue).putExtra("account", accId)
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			PendingIntent pi = PendingIntent.getActivity(c, 0, content,
 					PendingIntent.FLAG_ONE_SHOT);
 			nb.setContentIntent(pi);
@@ -145,11 +144,6 @@ public class Api16 {
 			NotificationManager nm = (NotificationManager) c
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			nm.notify(accId + "", queue, inbox.build());
-			if(queue == Api11.MENTIONS) {
-				NotificationService.setReadMentions((long)accId, c);
-			} else {
-				NotificationService.setReadDMs((long)accId, c);
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -8,7 +8,6 @@ import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TimelineScreen;
 import com.teamboid.twitter.TweetViewer;
-import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.annotation.SuppressLint;
@@ -102,7 +101,6 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 							Notification n = setupNotification(accId,
 									nb.getNotification(), context);
 							nm.notify(accId + "", MENTIONS, n);
-							NotificationService.setReadMentions((long)accId, context);
 						}
 					}
 				});
@@ -147,7 +145,6 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 							Notification n = setupNotification(accId,
 									nb.getNotification(), c);
 							nm.notify(accId + "", DM, n);
-							NotificationService.setReadDMs((long)accId, c);
 						}
 					}
 				});
@@ -173,9 +170,11 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 						public void onImageReceived(String source, Bitmap bitmap) {
 							try {
 								Intent content = new Intent(c,
-										TimelineScreen.class).putExtra(
-										"switch", queue).addFlags(
-										Intent.FLAG_ACTIVITY_CLEAR_TOP);
+										TimelineScreen.class)
+										.putExtra("switch", queue)
+										.putExtra("account", accId)
+										.addFlags(
+												Intent.FLAG_ACTIVITY_CLEAR_TOP);
 								PendingIntent pi = PendingIntent
 										.getActivity(c, 0, content,
 												PendingIntent.FLAG_ONE_SHOT);
@@ -195,11 +194,6 @@ public class Api11 { // We don't support API 11, we only support API 14-16
 								Notification n = setupNotification((int) accId,
 										nb.getNotification(), c);
 								nm.notify(accId + "", queue, n);
-								if(queue == Api11.MENTIONS) {
-									NotificationService.setReadMentions((long)accId, c);
-								} else {
-									NotificationService.setReadDMs((long)accId, c);
-								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
