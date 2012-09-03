@@ -48,7 +48,7 @@ public class NotificationService extends Service {
 	 */
 	public static void setReadMentions(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().remove("c2dm_mention_queue_" + id).commit();
+		sp.edit().putString("c2dm_mention_queue_" + id, "[]").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.MENTIONS);
@@ -56,7 +56,7 @@ public class NotificationService extends Service {
 
 	public static void setReadDMs(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().remove("c2dm_dm_queue_" + id).commit();
+		sp.edit().putString("c2dm_dm_queue_" + id, "[]").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.DM);
