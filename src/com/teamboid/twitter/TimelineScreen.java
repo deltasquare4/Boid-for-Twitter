@@ -510,8 +510,12 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					@Override
 					public void onPageSelected(int position) {
 						getActionBar().getTabAt(position).select();
-						((TabsAdapter.IBoidFragment) mTabsAdapter
-								.getLiveItem(position)).onDisplay();
+						try {
+							((TabsAdapter.IBoidFragment) mTabsAdapter
+									.getLiveItem(position)).onDisplay();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				});
 

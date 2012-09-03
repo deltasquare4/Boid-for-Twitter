@@ -127,11 +127,20 @@ public class Api16 {
 					PendingIntent.FLAG_UPDATE_CURRENT);
 			nb.setContentIntent(pi);
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
-			int m = ja.length() - 5;
+
+			/**
+			 * Since it displays the top queued notification first, start at
+			 * index 4 (which is position 5).
+			 */
+			int m = 4;
 			if (ja.length() < 5) {
-				m = ja.length();
+				/**
+				 * If there's not 5 queued notifications, than settle with
+				 * what's there.
+				 */
+				m = ja.length() - 1;
 			}
-			for (int i = m; i > (m - 1); i--) {
+			for (int i = m - 1; i > 0; i--) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
