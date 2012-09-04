@@ -129,7 +129,7 @@ public class Api16 {
 			Notification.InboxStyle inbox = new Notification.InboxStyle(nb);
 
 			/**
-			 * Index 4 is equal to the 5th item
+			 * Index 4 is equal to the 5th item.
 			 */
 			int m = 4;
 			if (ja.length() < 5) {

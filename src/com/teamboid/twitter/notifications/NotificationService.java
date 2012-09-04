@@ -120,7 +120,7 @@ public class NotificationService extends Service {
 									.getDefaultSharedPreferences(mContext);
 							JSONArray ja = new JSONArray(sp.getString("c2dm_"
 									+ queue + "_queue_" + accId, "[]"));
-							Log.d("boid", ja.length() + "");
+							Log.d("boid", ja.length() + "\n" + ja.toString(3) + "\n");
 							if (ja.length() == 1 && single != null) {
 								if (queue.equals("mention")) {
 									Api11.displayReplyNotification((int) accId,
