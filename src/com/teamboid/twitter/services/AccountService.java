@@ -435,6 +435,9 @@ public class AccountService extends Service {
 		super.onStartCommand(intent, flags, startId);
 		loadTwitterConfig();
 		loadAccounts();
+		
+		if(accounts.size() > 0)
+			Crittercism.setUsername(accounts.get(0).getUser().getScreenName());
 		// TODO: move to NON_STICKY
 		return START_STICKY;
 	}
@@ -443,6 +446,7 @@ public class AccountService extends Service {
 	public IBinder onBind(Intent intent) {
 		if(accounts.size() > 0){
 			getApplicationContext().sendBroadcast(new Intent(AccountManager.END_LOAD));
+			Crittercism.setUsername(accounts.get(0).getUser().getScreenName());
 		}
 		return null;
 	}
