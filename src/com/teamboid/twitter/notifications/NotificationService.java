@@ -16,6 +16,7 @@ import android.accounts.Account;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -203,13 +204,19 @@ public class NotificationService extends Service {
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
 						Log.d("boid", m[0].getText());
-						setSinceId(accId, "mention", m[0].getId());
+						int added = 0;
+						setSinceId(accId, "mention", since_id);
 						for (Status status : m) {
-							addMessageToQueue("mention", accId, status
-									.getUser().getScreenName(),
-									status.getText());
+							if(status.getId() != since_id){
+								addMessageToQueue("mention", accId, status
+										.getUser().getScreenName(),
+										status.getText());
+								added += 1;
+							}
 						}
-						showQueue("mention", accId, m[0]);
+						if(added > 0){
+							showQueue("mention", accId, m[0]);
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -232,17 +239,23 @@ public class NotificationService extends Service {
 					DirectMessage[] m = client.getDirectMessages(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
-						setSinceId(accId, "dm", m[0].getId());
+						int added = 0;
+						setSinceId(accId, "dm", since_id);
 						for (DirectMessage message : m) {
-							String t = message.getText();
-							if (dm_priv) {
-								t = mContext.getString(R.string.message_recv)
-										.replace("{user}", "");
+							if(message.getId() != since_id){
+								String t = message.getText();
+								if (dm_priv) {
+									t = mContext.getString(R.string.message_recv)
+											.replace("{user}", "");
+								}
+								addMessageToQueue("dm", accId,
+										message.getSenderScreenName(), t);
+								added += 1;
 							}
-							addMessageToQueue("dm", accId,
-									message.getSenderScreenName(), t);
 						}
-						showQueue("dm", accId, m[0]);
+						if(added > 0){
+							showQueue("dm", accId, m[0]);
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -253,6 +266,11 @@ public class NotificationService extends Service {
 					.getDefaultSharedPreferences(mContext)).getString(accId
 					+ "_c2dm_period", "15"));
 			syncResult.delayUntil = period * 60;
+			ContentResolver.addPeriodicSync(
+					account, 
+					NotificationService.AUTHORITY,
+					new Bundle(),
+					period);
 		}
 	}
 }

@@ -1,9 +1,11 @@
 package com.teamboid.twitter.cab;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -211,6 +213,44 @@ public class TimelineCAB {
 			final Twitter cl = AccountService.getCurrentAccount().getClient();
 
 			switch (item.getItemId()) {
+			case R.id.reportSpam:
+				final ProgressDialog pd = new ProgressDialog(context);
+				pd.setMessage(context.getString(R.string.please_wait));
+				pd.show();
+				new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						List<String> reported = new ArrayList<String>();
+						boolean errors = false;
+						
+						for(Status t : selTweets){
+							if(reported.contains(t.getUser().getScreenName())) continue;
+							try{
+								cl.reportSpam(t.getUser().getScreenName());
+								reported.add(t.getUser().getScreenName());
+								removeStatus(t);
+							} catch(Exception e){
+								e.printStackTrace();
+								errors = true;
+							}
+						}
+						
+						final boolean f_errors = errors;
+						context.runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								pd.dismiss();
+								if(f_errors){
+									Toast.makeText(context, context.getString(R.string.error_str), Toast.LENGTH_SHORT).show();
+								}
+							}
+						});
+						
+					}
+					
+				}).start();
+				return true;
 			case R.id.replyAction: {
 				Status toReply = selTweets[0];
 				if (toReply.isRetweet())
