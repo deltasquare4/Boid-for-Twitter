@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
@@ -364,7 +366,7 @@ public class ComposerScreen extends Activity {
 	}
 
 	HashMap<String, String> autocomplete;
-	Timer timer;
+	ScheduledThreadPoolExecutor timer;
 
 	public void setupAutocomplete() {
 
@@ -389,7 +391,7 @@ public class ComposerScreen extends Activity {
 			e.printStackTrace();
 		}
 
-		timer = new Timer();
+		timer = new ScheduledThreadPoolExecutor(1);
 		editor.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -403,11 +405,11 @@ public class ComposerScreen extends Activity {
 			@Override
 			public void onTextChanged(CharSequence text, int s, int before,
 					int count) {
-				timer.cancel();
-				timer = new Timer();
+				timer.shutdownNow ();
+				timer = new ScheduledThreadPoolExecutor(1);
 				l.removeAllViews();
 
-				timer.schedule(new TimerTask() {
+				timer.schedule(new Runnable() {
 					@Override
 					public void run() {
 						final boolean b = doRun();
@@ -436,13 +438,17 @@ public class ComposerScreen extends Activity {
 								return false;
 							if (typed.charAt(0) == '@')
 								typed = typed.substring(1);
-							Log.d("autocomplete", "[" + (p + 1) + "," + start
-									+ "]: " + typed);
+							
+							List<String> added = new ArrayList<String>();
+							final List<View> tbA = new ArrayList<View>();
 
 							boolean r = false;
 							for (final String u : autocomplete.keySet()) {
 								if (u.toLowerCase().contains(typed)) {
 									r = true;
+									if(added.contains(autocomplete.get(u))) continue;
+									added.add(autocomplete.get(u));
+									
 									final LinearLayout item = (LinearLayout) getLayoutInflater()
 											.inflate(
 													R.layout.autocomplete_item,
@@ -481,16 +487,27 @@ public class ComposerScreen extends Activity {
 											riv.setImageURL(Utilities.getUserImage(
 													autocomplete.get(u),
 													ComposerScreen.this));
-											l.addView(item);
+											tbA.add(item);
 										}
 									});
 								}
 							}
+							
+							runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									for(View v : tbA){
+										l.addView(v);
+									}
+								}
+								
+							});
 							return r;
 						}
 						return false;
 					}
-				}, 500L);
+				}, 500, TimeUnit.MILLISECONDS);
 			}
 		});
 	}
