@@ -85,8 +85,13 @@ public class NotificationService extends Service {
 			try {
 				SharedPreferences sp = PreferenceManager
 						.getDefaultSharedPreferences(mContext);
-				JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue
-						+ "_queue_" + accId, "[]"));
+				JSONArray ja;
+				try{
+					ja = new JSONArray(sp.getString("c2dm_" + queue
+							+ "_queue_" + accId, "[]"));
+				} catch(Exception e){
+					ja = new JSONArray();
+				}
 				JSONObject jo = new JSONObject();
 				jo.put("user", user);
 				jo.put("content", value);
@@ -121,7 +126,7 @@ public class NotificationService extends Service {
 									.getDefaultSharedPreferences(mContext);
 							JSONArray ja = new JSONArray(sp.getString("c2dm_"
 									+ queue + "_queue_" + accId, "[]"));
-							Log.d("boid", ja.length() + "\n" + ja.toString(3) + "\n");
+							// Log.d("boid", ja.length() + "\n" + ja.toString(3) + "\n");
 							if (ja.length() == 1 && single != null) {
 								if (queue.equals("mention")) {
 									Api11.displayReplyNotification((int) accId,
@@ -203,7 +208,7 @@ public class NotificationService extends Service {
 					Status[] m = client.getMentions(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
-						Log.d("boid", m[0].getText());
+						since_id = m[0].getId();
 						int added = 0;
 						setSinceId(accId, "mention", since_id);
 						for (Status status : m) {
@@ -239,6 +244,7 @@ public class NotificationService extends Service {
 					DirectMessage[] m = client.getDirectMessages(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
+						since_id = m[0].getId();
 						int added = 0;
 						setSinceId(accId, "dm", since_id);
 						for (DirectMessage message : m) {
@@ -270,7 +276,7 @@ public class NotificationService extends Service {
 					account, 
 					NotificationService.AUTHORITY,
 					new Bundle(),
-					period);
+					period * 60);
 		}
 	}
 }
