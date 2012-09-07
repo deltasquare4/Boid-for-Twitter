@@ -177,28 +177,6 @@
 			<intent-filter>
 				<action android:name="com.android.ACTION_EMBED" />
 
-				<data android:host="youtu.be" android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
-				<data android:host="youtube.com" android:pathPrefix="/watch"
-					android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
-				<data android:host="youtu.be" android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
-				<data android:host="youtube.com" android:pathPrefix="/watch"
-					android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
 				<data android:host="www.youtu.be" android:scheme="http" />
 			</intent-filter>
 			<intent-filter>
@@ -206,17 +184,6 @@
 
 				<data android:host="www.youtube.com" android:pathPrefix="/watch"
 					android:scheme="http" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
-				<data android:host="www.youtu.be" android:scheme="https" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.android.ACTION_EMBED" />
-
-				<data android:host="www.youtube.com" android:pathPrefix="/watch"
-					android:scheme="https" />
 			</intent-filter>
 		</service>
 

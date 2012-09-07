@@ -151,16 +151,16 @@ public class Api11 {
 	}
 
 	public static void displayMany(final long accId, final int queue,
-			final Context c, final JSONObject[] ja) {
+			final Context c, final JSONArray ja) {
 		try {
-			if (ja.length == 0) {
+			if (ja.length() == 0) {
 				return;
 			}
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				Api16.displayMany(accId, queue, c, ja);
 				return;
 			}
-			final JSONObject first = ja[ja.length - 1];
+			final JSONObject first = ja.getJSONObject(ja.length() - 1);
 			final String imageURL = Utilities.getUserImage(
 					first.getString("user"), c);
 			ImageManager.getInstance(c).get(imageURL,
@@ -190,7 +190,7 @@ public class Api11 {
 										.setContentIntent(pi)
 										.setSmallIcon(R.drawable.statusbar_icon)
 										.setLargeIcon(bitmap)
-										.setNumber(ja.length);
+										.setNumber(ja.length());
 								Notification n = setupNotification((int) accId,
 										nb.getNotification(), c);
 								nm.notify(accId + "", queue, n);

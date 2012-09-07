@@ -114,12 +114,12 @@ public class Api16 {
 	}
 
 	public static void displayMany(long accId, int queue, Context c,
-			JSONObject[] ja) {
+			JSONArray ja) {
 		try {
 			Notification.Builder nb = new Notification.Builder(c)
 					.setContentTitle(c.getString(getQueueMessage(queue)))
-					.setContentText(getQueueContent(c, queue, ja.length))
-					.setNumber(ja.length)
+					.setContentText(getQueueContent(c, queue, ja.length()))
+					.setNumber(ja.length())
 					.setSmallIcon(R.drawable.statusbar_icon);
 			Intent content = new Intent(c, TimelineScreen.class)
 					.putExtra("switch", queue).putExtra("account", accId)
@@ -133,15 +133,15 @@ public class Api16 {
 			 * Index 4 is equal to the 5th item.
 			 */
 			int m = 4;
-			if (ja.length < 5) {
+			if (ja.length() < 5) {
 				/**
 				 * If there's not 5 queued notifications, than settle with
 				 * what's there.
 				 */
-				m = ja.length - 1;
+				m = ja.length() - 1;
 			}
 			for (int i = 0; i < m; i++) {
-				JSONObject jo = ja[i];
+				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
 						+ jo.getString("content"));

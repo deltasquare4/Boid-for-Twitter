@@ -80,7 +80,7 @@ public class BoidActivity {
 		
 		// Creates a dependency on the Account Service sticking around
 		Intent intent = new Intent(mContext, AccountService.class);
-		mContext.startService(intent);
+		//mContext.startService(intent);
 		mContext.bindService(intent, accConn, Context. BIND_AUTO_CREATE);
 		
 		try{

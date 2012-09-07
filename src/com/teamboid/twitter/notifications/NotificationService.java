@@ -49,7 +49,7 @@ public class NotificationService extends Service {
 	 */
 	public static void setReadMentions(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().putString("c2dm_mention_queue_" + id, "{}").commit();
+		sp.edit().putString("c2dm_mention_queue_" + id, "[]").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.MENTIONS);
@@ -57,7 +57,7 @@ public class NotificationService extends Service {
 
 	public static void setReadDMs(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().putString("c2dm_dm_queue_" + id, "{}").commit();
+		sp.edit().putString("c2dm_dm_queue_" + id, "[]").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.DM);
@@ -79,41 +79,23 @@ public class NotificationService extends Service {
 	private static class SyncAdapterImpl extends BaseTwitterSync {
 
 		public Handler handler = new Handler();
-		
-		JSONObject getQueue(String val){
-			SharedPreferences sp = PreferenceManager
-					.getDefaultSharedPreferences(mContext);
-			try{
-				return new JSONObject(sp.getString(val, "{}"));
-			} catch(Exception e){
-				sp.edit().putString(val, "{}").commit(); // Migration
-				return new JSONObject();
-			}
-		}
-		
-		JSONObject[] objectToArray(JSONObject jo){
-			JSONObject[] r = new JSONObject[jo.length()];
-			for(int i = 0; i < jo.length(); i ++){
-				try{
-					r[i] = jo.getJSONObject( jo.names().getString(i) );
-				} catch(Exception e){
-					e.printStackTrace();
-				}
-			}
-			return r;
-		}
 
-		public void addMessageToQueue(String queue, long id, long accId, String user,
+		public void addMessageToQueue(String queue, long accId, String user,
 				String value) {
 			try {
 				SharedPreferences sp = PreferenceManager
 						.getDefaultSharedPreferences(mContext);
-				JSONObject ja = getQueue("c2dm_" + queue
-						+ "_queue_" + accId);
+				JSONArray ja;
+				try{
+					ja = new JSONArray(sp.getString("c2dm_" + queue
+							+ "_queue_" + accId, "[]"));
+				} catch(Exception e){
+					ja = new JSONArray();
+				}
 				JSONObject jo = new JSONObject();
 				jo.put("user", user);
 				jo.put("content", value);
-				ja.put(id+"", jo);
+				ja.put(jo);
 				sp.edit()
 						.putString("c2dm_" + queue + "_queue_" + accId,
 								ja.toString()).commit();
@@ -142,10 +124,10 @@ public class NotificationService extends Service {
 
 							SharedPreferences sp = PreferenceManager
 									.getDefaultSharedPreferences(mContext);
-							JSONObject jo = getQueue("c2dm_"
-									+ queue + "_queue_" + accId);
-							// Log.d("boid", jo.length());
-							if (jo.length() == 1 && single != null) {
+							JSONArray ja = new JSONArray(sp.getString("c2dm_"
+									+ queue + "_queue_" + accId, "[]"));
+							// Log.d("boid", ja.length() + "\n" + ja.toString(3) + "\n");
+							if (ja.length() == 1 && single != null) {
 								if (queue.equals("mention")) {
 									Api11.displayReplyNotification((int) accId,
 											mContext, (Status) single);
@@ -157,10 +139,10 @@ public class NotificationService extends Service {
 							} else {
 								if (queue.equals("mention")) {
 									Api11.displayMany(accId, Api11.MENTIONS,
-											mContext, objectToArray(jo));
+											mContext, ja);
 								} else if (queue.equals("dm")) {
 									Api11.displayMany(accId, Api11.DM,
-											mContext, objectToArray(jo));
+											mContext, ja);
 								}
 							}
 						} catch (Exception e) {
@@ -226,12 +208,12 @@ public class NotificationService extends Service {
 					Status[] m = client.getMentions(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
-						Log.d("boid", m[0].getText());
+						since_id = m[0].getId();
 						int added = 0;
 						setSinceId(accId, "mention", since_id);
 						for (Status status : m) {
 							if(status.getId() != since_id){
-								addMessageToQueue("mention", status.getId(), accId, status
+								addMessageToQueue("mention", accId, status
 										.getUser().getScreenName(),
 										status.getText());
 								added += 1;
@@ -262,6 +244,7 @@ public class NotificationService extends Service {
 					DirectMessage[] m = client.getDirectMessages(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
+						since_id = m[0].getId();
 						int added = 0;
 						setSinceId(accId, "dm", since_id);
 						for (DirectMessage message : m) {
@@ -271,7 +254,7 @@ public class NotificationService extends Service {
 									t = mContext.getString(R.string.message_recv)
 											.replace("{user}", "");
 								}
-								addMessageToQueue("dm", message.getId(), accId,
+								addMessageToQueue("dm", accId,
 										message.getSenderScreenName(), t);
 								added += 1;
 							}
@@ -293,7 +276,7 @@ public class NotificationService extends Service {
 					account, 
 					NotificationService.AUTHORITY,
 					new Bundle(),
-					period);
+					period * 60);
 		}
 	}
 }

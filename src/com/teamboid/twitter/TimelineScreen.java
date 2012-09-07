@@ -191,26 +191,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	BoidActivity boid;
 
 	private void initialize(Bundle savedInstanceState) {
-		// This callback must stay here, otherwise in-app billing doesn't work
-		// for some reason.
-		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(
-				this) {
-			@Override
-			public void onBillingChecked(boolean supported) {
-			}
-
-			@Override
-			public void onPurchaseStateChanged(String itemId,
-					PurchaseState state) {
-			}
-
-			@Override
-			public void onRequestPurchaseResponse(String itemId,
-					ResponseCode response) {
-			}
-		};
-		BillingController.registerObserver(mBillingObserver);
-		BillingController.checkBillingSupported(this);
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		if (!prefs.contains("enable_profileimg_download"))
@@ -638,6 +618,27 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		initialize(savedInstanceState);
+		
+		// This callback must stay here, otherwise in-app billing doesn't work
+		// for some reason.
+		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(
+				this) {
+			@Override
+			public void onBillingChecked(boolean supported) {
+			}
+
+			@Override
+			public void onPurchaseStateChanged(String itemId,
+					PurchaseState state) {
+			}
+
+			@Override
+			public void onRequestPurchaseResponse(String itemId,
+					ResponseCode response) {
+			}
+		};
+		BillingController.registerObserver(mBillingObserver);
+		BillingController.checkBillingSupported(this);
 	}
 
 	public void accountsLoaded() {
