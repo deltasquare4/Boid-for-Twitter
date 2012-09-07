@@ -72,7 +72,9 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		if(places != null) {
 			spinAdapt.remove(spinAdapt.getItem(3));
 			for(TrendLocation loc : places) {
-				spinAdapt.add(context.getString(R.string.local_trend_with_place).replace("{place}", loc.getName()));
+				try{
+					spinAdapt.add(context.getString(R.string.local_trend_with_place).replace("{place}", loc.getName()));
+				} catch(Exception e){}
 			}
 			getSpinner().setAdapter(spinAdapt);
 			getSpinner().setSelection(3);

@@ -49,7 +49,7 @@ public class NotificationService extends Service {
 	 */
 	public static void setReadMentions(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().putString("c2dm_mention_queue_" + id, "[]").commit();
+		sp.edit().putString("c2dm_mention_queue_" + id, "{}").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.MENTIONS);
@@ -57,7 +57,7 @@ public class NotificationService extends Service {
 
 	public static void setReadDMs(long id, Context c) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-		sp.edit().putString("c2dm_dm_queue_" + id, "[]").commit();
+		sp.edit().putString("c2dm_dm_queue_" + id, "{}").commit();
 		NotificationManager nm = (NotificationManager) c
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(id + "", Api11.DM);
@@ -79,18 +79,41 @@ public class NotificationService extends Service {
 	private static class SyncAdapterImpl extends BaseTwitterSync {
 
 		public Handler handler = new Handler();
+		
+		JSONObject getQueue(String val){
+			SharedPreferences sp = PreferenceManager
+					.getDefaultSharedPreferences(mContext);
+			try{
+				return new JSONObject(sp.getString(val, "{}"));
+			} catch(Exception e){
+				sp.edit().putString(val, "{}").commit(); // Migration
+				return new JSONObject();
+			}
+		}
+		
+		JSONObject[] objectToArray(JSONObject jo){
+			JSONObject[] r = new JSONObject[jo.length()];
+			for(int i = 0; i < jo.length(); i ++){
+				try{
+					r[i] = jo.getJSONObject( jo.names().getString(i) );
+				} catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			return r;
+		}
 
-		public void addMessageToQueue(String queue, long accId, String user,
+		public void addMessageToQueue(String queue, long id, long accId, String user,
 				String value) {
 			try {
 				SharedPreferences sp = PreferenceManager
 						.getDefaultSharedPreferences(mContext);
-				JSONArray ja = new JSONArray(sp.getString("c2dm_" + queue
-						+ "_queue_" + accId, "[]"));
+				JSONObject ja = getQueue("c2dm_" + queue
+						+ "_queue_" + accId);
 				JSONObject jo = new JSONObject();
 				jo.put("user", user);
 				jo.put("content", value);
-				ja.put(jo);
+				ja.put(id+"", jo);
 				sp.edit()
 						.putString("c2dm_" + queue + "_queue_" + accId,
 								ja.toString()).commit();
@@ -119,10 +142,10 @@ public class NotificationService extends Service {
 
 							SharedPreferences sp = PreferenceManager
 									.getDefaultSharedPreferences(mContext);
-							JSONArray ja = new JSONArray(sp.getString("c2dm_"
-									+ queue + "_queue_" + accId, "[]"));
-							Log.d("boid", ja.length() + "\n" + ja.toString(3) + "\n");
-							if (ja.length() == 1 && single != null) {
+							JSONObject jo = getQueue("c2dm_"
+									+ queue + "_queue_" + accId);
+							// Log.d("boid", jo.length());
+							if (jo.length() == 1 && single != null) {
 								if (queue.equals("mention")) {
 									Api11.displayReplyNotification((int) accId,
 											mContext, (Status) single);
@@ -134,10 +157,10 @@ public class NotificationService extends Service {
 							} else {
 								if (queue.equals("mention")) {
 									Api11.displayMany(accId, Api11.MENTIONS,
-											mContext, ja);
+											mContext, objectToArray(jo));
 								} else if (queue.equals("dm")) {
 									Api11.displayMany(accId, Api11.DM,
-											mContext, ja);
+											mContext, objectToArray(jo));
 								}
 							}
 						} catch (Exception e) {
@@ -208,7 +231,7 @@ public class NotificationService extends Service {
 						setSinceId(accId, "mention", since_id);
 						for (Status status : m) {
 							if(status.getId() != since_id){
-								addMessageToQueue("mention", accId, status
+								addMessageToQueue("mention", status.getId(), accId, status
 										.getUser().getScreenName(),
 										status.getText());
 								added += 1;
@@ -248,7 +271,7 @@ public class NotificationService extends Service {
 									t = mContext.getString(R.string.message_recv)
 											.replace("{user}", "");
 								}
-								addMessageToQueue("dm", accId,
+								addMessageToQueue("dm", message.getId(), accId,
 										message.getSenderScreenName(), t);
 								added += 1;
 							}
