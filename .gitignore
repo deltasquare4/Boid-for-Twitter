@@ -24,3 +24,4 @@ out/
 *.iml
 proguard-project.txt
 
+/localSpark.yaml

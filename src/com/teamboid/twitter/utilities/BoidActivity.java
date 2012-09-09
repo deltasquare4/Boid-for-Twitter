@@ -3,6 +3,7 @@ package com.teamboid.twitter.utilities;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.services.AccountService;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Window;
 
 /**
  * Defines common things all Boid activites should require to function correctly
@@ -26,16 +28,17 @@ public class BoidActivity {
 	}
 	
 	void callAccountsReady(){
+		mContext.setProgressBarIndeterminateVisibility(false);
 		AccountsReady.done();
 		AccountsReady = new NullOnAction(); // reset
 	}
 	
 	public OnAction AccountsReady = new NullOnAction();
 	
-	public BoidActivity(Context c){
+	public BoidActivity(Activity c){
 		this.mContext = c;
 	}
-	Context mContext;
+	Activity mContext;
 	
 	public ServiceConnection accConn = new ServiceConnection(){
 		@Override
@@ -73,15 +76,8 @@ public class BoidActivity {
 		} else
 			mContext.setTheme(Utilities.getTheme(mContext));
 		
-		// Register for when service is ready
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(AccountManager.END_LOAD);
-		mContext.registerReceiver(acBC, filter);
-		
-		// Creates a dependency on the Account Service sticking around
-		Intent intent = new Intent(mContext, AccountService.class);
-		//mContext.startService(intent);
-		mContext.bindService(intent, accConn, Context. BIND_AUTO_CREATE);
+		mContext.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		mContext.setProgressBarIndeterminateVisibility(true);
 		
 		try{
 			Log.d("boid", AccountService.getAccounts().size() + "");
@@ -91,6 +87,16 @@ public class BoidActivity {
 		} catch(Exception e){
 			e.printStackTrace();
 		}
+		
+		// Register for when service is ready
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(AccountManager.END_LOAD);
+		mContext.registerReceiver(acBC, filter);
+		
+		// Creates a dependency on the Account Service sticking around
+		Intent intent = new Intent(mContext, AccountService.class);
+		//mContext.startService(intent);
+		mContext.bindService(intent, accConn, Context. BIND_AUTO_CREATE);
 	}
 	
 	public void onSaveInstanceState(Bundle out){

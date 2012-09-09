@@ -119,7 +119,6 @@ public class Api16 {
 			Notification.Builder nb = new Notification.Builder(c)
 					.setContentTitle(c.getString(getQueueMessage(queue)))
 					.setContentText(getQueueContent(c, queue, ja.length()))
-					.setNumber(ja.length())
 					.setSmallIcon(R.drawable.statusbar_icon);
 			Intent content = new Intent(c, TimelineScreen.class)
 					.putExtra("switch", queue).putExtra("account", accId)
