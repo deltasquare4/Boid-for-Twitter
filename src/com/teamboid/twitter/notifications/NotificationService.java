@@ -208,7 +208,9 @@ public class NotificationService extends Service {
 					Status[] m = client.getMentions(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
+						since_id = m[0].getId();
 						int added = 0;
+						setSinceId(accId, "mention", since_id);
 						for (Status status : m) {
 							if(status.getId() != since_id){
 								addMessageToQueue("mention", accId, status
@@ -220,9 +222,6 @@ public class NotificationService extends Service {
 						if(added > 0){
 							showQueue("mention", accId, m[0]);
 						}
-						
-						since_id = m[0].getId();
-						setSinceId(accId, "mention", since_id);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -245,7 +244,9 @@ public class NotificationService extends Service {
 					DirectMessage[] m = client.getDirectMessages(paging);
 					Log.d("boid", m.length + " m");
 					if (m.length > 0) {
+						since_id = m[0].getId();
 						int added = 0;
+						setSinceId(accId, "dm", since_id);
 						for (DirectMessage message : m) {
 							if(message.getId() != since_id){
 								String t = message.getText();
@@ -261,9 +262,6 @@ public class NotificationService extends Service {
 						if(added > 0){
 							showQueue("dm", accId, m[0]);
 						}
-						
-						since_id = m[0].getId();
-						setSinceId(accId, "dm", since_id);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
