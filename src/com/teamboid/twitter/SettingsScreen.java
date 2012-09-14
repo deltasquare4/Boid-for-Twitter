@@ -1,7 +1,5 @@
 package com.teamboid.twitter;
 
-import java.util.List;
-
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.helper.AbstractBillingObserver;
@@ -15,15 +13,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
+import me.kennydude.awesomeprefs.Preference;
+import me.kennydude.awesomeprefs.Preference.OnPreferenceChangeListener;
 
-import android.preference.ListPreference;
-import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
+import me.kennydude.awesomeprefs.ListPreference;
+import me.kennydude.awesomeprefs.Preference.OnPreferenceClickListener;
+import me.kennydude.awesomeprefs.PreferenceActivity;
+import me.kennydude.awesomeprefs.PreferenceFragment;
+
 import android.preference.PreferenceManager;
-
 import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
@@ -33,6 +31,7 @@ import android.widget.TextView;
  * The settings screen, displays fragments that contain preferences.
  * @author Aidan Follestad
  */
+@SuppressWarnings("rawtypes")
 public class SettingsScreen extends PreferenceActivity  {
 
 	private int lastTheme;
@@ -55,12 +54,16 @@ public class SettingsScreen extends PreferenceActivity  {
 		};
 		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
+		
+		addHeaders(R.xml.pref_headers);
 	}
 
+	/* Depracted
 	@Override
 	public void onBuildHeaders(List<Header> target) {
 		loadHeadersFromResource(R.xml.pref_headers, target);
 	}
+	*/
 
 	@Override
 	public void onResume() {
@@ -169,8 +172,8 @@ public class SettingsScreen extends PreferenceActivity  {
 	                    setMediaName();
 	            }
 	    }
-	
-	    @Override
+	    
+		@Override
 	    public void onCreate(Bundle savedInstanceState) {
 	            super.onCreate(savedInstanceState);
 	            addPreferencesFromResource(R.xml.composer_category);

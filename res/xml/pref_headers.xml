@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Please note: These no longer work with **android** preferences, but do with "AwesomePrefs" -->
+    
+    <!-- Accounts -->
+    <com.teamboid.twitter.views.AccountPreferenceCategory android:title="@string/manage_accounts_str" />
+    
+    <!-- General Preferences -->
+    <PreferenceCategory android:title="@string/settings_str" />
+    
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$HelpFragment"
 		android:summary="@string/help_description" android:title="@string/help_title" />
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$GeneralFragment"
             android:summary="@string/general_description" android:title="@string/general_title" />
+	<!--  To be removed
 	<header android:summary="@string/manage_accounts_str_desc"
 		android:title="@string/manage_accounts_str">
 		<intent android:targetClass="com.teamboid.twitter.AccountManager"
 			android:targetPackage="com.teamboid.twitter" />
-	</header>
+	</header> -->
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$AppearanceFragment"
 		android:summary="@string/appearance_category_desc" android:title="@string/appearance_category" />
 	<header android:fragment="com.teamboid.twitter.SettingsScreen$ComposerFragment"

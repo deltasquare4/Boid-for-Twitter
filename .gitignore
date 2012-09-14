@@ -25,3 +25,5 @@ out/
 proguard-project.txt
 
 /localSpark.yaml
+
+project.properties

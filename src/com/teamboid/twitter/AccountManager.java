@@ -18,12 +18,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
+import me.kennydude.awesomeprefs.ListPreference;
+import me.kennydude.awesomeprefs.Preference;
+import me.kennydude.awesomeprefs.PreferenceActivity;
+import me.kennydude.awesomeprefs.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
+import me.kennydude.awesomeprefs.SwitchPreference;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
@@ -125,11 +125,6 @@ public class AccountManager extends PreferenceActivity {
 		void setKey(String key, int accountId) {
 			Preference p = findPreference("{user}_" + key);
 			p.setKey(accountId + "_" + key);
-			if(p instanceof SwitchPreference){
-				((SwitchPreference)p).setChecked(sp.getBoolean(accountId + "_" + key, ((SwitchPreference) p).isChecked()));
-			} //else if(p instanceof ListPreference){
-			//	((ListPreference)p).setValue(((ListPreference)p).getValue());
-			//}
 		}
 	}
 
@@ -150,6 +145,8 @@ public class AccountManager extends PreferenceActivity {
 
 	UpdateReceiver receiver = new UpdateReceiver();
 
+	/*
+	 * AwesomePrefs deprecated this
 	@Override
 	public void onBuildHeaders(List<Header> target) {
 		// Tricks Android into thinking we're wanting a proper Preference View
@@ -158,6 +155,7 @@ public class AccountManager extends PreferenceActivity {
 		h.fragment = "null";
 		target.add(h);
 	}
+	*/
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -167,6 +165,8 @@ public class AccountManager extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setProgressBarIndeterminateVisibility(false);
+		
+		/*
 		if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) {
 			Log.d("acc", "Showing frag");
 			return;
@@ -232,6 +232,7 @@ public class AccountManager extends PreferenceActivity {
 				return false;
 			}
 		});
+		*/
 	}
 
 	@Override
@@ -250,7 +251,7 @@ public class AccountManager extends PreferenceActivity {
 			recreate();
 			return;
 		}
-		setListAdapter(adapter);
+		//setListAdapter(adapter);
 	}
 
 	@Override
@@ -273,7 +274,7 @@ public class AccountManager extends PreferenceActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) return true;
+		//if (this.getIntent().hasExtra(EXTRA_SHOW_FRAGMENT)) return true;
 		getMenuInflater().inflate(R.menu.accountmanager_actionbar, menu);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
