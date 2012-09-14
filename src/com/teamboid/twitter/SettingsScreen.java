@@ -26,6 +26,7 @@ import android.provider.SearchRecentSuggestions;
 import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The settings screen, displays fragments that contain preferences.
@@ -56,6 +57,45 @@ public class SettingsScreen extends PreferenceActivity  {
 		BillingController.checkBillingSupported(this);
 		
 		addHeaders(R.xml.pref_headers);
+	}
+	
+	private void startAuth() {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					startActivityForResult(new Intent(SettingsScreen.this,
+							LoginHandler.class).putExtra("url", AccountService
+							.getAuthorizer().getAuthorizeUrl()), 600);
+				} catch (final Exception e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(
+									getApplicationContext(),
+									getString(R.string.authorization_error)
+											+ "; " + e.getMessage(),
+									Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		}).start();
+	}
+		
+	@Override
+	public void finishAddingPreferences(){
+		// TODO: Add accounts
+		
+		getHeaderFragment().findPreference("addNewAccount").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+			@Override
+			public boolean onPreferenceClick(Preference pref) {
+				startAuth();
+				return false;
+			}
+			
+		});
 	}
 
 	/* Depracted

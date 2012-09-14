@@ -3,7 +3,12 @@
     <!-- Please note: These no longer work with **android** preferences, but do with "AwesomePrefs" -->
     
     <!-- Accounts -->
-    <com.teamboid.twitter.views.AccountPreferenceCategory android:title="@string/manage_accounts_str" />
+    <PreferenceCategory android:title="@string/manage_accounts_str" />
+    
+    <Preference
+        android:icon="?addAccountIcon"
+        android:key="addNewAccount"
+        android:title="@string/add_account_str" />
     
     <!-- General Preferences -->
     <PreferenceCategory android:title="@string/settings_str" />

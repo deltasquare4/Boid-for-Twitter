@@ -60,6 +60,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -639,6 +640,17 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		};
 		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
+		
+		// ActionBar Fix
+		// http://stackoverflow.com/questions/8465258/how-can-i-force-the-action-bar-to-be-at-the-bottom-in-ics
+		// based on how Google did it
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayOptions(actionBar.getDisplayOptions() | ActionBar.DISPLAY_SHOW_CUSTOM);
+		/*View v = new View(this);
+		actionBar.setCustomView(v,
+	            new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
+	                    0,
+	                    Gravity.CENTER_VERTICAL | Gravity.RIGHT));*/
 	}
 
 	public void accountsLoaded() {

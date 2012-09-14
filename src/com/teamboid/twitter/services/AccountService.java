@@ -433,11 +433,18 @@ public class AccountService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-		loadTwitterConfig();
-		loadAccounts();
-		
-		if(accounts.size() > 0)
-			Crittercism.setUsername(accounts.get(0).getUser().getScreenName());
+		new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				loadTwitterConfig();
+				loadAccounts();
+				
+				if(accounts.size() > 0)
+					Crittercism.setUsername(accounts.get(0).getUser().getScreenName());
+			}
+			
+		}).start();
 		// TODO: move to NON_STICKY
 		return START_STICKY;
 	}

@@ -3,7 +3,9 @@ package com.teamboid.twitter.utilities;
 import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.services.AccountService;
 
+import com.teamboid.twitter.R;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,7 +30,9 @@ public class BoidActivity {
 	}
 	
 	void callAccountsReady(){
-		mContext.setProgressBarIndeterminateVisibility(false);
+		ready=true;
+		if(pd != null) pd.dismiss();
+		mContext.setTitle(oldTitle);
 		AccountsReady.done();
 		AccountsReady = new NullOnAction(); // reset
 	}
@@ -63,6 +67,9 @@ public class BoidActivity {
 	};
 	
 	int lastTheme;
+	ProgressDialog pd;
+	boolean ready = false;
+	CharSequence oldTitle;
 	
 	/**
 	 * Call this when the Activity is inside `onCreate()`
@@ -76,9 +83,6 @@ public class BoidActivity {
 		} else
 			mContext.setTheme(Utilities.getTheme(mContext));
 		
-		mContext.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		mContext.setProgressBarIndeterminateVisibility(true);
-		
 		try{
 			Log.d("boid", AccountService.getAccounts().size() + "");
 			if(AccountService.getAccounts().size() > 0){
@@ -86,6 +90,12 @@ public class BoidActivity {
 			}
 		} catch(Exception e){
 			e.printStackTrace();
+		}
+		
+		if(!ready){
+			pd = new ProgressDialog(mContext);
+			pd.setMessage(mContext.getString(R.string.loading_str));
+			pd.show();
 		}
 		
 		// Register for when service is ready
