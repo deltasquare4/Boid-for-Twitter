@@ -38,8 +38,11 @@ import android.widget.Toast;
  * The activity that represents the account manager, allows the user to add and
  * remove accounts.
  * 
+ * DEPRECATED. Moving to SettingsScreen in wake of AwesomePrefs, that are darn cool
+ * 
  * @author Aidan Follestad
  */
+@Deprecated
 public class AccountManager extends PreferenceActivity {
 	
 	public static class AccountFragment extends PreferenceFragment {

@@ -97,6 +97,11 @@
 				<data android:mimeType="text/*" />
 				<data android:mimeType="image/*" />
 			</intent-filter>
+			<intent-filter android:label="">
+			    <action android:name="android.intent.action.BROWSE" />
+			    <category android:name="android.intent.category.DEFAULT" />
+			    <data android:host="twitter.com" android:pathPrefix="/intent/tweet" />
+			</intent-filter>
 		</activity>
 		<activity android:name="com.teamboid.twitter.SearchScreen"
 			android:configChanges="keyboardHidden|orientation|screenSize"
