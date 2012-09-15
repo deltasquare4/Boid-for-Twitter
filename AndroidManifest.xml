@@ -191,6 +191,13 @@
 					android:scheme="http" />
 			</intent-filter>
 		</service>
+		<service android:name="com.teamboid.twitter.TimeisWidget"
+			android:exported="false">
+			<intent-filter>
+				<action android:name="com.android.ACTION_EMBED" />
+				<data android:host="www.time.is" android:pathPattern="/.*_in_.*" android:scheme="http" />
+			</intent-filter>
+		</service>
 
 		<!-- Webkit Views -->
 		<activity android:name="com.teamboid.twitter.LoginHandler"

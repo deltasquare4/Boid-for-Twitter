@@ -3,7 +3,9 @@
     <!-- Please note: These no longer work with **android** preferences, but do with "AwesomePrefs" -->
     
     <!-- Accounts -->
-    <PreferenceCategory android:title="@string/manage_accounts_str" />
+    <PreferenceCategory
+        android:key="accounts"
+        android:title="@string/manage_accounts_str" />
     
     <Preference
         android:icon="?addAccountIcon"

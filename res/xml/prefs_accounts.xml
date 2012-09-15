@@ -40,4 +40,12 @@
 			android:defaultValue="mutual" android:entryValues="@array/sync_types_values"
 			android:entries="@array/sync_types" android:title="@string/contactsync_what" />
 	</PreferenceCategory>
+	
+	<DangerPreferenceCategory android:title="@string/danger_zone">
+	    
+	    <Preference
+	        android:key="delete"
+	        android:title="@string/remove_account" />
+	    
+	</DangerPreferenceCategory>
 </PreferenceScreen>

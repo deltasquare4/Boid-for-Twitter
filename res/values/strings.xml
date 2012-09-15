@@ -568,5 +568,6 @@
 	<string name="notification_period">Notification refresh period</string>
 	<string name="notification_every">Notifications will refresh every {x} minutes
 	</string>
+	<string name="danger_zone">Danger Zone!</string>
 
 </resources>
