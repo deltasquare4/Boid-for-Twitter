@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
@@ -353,6 +354,7 @@ public class FeedListAdapter extends BaseAdapter {
 			userNameTxt.setText("@" + tweet.getUser().getScreenName());
 		if (PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
 				"enable_profileimg_download", true)) {
+			profilePic.setScaleType(ScaleType.FIT_XY);
 			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser()
 					.getScreenName(), mContext));

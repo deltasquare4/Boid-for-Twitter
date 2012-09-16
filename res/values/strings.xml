@@ -568,6 +568,8 @@
 	<string name="notification_period">Notification refresh period</string>
 	<string name="notification_every">Notifications will refresh every {x} minutes
 	</string>
+	<string name="welcome_str">Welcome to Boid</string>
 	<string name="danger_zone">Danger Zone!</string>
+	<string name="sign_in_failure">We could not sign you in. Would you like to give it another try?</string>
 
 </resources>

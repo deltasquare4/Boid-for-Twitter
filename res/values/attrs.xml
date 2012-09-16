@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="notification_large_icon_width">64dp</dimen>
+    
     <attr name="dragHandle" format="reference" />
     <attr name="themeColor" format="color" />
 	<attr name="usernameColor" format="color" />

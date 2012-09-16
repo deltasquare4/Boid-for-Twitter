@@ -43,6 +43,7 @@ public class BoidActivity {
 		this.mContext = c;
 	}
 	Activity mContext;
+	public boolean firstLoad;
 	
 	public ServiceConnection accConn = new ServiceConnection(){
 		@Override
@@ -61,6 +62,7 @@ public class BoidActivity {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			Log.d("Boid", "Accounts are ready");
+			firstLoad = arg1.getBooleanExtra("last_account_count", false);
 			callAccountsReady();
 		}
 		
@@ -100,12 +102,12 @@ public class BoidActivity {
 		
 		// Register for when service is ready
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(AccountManager.END_LOAD);
+		filter.addAction(AccountService.END_LOAD);
 		mContext.registerReceiver(acBC, filter);
 		
 		// Creates a dependency on the Account Service sticking around
 		Intent intent = new Intent(mContext, AccountService.class);
-		//mContext.startService(intent);
+		mContext.startService(intent);
 		mContext.bindService(intent, accConn, Context. BIND_AUTO_CREATE);
 	}
 	

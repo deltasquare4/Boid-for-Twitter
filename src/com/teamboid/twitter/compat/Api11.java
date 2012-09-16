@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.ImageManager.ExtendedRequest;
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TimelineScreen;
@@ -22,6 +23,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.widget.ImageView.ScaleType;
 
 import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.status.Status;
@@ -56,6 +58,43 @@ public class Api11 {
 		}
 		return nb;
 	}
+	
+	// This makes the image the right size
+	static ExtendedRequest getRequest(final Context c, final String url, final ImageManager.OnImageReceivedListener oil){
+		return new ExtendedRequest() {
+
+			@Override
+			public String getSource() {
+				return url;
+			}
+
+			@Override
+			public void onImageReceived(String source, Bitmap bitmap) {
+				oil.onImageReceived(source, bitmap);
+			}
+
+			@Override
+			public Bitmap onPreProcess(Bitmap raw) {
+				return raw;
+			}
+
+			@Override
+			public ScaleType getScaleType() {
+				return ScaleType.CENTER_INSIDE;
+			}
+
+			@Override
+			public int getHeight() {
+				return (int) c.getResources().getDimension(R.dimen.notification_large_icon_width);
+			}
+
+			@Override
+			public int getWidth() {
+				return getHeight();
+			}
+			
+		};
+	}
 
 	/**
 	 * Display single notification
@@ -64,7 +103,7 @@ public class Api11 {
 			final Context context, final Status s) {
 		final String imageURL = Utilities.getUserImage(s.getUser()
 				.getScreenName(), context, s.getUser());
-		ImageManager.getInstance(context).get(imageURL,
+		ImageManager.getInstance(context).get(getRequest(context, imageURL,
 				new ImageManager.OnImageReceivedListener() {
 					@SuppressLint("NewApi")
 					@Override
@@ -103,14 +142,14 @@ public class Api11 {
 							nm.notify(accId + "", MENTIONS, n);
 						}
 					}
-				});
+				}));
 	}
 
 	public static void displayDirectMessageNotification(final int accId,
 			final Context c, final DirectMessage dm) {
 		final String imageURL = Utilities.getUserImage(
 				dm.getSenderScreenName(), c, dm.getSender());
-		ImageManager.getInstance(c).get(imageURL,
+		ImageManager.getInstance(c).get(getRequest(c, imageURL,
 				new ImageManager.OnImageReceivedListener() {
 					@SuppressWarnings("deprecation")
 					@Override
@@ -147,7 +186,7 @@ public class Api11 {
 							nm.notify(accId + "", DM, n);
 						}
 					}
-				});
+				}));
 	}
 
 	public static void displayMany(final long accId, final int queue,
@@ -163,7 +202,7 @@ public class Api11 {
 			final JSONObject first = ja.getJSONObject(ja.length() - 1);
 			final String imageURL = Utilities.getUserImage(
 					first.getString("user"), c);
-			ImageManager.getInstance(c).get(imageURL,
+			ImageManager.getInstance(c).get(getRequest(c, imageURL,
 					new ImageManager.OnImageReceivedListener() {
 						@SuppressWarnings("deprecation")
 						@Override
@@ -199,7 +238,7 @@ public class Api11 {
 							}
 						}
 
-					});
+					}));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

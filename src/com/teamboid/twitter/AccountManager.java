@@ -45,15 +45,13 @@ import android.widget.Toast;
 @Deprecated
 public class AccountManager extends PreferenceActivity {
 
-	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
-
 	private int lastTheme;
 	public AccountListAdapter adapter;
 
 	public class UpdateReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			if (intent.getAction().equals(END_LOAD)) {
+			if (intent.getAction().equals(AccountService.END_LOAD)) {
 				setProgressBarIndeterminateVisibility(false);
 				adapter.notifyDataSetChanged();
 			}

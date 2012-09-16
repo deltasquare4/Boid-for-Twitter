@@ -3,10 +3,6 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitterapi.list.UserList;
-import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.BillingRequest.ResponseCode;
-import net.robotmedia.billing.helper.AbstractBillingObserver;
-import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
@@ -92,12 +88,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	public class SendTweetUpdater extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			if (intent.getAction().equals(AccountManager.END_LOAD)) {
-				loadColumns(
-						intent.getBooleanExtra("last_account_count", false),
-						null);
-				accountsLoaded();
-				invalidateOptionsMenu();
+			if (intent.getAction().equals(AccountService.END_LOAD)) {
+				// lets see what we can do
 				return;
 			}
 			try {
@@ -220,7 +212,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		startService(new Intent(this, AccountService.class));
+		// startService(new Intent(this, AccountService.class));
 	}
 
 	private void notificationSwitch(Intent intent) {
@@ -574,8 +566,25 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
 		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				loadColumns(
+						boid.firstLoad,
+						null);
+				accountsLoaded();
+				invalidateOptionsMenu();
+			}
+		};
 		boid.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.main);
+		initialize(savedInstanceState);
+		
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey("lastTheme")
 					|| savedInstanceState.containsKey("lastDisplayReal")) {
@@ -616,30 +625,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					getApplicationContext()).getBoolean("show_real_names",
 					false);
 		}
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		initialize(savedInstanceState);
-		
-		// This callback must stay here, otherwise in-app billing doesn't work
-		// for some reason.
-		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(
-				this) {
-			@Override
-			public void onBillingChecked(boolean supported) {
-			}
-
-			@Override
-			public void onPurchaseStateChanged(String itemId,
-					PurchaseState state) {
-			}
-
-			@Override
-			public void onRequestPurchaseResponse(String itemId,
-					ResponseCode response) {
-			}
-		};
-		BillingController.registerObserver(mBillingObserver);
-		BillingController.checkBillingSupported(this);
 		
 		// ActionBar Fix
 		// http://stackoverflow.com/questions/8465258/how-can-i-force-the-action-bar-to-be-at-the-bottom-in-ics
@@ -830,7 +815,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		invalidateOptionsMenu();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SendTweetService.UPDATE_STATUS);
-		filter.addAction(AccountManager.END_LOAD);
+		filter.addAction(AccountService.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
 
@@ -948,10 +933,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 							getActionBar().getTabCount()), 900);
 			return true;
 		case R.id.donateAction:
-			Toast.makeText(getApplicationContext(),
-					R.string.donations_appreciated, Toast.LENGTH_SHORT).show();
-			BillingController.requestPurchase(this,
-					"com.teamboid.twitter.donate", true);
+			startActivity(new Intent(this, DonateActivity.class));
 			return true;
 		case R.id.refreshAction:
 			performRefresh();

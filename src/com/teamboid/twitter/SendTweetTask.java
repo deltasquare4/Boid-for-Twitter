@@ -24,6 +24,7 @@ import com.teamboid.twitter.utilities.TwitlongerHelper.TwitlongerPostResponse;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -124,12 +125,16 @@ public class SendTweetTask {
 			try {
 				String prefValue = mediaService;
 				InputStream input;
+				long length;
 				if (attachedImageUri != null) {
-					input = context.getContentResolver()
-							.openAssetFileDescriptor(attachedImageUri, "r")
-							.createInputStream();
+					AssetFileDescriptor afd = context.getContentResolver()
+							.openAssetFileDescriptor(attachedImageUri, "r");
+					input = afd.createInputStream();
+					length = afd.getLength();
 				} else {
-					input = new FileInputStream(new File(attachedImage));
+					File f = new File(attachedImage);
+					input = new FileInputStream(f);
+					length = f.length();
 				}
 				Log.d("up", "Uploading with " + prefValue);
 
@@ -162,7 +167,7 @@ public class SendTweetTask {
 				}
 
 				MediaEntity me = ems
-						.uploadFile(update, from.getClient(), input);
+						.uploadFile(update, from.getClient(), input, length);
 				if (!prefValue.equals("twitter")) { // Only twitter doesn't
 													// respond the same
 					if (contents.length() >= 1) {

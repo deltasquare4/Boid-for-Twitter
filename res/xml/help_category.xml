@@ -8,11 +8,6 @@
 		<intent android:action="android.intent.action.VIEW"
 			android:data="http://www.boidapp.com" />
 	</Preference>
-	<Preference android:key="aboutNodester" android:summary="@string/about_nodester_summary"
-		android:title="@string/about_nodester">
-		<intent android:action="android.intent.action.VIEW"
-			android:data="http://nodester.com" />
-	</Preference>
 	<Preference android:key="send_feedback" android:summary="@string/sendfeedback_description"
 		android:title="@string/sendfeedback_title">
 		<intent android:action="android.intent.action.VIEW"

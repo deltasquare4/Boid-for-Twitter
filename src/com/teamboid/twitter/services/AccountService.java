@@ -1,6 +1,7 @@
 package com.teamboid.twitter.services;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +22,10 @@ import java.util.Map;
 
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.AccountManager;
+import com.teamboid.twitter.LoginHandler;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.SettingsScreen;
+import com.teamboid.twitter.WelcomeActivity;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
@@ -41,10 +45,53 @@ import com.teamboid.twitterapi.utilities.Utils;
  * @author Aidan Follestad
  */
 public class AccountService extends Service {
+	public static String END_LOAD = "com.teamboid.twitter.DONE_LOADING_ACCOUNTS";
 
 	public final static String CONSUMER_KEY = "5LvP1d0cOmkQleJlbKICtg";
 	public final static String CONSUMER_SECRET = "j44kDQMIDuZZEvvCHy046HSurt8avLuGeip2QnOpHKI";
 	public final static String CALLBACK_URL = "boid://auth";
+	public final static int AUTH_CODE = 600;
+	
+	/**
+	 * Starts Authorization for a new Account
+	 * @param a
+	 */
+	public static void startAuth(final Activity a) {
+		final ProgressDialog pd = new ProgressDialog(a);
+		pd.setMessage(a.getString(R.string.please_wait));
+		pd.show();
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					String url = AccountService
+						.getAuthorizer().getAuthorizeUrl() + "&force_login=true";
+					a.runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							pd.dismiss();
+						}
+						
+					});
+					a.startActivityForResult(new Intent(a,
+							LoginHandler.class).putExtra("url", url), AUTH_CODE);
+				} catch (final Exception e) {
+					e.printStackTrace();
+					a.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							pd.dismiss();
+							Toast.makeText(
+									a.getApplicationContext(),
+									a.getString(R.string.authorization_error)
+											+ "; " + e.getMessage(),
+									Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		}).start();
+	}
 
 	private static Authorizer _authorizer;
 	public static Authorizer getAuthorizer() {
@@ -147,56 +194,42 @@ public class AccountService extends Service {
 		}
 	}
 
-	public static void verifyAccount(final Activity activity, final String verifier) {
-		//final Toast act = Toast.makeText(activity, activity
-		//		.getString(R.string.authorizing_account), Toast.LENGTH_LONG);
-		// act.show();
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					final Twitter toAdd = getAuthorizer().getAuthorizedInstance(verifier);
-					toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
-					final User toAddUser = toAdd.verifyCredentials();
-					ArrayList<Account> accs = getAccounts();
-					for (Account user : accs) {
-						if (user.getUser().getId() == toAddUser.getId()) {
-							activity.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									//act.cancel();
-									Toast.makeText(activity, activity.getString(R.string.account_already_added), Toast.LENGTH_LONG).show();
-									activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
-								}
-							});
-							return;
-						}
-					}
-					Account profile = new Account(toAdd).setUser(toAddUser);
-					accounts.add(profile);
-					activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
-					.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
-					AndroidAccountHelper.addAccount(activity, profile);
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							//act.cancel();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
-						}
-					});
-				} catch (final Exception e) {
-					e.printStackTrace();
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							//act.cancel();
-							Toast.makeText(activity, activity.getString(R.string.authorization_error) + " "
-									+ e.getMessage(), Toast.LENGTH_LONG).show();
-							activity.sendBroadcast(new Intent(AccountManager.END_LOAD));
-						}
-					});
+	public static enum VerifyAccountResult{
+		OK(1), ALREADY_ADDED(2), FAILURE(3);
+		
+		public final int code;
+		VerifyAccountResult(int code){ this.code = code; }
+	}
+	
+	/**
+	 * Verify an Account.
+	 * 
+	 * Run in your own thread
+	 * @return Result
+	 */
+	public static VerifyAccountResult verifyAccount(final Activity activity, final String verifier) {
+		try{
+			final Twitter toAdd = getAuthorizer().getAuthorizedInstance(verifier);
+			toAdd.setSslEnabled(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_ssl", false));
+			final User toAddUser = toAdd.verifyCredentials();
+			ArrayList<Account> accs = getAccounts();
+			for (Account user : accs) {
+				if (user.getUser().getId() == toAddUser.getId()) {
+					return VerifyAccountResult.ALREADY_ADDED;
 				}
 			}
-		}).start();
+			Account profile = new Account(toAdd).setUser(toAddUser);
+			accounts.add(profile);
+			activity.getSharedPreferences("profiles-v2", Context.MODE_PRIVATE).edit()
+				.putString(profile.getUser().getId()+"", Utils.serializeObject(profile)).commit();
+			AndroidAccountHelper.addAccount(activity, profile);
+			
+			activity.sendBroadcast(new Intent(END_LOAD).putExtra("last_account_count", false));
+			return VerifyAccountResult.OK;
+		} catch (final Exception e) {
+			e.printStackTrace();
+			return VerifyAccountResult.FAILURE;
+		}
 	}
 
 	public boolean loadAccounts() {
@@ -208,7 +241,7 @@ public class AccountService extends Service {
 		}
 		final Map<String, ?> accountStore = getApplicationContext().getSharedPreferences("profiles-v2", 0).getAll();
 		if (accountStore.size() == 0) {
-			getApplicationContext().startActivity(new Intent(getApplicationContext(), AccountManager.class)
+			getApplicationContext().startActivity(new Intent(getApplicationContext(), WelcomeActivity.class)
 			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 			return false;
 		} else if (getAccounts().size() == accountStore.size()) return false;
@@ -270,12 +303,12 @@ public class AccountService extends Service {
 		if (getAccounts().size() > 0) {
 			if (getAccounts().size() != lastAccountCount) {
 				selectedAccount = accounts.get(0).getId();
-				getApplicationContext().sendBroadcast(new Intent(AccountManager.END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
+				getApplicationContext().sendBroadcast(new Intent(END_LOAD).putExtra("last_account_count", lastAccountCount == 0));
 				return true;
 			}
 		} else {
 			getApplicationContext().startActivity(new Intent(getApplicationContext(), 
-					AccountManager.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+					WelcomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 		}
 		return false;
 	}
@@ -452,7 +485,7 @@ public class AccountService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		if(accounts.size() > 0){
-			getApplicationContext().sendBroadcast(new Intent(AccountManager.END_LOAD));
+			getApplicationContext().sendBroadcast(new Intent(END_LOAD));
 			Crittercism.setUsername(accounts.get(0).getUser().getScreenName());
 		}
 		return null;

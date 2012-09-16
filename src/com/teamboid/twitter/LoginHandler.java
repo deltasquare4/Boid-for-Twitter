@@ -1,7 +1,11 @@
 package com.teamboid.twitter;
 
+import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.services.AccountService.VerifyAccountResult;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,11 +26,36 @@ public class LoginHandler extends Activity {
 		view.getSettings().setAppCacheEnabled(false);
 		view.setWebViewClient(new WebViewClient() {
 			@Override
-		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+		    public boolean shouldOverrideUrlLoading(WebView view, final String url) {
 				if(url.startsWith("boid://")) {
-					setResult(RESULT_OK, new Intent().putExtra("oauth_verifier", 
-							Uri.parse(url).getQueryParameter("oauth_verifier")));
-					finish();
+					final ProgressDialog pd = new ProgressDialog(LoginHandler.this);
+					pd.setMessage(getString(R.string.please_wait));
+					pd.show();
+					new Thread(new Runnable(){
+
+						@Override
+						public void run() {
+							final VerifyAccountResult var = AccountService.verifyAccount(LoginHandler.this,
+									Uri.parse(url).getQueryParameter("oauth_verifier"));
+							runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									pd.dismiss();
+									switch(var){
+									case OK:
+										setResult(RESULT_OK);
+										break;
+									default:
+										setResult(var.code);
+									}
+									finish();
+								}
+								
+							});
+						}
+						
+					}).start();
 					return true;
 				} else return false;
 		    }

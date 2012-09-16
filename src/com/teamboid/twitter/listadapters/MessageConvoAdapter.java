@@ -274,7 +274,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 		final TextView messageTxt = (TextView) toReturn
 				.findViewById(R.id.dmConvoMessageTxt);
 		if (curItem.getLastSenderIsMe()) {
-			ImageView replyIndic = (ImageView) toReturn
+			View replyIndic = toReturn
 					.findViewById(R.id.dmConvoReplyIndicator);
 			replyIndic.setVisibility(View.VISIBLE);
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) replyIndic
@@ -291,7 +291,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 					R.id.dmConvoScreenNameTxt);
 			messageTxt.setLayoutParams(layoutParams);
 		} else {
-			((ImageView) toReturn.findViewById(R.id.dmConvoReplyIndicator))
+			(toReturn.findViewById(R.id.dmConvoReplyIndicator))
 					.setVisibility(View.GONE);
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) messageTxt
 					.getLayoutParams();

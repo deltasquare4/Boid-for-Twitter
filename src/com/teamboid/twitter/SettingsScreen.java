@@ -1,9 +1,5 @@
 package com.teamboid.twitter;
 
-import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.BillingRequest.ResponseCode;
-import net.robotmedia.billing.helper.AbstractBillingObserver;
-import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.notifications.NotificationService;
@@ -22,7 +18,6 @@ import android.os.Bundle;
 import me.kennydude.awesomeprefs.Preference;
 import me.kennydude.awesomeprefs.Preference.OnPreferenceChangeListener;
 
-import me.kennydude.awesomeprefs.HeaderPreference;
 import me.kennydude.awesomeprefs.ListPreference;
 import me.kennydude.awesomeprefs.Preference.OnPreferenceClickListener;
 import me.kennydude.awesomeprefs.PreferenceActivity;
@@ -56,42 +51,8 @@ public class SettingsScreen extends PreferenceActivity  {
 		} else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(this) {
-			@Override
-			public void onBillingChecked(boolean supported) { }
-			@Override
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) { }
-			@Override
-			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { }
-		};
-		BillingController.registerObserver(mBillingObserver);
-		BillingController.checkBillingSupported(this);
 		
 		addHeaders(R.xml.pref_headers);
-	}
-	
-	private void startAuth() {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					startActivityForResult(new Intent(SettingsScreen.this,
-							LoginHandler.class).putExtra("url", AccountService
-							.getAuthorizer().getAuthorizeUrl()), 600);
-				} catch (final Exception e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(
-									getApplicationContext(),
-									getString(R.string.authorization_error)
-											+ "; " + e.getMessage(),
-									Toast.LENGTH_LONG).show();
-						}
-					});
-				}
-			}
-		}).start();
 	}
 		
 	@Override
@@ -126,7 +87,7 @@ public class SettingsScreen extends PreferenceActivity  {
 
 			@Override
 			public boolean onPreferenceClick(Preference pref) {
-				startAuth();
+				AccountService.startAuth(SettingsScreen.this);
 				return false;
 			}
 			
@@ -164,6 +125,16 @@ public class SettingsScreen extends PreferenceActivity  {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == AccountService.AUTH_CODE){
+			if(resultCode == RESULT_OK){
+				addAccounts();
+			}
 		}
 	}
 	
@@ -314,7 +285,7 @@ public class SettingsScreen extends PreferenceActivity  {
 			findPreference("donate").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					BillingController.requestPurchase(getActivity(), "com.teamboid.twitter.donate", true);
+					startActivity(new Intent(getActivity(), DonateActivity.class));
 					return false;
 				}
 			});
