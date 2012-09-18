@@ -80,7 +80,7 @@ public class Api11 {
 
 			@Override
 			public ScaleType getScaleType() {
-				return ScaleType.CENTER_INSIDE;
+				return ScaleType.FIT_XY;
 			}
 
 			@Override

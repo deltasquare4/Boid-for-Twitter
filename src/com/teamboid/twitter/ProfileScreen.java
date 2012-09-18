@@ -536,28 +536,6 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		}
 		super.onSaveInstanceState(outState);
 	}
-	
-	@Deprecated
-	public void setupMediaView() {
-		if (user == null) {
-			return;
-		}
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				setHeaderBackground(user.getProfileBackgroundImageUrl());
-				// try {
-				// MediaFeedListAdapter.MediaFeedItem m =
-				// getMediaFragment().getAdapter().get(0);
-				// setHeaderBackground(m.imgurl);
-				// } catch(Exception e){
-				// e.printStackTrace();
-				// // Here we should divert to profile bg?
-				// setHeaderBackground(user.getProfileBackgroundImageUrl());
-				// }
-			}
-		});
-	}
 
 	void setHeaderBackground(String url) {
 		if (url.startsWith("http")) {
@@ -650,7 +628,12 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			@Override
 			public void onPageScrollStateChanged(int arg0) {}
 		});
-		setHeaderBackground(user.getProfileBackgroundImageUrl());
+		try{
+			// TODO: On screens wide enough fetch web
+			setHeaderBackground(user.getProfileBannerMobile());
+		} catch(Exception e){
+			setHeaderBackground(user.getProfileBackgroundImageUrl());
+		}
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {
