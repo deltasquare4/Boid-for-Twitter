@@ -416,9 +416,8 @@ public class TweetViewer extends MapActivity {
 		widgetPos.add(url);
 		twhh.findWidget(status.getId(), url, this, new IFoundWidget() {
 			@Override
-			public void displayWidget(RemoteViews rv) {
+			public void displayWidget(View v) {
 				try {
-					View v = rv.apply(TweetViewer.this, widgets);
 					widgets.removeViewAt(widgetPos.indexOf(url));
 					widgets.addView(v, widgetPos.indexOf(url),
 							new LinearLayout.LayoutParams(

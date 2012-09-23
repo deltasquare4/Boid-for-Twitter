@@ -511,6 +511,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			ViewPager pager = (ViewPager) findViewById(R.id.pager);
 			pager.setAdapter(mTabsAdapter);
 			pager.setCurrentItem(defaultColumn);
+			((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(defaultColumn)).onDisplay();
 		}
 		filterDefaultColumnSelection = false;
 		notificationSwitch(intent);

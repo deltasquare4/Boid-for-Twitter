@@ -20,11 +20,11 @@ public class AccountHeaderPreference extends HeaderPreference {
 	public View getIconView(){
 		RemoteImageView riv = new RemoteImageView(getContext());
 		
-		/*DisplayMetrics outMetrics = new DisplayMetrics();
+		DisplayMetrics outMetrics = new DisplayMetrics();
 		getFragment().getActivity().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 		float dp = outMetrics.density;
-		*/
-		// riv.setMaxWidth((int) (64 * dp));
+		riv.setMinimumWidth((int)(64*dp));
+		//((int) (64 * dp));
 		
 		riv.setImageResource(R.drawable.sillouette);
 		if(url != null){

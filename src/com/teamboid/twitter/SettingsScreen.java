@@ -1,6 +1,5 @@
 package com.teamboid.twitter;
 
-
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;

@@ -51,6 +51,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.LoaderManager;
@@ -304,7 +305,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				menu.findItem(R.id.reportAction).setEnabled(true);
 			}
 		}
-		/* TODO: Uncomment when it's working.
+		/* TODO: Uncomment when it's working. */
 		Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:"
 								+ getActionBar()
@@ -317,7 +318,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 						.setEnabled(false);
 			}
 		}
-		*/
+		
 		if (showProgress) {
 			final MenuItem refreshAction = menu.findItem(R.id.refreshAction);
 			refreshAction.setEnabled(false);
