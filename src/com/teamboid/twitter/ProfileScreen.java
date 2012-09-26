@@ -620,10 +620,17 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			}
 
 			@Override
-			public void onPageSelected(int position) {
+			public void onPageSelected(final int position) {
 				getActionBar().getTabAt(position).select();
 				invalidateOptionsMenu();
-				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
+				runOnUiThread(new Runnable(){
+
+					@Override
+					public void run() {
+						((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
+					}
+					
+				});
 			}
 
 			@Override
