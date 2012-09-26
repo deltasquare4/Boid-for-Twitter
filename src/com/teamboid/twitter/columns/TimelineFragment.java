@@ -52,7 +52,7 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onDisplay() {
+	public void onReadyToLoad() {
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		getListView().setOnScrollListener(

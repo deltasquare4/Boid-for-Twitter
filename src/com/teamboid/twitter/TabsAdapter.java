@@ -142,8 +142,12 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 	public static abstract class BaseListFragment extends ListFragment
 			implements IBoidFragment {
+		boolean hasLoaded = false;
+		
 		public void onDisplay() {
+			if(!hasLoaded) { onReadyToLoad(); hasLoaded = true; }
 		};
+		public void onReadyToLoad() {};
 
 		public boolean isLoading;
 
