@@ -11,6 +11,7 @@ import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
 import com.teamboid.twitter.TabsAdapter.TabInfo;
+import com.teamboid.twitter.boxes.TimelineSidebarBox;
 import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.cab.UserListCAB;
@@ -591,6 +592,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		boid.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main);
+		TimelineSidebarBox.setup(this);
 		initialize(savedInstanceState);
 		
 		if (savedInstanceState != null) {

@@ -139,7 +139,7 @@ public class Api16 {
 				 */
 				m = ja.length() - 1;
 			}
-			for (int i = 0; i < m; i++) {
+			for (int i = m; i > 0; i--) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user
