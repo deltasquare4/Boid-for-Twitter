@@ -12,6 +12,7 @@ import android.view.*;
 import android.widget.*;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.user.User;
 
@@ -33,6 +34,7 @@ public class ProfileEditor extends Activity implements
 	private File newProfileImg;
 	private Uri newProfileUri;
 	private File cropResultImg;
+	BoidActivity boid;
 
 	public static final int CROP_RESULT = 400;
 	public static final int CAMERA_SELECT_INTENT = 500;
@@ -56,6 +58,12 @@ public class ProfileEditor extends Activity implements
 		}
 		invalidateOptionsMenu();
 	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -73,7 +81,16 @@ public class ProfileEditor extends Activity implements
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.profile_editor);
 		setTitle("@" + getIntent().getStringExtra("screen_name"));
-		loadAccount();
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				loadAccount();
+			}
+		};
+		boid.onCreate(savedInstanceState);
 	}
 
 	public void showPopup(View v) {

@@ -579,6 +579,19 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+			if (getIntent().getData().getPath().contains("/status/")) {
+				startActivity(getIntent().setClass(this, TweetViewer.class));
+				finish();
+				return;
+			} else if (getIntent().getDataString().contains("twitter.com/")
+					&& getIntent().getData().getPathSegments().size() == 1) {
+				startActivity(getIntent().setClass(this, ProfileScreen.class));
+				finish();
+				return;
+			}
+		}
+		
 		boid = new BoidActivity(this);
 		boid.AccountsReady = new BoidActivity.OnAction() {
 			
@@ -650,16 +663,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	public void accountsLoaded() {
-		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
-			if (getIntent().getData().getPath().contains("/status/")) {
-				startActivity(getIntent().setClass(this, TweetViewer.class));
-				finish();
-			} else if (getIntent().getDataString().contains("twitter.com/")
-					&& getIntent().getData().getPathSegments().size() == 1) {
-				startActivity(getIntent().setClass(this, ProfileScreen.class));
-				finish();
-			}
-		}
 		invalidateOptionsMenu();
 		startService(new Intent(this, SendTweetService.class)
 				.setAction(SendTweetService.LOAD_TWEETS));

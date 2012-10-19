@@ -9,6 +9,7 @@ import com.teamboid.twitter.listadapters.MessageItemAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Extractor;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -54,6 +55,14 @@ public class ConversationScreen extends ListActivity {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		getListView().setItemChecked(position, true);
 	}
+	
+	BoidActivity boid;
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +80,20 @@ public class ConversationScreen extends ListActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.conversation_screen);
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate();
+			}
+		};
+		boid.onCreate(savedInstanceState);
+		
+	}
+	public void finishCreate(){
+		
 		if (getIntent().hasExtra("account")) {
 			long accId = getIntent().getIntExtra("account", 0);
 			AccountService.selectedAccount = (long) accId;

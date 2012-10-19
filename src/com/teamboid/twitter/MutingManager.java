@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import com.teamboid.twitter.listadapters.MutingListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.SwipeDismissListViewTouchListener;
 
@@ -42,6 +43,7 @@ public class MutingManager extends ListActivity {
 
 	private MutingListAdapter adapt;
 	private int lastTheme;
+	BoidActivity boid;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,26 @@ public class MutingManager extends ListActivity {
 	    	} else setTheme(Utilities.getTheme(getApplicationContext()));
 	    }  else setTheme(Utilities.getTheme(getApplicationContext()));
 		super.onCreate(savedInstanceState);
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction(){
+
+			@Override
+			public void done() {
+				finishCreate();
+			}
+			
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
+	
+	public void finishCreate(){
+		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.muting_manager);
 		adapt = new MutingListAdapter(this);

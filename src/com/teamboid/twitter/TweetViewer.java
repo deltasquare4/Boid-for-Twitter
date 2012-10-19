@@ -31,6 +31,7 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.TwitlongerHelper;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.BetterMapView;
@@ -86,6 +87,7 @@ public class TweetViewer extends MapActivity {
 	private int lastTheme;
 	private String mediaUrl;
 	private boolean hasConvo;
+	BoidActivity boid;
 
 	private FeedListAdapter binder;
 
@@ -129,6 +131,19 @@ public class TweetViewer extends MapActivity {
 						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate();
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	public void finishCreate(){
+		
 		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
 			try {
 				statusId = Long.parseLong(getIntent().getData()
@@ -500,6 +515,12 @@ public class TweetViewer extends MapActivity {
 				});
 			}
 		}).start();
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
 	}
 
 	@Override

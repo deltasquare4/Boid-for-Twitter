@@ -478,8 +478,7 @@ public class AccountService extends Service {
 			}
 			
 		}).start();
-		// TODO: move to NON_STICKY
-		return START_STICKY;
+		return START_NOT_STICKY;
 	}
 
 	@Override

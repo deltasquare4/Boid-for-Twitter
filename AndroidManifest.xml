@@ -76,11 +76,6 @@
 			</intent-filter>
 		</activity>
 		
-		<!-- Deprecated -->
-		<activity android:name="com.teamboid.twitter.AccountManager"
-			android:configChanges="screenSize" android:exported="false"
-			android:label="@string/manage_accounts_str" />
-		<!-- Replacement -->
 		<activity android:name="com.teamboid.twitter.WelcomeActivity" />
 		<activity android:name="com.teamboid.twitter.DonateActivity"
 		    android:theme="@style/Invisible" />

@@ -18,6 +18,7 @@ import com.teamboid.twitter.columns.ProfileAboutFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
@@ -76,6 +77,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	public FeedListAdapter adapter;
 	public User user;
 	private ViewPager mViewPager;
+	BoidActivity boid;
 
 	public void showProgress(boolean visible) {
 		if (showProgress == visible)
@@ -98,6 +100,18 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			setTheme(Utilities.getTheme(getApplicationContext()));
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate(savedInstanceState);
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	public void finishCreate(final Bundle savedInstanceState){
 		ActionBar ab = getActionBar();
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(false);
@@ -153,6 +167,11 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 					});
 			setTitle(R.string.please_wait);
 		}
+	}
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
 	}
 
 	private TabsAdapter mTabsAdapter;
