@@ -62,5 +62,15 @@
         </LinearLayout>
         
     </LinearLayout>
+    
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sidebarSpinner" />
+    
+    <ListView 
+        android:id="@+id/sidebarList"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
 
 </LinearLayout>

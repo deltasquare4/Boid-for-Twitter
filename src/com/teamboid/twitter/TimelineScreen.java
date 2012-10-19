@@ -297,6 +297,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				AccountService.selectedAccount = lastSel;
 			}
 		}
+		
+		TimelineSidebarBox.setup(this);
 		if (mTabsAdapter == null) {
 			mTabsAdapter = new TabsAdapter(this);
 			filterDefaultColumnSelection = true;
@@ -592,7 +594,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		boid.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main);
-		TimelineSidebarBox.setup(this);
 		initialize(savedInstanceState);
 		
 		if (savedInstanceState != null) {

@@ -7,7 +7,7 @@
     <ViewStub
         android:layout="@layout/main_sidebar"
         android:id="@+id/sidebar"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="match_parent" />
     
     <!-- TODO: Assets -->
