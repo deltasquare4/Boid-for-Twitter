@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.teamboid.twitter.Account;
-import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.LoginHandler;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.SettingsScreen;

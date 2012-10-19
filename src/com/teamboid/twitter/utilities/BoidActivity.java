@@ -1,6 +1,5 @@
 package com.teamboid.twitter.utilities;
 
-import com.teamboid.twitter.AccountManager;
 import com.teamboid.twitter.services.AccountService;
 
 import com.teamboid.twitter.R;
@@ -15,7 +14,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Window;
 
 /**
  * Defines common things all Boid activites should require to function correctly
