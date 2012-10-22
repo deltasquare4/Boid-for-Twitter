@@ -72,6 +72,8 @@ public class FeedListAdapter extends BaseAdapter {
 	public String user;
 	public long account;
 	
+	public ArrayList<Status> getData(){ return tweets; }
+	
 	public void setLastViewed(ListView list) {
 		if (list == null)
 			return;

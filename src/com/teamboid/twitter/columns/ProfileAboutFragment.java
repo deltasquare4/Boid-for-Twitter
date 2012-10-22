@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.net.URLEncoder;
+import java.util.List;
 
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -189,4 +191,12 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+	
+	@Override
+	public String getColumnName() {
+		return "n/a";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {}
 }

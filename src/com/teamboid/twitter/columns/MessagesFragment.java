@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -165,4 +167,16 @@ public class MessagesFragment extends BaseListFragment {
         }
         return toReturn.toArray(new DMConversation[0]);
     }
+    
+    @Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add(new DMConversation[]{ (DMConversation) obj });
+		}
+	}
+
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".dm_list";
+	}
 }

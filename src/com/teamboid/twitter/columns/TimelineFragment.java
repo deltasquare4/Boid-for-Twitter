@@ -1,7 +1,10 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -73,7 +76,6 @@ public class TimelineFragment extends BaseListFragment {
 				});
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_tweets));
-		reloadAdapter(true);
 	}
 
 	@Override
@@ -113,11 +115,13 @@ public class TimelineFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
 								int beforeLast = adapt.getCount() - 1;
+								if(!paginate) adapt.clear(); // stops gaps
 								int addedCount = adapt.add(feed);
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
-											getListView().smoothScrollToPosition(beforeLast + 1);
+											// getListView().smoothScrollToPosition(beforeLast + 1);
                                         } else if (getView() != null && adapt != null) {
 											adapt.restoreLastViewed(getListView());
                                         }
@@ -215,4 +219,16 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".home";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((Status) obj);
+		}
+	}
 }

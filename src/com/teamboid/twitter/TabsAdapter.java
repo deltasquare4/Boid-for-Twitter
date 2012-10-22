@@ -1,7 +1,10 @@
 package com.teamboid.twitter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+import com.teamboid.twitter.columns.ColumnCacheManager;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -12,6 +15,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,16 +140,40 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 	public interface IBoidFragment {
 		public boolean isRefreshing();
-
+		
 		public void onDisplay();
 	}
 
 	public static abstract class BaseListFragment extends ListFragment
 			implements IBoidFragment {
+		public abstract String getColumnName();
+		public abstract void showCachedContents(List<Serializable> contents);
+		public void saveCachedContents(List<Serializable> contents){
+			ColumnCacheManager.saveCache(getActivity(), getColumnName(), contents);
+		}
+		
+		public List<Serializable> statusToSerializableArray(
+				ArrayList<Status> data) {
+			List<Serializable> ret = new ArrayList<Serializable>();
+			for(Status s : data){
+				ret.add(s);
+			}
+			return ret;
+		}
+		
 		boolean hasLoaded = false;
 		
 		public void onDisplay() {
-			if(!hasLoaded) { onReadyToLoad(); hasLoaded = true; }
+			if(!hasLoaded) {
+				List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
+				onReadyToLoad();
+				reloadAdapter(true);
+				if(contents != null){
+					showCachedContents(contents);
+					Log.d("boid", getColumnName() + " loaded from cache :)");
+				} else{ performRefresh(false); }
+				hasLoaded = true;
+			}
 		};
 		public void onReadyToLoad() {};
 

@@ -1,5 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -150,4 +153,16 @@ public class MyListsFragment extends BaseListFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+	
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".mylists";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((UserList) obj);
+		}
+	}
 }

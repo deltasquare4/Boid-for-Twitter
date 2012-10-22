@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -263,5 +265,13 @@ public class PaddedProfileTimelineFragment extends ProfilePaddedFragment {
 	public DMConversation[] getSelectedMessages() {
 		return null;
 	}
+	
+	@Override
+	public String getColumnName() {
+		return "n/a";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {}
 
 }

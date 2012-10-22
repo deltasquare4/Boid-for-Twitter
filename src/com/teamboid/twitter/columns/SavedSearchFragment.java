@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -285,5 +287,17 @@ public class SavedSearchFragment extends BaseListFragment {
 	@Override
 	public DMConversation[] getSelectedMessages() {
 		return null;
+	}
+	
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".saved-" + query.replace("/", "_");
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add(new Tweet[]{(Tweet) obj});
+		}
 	}
 }
