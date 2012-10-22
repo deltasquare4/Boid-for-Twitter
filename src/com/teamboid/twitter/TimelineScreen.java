@@ -10,6 +10,7 @@ import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.IBoidFragment;
 import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.boxes.TimelineSidebarBox;
 import com.teamboid.twitter.cab.MessageConvoCAB;
@@ -566,12 +567,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		for (int i = 0; i < getActionBar().getTabCount(); i++) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
-			if (frag instanceof BaseListFragment)
-				((BaseListFragment) frag).reloadAdapter(false);
-			else if (frag instanceof BaseSpinnerFragment)
-				((BaseSpinnerFragment) frag).reloadAdapter(false);
-			else
-				((BaseGridFragment) frag).reloadAdapter(false);
+			if (IBoidFragment.class.isInstance(frag)){
+				((IBoidFragment) frag).reloadAdapter(false);
+			}
 		}
 	}
 

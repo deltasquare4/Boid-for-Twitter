@@ -1,6 +1,7 @@
 package com.teamboid.twitter.columns;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -83,6 +84,13 @@ public class MyListsFragment extends BaseListFragment {
 				if (acc != null) {
 					try {
 						final UserList[] lists = acc.getClient().getLists();
+						
+						List<Serializable> data = new ArrayList<Serializable>();
+						for(UserList ul : lists){
+							data.add(ul);
+						}
+						saveCachedContents(data);
+						
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {

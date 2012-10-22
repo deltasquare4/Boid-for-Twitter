@@ -25,7 +25,8 @@ import android.util.Log;
 public class ColumnCacheManager {
 	static File getCacheFile( Context c, String column ){
 		File r = new File( c.getCacheDir(), "columnCache." + column + ".cache" );
-		try{ r.createNewFile(); } catch(Exception e){}
+		try{ r.mkdirs(); } catch(Exception e){ e.printStackTrace(); } 
+		try{ r.createNewFile(); } catch(Exception e){ e.printStackTrace(); }
 		return r;
 	}
 	
@@ -58,9 +59,9 @@ public class ColumnCacheManager {
 	public static List<Serializable> getCache(Context c, String column){
 		try{
 			List<Serializable> contents = new ArrayList<Serializable>();
+			Log.d("cache", "reading from " + getCacheFile(c, column).getAbsolutePath());
 			FileInputStream fis = new FileInputStream(getCacheFile(c, column));
 			ObjectInputStream ooi = new ObjectInputStream(fis);
-			Log.d("cache", "reading from " + getCacheFile(c, column).getAbsolutePath());
 			while(true){
 				try{
 					contents.add((Serializable) ooi.readObject());
@@ -68,6 +69,8 @@ public class ColumnCacheManager {
 					break;
 				}
 			}
+			fis.close();
+			ooi.close();
 			return contents;
 		} catch(Exception e){
 			e.printStackTrace();

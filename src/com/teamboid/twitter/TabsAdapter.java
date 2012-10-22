@@ -140,8 +140,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 	public interface IBoidFragment {
 		public boolean isRefreshing();
-		
 		public void onDisplay();
+		public void reloadAdapter(boolean b);
 	}
 
 	public static abstract class BaseListFragment extends ListFragment
@@ -165,13 +165,29 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		public void onDisplay() {
 			if(!hasLoaded) {
-				List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
-				onReadyToLoad();
-				reloadAdapter(true);
-				if(contents != null){
-					showCachedContents(contents);
-					Log.d("boid", getColumnName() + " loaded from cache :)");
-				} else{ performRefresh(false); }
+				new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
+						
+						getActivity().runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								onReadyToLoad();
+								reloadAdapter(true);
+								
+								if(contents != null){
+									showCachedContents(contents);
+									Log.d("boid", getColumnName() + " loaded from cache :)");
+								} else{ performRefresh(false); }
+							}
+							
+						});
+					}
+					
+				}).start();
 				hasLoaded = true;
 			}
 		};

@@ -114,8 +114,9 @@ public class TimelineFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
-								int beforeLast = adapt.getCount() - 1;
 								if(!paginate) adapt.clear(); // stops gaps
+								
+								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
 								saveCachedContents(statusToSerializableArray(adapt.getData()));
 								if (addedCount > 0 || beforeLast > 0) {
@@ -165,8 +166,8 @@ public class TimelineFragment extends BaseListFragment {
 				adapt.setLastViewed(getListView());
 			adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0) performRefresh(false);
-			else if (getView() != null && adapt != null) {
+			// if (adapt.getCount() == 0) performRefresh(false);
+			if (getView() != null && adapt != null) {
 				adapt.restoreLastViewed(getListView());
 			}
 		}
@@ -230,5 +231,6 @@ public class TimelineFragment extends BaseListFragment {
 		for(Serializable obj : contents){
 			adapt.add((Status) obj);
 		}
+		setListShown(true);
 	}
 }

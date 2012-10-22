@@ -126,8 +126,11 @@ public class UserListFragment extends BaseListFragment {
                             public void run() {
                                 setEmptyText(context
                                         .getString(R.string.no_tweets));
+                                if(!paginate) adapt.clear(); // stops gaps
                                 int beforeLast = adapt.getCount() - 1;
                                 int addedCount = adapt.add(feed);
+                                saveCachedContents(statusToSerializableArray(adapt.getData()));
+                                
                                 if (addedCount > 0 || beforeLast > 0) {
                                     if (getView() != null) {
                                         if (paginate && addedCount > 0) {

@@ -178,6 +178,8 @@ public class MediaTimelineFragment extends BaseGridFragment {
 							@Override
 							public void run() {
 								adapt.notifyDataSetChanged();
+								isLoading = false;
+								context.invalidateOptionsMenu();
 							}
 						});
 						

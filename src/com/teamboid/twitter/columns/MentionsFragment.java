@@ -133,8 +133,12 @@ public class MentionsFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_mentions));
+								if(!paginate) adapt.clear();
+								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
+
 								if (addedCount > 0 || beforeLast > 0) {
 									NotificationService.setReadMentions(acc.getId(), context);
 									if (getView() != null) {

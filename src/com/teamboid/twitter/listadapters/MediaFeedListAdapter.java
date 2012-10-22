@@ -6,10 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.ImageManager;
+import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 
@@ -115,21 +117,12 @@ public class MediaFeedListAdapter extends BaseAdapter {
 		else
 			toReturn = LayoutInflater.from(mContext).inflate(
 					R.layout.media_list_item, null);
-		final ImageView img = (ImageView) toReturn
+		final RemoteImageView img = (RemoteImageView) toReturn
 				.findViewById(R.id.mediaItemImage);
 		final View prog = toReturn.findViewById(R.id.mediaItemProgress);
-		img.setVisibility(View.GONE);
-		prog.setVisibility(View.VISIBLE);
-		ImageManager downloader = ImageManager.getInstance(mContext);
-		downloader.get(tweets.get(position).imgurl,
-				new ImageManager.OnImageReceivedListener() {
-					@Override
-					public void onImageReceived(String arg0, Bitmap image) {
-						prog.setVisibility(View.GONE);
-						img.setImageBitmap(image);
-						img.setVisibility(View.VISIBLE);
-					}
-				});
+		
+		img.setScaleType(ScaleType.CENTER_CROP);
+		img.setImageURL(tweets.get(position).imgurl);
 		return toReturn;
 	}
 

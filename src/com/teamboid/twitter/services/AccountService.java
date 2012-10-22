@@ -244,10 +244,6 @@ public class AccountService extends Service {
 			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 			return false;
 		} else if (getAccounts().size() == accountStore.size()) return false;
-		if (!NetworkUtils.haveNetworkConnection(getApplicationContext())) {
-			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
-			return false;
-		}
 
 		// Android Accounts
 		HashMap<String, android.accounts.Account> androidAccounts = AndroidAccountHelper.getAccounts(getApplicationContext());
@@ -458,7 +454,9 @@ public class AccountService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Crittercism.init(getApplicationContext(), "503a15912cd9524709000002");
+		try{
+			Crittercism.init(getApplicationContext(), "503a15912cd9524709000002");
+		} catch(Exception e){}
 		accounts = new ArrayList<Account>();
 	}
 

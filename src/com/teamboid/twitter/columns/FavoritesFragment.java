@@ -130,8 +130,12 @@ public class FavoritesFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_favorites));
+								if(!paginate) adapt.clear(); // stops gaps
+								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
+								
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
 								if (beforeLast > 0) {
 									if (getView() != null && addedCount > 0) {
 										if (paginate && addedCount > 0) {
