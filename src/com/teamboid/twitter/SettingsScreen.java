@@ -1,5 +1,6 @@
 package com.teamboid.twitter;
 
+import com.handlerexploit.prime.ImageManager;
 import com.teamboid.twitter.contactsync.AndroidAccountHelper;
 import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
@@ -9,6 +10,7 @@ import com.teamboid.twitterapi.media.MediaServices;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -315,6 +317,36 @@ public class SettingsScreen extends PreferenceActivity  {
 					SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
 							SearchSuggestionsProvider.AUTHORITY, SearchSuggestionsProvider.MODE);
 					suggestions.clearHistory();
+					return false;
+				}
+			});
+			findPreference("delete_media_cache").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference pref) {
+					final ProgressDialog pd = new ProgressDialog(getActivity());
+					pd.setMessage(getActivity().getString(R.string.please_wait));
+					pd.show();
+					
+					new Thread(new Runnable(){
+						public void run(){
+							try{
+								ImageManager.getInstance(getActivity()).mDiskLruCache.delete();
+							} catch(Exception e){
+								e.printStackTrace();
+							}
+							
+							getActivity().runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									pd.dismiss();
+									// TODO: Toast/Crouton something
+								}
+								
+							});
+						}
+					}).start();
 					return false;
 				}
 			});

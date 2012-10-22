@@ -23,5 +23,8 @@
 		<SwitchPreference android:key="enable_inline_previewing"
 			android:layout="@layout/boid_preference" android:summary="@string/enable_inline_desc"
 			android:title="@string/enable_inline_title" android:persistent="true" />
+		<Preference android:key="delete_media_cache"
+		    android:summary="@string/delete_media_desc"
+		    android:title="@string/delete_media" />
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -575,4 +575,7 @@
 	<string name="advanced_title">Advanced Settings</string>
 	<string name="advanced_summary">Show advanced settings</string>
 	
+	<string name="delete_media">Delete Cached Media</string>
+	<string name="delete_media_desc">Images such as profile pictures etc</string>
+	
 </resources>
