@@ -578,4 +578,14 @@
 	<string name="delete_media">Delete Cached Media</string>
 	<string name="delete_media_desc">Images such as profile pictures etc</string>
 	
+	<string name="link_action">Link Action</string>
+	<string-array name="link_action_human">
+	    <item>Open in Web Browser</item>
+	    <item>Use \"Read now with Readability\"</item>
+	</string-array>
+	<string-array name="link_action_robot">
+	    <item>browser</item>
+	    <item>readability</item>
+	</string-array>
+	
 </resources>

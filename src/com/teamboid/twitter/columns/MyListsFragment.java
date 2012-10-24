@@ -104,7 +104,7 @@ public class MyListsFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context,	e.getMessage(), Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}

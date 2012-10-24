@@ -133,7 +133,7 @@ public class MentionsFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_mentions));
-								if(!paginate) adapt.clear();
+								if(!paginate && feed.length < 50) adapt.clear();
 								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
@@ -183,8 +183,7 @@ public class MentionsFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context, e.getMessage(),
-										Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}
@@ -212,9 +211,7 @@ public class MentionsFragment extends BaseListFragment {
 			adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID,
 					AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-			else if (getView() != null && adapt != null)
+			if (getView() != null && adapt != null)
 				adapt.restoreLastViewed(getListView());
 		}
 	}

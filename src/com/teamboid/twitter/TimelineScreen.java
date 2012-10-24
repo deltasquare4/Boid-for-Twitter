@@ -35,6 +35,7 @@ import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.BoidActivity;
+import com.teamboid.twitter.utilities.NetworkUtils;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
@@ -92,6 +93,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		public void onReceive(Context arg0, Intent intent) {
 			if (intent.getAction().equals(AccountService.END_LOAD)) {
 				// lets see what we can do
+				return;
+			} else if(intent.getAction().equals(SendTweetService.NETWORK_AVAIL)){
+				TimelineScreen.this.invalidateOptionsMenu();
 				return;
 			}
 			try {
@@ -648,6 +652,12 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					false);
 		}
 		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(SendTweetService.NETWORK_AVAIL);
+		filter.addAction(SendTweetService.UPDATE_STATUS);
+		filter.addAction(AccountService.END_LOAD);
+		registerReceiver(receiver, filter);
+		
 		// ActionBar Fix
 		// http://stackoverflow.com/questions/8465258/how-can-i-force-the-action-bar-to-be-at-the-bottom-in-ics
 		// based on how Google did it
@@ -826,6 +836,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		}
 		invalidateOptionsMenu();
 		IntentFilter filter = new IntentFilter();
+		filter.addAction(SendTweetService.NETWORK_AVAIL);
 		filter.addAction(SendTweetService.UPDATE_STATUS);
 		filter.addAction(AccountService.END_LOAD);
 		registerReceiver(receiver, filter);
@@ -909,6 +920,10 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						+ AccountService.getCurrentAccount().getUser()
 								.getScreenName());
 		}
+		
+		if(!NetworkUtils.haveNetworkConnection(this))
+			menu.findItem(R.id.refreshAction).setVisible(false);
+		
 		return true;
 	}
 

@@ -10,6 +10,8 @@ import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.user.User;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -152,6 +155,31 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			ColumnCacheManager.saveCache(getActivity(), getColumnName(), contents);
 		}
 		
+		public void showError(final String message){
+			if(getActivity() == null) return; 
+			getActivity().runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+					final TextView tv = (TextView) (getView().findViewById(R.id.error));
+					tv.setText(message);
+					tv.setAlpha(1);
+					tv.setVisibility(View.VISIBLE);
+					tv.animate().setStartDelay(3000).setListener(new AnimatorListener(){
+						@Override public void onAnimationCancel(Animator arg0) {}
+						@Override public void onAnimationRepeat(Animator arg0) {}
+						@Override public void onAnimationStart(Animator arg0) {}
+						
+						@Override public void onAnimationEnd(Animator arg0) {
+							tv.setVisibility(View.GONE);
+						}
+						
+					}).alpha(0);
+				}
+				
+			});
+		}
+		
 		public List<Serializable> statusToSerializableArray(
 				ArrayList<Status> data) {
 			List<Serializable> ret = new ArrayList<Serializable>();
@@ -175,13 +203,14 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 							@Override
 							public void run() {
-								onReadyToLoad();
 								reloadAdapter(true);
 								
 								if(contents != null){
 									showCachedContents(contents);
 									Log.d("boid", getColumnName() + " loaded from cache :)");
 								} else{ performRefresh(false); }
+								
+								onReadyToLoad();
 							}
 							
 						});
@@ -225,11 +254,32 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
+		
+		public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+			return inflater.inflate(R.layout.list_content, container, false); 
+		}
 
 		@Override
 		public void setEmptyText(CharSequence text) {
 			if (getView() != null)
-				super.setEmptyText(text);
+				((TextView)getView().findViewById(android.R.id.empty)).setText(text);
+		}
+		
+		@Override
+		public void setListShown(boolean shown) {
+			View mProgressContainer = getView().findViewById(R.id.progressContainer);
+			View mListContainer = getView().findViewById(R.id.listContainer);
+			if (shown) {
+				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+				mProgressContainer.setVisibility(View.GONE);
+				mListContainer.setVisibility(View.VISIBLE);
+			} else {
+				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+				mProgressContainer.setVisibility(View.VISIBLE);
+				mListContainer.setVisibility(View.GONE);
+			}
 		}
 	}
 

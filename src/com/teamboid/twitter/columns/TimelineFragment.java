@@ -90,6 +90,8 @@ public class TimelineFragment extends BaseListFragment {
 		super.onPause();
 		savePosition();
 	}
+	
+	public static final int TWEETS_PER_LOAD = 50;
 
 	@Override
 	public void performRefresh(final boolean paginate) {
@@ -104,7 +106,7 @@ public class TimelineFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(50);
+				Paging paging = new Paging(TWEETS_PER_LOAD);
 				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
@@ -114,7 +116,7 @@ public class TimelineFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
-								if(!paginate) adapt.clear(); // stops gaps
+								if(!paginate && feed.length < TWEETS_PER_LOAD) adapt.clear(); // stops gaps
 								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
@@ -141,7 +143,7 @@ public class TimelineFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}
@@ -231,6 +233,7 @@ public class TimelineFragment extends BaseListFragment {
 		for(Serializable obj : contents){
 			adapt.add((Status) obj);
 		}
+		adapt.notifyDataSetInvalidated();
 		setListShown(true);
 	}
 }
