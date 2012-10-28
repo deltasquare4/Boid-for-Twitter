@@ -16,28 +16,15 @@ import android.widget.Toast;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class LoginHandler extends Activity {
-	BoidActivity boid;
 	
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		boid.onDestroy();
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		boid = new BoidActivity(this);
-		boid.AccountsReady = new BoidActivity.OnAction() {
-			
-			@Override
-			public void done() {
-				finishCreate();
-			}
-		};
-		boid.onCreate(savedInstanceState);
-	}
-	public void finishCreate(){
 		
 		WebView view = new WebView(this);
 		setContentView(view);

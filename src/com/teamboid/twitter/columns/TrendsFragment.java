@@ -69,7 +69,10 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		String[] toAdd = context.getResources().getStringArray(R.array.trend_sources);
 		for (String t : toAdd) spinAdapt.add(t);
 		filterSelected = true;
-		if(places != null) {
+		
+		if(!deviceHasLocation()){ // probably won't happen in production, but it's to cover us
+			spinAdapt.remove(spinAdapt.getItem(3));
+		} else if(places != null) {
 			spinAdapt.remove(spinAdapt.getItem(3));
 			for(TrendLocation loc : places) {
 				try{
@@ -219,6 +222,16 @@ public class TrendsFragment extends BaseSpinnerFragment {
 		setListAdapter(adapt);
 		if (adapt.getCount() == 0)
 			performRefresh(false);
+	}
+	
+	public boolean deviceHasLocation(){
+		try{
+			LocationManager locationManager = (LocationManager) context
+					.getSystemService(Context.LOCATION_SERVICE);
+			return locationManager.getProviders(true).size() > 0;
+		} catch(Exception e){
+			return false;
+		}
 	}
 
 	@Override
