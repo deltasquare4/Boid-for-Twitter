@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/profileHeader"
+	android:layout_width="match_parent" android:layout_height="93dp">
+	<ImageView android:id="@+id/img" android:scaleType="centerCrop"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentTop="true" />
+	<ImageView android:src="@drawable/st"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentTop="true" android:scaleType="centerCrop"
+		android:layout_margin="0dp" android:padding="0dp"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	<ImageView android:src="@drawable/sillouette" android:id="@+id/userItemProfilePic"
+		android:layout_alignParentLeft="true" android:layout_width="73dp"
+		android:layout_height="73dp" android:layout_marginRight="10dp"
+		android:layout_marginLeft="10dp" android:layout_marginTop="10dp" />
+	<TextView android:id="@+id/profileTopLeftDetail"
+		android:layout_toRightOf="@+id/userItemProfilePic"
+		android:layout_width="wrap_content" style="@style/SpecialText"
+		android:textAppearance="@style/SpecialText" android:layout_marginTop="10dp"
+		android:layout_alignParentTop="true" android:layout_height="wrap_content" />
+	<View android:layout_width="fill_parent" android:layout_height="1dp"
+		android:background="@drawable/divider"
+		android:layout_alignParentBottom="true" />
+</RelativeLayout>

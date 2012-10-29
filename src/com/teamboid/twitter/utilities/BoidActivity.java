@@ -27,6 +27,10 @@ public class BoidActivity {
 		public void done(){}
 	}
 	
+	public boolean isTablet(){
+		return mContext.getResources().getBoolean(R.bool.is_tablet);
+	}
+	
 	void callAccountsReady(){
 		ready=true;
 		if(pd != null) pd.dismiss();

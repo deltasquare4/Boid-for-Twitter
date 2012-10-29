@@ -101,9 +101,18 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	public void onStart() {
 		super.onStart();
 		setRetainInstance(true);
+		if(getArguments() == null) return;
 		screenName = getArguments().getString("query");
+		if(screenName != null){
+			reloadAdapter(true);
+	        getListView().setDivider(null);
+		}
+	}
+	
+	public void setScreenName(String screenName){
+		this.screenName = screenName;
 		reloadAdapter(true);
-        getListView().setDivider(null);
+		getListView().setDivider(null);
 	}
 
 	@Override

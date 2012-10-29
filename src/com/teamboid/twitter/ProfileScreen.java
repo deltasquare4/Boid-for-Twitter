@@ -194,14 +194,21 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 											new int[] { R.attr.timelineTab })
 											.getDrawable(0)),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab()
-							.setTabListener(this)
-							.setIcon(
-									getTheme().obtainStyledAttributes(
-											new int[] { R.attr.aboutTab })
-											.getDrawable(0)),
-					ProfileAboutFragment.class, 1, screenName);
+			
+			int i = 2;
+			if(boid.isTablet()){
+				i = 1;
+				((ProfileAboutFragment)getFragmentManager().findFragmentById(R.id.aboutFragment)).setScreenName(screenName);
+			} else{
+				mTabsAdapter.addTab(
+						bar.newTab()
+								.setTabListener(this)
+								.setIcon(
+										getTheme().obtainStyledAttributes(
+												new int[] { R.attr.aboutTab })
+												.getDrawable(0)),
+						ProfileAboutFragment.class, 1, screenName);
+			}
 			mTabsAdapter.addTab(
 					bar.newTab()
 							.setTabListener(this)
@@ -209,20 +216,26 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 									getTheme().obtainStyledAttributes(
 											new int[] { R.attr.mediaTab })
 											.getDrawable(0)),
-					MediaTimelineFragment.class, 2, screenName, false);
+					MediaTimelineFragment.class, i, screenName, false);
 		} else {
 			mTabsAdapter.addTab(
 					bar.newTab().setTabListener(this)
 							.setText(R.string.tweets_str),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setTabListener(this)
-							.setText(R.string.about_str),
-					ProfileAboutFragment.class, 1, screenName);
+			int i = 2;
+			if(boid.isTablet()){
+				i = 1;
+				((ProfileAboutFragment)getFragmentManager().findFragmentById(R.id.aboutFragment)).setScreenName(screenName);
+			} else{
+				mTabsAdapter.addTab(
+						bar.newTab().setTabListener(this)
+								.setText(R.string.about_str),
+						ProfileAboutFragment.class, 1, screenName);
+			}
 			mTabsAdapter.addTab(
 					bar.newTab().setTabListener(this)
 							.setText(R.string.media_title),
-					MediaTimelineFragment.class, 2, screenName, false);
+					MediaTimelineFragment.class, i, screenName, false);
 		}
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -575,11 +588,18 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	public ProfileAboutFragment getAboutFragment() {
+		if(boid.isTablet()){
+			return (ProfileAboutFragment) getFragmentManager().findFragmentById(R.id.aboutFragment);
+		}
 		return (ProfileAboutFragment) getFragmentManager().findFragmentByTag(
 				"page:1");
 	}
 
 	public MediaTimelineFragment getMediaFragment() {
+		if(boid.isTablet()){
+			return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
+					"page:1");
+		}
 		return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
 				"page:2");
 	}
@@ -622,6 +642,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
+		if(!boid.isTablet()){
 		((ViewPager) findViewById(R.id.pager))
 				.setOnPageChangeListener(new OnPageChangeListener() {
 
@@ -655,6 +676,8 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			@Override
 			public void onPageScrollStateChanged(int arg0) {}
 		});
+		}
+		
 		try{
 			// TODO: On screens wide enough fetch web
 			setHeaderBackground(user.getProfileBannerMobile());

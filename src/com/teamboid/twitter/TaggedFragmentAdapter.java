@@ -41,6 +41,11 @@ public abstract class TaggedFragmentAdapter extends PagerAdapter {
     public TaggedFragmentAdapter(FragmentManager fm) {
         mFragmentManager = fm;
     }
+    
+    @Override
+    public float getPageWidth(int position){
+    	return 0.4f; // TODO: Option
+    }
 
     /**
      * Return the Fragment associated with a specified position.

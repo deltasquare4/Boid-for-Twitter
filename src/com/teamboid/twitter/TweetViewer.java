@@ -172,6 +172,8 @@ public class TweetViewer extends MapActivity {
 	@Override
 	public void onBackPressed() {
 		SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
+		if(sideNav == null) { super.onBackPressed(); return; }
+		
 		if (sideNav.isShowingNavigationView()) {
 			sideNav.showContentView();
 		} else
@@ -333,14 +335,20 @@ public class TweetViewer extends MapActivity {
 									invalidateOptionsMenu();
 									binder.add(toAdd.toArray(new Status[0]));
 									binder.notifyDataSetChanged();
-									((GlowableRelativeLayout) findViewById(R.id.glowstone))
-											.glow();
+									if(findViewById(R.id.glowstone) != null){
+										((GlowableRelativeLayout) findViewById(R.id.glowstone))
+												.glow();
+									}
 								}
 							});
 						}
 					} else {
 						final SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
-						sideNav.enabled = false;
+						if(sideNav == null){
+							findViewById(android.R.id.list).setVisibility(View.GONE);
+						} else{
+							sideNav.enabled = false;
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

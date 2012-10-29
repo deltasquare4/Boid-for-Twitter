@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -672,6 +673,13 @@ public class ComposerScreen extends Activity {
 					stt.hasMedia() ? View.VISIBLE : View.GONE);
 			findViewById(R.id.upload_with_label).setVisibility(
 					stt.hasMedia() ? View.VISIBLE : View.GONE);
+		}
+		
+		// Check for camera
+		PackageManager pm = getPackageManager();
+		if(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+			// You can't take a photo if you don't have a camera!
+			menu.findItem(R.id.captureAction).setVisible(false);
 		}
 
 		if (!stt.isGalleryImage && stt.hasMedia()) {

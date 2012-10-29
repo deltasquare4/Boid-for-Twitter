@@ -25,7 +25,7 @@ import android.util.Log;
 public class ColumnCacheManager {
 	static File getCacheFile( Context c, String column ){
 		File r = new File( c.getCacheDir(), "columnCache." + column + ".cache" );
-		try{ r.mkdirs(); } catch(Exception e){ e.printStackTrace(); } 
+		try{ new File(r.getParent()).mkdirs(); } catch(Exception e){ e.printStackTrace(); } 
 		try{ r.createNewFile(); } catch(Exception e){ e.printStackTrace(); }
 		return r;
 	}
