@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/newTweetAction" android:title="@string/new_tweet_str"
-		android:icon="?newTweetIcon" android:showAsAction="always" />
+		android:icon="?newTweetIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/searchAction" android:title="@string/search_str"
 		android:icon="?searchIcon" android:showAsAction="ifRoom" />
 	<item android:id="@+id/accountSwitcher" android:showAsAction="always"

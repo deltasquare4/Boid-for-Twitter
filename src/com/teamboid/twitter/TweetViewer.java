@@ -213,9 +213,7 @@ public class TweetViewer extends MapActivity {
 		RelativeLayout toReturn = (RelativeLayout) findViewById(R.id.tweetDisplay);
 		RemoteImageView profilePic = (RemoteImageView) toReturn
 				.findViewById(R.id.tweetProfilePic);
-		profilePic.setImageResource(R.drawable.sillouette);
-		profilePic.setImageURL(Utilities.getUserImage(screenName, this));
-		profilePic.setOnClickListener(new View.OnClickListener() {
+		View.OnClickListener profileOpen = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getApplicationContext(),
@@ -223,31 +221,18 @@ public class TweetViewer extends MapActivity {
 						.putExtra("screen_name", screenName).addFlags(
 								Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
-		});
+		};
+		profilePic.setImageResource(R.drawable.sillouette);
+		profilePic.setImageURL(Utilities.getUserImage(screenName, this));
+		profilePic.setOnClickListener(profileOpen);
 		final TextView userName = (TextView) toReturn
 				.findViewById(R.id.tweetUserName);
 		userName.setText(getIntent().getStringExtra("user_name"));
-		userName.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(),
-						ProfileScreen.class)
-						.putExtra("screen_name", screenName).addFlags(
-								Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
+		userName.setOnClickListener(profileOpen);
 		final TextView screen = (TextView) toReturn
 				.findViewById(R.id.tweetScreenName);
+		screen.setOnClickListener(profileOpen);
 		screen.setText("@" + screenName);
-		screen.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(),
-						ProfileScreen.class)
-						.putExtra("screen_name", screenName).addFlags(
-								Intent.FLAG_ACTIVITY_CLEAR_TOP));
-			}
-		});
 		TextView contents = (TextView) toReturn
 				.findViewById(R.id.tweetContents);
 		contents.setText(Utilities.twitterifyText(this, getIntent()
@@ -378,8 +363,8 @@ public class TweetViewer extends MapActivity {
 		RemoteImageView profilePic = (RemoteImageView) findViewById(R.id.tweetProfilePic);
 		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(status.getUser()
-				.getScreenName(), this, status.getUser()));
-		profilePic.setOnClickListener(new View.OnClickListener() {
+				.getScreenName(), this));
+		View.OnClickListener profileOpen = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getApplicationContext(),
@@ -387,11 +372,14 @@ public class TweetViewer extends MapActivity {
 						status.getUser().getScreenName()).addFlags(
 						Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
-		});
-		((TextView) findViewById(R.id.tweetUserName)).setText(status.getUser()
-				.getName());
-		((TextView) findViewById(R.id.tweetScreenName)).setText("@"
-				+ status.getUser().getScreenName());
+		};
+		profilePic.setOnClickListener(profileOpen);
+		TextView userName = (TextView) findViewById(R.id.tweetUserName);
+		userName.setText(status.getUser().getName());
+		userName.setOnClickListener(profileOpen);
+		TextView screenName = (TextView) findViewById(R.id.tweetScreenName);
+		screenName.setText("@" + status.getUser().getScreenName());
+		screenName.setOnClickListener(profileOpen);
 		TextView contents = (TextView) findViewById(R.id.tweetContents);
 		contents.setText(Utilities.twitterifyText(this, status.getText(),
 				status.getUrlEntities(), status.getMediaEntities(), true, null));
@@ -570,7 +558,8 @@ public class TweetViewer extends MapActivity {
 			startActivity(new Intent(this, ComposerScreen.class)
 					.putExtra("reply_to", status)
 					.putExtra("reply_to_name", replyToName)
-					.putExtra("append", Utilities.getAllMentions(replyToName, content))
+					.putExtra("append",
+							Utilities.getAllMentions(replyToName, content))
 					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			return true;
 		case R.id.favoriteAction:

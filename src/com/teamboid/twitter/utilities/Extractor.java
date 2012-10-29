@@ -119,7 +119,7 @@ public class Extractor {
 		if(text == null || text.trim().length() == 0) return Collections.emptyList();
 		boolean found = false;
 		for (char c : text.toCharArray()) {
-			if (c == '@' || c == '＠') {
+			if (c == '@') {
 				found = true;
 				break;
 			}
@@ -205,7 +205,7 @@ public class Extractor {
 		if(text == null || text.trim().length() == 0) return Collections.emptyList();
 		boolean found = false;
 		for (char c : text.toCharArray()) {
-			if (c == '#' || c == '＃') {
+			if (c == '#') {
 				found = true;
 				break;
 			}

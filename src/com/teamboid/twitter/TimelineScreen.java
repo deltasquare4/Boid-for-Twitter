@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import com.teamboid.twitterapi.list.UserList;
 
-import com.handlerexploit.prime.ImageManager;
-import com.handlerexploit.prime.ImageManager.OnImageReceivedListener;
 import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
@@ -31,7 +29,6 @@ import com.teamboid.twitter.compat.Api11;
 import com.teamboid.twitter.listadapters.SendTweetArrayAdapter;
 import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
-import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.BoidActivity;
@@ -53,8 +50,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -887,28 +882,10 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		final MenuItem myProfile = menu.findItem(R.id.myProfileAction);
 		if (accs.size() == 1) {
 			menu.findItem(R.id.accountSwitcher).setVisible(false);
-			myProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			myProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		} else {
 			for (int i = 0; i < accs.size(); i++) {
-				ImageManager imageManager = ImageManager.getInstance(this);
-				final int index = i;
-				imageManager.get(
-						"http://api.twitter.com/1/users/profile_image?screen_name="
-								+ accs.get(i).getUser().getScreenName()
-								+ "&size=bigger",
-						new OnImageReceivedListener() {
-							@Override
-							public void onImageReceived(String source,
-									Bitmap bitmap) {
-								switcher.getSubMenu()
-										.add("@"
-												+ accs.get(index).getUser()
-														.getScreenName())
-										.setIcon(
-												new BitmapDrawable(
-														getResources(), bitmap));
-							}
-						});
+				switcher.getSubMenu().add("@" + accs.get(i).getUser().getScreenName());
 			}
 		}
 		if (AccountService.getCurrentAccount() != null) {
