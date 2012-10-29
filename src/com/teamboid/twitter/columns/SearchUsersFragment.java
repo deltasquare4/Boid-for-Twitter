@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ActionBar.Tab;
@@ -196,4 +198,12 @@ public class SearchUsersFragment extends BaseListFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+	
+	@Override
+	public String getColumnName() {
+		return "n/a";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {}
 }

@@ -1,0 +1,8 @@
+%YAML 1.2
+---
+debug:
+ Type: AndroidDebug
+release:
+ Type: Android
+ Filters:
+  - dpi

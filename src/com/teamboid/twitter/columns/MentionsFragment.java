@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -56,8 +58,7 @@ public class MentionsFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
+	public void onReadyToLoad(){
 		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -132,8 +133,12 @@ public class MentionsFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_mentions));
+								if(!paginate && feed.length < 50) adapt.clear();
+								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
+
 								if (addedCount > 0 || beforeLast > 0) {
 									NotificationService.setReadMentions(acc.getId(), context);
 									if (getView() != null) {
@@ -178,8 +183,7 @@ public class MentionsFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.error_str));
-								Toast.makeText(context, e.getMessage(),
-										Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}
@@ -207,9 +211,7 @@ public class MentionsFragment extends BaseListFragment {
 			adapt = AccountService.getFeedAdapter(context, MentionsFragment.ID,
 					AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-			else if (getView() != null && adapt != null)
+			if (getView() != null && adapt != null)
 				adapt.restoreLastViewed(getListView());
 		}
 	}
@@ -272,5 +274,17 @@ public class MentionsFragment extends BaseListFragment {
 	@Override
 	public DMConversation[] getSelectedMessages() {
 		return null;
+	}
+	
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((Status) obj);
+		}
+	}
+
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".mentions";
 	}
 }

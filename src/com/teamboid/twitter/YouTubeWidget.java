@@ -53,7 +53,9 @@ public class YouTubeWidget extends TweetWidget {
 		Intent send = new Intent(Intent.ACTION_VIEW);
 		send.setData(Uri.parse("http://youtube.com/watch?v=" + vidid));
 		PendingIntent pendingIntent = PendingIntent.getActivity(cntxt, 0, send, 0);
+		
 		rv.setOnClickPendingIntent(R.id.title, pendingIntent);
+		rv.setOnClickPendingIntent(R.id.thumb, pendingIntent);
 		ImageManager imageManager = ImageManager.getInstance(cntxt);
 		rv.setBitmap(R.id.thumb, "setImageBitmap", 
 				imageManager.get("http://i.ytimg.com/vi/" + vidid + "/mqdefault.jpg")); 

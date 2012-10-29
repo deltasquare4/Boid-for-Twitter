@@ -14,9 +14,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
+import me.kennydude.awesomeprefs.BlankPreference;
+import me.kennydude.awesomeprefs.Preference;
+import me.kennydude.awesomeprefs.Preference.OnPreferenceClickListener;
+import me.kennydude.awesomeprefs.PreferenceActivity;
+import me.kennydude.awesomeprefs.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,15 +43,15 @@ import com.teamboid.twitterapi.media.MediaServices;
 
 public class SelectMediaScreen extends PreferenceActivity {
 
-	public class MediaPreference extends Preference {
+	public class MediaPreference extends BlankPreference {
 		public boolean checked;
 		public boolean needsConfig;
 		public ExternalMediaService m;
 		public OnPreferenceClickListener callback;
 
 		public MediaPreference(Context context, ExternalMediaService m,
-				final String key) {
-			super(context);
+				final String key, final PreferenceFragment fragment) {
+			super(context, fragment);
 			try {
 				setTitle(m.getServiceName());
 			} catch (Exception e) {
@@ -57,6 +59,8 @@ public class SelectMediaScreen extends PreferenceActivity {
 			}
 			needsConfig = (m.getNeededAuthorization() != AuthorizationNeeded.NONE);
 			this.m = m;
+			this.m.setAPIKey(SendTweetTask.MEDIA_API_KEYS.get(getKey()));
+			this.m.setAPISecret(SendTweetTask.MEDIA_API_SECRETS.get(getKey()));
 
 			Uri.parse("boid://finishconfig/" + key);
 		}
@@ -74,9 +78,9 @@ public class SelectMediaScreen extends PreferenceActivity {
 		}
 
 		@Override
-		public View getView(View convertView, ViewGroup parent) {
-			if (convertView == null)
-				convertView = LayoutInflater.from(getContext()).inflate(
+		public View getView() {
+			//if (convertView == null)
+			View convertView = LayoutInflater.from(getContext()).inflate(
 						R.layout.media_service, null);
 			RadioButton r = (RadioButton) convertView.findViewById(R.id.radio);
 			boolean configured = isLoggedIn();
@@ -399,21 +403,21 @@ public class SelectMediaScreen extends PreferenceActivity {
 
 		}
 	}
-
-	@SuppressWarnings("deprecation")
+	
 	private void setupPreferences() {
 		String pref = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getString("upload_service", "twitter");
 		MediaServices.setupServices();
-		// TODO this function is deprecated and needs to be replaced.
-		getPreferenceScreen().removeAll();
+		
+		getHeaderFragment().holdRefresh();
+		getHeaderFragment().removeAll();
 
 		for (final Entry<String, ExternalMediaService> entry : MediaServices.services
 				.entrySet()) {
 			MediaPreference m = new MediaPreference(this, entry.getValue(),
-					entry.getKey());
+					entry.getKey(), getHeaderFragment());
 			m.setKey(entry.getKey());
-			m.setPersistent(false);
+			// m.setPersistent(false);
 			m.checked = pref.equals(entry.getKey());
 			m.callback = new OnPreferenceClickListener() {
 				@Override
@@ -424,11 +428,11 @@ public class SelectMediaScreen extends PreferenceActivity {
 				}
 			};
 			// TODO this function is deprecated and needs to be replaced.
-			getPreferenceScreen().addPreference(m);
+			getHeaderFragment().addPreference(m);
 		}
+		getHeaderFragment().releaseRefresh();
 	}
-
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
@@ -442,7 +446,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		// TODO this function is deprecated and needs to be replaced.
-		addPreferencesFromResource(R.xml.select_media);
+		// addPreferencesFromResource(R.xml.select_media);
 		setupPreferences();
 	}
 

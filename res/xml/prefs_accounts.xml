@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="@string/notifications"
 		android:key="push">
-		<com.teamboid.twitter.views.CustomSwitchPreference
+		<SwitchPreference
 			android:key="{user}_c2dm" android:enabled="true" android:layout="@layout/boid_preference"
 			android:defaultValue="true" android:summary="@string/notifications_enable"
 			android:title="@string/notifications" android:persistent="true" />
@@ -11,17 +11,17 @@
 			android:entryValues="@array/notifications_period_values"
 			android:entries="@array/notifications_period_name" />
 
-		<com.teamboid.twitter.views.CustomSwitchPreference
+		<SwitchPreference
 			android:key="{user}_c2dm_mention" android:defaultValue="true"
 			android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/mention_notify_desc" android:title="@string/mentions_str"
 			android:persistent="true" />
-		<com.teamboid.twitter.views.CustomSwitchPreference
+		<SwitchPreference
 			android:key="{user}_c2dm_dm" android:defaultValue="true"
 			android:enabled="true" android:layout="@layout/boid_preference"
 			android:summary="@string/messages_notify_desc" android:title="@string/messages_str"
 			android:persistent="true" />
-		<com.teamboid.twitter.views.CustomSwitchPreference
+		<SwitchPreference
 			android:key="{user}_c2dm_vibrate" android:enabled="true"
 			android:layout="@layout/boid_preference" android:summary="@string/vibrate_str_desc"
 			android:title="@string/vibrate_str" android:persistent="true" />
@@ -32,7 +32,7 @@
 
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/contact_sync">
-		<com.teamboid.twitter.views.CustomSwitchPreference
+		<SwitchPreference
 			android:key="{user}_contactsync_on" android:summaryOn="@string/contact_sync_on"
 			android:defaultValue="false" android:summaryOff="@string/contact_sync_off"
 			android:title="@string/contact_sync" />
@@ -40,4 +40,12 @@
 			android:defaultValue="mutual" android:entryValues="@array/sync_types_values"
 			android:entries="@array/sync_types" android:title="@string/contactsync_what" />
 	</PreferenceCategory>
+	
+	<DangerPreferenceCategory android:title="@string/danger_zone">
+	    
+	    <Preference
+	        android:key="delete"
+	        android:title="@string/remove_account" />
+	    
+	</DangerPreferenceCategory>
 </PreferenceScreen>

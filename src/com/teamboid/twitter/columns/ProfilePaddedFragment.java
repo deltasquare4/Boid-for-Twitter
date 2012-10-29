@@ -20,27 +20,4 @@ public abstract class ProfilePaddedFragment extends BaseListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.profile_content, container, false);
 	}
-
-	@Override
-	public void setEmptyText(CharSequence text) {
-		if(getView() == null) return;
-		((TextView)getView().findViewById(android.R.id.empty)).setText(text);
-	}
-
-	@Override
-	public void setListShown(boolean shown) {
-		View mProgressContainer = getActivity().findViewById(R.id.progressContainer);
-		View mListContainer = getActivity().findViewById(R.id.listContainer);
-		if (shown) {
-			mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-			mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-			mProgressContainer.setVisibility(View.GONE);
-			mListContainer.setVisibility(View.VISIBLE);
-		} else {
-			mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-			mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-			mProgressContainer.setVisibility(View.VISIBLE);
-			mListContainer.setVisibility(View.GONE);
-		}
-	}
 }

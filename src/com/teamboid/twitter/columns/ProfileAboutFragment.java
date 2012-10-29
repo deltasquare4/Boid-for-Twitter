@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.net.URLEncoder;
+import java.util.List;
 
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -99,9 +101,18 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 	public void onStart() {
 		super.onStart();
 		setRetainInstance(true);
+		if(getArguments() == null) return;
 		screenName = getArguments().getString("query");
+		if(screenName != null){
+			reloadAdapter(true);
+	        getListView().setDivider(null);
+		}
+	}
+	
+	public void setScreenName(String screenName){
+		this.screenName = screenName;
 		reloadAdapter(true);
-        getListView().setDivider(null);
+		getListView().setDivider(null);
 	}
 
 	@Override
@@ -189,4 +200,12 @@ public class ProfileAboutFragment extends ProfilePaddedFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+	
+	@Override
+	public String getColumnName() {
+		return "n/a";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {}
 }

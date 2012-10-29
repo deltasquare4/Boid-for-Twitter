@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.teamboid.twitter.cab.UserListCAB;
 import com.teamboid.twitter.listadapters.SearchUsersListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ListActivity;
@@ -33,6 +34,7 @@ public class UserListActivity extends ListActivity {
 	private boolean allowPagination = true;
 	public SearchUsersListAdapter binder;
 	private ProgressDialog progDialog;
+	BoidActivity boid;
 
 	public void showProgress(final boolean visible) {
 		if (showProgress == visible && progDialog != null) {
@@ -71,6 +73,19 @@ public class UserListActivity extends ListActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		binder = new SearchUsersListAdapter(this);
 		setListAdapter(binder);
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate();
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	
+	public void finishCreate(){
 		refresh();
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -100,6 +115,12 @@ public class UserListActivity extends ListActivity {
 			}
 		});
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
 	}
 
 	@Override

@@ -3,16 +3,14 @@ package com.teamboid.twitter;
 import java.util.ArrayList;
 
 import com.teamboid.twitterapi.list.UserList;
-import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.BillingRequest.ResponseCode;
-import net.robotmedia.billing.helper.AbstractBillingObserver;
-import net.robotmedia.billing.model.Transaction.PurchaseState;
 
 import com.teamboid.twitter.SendTweetTask.Result;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.IBoidFragment;
 import com.teamboid.twitter.TabsAdapter.TabInfo;
+import com.teamboid.twitter.boxes.TimelineSidebarBox;
 import com.teamboid.twitter.cab.MessageConvoCAB;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.cab.UserListCAB;
@@ -34,6 +32,7 @@ import com.teamboid.twitter.listadapters.UserListDisplayAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.SendTweetService;
 import com.teamboid.twitter.utilities.BoidActivity;
+import com.teamboid.twitter.utilities.NetworkUtils;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.animation.Animator;
@@ -55,6 +54,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -86,12 +86,11 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	public class SendTweetUpdater extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			if (intent.getAction().equals(AccountManager.END_LOAD)) {
-				loadColumns(
-						intent.getBooleanExtra("last_account_count", false),
-						null);
-				accountsLoaded();
-				invalidateOptionsMenu();
+			if (intent.getAction().equals(AccountService.END_LOAD)) {
+				// lets see what we can do
+				return;
+			} else if(intent.getAction().equals(SendTweetService.NETWORK_AVAIL)){
+				TimelineScreen.this.invalidateOptionsMenu();
 				return;
 			}
 			try {
@@ -214,7 +213,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		startService(new Intent(this, AccountService.class));
+		// startService(new Intent(this, AccountService.class));
 	}
 
 	private void notificationSwitch(Intent intent) {
@@ -298,6 +297,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				AccountService.selectedAccount = lastSel;
 			}
 		}
+		
+		TimelineSidebarBox.setup(this);
 		if (mTabsAdapter == null) {
 			mTabsAdapter = new TabsAdapter(this);
 			filterDefaultColumnSelection = true;
@@ -480,11 +481,14 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOffscreenPageLimit(4);
 		mViewPager.setAdapter(mTabsAdapter);
-		mViewPager
-				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(final int position) {
+				getActionBar().getTabAt(position).select();
+				runOnUiThread(new Runnable(){
+
 					@Override
-					public void onPageSelected(int position) {
-						getActionBar().getTabAt(position).select();
+					public void run() {
 						try {
 							((TabsAdapter.IBoidFragment) mTabsAdapter
 									.getLiveItem(position)).onDisplay();
@@ -492,7 +496,11 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 							e.printStackTrace();
 						}
 					}
+					
 				});
+				
+			}
+		});
 
 		if (newColumn) {
 			newColumn = false;
@@ -513,6 +521,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			ViewPager pager = (ViewPager) findViewById(R.id.pager);
 			pager.setAdapter(mTabsAdapter);
 			pager.setCurrentItem(defaultColumn);
+			((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(defaultColumn)).onDisplay();
 		}
 		filterDefaultColumnSelection = false;
 		notificationSwitch(intent);
@@ -557,19 +566,46 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		for (int i = 0; i < getActionBar().getTabCount(); i++) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
-			if (frag instanceof BaseListFragment)
-				((BaseListFragment) frag).reloadAdapter(false);
-			else if (frag instanceof BaseSpinnerFragment)
-				((BaseSpinnerFragment) frag).reloadAdapter(false);
-			else
-				((BaseGridFragment) frag).reloadAdapter(false);
+			if (IBoidFragment.class.isInstance(frag)){
+				((IBoidFragment) frag).reloadAdapter(false);
+			}
 		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+			if (getIntent().getData().getPath().contains("/status/")) {
+				startActivity(getIntent().setClass(this, TweetViewer.class));
+				finish();
+				return;
+			} else if (getIntent().getDataString().contains("twitter.com/")
+					&& getIntent().getData().getPathSegments().size() == 1) {
+				startActivity(getIntent().setClass(this, ProfileScreen.class));
+				finish();
+				return;
+			}
+		}
+		
 		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				loadColumns(
+						boid.firstLoad,
+						null);
+				accountsLoaded();
+				invalidateOptionsMenu();
+			}
+		};
 		boid.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.main);
+		initialize(savedInstanceState);
+		
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey("lastTheme")
 					|| savedInstanceState.containsKey("lastDisplayReal")) {
@@ -610,43 +646,26 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					getApplicationContext()).getBoolean("show_real_names",
 					false);
 		}
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		initialize(savedInstanceState);
 		
-		// This callback must stay here, otherwise in-app billing doesn't work
-		// for some reason.
-		AbstractBillingObserver mBillingObserver = new AbstractBillingObserver(
-				this) {
-			@Override
-			public void onBillingChecked(boolean supported) {
-			}
-
-			@Override
-			public void onPurchaseStateChanged(String itemId,
-					PurchaseState state) {
-			}
-
-			@Override
-			public void onRequestPurchaseResponse(String itemId,
-					ResponseCode response) {
-			}
-		};
-		BillingController.registerObserver(mBillingObserver);
-		BillingController.checkBillingSupported(this);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(SendTweetService.NETWORK_AVAIL);
+		filter.addAction(SendTweetService.UPDATE_STATUS);
+		filter.addAction(AccountService.END_LOAD);
+		registerReceiver(receiver, filter);
+		
+		// ActionBar Fix
+		// http://stackoverflow.com/questions/8465258/how-can-i-force-the-action-bar-to-be-at-the-bottom-in-ics
+		// based on how Google did it
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayOptions(actionBar.getDisplayOptions() | ActionBar.DISPLAY_SHOW_CUSTOM);
+		/*View v = new View(this);
+		actionBar.setCustomView(v,
+	            new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
+	                    0,
+	                    Gravity.CENTER_VERTICAL | Gravity.RIGHT));*/
 	}
 
 	public void accountsLoaded() {
-		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
-			if (getIntent().getData().getPath().contains("/status/")) {
-				startActivity(getIntent().setClass(this, TweetViewer.class));
-				finish();
-			} else if (getIntent().getDataString().contains("twitter.com/")
-					&& getIntent().getData().getPathSegments().size() == 1) {
-				startActivity(getIntent().setClass(this, ProfileScreen.class));
-				finish();
-			}
-		}
 		invalidateOptionsMenu();
 		startService(new Intent(this, SendTweetService.class)
 				.setAction(SendTweetService.LOAD_TWEETS));
@@ -812,8 +831,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		}
 		invalidateOptionsMenu();
 		IntentFilter filter = new IntentFilter();
+		filter.addAction(SendTweetService.NETWORK_AVAIL);
 		filter.addAction(SendTweetService.UPDATE_STATUS);
-		filter.addAction(AccountManager.END_LOAD);
+		filter.addAction(AccountService.END_LOAD);
 		registerReceiver(receiver, filter);
 	}
 
@@ -877,6 +897,10 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						+ AccountService.getCurrentAccount().getUser()
 								.getScreenName());
 		}
+		
+		if(!NetworkUtils.haveNetworkConnection(this))
+			menu.findItem(R.id.refreshAction).setVisible(false);
+		
 		return true;
 	}
 
@@ -913,10 +937,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 							getActionBar().getTabCount()), 900);
 			return true;
 		case R.id.donateAction:
-			Toast.makeText(getApplicationContext(),
-					R.string.donations_appreciated, Toast.LENGTH_SHORT).show();
-			BillingController.requestPurchase(this,
-					"com.teamboid.twitter.donate", true);
+			startActivity(new Intent(this, DonateActivity.class));
 			return true;
 		case R.id.refreshAction:
 			performRefresh();

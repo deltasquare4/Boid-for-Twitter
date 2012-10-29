@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Place;
@@ -69,6 +71,8 @@ public class FeedListAdapter extends BaseAdapter {
 	private int lastViewedTopMargin;
 	public String user;
 	public long account;
+	
+	public ArrayList<Status> getData(){ return tweets; }
 	
 	public void setLastViewed(ListView list) {
 		if (list == null)
@@ -312,7 +316,7 @@ public class FeedListAdapter extends BaseAdapter {
 				.findViewById(R.id.locationIndicTxt);
 		TextView replyIndic = (TextView) toReturn
 				.findViewById(R.id.inReplyIndicTxt);
-		final ImageView mediaPreview = (ImageView) toReturn
+		final RemoteImageView mediaPreview = (RemoteImageView) toReturn
 				.findViewById(R.id.feedItemMediaPreview);
 		ImageView rtIndic = (ImageView) toReturn
 				.findViewById(R.id.feedItemRetweetIndicatorImg);
@@ -353,6 +357,7 @@ public class FeedListAdapter extends BaseAdapter {
 			userNameTxt.setText("@" + tweet.getUser().getScreenName());
 		if (PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
 				"enable_profileimg_download", true)) {
+			profilePic.setScaleType(ScaleType.FIT_XY);
 			profilePic.setImageResource(R.drawable.sillouette);
 			profilePic.setImageURL(Utilities.getUserImage(tweet.getUser()
 					.getScreenName(), mContext));
@@ -376,28 +381,30 @@ public class FeedListAdapter extends BaseAdapter {
 			final String media = Utilities.getTweetYFrogTwitpicMedia(tweet);
 			if (media != null && !media.isEmpty()) {
 				hasMedia = true;
-				addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
-				addRule(replyFrame, R.id.feedItemMediaFrame,
-						RelativeLayout.BELOW);
-				mediaFrame.setVisibility(View.VISIBLE);
-				mediaPreview.setVisibility(View.GONE);
-				mediaIndic.setVisibility(View.VISIBLE);
+				
 				if (prefs.getBoolean("enable_inline_previewing", true)) {
+					
+					addRule(locFrame, R.id.feedItemMediaFrame, RelativeLayout.BELOW);
+					addRule(replyFrame, R.id.feedItemMediaFrame,
+							RelativeLayout.BELOW);
+					mediaFrame.setVisibility(View.VISIBLE);
+					mediaPreview.setVisibility(View.VISIBLE);
+					mediaIndic.setVisibility(View.VISIBLE);
+				
 					itemTxt.setMinHeight(Utilities.convertDpToPx(mContext, 35)
 							+ Integer.parseInt(prefs.getString("font_size",
 									"16")));
 					mediaProg.setVisibility(View.VISIBLE);
-					ImageManager download = ImageManager.getInstance(mContext);
-					download.get(media,
-							new ImageManager.OnImageReceivedListener() {
-								@Override
-								public void onImageReceived(String source,
-										Bitmap bitmap) {
-									mediaProg.setVisibility(View.GONE);
-									mediaPreview.setVisibility(View.VISIBLE);
-									mediaPreview.setImageBitmap(bitmap);
-								}
-							});
+					mediaPreview.setScaleType(ScaleType.CENTER_CROP);
+					// ImageManager download = ImageManager.getInstance(mContext);
+					mediaPreview.onImageFinished = new BoidActivity.OnAction() {
+						
+						@Override
+						public void done() {
+							mediaProg.setVisibility(View.GONE);
+						}
+					};
+					mediaPreview.setImageURL(media);
 				} else
 					hideInlineMedia(toReturn);
 			} else
@@ -447,7 +454,7 @@ public class FeedListAdapter extends BaseAdapter {
 		ProgressBar mediaProg = (ProgressBar) toReturn
 				.findViewById(R.id.feedItemMediaProgress);
 		View mediaFrame = toReturn.findViewById(R.id.feedItemMediaFrame);
-		ImageView mediaPreview = (ImageView) toReturn
+		RemoteImageView mediaPreview = (RemoteImageView) toReturn
 				.findViewById(R.id.feedItemMediaPreview);
 		ImageView mediaIndic = (ImageView) toReturn
 				.findViewById(R.id.feedItemMediaIndicator);

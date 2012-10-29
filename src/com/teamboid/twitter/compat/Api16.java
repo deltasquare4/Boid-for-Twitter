@@ -119,7 +119,6 @@ public class Api16 {
 			Notification.Builder nb = new Notification.Builder(c)
 					.setContentTitle(c.getString(getQueueMessage(queue)))
 					.setContentText(getQueueContent(c, queue, ja.length()))
-					.setNumber(ja.length())
 					.setSmallIcon(R.drawable.statusbar_icon);
 			Intent content = new Intent(c, TimelineScreen.class)
 					.putExtra("switch", queue).putExtra("account", accId)
@@ -140,7 +139,7 @@ public class Api16 {
 				 */
 				m = ja.length() - 1;
 			}
-			for (int i = 0; i < m; i++) {
+			for (int i = m; i > 0; i--) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user

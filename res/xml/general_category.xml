@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:awesome="http://schemas.android.com/apk/awesomeprefs"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    
     <CheckBoxPreference 
         android:key="notifications_global"
         android:defaultValue="true"
@@ -9,6 +12,15 @@
 	<SwitchPreference android:key="enable_ssl"
 		android:layout="@layout/boid_preference" android:summary="@string/enable_ssl_description"
 		android:title="@string/enable_ssl_title" android:persistent="true" />
+	
+	<ListPreference android:key="link_action"
+	    awesome:visibleIf="advanced"
+	    android:title="@string/link_action"
+	    android:defaultValue="browser"
+	    android:entries="@array/link_action_human"
+	    android:entryValues="@array/link_action_robot"
+	    />
+	
 	<PreferenceCategory android:key="profile_picture_category"
 		android:title="@string/profile_picture_header">
 		<SwitchPreference android:key="enable_profileimg_download"
@@ -23,5 +35,8 @@
 		<SwitchPreference android:key="enable_inline_previewing"
 			android:layout="@layout/boid_preference" android:summary="@string/enable_inline_desc"
 			android:title="@string/enable_inline_title" android:persistent="true" />
+		<Preference android:key="delete_media_cache"
+		    android:summary="@string/delete_media_desc"
+		    android:title="@string/delete_media" />
 	</PreferenceCategory>
 </PreferenceScreen>

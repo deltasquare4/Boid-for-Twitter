@@ -36,6 +36,7 @@
 		android:xlargeScreens="true" />
 
 	<application android:icon="@drawable/launcher_icon"
+	    android:name=".utilities.BoidApplication"
 		android:label="@string/app_name">
 		<meta-data android:name="android.app.default_searchable"
 			android:value=".SearchScreen" />
@@ -53,6 +54,9 @@
 				<action android:name="android.intent.action.MAIN" />
 
 				<category android:name="android.intent.category.LAUNCHER" />
+				
+				<!-- Samsung Multi-Window. Cheers Paul! -->
+				<category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
 			</intent-filter>
 
 			<!-- View Tweets/Users from Browser/Other Apps -->
@@ -71,9 +75,11 @@
 				<data android:host="twitter.com" android:scheme="https" />
 			</intent-filter>
 		</activity>
-		<activity android:name="com.teamboid.twitter.AccountManager"
-			android:configChanges="screenSize" android:exported="false"
-			android:label="@string/manage_accounts_str" />
+		
+		<activity android:name="com.teamboid.twitter.WelcomeActivity" />
+		<activity android:name="com.teamboid.twitter.DonateActivity"
+		    android:theme="@style/Invisible" />
+		
 		<activity android:name="com.teamboid.twitter.ProfileEditor"
 			android:configChanges="screenSize|keyboardHidden|orientation"
 			android:exported="false" />
@@ -96,6 +102,11 @@
 
 				<data android:mimeType="text/*" />
 				<data android:mimeType="image/*" />
+			</intent-filter>
+			<intent-filter android:label="">
+			    <action android:name="android.intent.action.BROWSE" />
+			    <category android:name="android.intent.category.DEFAULT" />
+			    <data android:host="twitter.com" android:pathPrefix="/intent/tweet" />
 			</intent-filter>
 		</activity>
 		<activity android:name="com.teamboid.twitter.SearchScreen"
@@ -186,6 +197,13 @@
 					android:scheme="http" />
 			</intent-filter>
 		</service>
+		<service android:name="com.teamboid.twitter.TimeisWidget"
+			android:exported="false">
+			<intent-filter>
+				<action android:name="com.android.ACTION_EMBED" />
+				<data android:host="www.time.is" android:pathPattern="/.*_in_.*" android:scheme="http" />
+			</intent-filter>
+		</service>
 
 		<!-- Webkit Views -->
 		<activity android:name="com.teamboid.twitter.LoginHandler"
@@ -267,6 +285,14 @@
 		</service>
 
 		<activity android:name="com.crittercism.NotificationActivity" />
+		
+		<!-- Samsung Multi-Window Support. Cheers Paul@MoDaCo! -->
+		<uses-library required="false" name="com.sec.android.app.multiwindow"> </uses-library>
+		<meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+		<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_W" android:resource="@dimen/app_defaultsize_w" />
+		<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_H" android:resource="@dimen/app_defaultsize_h" />
+		<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_W" android:resource="@dimen/app_minimumsize_w" />
+		<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H" android:resource="@dimen/app_minimumsize_h" />
 	</application>
 
 </manifest>

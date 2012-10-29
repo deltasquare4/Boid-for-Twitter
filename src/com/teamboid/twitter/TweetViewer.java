@@ -3,6 +3,7 @@ package com.teamboid.twitter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper;
 import com.teamboid.twitter.tweetwidgets.TweetWidgetHostHelper.IFoundWidget;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.TwitlongerHelper;
 import com.teamboid.twitter.utilities.Utilities;
 import com.teamboid.twitter.views.BetterMapView;
@@ -45,6 +47,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.Drawable;
@@ -86,6 +90,7 @@ public class TweetViewer extends MapActivity {
 	private int lastTheme;
 	private String mediaUrl;
 	private boolean hasConvo;
+	BoidActivity boid;
 
 	private FeedListAdapter binder;
 
@@ -129,6 +134,19 @@ public class TweetViewer extends MapActivity {
 						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}
 		});
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate();
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	public void finishCreate(){
+		
 		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
 			try {
 				statusId = Long.parseLong(getIntent().getData()
@@ -154,6 +172,8 @@ public class TweetViewer extends MapActivity {
 	@Override
 	public void onBackPressed() {
 		SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
+		if(sideNav == null) { super.onBackPressed(); return; }
+		
 		if (sideNav.isShowingNavigationView()) {
 			sideNav.showContentView();
 		} else
@@ -300,14 +320,20 @@ public class TweetViewer extends MapActivity {
 									invalidateOptionsMenu();
 									binder.add(toAdd.toArray(new Status[0]));
 									binder.notifyDataSetChanged();
-									((GlowableRelativeLayout) findViewById(R.id.glowstone))
-											.glow();
+									if(findViewById(R.id.glowstone) != null){
+										((GlowableRelativeLayout) findViewById(R.id.glowstone))
+												.glow();
+									}
 								}
 							});
 						}
 					} else {
 						final SideNavigationLayout sideNav = (SideNavigationLayout) findViewById(R.id.slide);
-						sideNav.enabled = false;
+						if(sideNav == null){
+							findViewById(android.R.id.list).setVisibility(View.GONE);
+						} else{
+							sideNav.enabled = false;
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -404,9 +430,8 @@ public class TweetViewer extends MapActivity {
 		widgetPos.add(url);
 		twhh.findWidget(status.getId(), url, this, new IFoundWidget() {
 			@Override
-			public void displayWidget(RemoteViews rv) {
+			public void displayWidget(View v) {
 				try {
-					View v = rv.apply(TweetViewer.this, widgets);
 					widgets.removeViewAt(widgetPos.indexOf(url));
 					widgets.addView(v, widgetPos.indexOf(url),
 							new LinearLayout.LayoutParams(
@@ -436,6 +461,22 @@ public class TweetViewer extends MapActivity {
 					.getId()) {
 				menu.findItem(R.id.retweetAction).setVisible(false);
 				menu.findItem(R.id.deleteAction).setVisible(true);
+			} else if(status.getUser().isProtected()){
+				menu.findItem(R.id.retweetAction).setVisible(false);
+			}
+			
+			// And here we have another api :)
+			PackageManager pm = this.getPackageManager();
+			Intent intent = new Intent("com.teamboid.twitter.tweet_actions");
+			intent.setData( Uri.parse( "http://twitter.com/" + status.getUser().getScreenName() + "/status/" + status.getId() ));
+			intent.putExtra("contents", status.getText());
+			intent.putExtra("byUser", status.getUser().getScreenName());
+			intent.putExtra("id", status.getId());
+			
+			List<ResolveInfo> ri = pm.queryIntentActivities(intent, 0);
+			for(ResolveInfo r : ri){
+				menu.add(r.loadLabel(pm)).setIntent(intent)
+					.setIcon(r.loadIcon(pm)).setShowAsAction( MenuItem.SHOW_AS_ACTION_NEVER );
 			}
 		}
 		MenuItem fav = menu.findItem(R.id.favoriteAction);
@@ -489,6 +530,12 @@ public class TweetViewer extends MapActivity {
 				});
 			}
 		}).start();
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
 	}
 
 	@Override

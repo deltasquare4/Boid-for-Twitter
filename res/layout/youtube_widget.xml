@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent">
-	<ImageView android:id="@+id/thumb" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
-	<Button android:id="@+id/title" android:layout_marginBottom="5dp"
-		android:layout_alignBottom="@+id/thumb" android:layout_width="fill_parent"
+
+	<ImageView
+	    android:id="@+id/thumb"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content" />
+	
+	<ImageView
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBottom="@+id/thumb"
+	    android:layout_alignLeft="@+id/thumb"
+	    android:layout_alignRight="@+id/thumb"
+	    android:layout_alignTop="@+id/thumb"
+	    android:layout_gravity="center"
+	    android:scaleType="center"
+	    android:src="@drawable/av_play" />
+	
+	<TextView android:id="@+id/title"
+	    android:layout_below="@+id/thumb"
+	    android:layout_marginBottom="5dp"
+		android:padding="5dp"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content" />
 </RelativeLayout>

@@ -1,6 +1,8 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -128,8 +130,12 @@ public class FavoritesFragment extends BaseListFragment {
 							public void run() {
 								setEmptyText(context
 										.getString(R.string.no_favorites));
+								if(!paginate) adapt.clear(); // stops gaps
+								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
+								
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
 								if (beforeLast > 0) {
 									if (getView() != null && addedCount > 0) {
 										if (paginate && addedCount > 0) {
@@ -258,5 +264,17 @@ public class FavoritesFragment extends BaseListFragment {
 	@Override
 	public DMConversation[] getSelectedMessages() {
 		return null;
+	}
+
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".favs";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((Status) obj);
+		}
 	}
 }

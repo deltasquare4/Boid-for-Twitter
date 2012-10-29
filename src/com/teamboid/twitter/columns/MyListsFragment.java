@@ -1,5 +1,9 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -80,6 +84,13 @@ public class MyListsFragment extends BaseListFragment {
 				if (acc != null) {
 					try {
 						final UserList[] lists = acc.getClient().getLists();
+						
+						List<Serializable> data = new ArrayList<Serializable>();
+						for(UserList ul : lists){
+							data.add(ul);
+						}
+						saveCachedContents(data);
+						
 						context.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -93,7 +104,7 @@ public class MyListsFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context,	e.getMessage(), Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}
@@ -150,4 +161,16 @@ public class MyListsFragment extends BaseListFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+	
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".mylists";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((UserList) obj);
+		}
+	}
 }

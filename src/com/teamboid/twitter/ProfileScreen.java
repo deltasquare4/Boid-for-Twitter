@@ -18,6 +18,7 @@ import com.teamboid.twitter.columns.ProfileAboutFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.services.AccountService;
+import com.teamboid.twitter.utilities.BoidActivity;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.app.ActionBar;
@@ -51,6 +52,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.LoaderManager;
@@ -75,6 +77,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	public FeedListAdapter adapter;
 	public User user;
 	private ViewPager mViewPager;
+	BoidActivity boid;
 
 	public void showProgress(boolean visible) {
 		if (showProgress == visible)
@@ -97,6 +100,18 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			setTheme(Utilities.getTheme(getApplicationContext()));
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
+		
+		boid = new BoidActivity(this);
+		boid.AccountsReady = new BoidActivity.OnAction() {
+			
+			@Override
+			public void done() {
+				finishCreate(savedInstanceState);
+			}
+		};
+		boid.onCreate(savedInstanceState);
+	}
+	public void finishCreate(final Bundle savedInstanceState){
 		ActionBar ab = getActionBar();
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(false);
@@ -153,6 +168,11 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			setTitle(R.string.please_wait);
 		}
 	}
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		boid.onDestroy();
+	}
 
 	private TabsAdapter mTabsAdapter;
 	private String mScreenName;
@@ -174,14 +194,21 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 											new int[] { R.attr.timelineTab })
 											.getDrawable(0)),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab()
-							.setTabListener(this)
-							.setIcon(
-									getTheme().obtainStyledAttributes(
-											new int[] { R.attr.aboutTab })
-											.getDrawable(0)),
-					ProfileAboutFragment.class, 1, screenName);
+			
+			int i = 2;
+			if(boid.isTablet()){
+				i = 1;
+				((ProfileAboutFragment)getFragmentManager().findFragmentById(R.id.aboutFragment)).setScreenName(screenName);
+			} else{
+				mTabsAdapter.addTab(
+						bar.newTab()
+								.setTabListener(this)
+								.setIcon(
+										getTheme().obtainStyledAttributes(
+												new int[] { R.attr.aboutTab })
+												.getDrawable(0)),
+						ProfileAboutFragment.class, 1, screenName);
+			}
 			mTabsAdapter.addTab(
 					bar.newTab()
 							.setTabListener(this)
@@ -189,20 +216,26 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 									getTheme().obtainStyledAttributes(
 											new int[] { R.attr.mediaTab })
 											.getDrawable(0)),
-					MediaTimelineFragment.class, 2, screenName, false);
+					MediaTimelineFragment.class, i, screenName, false);
 		} else {
 			mTabsAdapter.addTab(
 					bar.newTab().setTabListener(this)
 							.setText(R.string.tweets_str),
 					PaddedProfileTimelineFragment.class, 0, screenName);
-			mTabsAdapter.addTab(
-					bar.newTab().setTabListener(this)
-							.setText(R.string.about_str),
-					ProfileAboutFragment.class, 1, screenName);
+			int i = 2;
+			if(boid.isTablet()){
+				i = 1;
+				((ProfileAboutFragment)getFragmentManager().findFragmentById(R.id.aboutFragment)).setScreenName(screenName);
+			} else{
+				mTabsAdapter.addTab(
+						bar.newTab().setTabListener(this)
+								.setText(R.string.about_str),
+						ProfileAboutFragment.class, 1, screenName);
+			}
 			mTabsAdapter.addTab(
 					bar.newTab().setTabListener(this)
 							.setText(R.string.media_title),
-					MediaTimelineFragment.class, 2, screenName, false);
+					MediaTimelineFragment.class, i, screenName, false);
 		}
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -304,7 +337,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 				menu.findItem(R.id.reportAction).setEnabled(true);
 			}
 		}
-		/* TODO: Uncomment when it's working.
+		/* TODO: Uncomment when it's working. */
 		Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:"
 								+ getActionBar()
@@ -317,7 +350,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 						.setEnabled(false);
 			}
 		}
-		*/
+		
 		if (showProgress) {
 			final MenuItem refreshAction = menu.findItem(R.id.refreshAction);
 			refreshAction.setEnabled(false);
@@ -536,28 +569,6 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		}
 		super.onSaveInstanceState(outState);
 	}
-	
-	@Deprecated
-	public void setupMediaView() {
-		if (user == null) {
-			return;
-		}
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				setHeaderBackground(user.getProfileBackgroundImageUrl());
-				// try {
-				// MediaFeedListAdapter.MediaFeedItem m =
-				// getMediaFragment().getAdapter().get(0);
-				// setHeaderBackground(m.imgurl);
-				// } catch(Exception e){
-				// e.printStackTrace();
-				// // Here we should divert to profile bg?
-				// setHeaderBackground(user.getProfileBackgroundImageUrl());
-				// }
-			}
-		});
-	}
 
 	void setHeaderBackground(String url) {
 		if (url.startsWith("http")) {
@@ -577,11 +588,18 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	}
 
 	public ProfileAboutFragment getAboutFragment() {
+		if(boid.isTablet()){
+			return (ProfileAboutFragment) getFragmentManager().findFragmentById(R.id.aboutFragment);
+		}
 		return (ProfileAboutFragment) getFragmentManager().findFragmentByTag(
 				"page:1");
 	}
 
 	public MediaTimelineFragment getMediaFragment() {
+		if(boid.isTablet()){
+			return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
+					"page:1");
+		}
 		return (MediaTimelineFragment) getFragmentManager().findFragmentByTag(
 				"page:2");
 	}
@@ -624,6 +642,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		});
 		TextView tv = (TextView) findViewById(R.id.profileTopLeftDetail);
 		tv.setText(user.getName() + "\n@" + user.getScreenName());
+		if(!boid.isTablet()){
 		((ViewPager) findViewById(R.id.pager))
 				.setOnPageChangeListener(new OnPageChangeListener() {
 
@@ -641,16 +660,30 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			}
 
 			@Override
-			public void onPageSelected(int position) {
+			public void onPageSelected(final int position) {
 				getActionBar().getTabAt(position).select();
 				invalidateOptionsMenu();
-				((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
+				runOnUiThread(new Runnable(){
+
+					@Override
+					public void run() {
+						((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(position)).onDisplay();
+					}
+					
+				});
 			}
 
 			@Override
 			public void onPageScrollStateChanged(int arg0) {}
 		});
-		setHeaderBackground(user.getProfileBackgroundImageUrl());
+		}
+		
+		try{
+			// TODO: On screens wide enough fetch web
+			setHeaderBackground(user.getProfileBannerMobile());
+		} catch(Exception e){
+			setHeaderBackground(user.getProfileBackgroundImageUrl());
+		}
 	}
 
 	public void showAddToListDialog(final UserList[] lists) {

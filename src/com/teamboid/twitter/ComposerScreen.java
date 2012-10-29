@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -271,7 +272,29 @@ public class ComposerScreen extends Activity {
 			}
 		});
 		//final EditText content = (EditText) findViewById(R.id.tweetContent);
-		if (getIntent().getExtras() != null) {
+		if( getIntent().getData() != null ){
+			// Reply or Tweet button clicks
+			if(getIntent().getDataString().startsWith("/intent/tweet")){
+				// Tweet Intent
+				String text = "", q = "";
+				if((q = getIntent().getData().getQueryParameter("text")) != null){
+					text = q;
+				}
+				if((q = getIntent().getData().getQueryParameter("url")) != null){
+					text += " " + q;
+				}
+				if((q = getIntent().getData().getQueryParameter("via")) != null){
+					text += " via " + q; // TODO: Translate
+				}
+				if((q = getIntent().getData().getQueryParameter("hashtags")) != null){
+					String[] htags = q.split(",");
+					for(String tag : htags){
+						text += " #" + tag;
+					}
+				}
+				content.setText(text);
+			}
+		} else if (getIntent().getExtras() != null) {
 			if (getIntent().hasExtra("reply_to")) {
 				Status replyTo = (Status) getIntent().getSerializableExtra(
 						"reply_to");
@@ -650,6 +673,13 @@ public class ComposerScreen extends Activity {
 					stt.hasMedia() ? View.VISIBLE : View.GONE);
 			findViewById(R.id.upload_with_label).setVisibility(
 					stt.hasMedia() ? View.VISIBLE : View.GONE);
+		}
+		
+		// Check for camera
+		PackageManager pm = getPackageManager();
+		if(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+			// You can't take a photo if you don't have a camera!
+			menu.findItem(R.id.captureAction).setVisible(false);
 		}
 
 		if (!stt.isGalleryImage && stt.hasMedia()) {

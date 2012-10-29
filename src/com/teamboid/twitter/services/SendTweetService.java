@@ -203,7 +203,9 @@ public class SendTweetService extends Service {
 		if (intent == null)
 			return Service.START_STICKY;
 		if (intent.getAction().equals(NETWORK_AVAIL)) {
-			startBackground();
+			if(NetworkUtils.haveNetworkConnection(this)){
+				startBackground();
+			}
 		} else if (intent.getAction().equals(LOAD_TWEETS)) {
 			loadTweets();
 			Intent update = new Intent(UPDATE_STATUS);

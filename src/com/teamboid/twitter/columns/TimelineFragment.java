@@ -1,7 +1,10 @@
 package com.teamboid.twitter.columns;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -52,8 +55,7 @@ public class TimelineFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
+	public void onReadyToLoad() {
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
 		getListView().setOnScrollListener(
@@ -74,7 +76,6 @@ public class TimelineFragment extends BaseListFragment {
 				});
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_tweets));
-		reloadAdapter(true);
 	}
 
 	@Override
@@ -89,6 +90,8 @@ public class TimelineFragment extends BaseListFragment {
 		super.onPause();
 		savePosition();
 	}
+	
+	public static final int TWEETS_PER_LOAD = 50;
 
 	@Override
 	public void performRefresh(final boolean paginate) {
@@ -103,7 +106,7 @@ public class TimelineFragment extends BaseListFragment {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Paging paging = new Paging(50);
+				Paging paging = new Paging(TWEETS_PER_LOAD);
 				if (paginate) paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
 				final Account acc = AccountService.getCurrentAccount();
 				if (acc != null) {
@@ -113,12 +116,15 @@ public class TimelineFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.no_tweets));
+								if(!paginate && feed.length < TWEETS_PER_LOAD) adapt.clear(); // stops gaps
+								
 								int beforeLast = adapt.getCount() - 1;
 								int addedCount = adapt.add(feed);
+								saveCachedContents(statusToSerializableArray(adapt.getData()));
 								if (addedCount > 0 || beforeLast > 0) {
 									if (getView() != null) {
 										if (paginate && addedCount > 0) {
-											getListView().smoothScrollToPosition(beforeLast + 1);
+											// getListView().smoothScrollToPosition(beforeLast + 1);
                                         } else if (getView() != null && adapt != null) {
 											adapt.restoreLastViewed(getListView());
                                         }
@@ -137,7 +143,7 @@ public class TimelineFragment extends BaseListFragment {
 							@Override
 							public void run() {
 								setEmptyText(context.getString(R.string.error_str));
-								Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+								showError(e.getMessage());
 							}
 						});
 					}
@@ -162,8 +168,8 @@ public class TimelineFragment extends BaseListFragment {
 				adapt.setLastViewed(getListView());
 			adapt = AccountService.getFeedAdapter(context, TimelineFragment.ID, AccountService.getCurrentAccount().getId());
 			setListAdapter(adapt);
-			if (adapt.getCount() == 0) performRefresh(false);
-			else if (getView() != null && adapt != null) {
+			// if (adapt.getCount() == 0) performRefresh(false);
+			if (getView() != null && adapt != null) {
 				adapt.restoreLastViewed(getListView());
 			}
 		}
@@ -216,4 +222,18 @@ public class TimelineFragment extends BaseListFragment {
 
 	@Override
 	public DMConversation[] getSelectedMessages() { return null; }
+
+	@Override
+	public String getColumnName() {
+		return AccountService.getCurrentAccount().getId() + ".home";
+	}
+
+	@Override
+	public void showCachedContents(List<Serializable> contents) {
+		for(Serializable obj : contents){
+			adapt.add((Status) obj);
+		}
+		adapt.notifyDataSetInvalidated();
+		setListShown(true);
+	}
 }

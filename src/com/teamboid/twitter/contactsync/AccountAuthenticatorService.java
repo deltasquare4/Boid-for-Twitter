@@ -1,10 +1,9 @@
 package com.teamboid.twitter.contactsync;
 
-import com.teamboid.twitter.AccountManager;
-
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.app.Service;
 import android.content.Context;
