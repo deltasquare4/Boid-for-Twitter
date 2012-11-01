@@ -1,29 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
-    
-    <ViewStub
-        android:layout="@layout/main_sidebar"
-        android:id="@+id/sidebar"
-        android:layout_width="@dimen/sidebarWidth"
-        android:layout_height="match_parent" />
-    
-    <!-- TODO: Assets -->
-    <ImageButton
-        android:id="@+id/sidebarDrawer"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="c" />
-    
-    <android.support.v4.view.ViewPager
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="horizontal">
+	<ViewStub android:layout="@layout/main_sidebar" android:id="@+id/sidebar"
+		android:layout_width="@dimen/sidebarWidth" android:layout_height="match_parent" />
+
+	<!-- TODO: Assets -->
+	<ImageButton android:id="@+id/sidebarDrawer"
+		android:layout_width="wrap_content" android:layout_height="match_parent" />
+	<android.support.v4.view.ViewPager
 		android:layout_width="match_parent" android:layout_height="match_parent"
 		android:id="@+id/pager" />
-    
-    <!-- This will move somewhere else... -->
-    <SlidingDrawer android:visibility="gone"
-		android:id="@+id/progress"
+
+	<!-- This will move somewhere else... -->
+	<SlidingDrawer android:visibility="gone" android:id="@+id/progress"
 		android:layout_width="match_parent" android:layout_height="wrap_content"
 		android:handle="@+id/progress_handle" android:content="@+id/progress_content">
 		<TextView android:textColor="?tweetColor" android:background="?sideNavColor"
@@ -33,5 +23,4 @@
 			android:layout_width="match_parent" android:layout_height="match_parent"
 			android:id="@+id/progress_content" />
 	</SlidingDrawer>
-
 </LinearLayout>

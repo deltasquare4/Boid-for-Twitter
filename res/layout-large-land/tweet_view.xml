@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:layout_width="match_parent"
-    android:orientation="horizontal"
-	android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-		<ListView android:background="?sideNavColor"
-			android:cacheColorHint="?sideNavColor" android:id="@android:id/list"
-			android:layout_width="@dimen/sidebarWidth" android:layout_height="match_parent" />
-		<include layout="@layout/tweet_view_content" />
+<LinearLayout android:layout_width="match_parent"
+	android:orientation="horizontal" android:layout_height="match_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<ListView android:background="?sideNavColor"
+		android:cacheColorHint="?sideNavColor" android:id="@android:id/list"
+		android:layout_width="@dimen/sidebarWidth" android:layout_height="match_parent" />
+	<include layout="@layout/tweet_view_content" />
 </LinearLayout>

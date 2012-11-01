@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  	xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-	android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent">
 	<ScrollView android:layout_width="match_parent"
 		android:layout_height="match_parent">
 		<RelativeLayout android:id="@+id/tweetDisplay"
@@ -26,24 +24,23 @@
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:singleLine="true" android:textAppearance="?android:attr/textAppearanceMedium" />
 			</RelativeLayout>
-			<TextView android:id="@+id/tweetContents" android:layout_below="@+id/tweetProfilePic"
-				android:textColor="?tweetColor" android:layout_marginTop="10dp"
-				android:textColorLink="?linkColor" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:linksClickable="true"
-				android:textAppearance="?android:attr/textAppearanceLarge" />
+			<TextView android:id="@+id/tweetContents"
+				android:layout_below="@+id/tweetProfilePic" android:textColor="?tweetColor"
+				android:layout_marginTop="10dp" android:textColorLink="?linkColor"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:linksClickable="true" android:textAppearance="?android:attr/textAppearanceLarge" />
 			<TextView android:id="@+id/tweetTimer" android:textColor="@color/dark"
 				android:layout_marginTop="5dp" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:singleLine="true"
-				android:layout_below="@+id/tweetContents"
-				android:layout_alignLeft="@+id/tweetContents"
+				android:layout_below="@+id/tweetContents" android:layout_alignLeft="@+id/tweetContents"
 				android:textAppearance="?android:attr/textAppearanceSmall" />
 			<RelativeLayout android:id="@+id/tweetMediaFrame"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:layout_below="@+id/tweetTimer" android:visibility="invisible">
-				<ImageView android:id="@+id/tweetMedia"
-					android:scaleType="centerCrop" android:adjustViewBounds="true"
-					android:visibility="gone" android:layout_marginTop="10dp"
-					android:layout_width="match_parent" android:layout_height="wrap_content" />
+				<ImageView android:id="@+id/tweetMedia" android:scaleType="centerCrop"
+					android:adjustViewBounds="true" android:visibility="gone"
+					android:layout_marginTop="10dp" android:layout_width="match_parent"
+					android:layout_height="wrap_content" />
 				<ProgressBar android:id="@+id/tweetMediaProgress"
 					android:visibility="gone" android:padding="5dp"
 					android:layout_centerInParent="true" android:layout_width="wrap_content"
