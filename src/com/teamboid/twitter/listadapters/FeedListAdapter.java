@@ -18,6 +18,8 @@ import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TabsAdapter;
+import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.utilities.BoidActivity;
@@ -32,8 +34,139 @@ import com.teamboid.twitterapi.status.Status;
  * 
  * @author Aidan Follestad
  */
-public class FeedListAdapter extends BaseAdapter {
+public class FeedListAdapter extends BoidAdapter<Status> implements Filterable {
+	public String ID;
 
+	public FeedListAdapter(Context context) {
+		super(context);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return getItem(position).getId();
+	}
+
+	@Override
+	public int getPosition(long id) {
+		for(int i = 0; i <= this.getCount(); i++){
+			if(getItem(i).getId() == id){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	Filter f;
+	public Filter getFilter(){
+		if(f == null) f = new TweetFilter();
+		return f;
+	}
+	
+	/**
+	 * Filters Tweets (Apply muting etc)
+	 * @author kennydude
+	 *
+	 */
+	private class TweetFilter extends Filter{
+
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults results = new FilterResults();
+			results.count = 0;
+			
+			// Check if we are going to filter
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+			if (prefs.getBoolean("enable_muting", false)) {
+				if(ID != null) {
+					boolean filteringDisabled = false;
+					if(ID.equals(TimelineFragment.ID)) {
+						filteringDisabled = (prefs.getBoolean("mute_timeline_enabled", true) == false);
+					} else if(ID.equals(MentionsFragment.ID)) {
+						filteringDisabled = (prefs.getBoolean("mute_mentions_enabled", false) == false);
+					}
+					if(filteringDisabled) return results;
+				}
+			} else return results;
+			
+			// If we haven't returned then we must filter ourselves
+			final String[] filter = Utilities.getMuteFilters(getContext());
+			if (filter == null || filter.length == 0) {
+				return results;
+			}
+			
+			// This will contain the IDs of the tweets we need to filter out
+			ArrayList<Integer> stripResults = new ArrayList<Integer>();
+			
+			final String[] types = getContext().getResources().getStringArray(
+					R.array.muting_types);
+			for (String rule : filter) {
+
+				String query = null;
+				String type = null;
+				if (rule.contains("@")) {
+					if (rule.endsWith("@" + types[1])) {
+						query = rule.substring(0, rule.indexOf("@"));
+						type = types[1];
+					} else {
+						query = rule.substring(0, rule.indexOf("@"));
+						type = types[2];
+					}
+				} else {
+					query = rule;
+					type = types[0];
+				}
+				query = query.replace("%40", "@");
+				
+				// Now we go through each tweet
+				for(int i = 0; i <= getCount(); i++){
+					Status tweet = getItem(i);
+
+					if (types[0].equals(type)) {
+						if (tweet.getText().toString().toLowerCase()
+								.contains(query.toLowerCase())) {
+							stripResults.add(i);
+						}
+					} else if (types[1].equals(type)) {
+						if (tweet.getUser().getScreenName().toLowerCase()
+								.equals(query.substring(1).toLowerCase())) {
+							stripResults.add(i);
+						}
+						if (tweet.isRetweet()) {
+							tweet = tweet.getRetweetedStatus();
+							if (tweet.getUser().getScreenName().toLowerCase()
+									.equals(query.substring(1).toLowerCase())) {
+								stripResults.add(i);
+							}
+						}
+					} else if (types[2].equals(type)) {
+						if (tweet.getSourcePlain().toLowerCase().equals(query.toLowerCase())) {
+							stripResults.add(i);
+						}
+					}
+					
+				}
+			}
+			
+			return results;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			if(results.count != 0){
+				// Now delete
+				
+				@SuppressWarnings("unchecked")
+				ArrayList<Integer> r = (ArrayList<Integer>) results.values;
+				for(Integer i : r){
+					remove(getItem(i));
+				}
+			}
+		}
+		
+	}
+	
+	// View stuff here {
+	
 	public static void ApplyFontSize(TextView in, Context c) {
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(c);
@@ -55,247 +188,7 @@ public class FeedListAdapter extends BaseAdapter {
 		p.addRule(rule, relativeToId);
 		target.setLayoutParams(p);
 	}
-
-	public FeedListAdapter(Activity context, String id, long _account) {
-		mContext = context;
-		tweets = new ArrayList<Status>();
-		ID = id;
-		account = _account;
-	}
-
-	private ArrayList<Status> tweets;
-
-	private Activity mContext;
-	public String ID;
-	private long lastViewedTweet;
-	private int lastViewedTopMargin;
-	public String user;
-	public long account;
 	
-	public ArrayList<Status> getData(){ return tweets; }
-	
-	public void setLastViewed(ListView list) {
-		if (list == null)
-			return;
-		else if (getCount() == 0)
-			return;
-		Status t = (Status) getItem(list.getFirstVisiblePosition());
-		if (t == null)
-			return;
-		lastViewedTweet = t.getId();
-		View v = list.getChildAt(0);
-		lastViewedTopMargin = (v == null) ? 0 : v.getTop(); 
-	}
-
-	public void restoreLastViewed(ListView list) {
-		if (list == null) {
-			return;
-		} else if (getCount() == 0) {
-			return;
-		}
-		int index = find(lastViewedTweet);
-		if (index > -1) {
-			list.setSelectionFromTop(index, lastViewedTopMargin);
-		}
-	}
-
-	private boolean shouldFilter(Context context, Status tweet) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		if (prefs.getBoolean("enable_muting", false)) {
-			if(this.ID != null) {
-				boolean filteringDisabled = false;
-				if(this.ID.equals(TimelineFragment.ID)) {
-					filteringDisabled = (prefs.getBoolean("mute_timeline_enabled", true) == false);
-				} else if(this.ID.equals(MentionsFragment.ID)) {
-					filteringDisabled = (prefs.getBoolean("mute_mentions_enabled", false) == false);
-				}
-				if(filteringDisabled) return false;
-			}
-		} else return false;
-		
-		final String[] filter = Utilities.getMuteFilters(context);
-		if (filter == null || filter.length == 0) {
-			return false;
-		}
-		final String[] types = context.getResources().getStringArray(
-				R.array.muting_types);
-		for (String rule : filter) {
-
-			String query = null;
-			String type = null;
-			if (rule.contains("@")) {
-				if (rule.endsWith("@" + types[1])) {
-					query = rule.substring(0, rule.indexOf("@"));
-					type = types[1];
-				} else {
-					query = rule.substring(0, rule.indexOf("@"));
-					type = types[2];
-				}
-			} else {
-				query = rule;
-				type = types[0];
-			}
-			query = query.replace("%40", "@");
-
-			if (types[0].equals(type)) {
-				if (tweet.getText().toString().toLowerCase()
-						.contains(query.toLowerCase())) {
-					return true;
-				}
-			} else if (types[1].equals(type)) {
-				if (tweet.getUser().getScreenName().toLowerCase()
-						.equals(query.substring(1).toLowerCase())) {
-					return true;
-				}
-				if (tweet.isRetweet()) {
-					tweet = tweet.getRetweetedStatus();
-					if (tweet.getUser().getScreenName().toLowerCase()
-							.equals(query.substring(1).toLowerCase())) {
-						return true;
-					}
-				}
-			} else if (types[2].equals(type)) {
-				if (tweet.getSourcePlain().toLowerCase().equals(query.toLowerCase())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public boolean add(Status tweet, boolean inverted) {
-		if (shouldFilter(mContext, tweet)) {
-			return false;
-		}
-		if (!update(tweet)) {
-			tweets.add(findAppropIndex(tweet, inverted), tweet);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean add(Status tweet) {
-		return add(tweet, false);
-	}
-
-	public int add(Status[] toAdd) {
-		int toReturn = 0;
-		for (Status tweet : toAdd) {
-			if (add(tweet))
-				toReturn++;
-		}
-		notifyDataSetChanged();
-		return toReturn;
-	}
-
-	public void remove(int index) {
-		tweets.remove(index);
-		notifyDataSetChanged();
-	}
-
-	public void remove(long tweetId) {
-		int index = 0;
-		for (Status t : tweets) {
-			if (t.getId() == tweetId) {
-				tweets.remove(index);
-				notifyDataSetChanged();
-				break;
-			}
-			index++;
-		}
-	}
-
-	public void clear() {
-		tweets.clear();
-		notifyDataSetChanged();
-	}
-
-	public void filter() {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		if (prefs.getBoolean("enable_muting", false)) {
-			if(this.ID != null) {
-				boolean filteringDisabled = false;
-				if(this.ID.equals(TimelineFragment.ID)) {
-					filteringDisabled = (prefs.getBoolean("mute_timeline_enabled", true) == false);
-				} else if(this.ID.equals(MentionsFragment.ID)) {
-					filteringDisabled = (prefs.getBoolean("mute_mentions_enabled", false) == false);
-				}
-				if(filteringDisabled) return;
-			}
-		} else return;
-		
-		for (int i = 0; i < tweets.size(); i++) {
-			if (shouldFilter(mContext, tweets.get(i))) {
-				tweets.remove(i);
-			}
-		}
-		notifyDataSetChanged();
-	}
-
-	public int find(long statusId) {
-		int index = -1;
-		ArrayList<Status> temp = tweets;
-		for (int i = 0; i < temp.size(); i++) {
-			if (temp.get(i).getId() == statusId) {
-				index = i;
-				break;
-			}
-		}
-		return index;
-	}
-
-	public Status[] toArray() {
-		ArrayList<Status> toReturn = new ArrayList<Status>();
-		for (Status t : tweets)
-			toReturn.add(t);
-		return toReturn.toArray(new Status[0]);
-	}
-
-	public boolean update(Status toFind) {
-		boolean found = false;
-		for (int i = 0; i < tweets.size(); i++) {
-			if (tweets.get(i).getId() == toFind.getId()) {
-				found = true;
-				tweets.set(i, toFind);
-				notifyDataSetChanged();
-				break;
-			}
-		}
-		return found;
-	}
-
-	private int findAppropIndex(Status tweet, boolean invert) {
-		int toReturn = 0;
-		for (Status t : tweets) {
-			if (invert && t.getCreatedAt().after(tweet.getCreatedAt()))
-				break;
-			else if (!invert && t.getCreatedAt().before(tweet.getCreatedAt()))
-				break;
-			toReturn++;
-		}
-		return toReturn;
-	}
-
-	@Override
-	public int getCount() {
-		return tweets.size();
-	}
-
-	@Override
-	public Object getItem(int position) {
-		return tweets.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		if ((position == 0 && tweets.size() == 0) || position > tweets.size())
-			return 0;
-		else if (position == -1 && tweets.size() == 1)
-			return tweets.get(0).getId();
-		return tweets.get(position).getId();
-	}
-
 	public static RelativeLayout createStatusView(Status tweet,
 			final Context mContext, View convertView) {
 		RelativeLayout toReturn = null;
@@ -447,7 +340,7 @@ public class FeedListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		return createStatusView(tweets.get(position), mContext, convertView);
+		return createStatusView( getItem(position), getContext(), convertView);
 	}
 
 	private static void hideInlineMedia(View toReturn) {
@@ -465,5 +358,20 @@ public class FeedListAdapter extends BaseAdapter {
 		mediaProg.setVisibility(View.GONE);
 		mediaPreview.setVisibility(View.GONE);
 		mediaPreview.setImageBitmap(null);
+	}
+	
+	// } end of views
+	
+	public boolean update(Status toFind) {
+		boolean found = false;
+		for (int i = 0; i < getCount(); i++) {
+			if (getItem(i).getId() == toFind.getId()) {
+				found = true;
+				insert(toFind, i);
+				notifyDataSetChanged();
+				break;
+			}
+		}
+		return found;
 	}
 }

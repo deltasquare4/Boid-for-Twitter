@@ -34,33 +34,30 @@ import com.teamboid.twitterapi.utilities.Utils;
  * 
  * @author Aidan Follestad
  */
-public class ProfileTimelineFragment extends BaseListFragment {
-
-	private Activity context;
-	private FeedListAdapter globalAdapter;
-	private String screenName;
+public class ProfileTimelineFragment extends TimelineFragment {
 	public static final String ID = "COLUMNTYPE:PROFILE_FEED";
 
 	@Override
-	public void onAttach(Activity act) {
-		super.onAttach(act);
-		context = act;
-	}
-
-	private FeedListAdapter getAdapter() {
-		return globalAdapter;
+	public Status[] fetch(long maxId) {
+		try{
+			Paging paging = new Paging(50);
+			if(maxId != -1){
+				paging.setMaxId(maxId);
+			}
+			return AccountService.getCurrentAccount().getClient().getMentions(paging);
+		} catch(Exception e){
+			e.printStackTrace();
+			showError(e.getMessage());
+			return null;
+		}
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int index, long id) {
-		super.onListItemClick(l, v, index, id);
-		Status tweet = (Status) globalAdapter.getItem(index);
-		if (tweet.isRetweet())
-			tweet = tweet.getRetweetedStatus();
-		context.startActivity(new Intent(context, TweetViewer.class).putExtra(
-				"sr_tweet", Utils.serializeObject(tweet)).addFlags(
-				Intent.FLAG_ACTIVITY_CLEAR_TOP));
+	public String getAdapterId() {
+		return ID;
 	}
+	
+	// old
 
 	@Override
 	public void onStart() {

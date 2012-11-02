@@ -412,7 +412,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 									.getSelectedNavigationIndex()));
 			if (frag != null) {
 				if (frag instanceof BaseListFragment) {
-					((BaseListFragment) frag).performRefresh(false);
+					((BaseListFragment) frag).performRefresh();
 				} else if (frag instanceof BaseGridFragment) {
 					((BaseGridFragment) frag).performRefresh(false);
 				}

@@ -245,13 +245,13 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				if (intent.getIntExtra("switch", -1) == Api11.MENTIONS) {
 					if (frag instanceof MentionsFragment) {
 						switchIndex = i;
-						((BaseListFragment) frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh();
 						break;
 					}
 				} else {
 					if (frag instanceof MessagesFragment) {
 						switchIndex = i;
-						((BaseListFragment) frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh();
 						break;
 					}
 				}
@@ -569,7 +569,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
 			if (IBoidFragment.class.isInstance(frag)) {
-				((IBoidFragment) frag).reloadAdapter(false);
+				// TODO: Solve
+				//((IBoidFragment) frag).reloadAdapter();
 			}
 		}
 	}
@@ -822,7 +823,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					Fragment frag = getFragmentManager().findFragmentByTag(
 							"page:" + i);
 					if (frag != null && frag instanceof BaseListFragment) {
-						((BaseListFragment) frag).filter();
+						// wut? ((BaseListFragment) frag).filter();
 					}
 				}
 			}
@@ -975,7 +976,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:" + Integer.toString(i));
 				if (frag instanceof BaseListFragment)
-					((BaseListFragment) frag).savePosition();
+					continue;
+					//((BaseListFragment) frag).savePosition();
 				else if (frag instanceof BaseSpinnerFragment)
 					((BaseSpinnerFragment) frag).savePosition();
 			}

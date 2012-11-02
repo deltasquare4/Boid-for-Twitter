@@ -172,7 +172,7 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 				Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:" + Integer.toString(i));
 				if (frag != null)
-					((BaseListFragment) frag).performRefresh(false);
+					((BaseListFragment) frag).performRefresh();
 			}
 			return true;
 		default:

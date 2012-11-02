@@ -64,7 +64,7 @@ public class TweetListActivity extends ListActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this, null, AccountService.getCurrentAccount().getId());
+		binder = new FeedListAdapter(this);
 		setListAdapter(binder);
 		refresh();
 		getListView().setOnItemClickListener(new OnItemClickListener(){
@@ -134,8 +134,8 @@ public class TweetListActivity extends ListActivity {
 								showProgress(false);
 								return;
 							}
-							int addedCount = binder.add(tweets);
-							if(addedCount == 0) allowPagination = false;
+							binder.addAll(tweets);
+							//if(addedCount == 0) allowPagination = false;
 							showProgress(false);
 						}
 					});

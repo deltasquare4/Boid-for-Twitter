@@ -4,12 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import com.handlerexploit.prime.ImageManager.LowPriorityThreadFactory;
+import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.ColumnCacheManager;
+import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
+import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.user.User;
+import com.teamboid.twitterapi.utilities.Utils;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -18,12 +25,16 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
@@ -147,13 +158,19 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	public interface IBoidFragment {
 		public boolean isRefreshing();
 		public void onDisplay();
-		public void reloadAdapter(boolean b);
+		public void performRefresh();
 	}
-	public abstract class BoidAdapter<T> extends ArrayAdapter<T>{
+	public static abstract class BoidAdapter<T> extends ArrayAdapter<T>{
 		public BoidAdapter(Context context) {
 			super(context, 0);
 		}
 		public abstract long getItemId(int position);
+		/**
+		 * Reverse of getItemId()
+		 * @param id ID returned by getItemId()
+		 * @return
+		 */
+		public abstract int getPosition(long id);
 	}
 
 	/**
@@ -168,7 +185,12 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	 */
 	public static abstract class BaseListFragment<T extends Serializable> extends ListFragment
 			implements IBoidFragment {
-		public BoidAdapter<T> adapter;
+		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
+		
+		@SuppressWarnings("unchecked")
+		public BoidAdapter<T> getAdapter(){
+			return (BoidAdapter<T>) getListView().getAdapter();
+		}
 		
 		// Abstracts
 		public abstract String getColumnName();
@@ -188,11 +210,45 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			ColumnCacheManager.saveCache(getActivity(), getColumnName(), (List<Serializable>) contents);
 		}
 		
+		long getCurrentTop(){
+			return getAdapter().getItemId( getListView().getFirstVisiblePosition() );
+		}
+		
 		@Override
 		public void onStart() {
+			super.onStart();
 			if(getActivity() == null) return;
 			
-			new Thread(new Runnable(){
+			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+				}
+
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					if (totalItemCount > 0
+							&& (firstVisibleItem + visibleItemCount) >= totalItemCount
+							&& totalItemCount > visibleItemCount) {
+						loadMore();
+					}
+					if (firstVisibleItem == 0
+							&& getActivity().getActionBar().getTabCount() > 0) {
+						if (!PreferenceManager.getDefaultSharedPreferences(getActivity())
+								.getBoolean("enable_iconic_tabs", true)) {
+							getActivity().getActionBar()
+									.getTabAt(getArguments().getInt("tab_index"))
+									.setText(R.string.mentions_str);
+						} else {
+							getActivity().getActionBar()
+									.getTabAt(getArguments().getInt("tab_index"))
+									.setText("");
+						}
+					}
+				}
+			});
+			
+			execService.execute(new Runnable(){
 
 				@SuppressWarnings("unchecked")
 				@Override
@@ -202,27 +258,15 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					// Try and load a cached result if we have one
 					final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
 					if(contents != null){
-						adapter.addAll((Collection<? extends T>) contents);
-						adapter.notifyDataSetChanged();
+						getAdapter().addAll((Collection<? extends T>) contents);
+						if(getAdapter().getFilter() != null)
+							getAdapter().getFilter().filter("");
+						getAdapter().notifyDataSetChanged();
 					} else{
-						setLoading(true);
-						T[] t = fetch(-1);
-						if(t != null){
-							adapter.addAll(t);
-							setLoading(false);
-							adapter.notifyDataSetChanged();
-							
-							if(cacheContents()){
-								ArrayList<T> y = new ArrayList<T>();
-								for(T x : t){
-									y.add(x);
-								}
-								saveCachedContents(y);
-							}
-						}
+						performRefresh();
 					}
 				}
-			}).start();
+			});
 		}
 		
 		public boolean isLoading;
@@ -293,17 +337,77 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			}
 		}
 		
-		public void performRefresh(){
+		public void loadMore(){
+			if(isLoading == true) return; // No double loading for you!
 			setLoading(true);
-			new Thread(new Runnable(){
-				public void run(){
-					T[] t = fetch(-1);
+			execService.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					T[] t = fetch( getAdapter().getItemId( getAdapter().getCount() - 1 ) );
+					setLoading(false);
 					if(t != null){
-						adapter.clear();
-						adapter.addAll(t);
+						getAdapter().addAll(t);
+						if(getAdapter().getFilter() != null)
+							getAdapter().getFilter().filter("");
+						getAdapter().notifyDataSetChanged();
 					}
 				}
-			}).start();
+				
+			});
+		}
+		
+		public void performRefresh(){
+			setLoading(true);
+			execService.execute(new Runnable(){
+				public void run(){
+					T[] t = fetch(-1);
+					setLoading(false);
+					if(t != null){
+						long id = getCurrentTop();
+						
+						getAdapter().clear();
+						getAdapter().addAll(t);
+						if(getAdapter().getFilter() != null)
+							getAdapter().getFilter().filter("");
+						getAdapter().notifyDataSetChanged();
+						
+						getListView().setSelection( getAdapter().getPosition(id) );
+						
+						if(cacheContents()){
+							ArrayList<T> y = new ArrayList<T>();
+							for(T x : t){
+								y.add(x);
+							}
+							saveCachedContents(y);
+						}
+						if(t.length > 0){
+							// Set the tab unread count
+							if (!PreferenceManager
+									.getDefaultSharedPreferences(getActivity()).getBoolean(
+											"enable_iconic_tabs", true)) {
+								getActivity().getActionBar()
+										.getTabAt(
+												getArguments().getInt(
+														"tab_index"))
+										.setText(
+												getActivity().getString(R.string.mentions_str)
+														+ " ("
+														+ Integer
+																.toString(t.length)
+														+ ")");
+							} else {
+								getActivity().getActionBar()
+										.getTabAt(
+												getArguments().getInt(
+														"tab_index"))
+										.setText(
+												Integer.toString(t.length));
+							}
+						}
+					}
+				}
+			});
 		}
 		
 		
@@ -312,81 +416,78 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
 		}
-	}
-		/*
-		public List<Serializable> statusToSerializableArray(
-				ArrayList<Status> data) {
-			List<Serializable> ret = new ArrayList<Serializable>();
-			for(Status s : data){
-				ret.add(s);
-			}
-			return ret;
+		
+		public void jumpTop() {
+			if (getView() != null)
+				getListView().setSelectionFromTop(0, 0);
 		}
 		
-		boolean hasLoaded = false;
-		
-		public void onDisplay() {
-			if(!hasLoaded) {
-				new Thread(new Runnable(){
-
-					@Override
-					public void run() {
-						final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
-						
-						if(getActivity() != null){
-							getActivity().runOnUiThread(new Runnable(){
-	
-								@Override
-								public void run() {
-									reloadAdapter(true);
-									
-									if(contents != null){
-										showCachedContents(contents);
-										Log.d("boid", getColumnName() + " loaded from cache :)");
-									} else{ performRefresh(false); }
-									
-									onReadyToLoad();
-								}
-								
-							});
-						}
-					}
-					
-				}).start();
-				hasLoaded = true;
-			}
-		};
-		public void onReadyToLoad() {};
-
-		
-
-		public abstract void performRefresh(boolean paginate);
-
-		public abstract void reloadAdapter(boolean firstInitialize);
-
-		public abstract void savePosition();
-
-		public abstract void restorePosition();
-
-		public abstract void jumpTop();
-
-		public abstract void filter();
-
-		public abstract Status[] getSelectedStatuses();
-
-		public abstract User[] getSelectedUsers();
-
-		public abstract Tweet[] getSelectedTweets();
-
-		public abstract DMConversation[] getSelectedMessages();
-
-		
-		
-		
 	}
-*/
+	
+	// Timeline shared stuff
+	public static abstract class BaseTimelineFragment extends BaseListFragment<Status>{
+		public abstract String getAdapterId();
+		
+		@Override
+		public void onListItemClick(ListView l, View v, int index, long id) {
+			super.onListItemClick(l, v, index, id);
+			Status tweet = (Status) getAdapter().getItem(index);
+			if (tweet.isRetweet())
+				tweet = tweet.getRetweetedStatus();
+			getActivity().startActivity(new Intent(getActivity(), TweetViewer.class).putExtra(
+					"sr_tweet", Utils.serializeObject(tweet)).addFlags(
+					Intent.FLAG_ACTIVITY_CLEAR_TOP));
+		}
+		
+		@Override
+		public Status[] getSelectedStatuses() {
+			if (getAdapter() == null && getView() == null) {
+				Log.d("BOID CAB",
+						"Adapter or view is null, getSelectedStatuses() cancelled...");
+				return null;
+			}
+			ArrayList<Status> toReturn = new ArrayList<Status>();
+			SparseBooleanArray choices = getListView().getCheckedItemPositions();
+			for (int i = 0; i < choices.size(); i++) {
+				if (choices.valueAt(i)) {
+					toReturn.add((Status) getAdapter().getItem(choices.keyAt(i)));
+				}
+			}
+			Log.d("BOID CAB", "getSelectedStatuses() returning " + toReturn.size()
+					+ " items!");
+			return toReturn.toArray(new Status[0]);
+		}
+
+		@Override
+		public User[] getSelectedUsers() {
+			return null;
+		}
+
+		@Override
+		public Tweet[] getSelectedTweets() {
+			return null;
+		}
+
+		@Override
+		public DMConversation[] getSelectedMessages() {
+			return null;
+		}
+
+		@Override
+		public void setupAdapter(){
+			getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+			getListView().setMultiChoiceModeListener(TimelineCAB.choiceListener);
+			if (AccountService.getCurrentAccount() != null) {
+				setListAdapter( AccountService.getFeedAdapter(getActivity(), getAdapterId(),
+									AccountService.getCurrentAccount().getId()) );
+			}
+		}
+	}
+	
 	public static abstract class BaseSpinnerFragment extends ListFragment
 			implements IBoidFragment {
+		// TODO: Should inherit BaseListFragment
+		
 		public void onDisplay() {
 		};
 
