@@ -2,6 +2,7 @@ package com.teamboid.twitter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.teamboid.twitter.columns.ColumnCacheManager;
@@ -16,12 +17,14 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -146,13 +149,96 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public void onDisplay();
 		public void reloadAdapter(boolean b);
 	}
+	public abstract class BoidAdapter<T> extends ArrayAdapter<T>{
+		public BoidAdapter(Context context) {
+			super(context, 0);
+		}
+		public abstract long getItemId(int position);
+	}
 
-	public static abstract class BaseListFragment extends ListFragment
+	/**
+	 * Basic List Fragment
+	 * 
+	 * 10000x more simplistic!
+	 * 
+	 * Basically, there is going to be less code in the actual fragments (no more copy and pasting thread work)
+	 * which will make them easier to change and fix issues with.
+	 * 
+	 * @author kennydude
+	 */
+	public static abstract class BaseListFragment<T extends Serializable> extends ListFragment
 			implements IBoidFragment {
+		public BoidAdapter<T> adapter;
+		
+		// Abstracts
 		public abstract String getColumnName();
-		public abstract void showCachedContents(List<Serializable> contents);
-		public void saveCachedContents(List<Serializable> contents){
-			ColumnCacheManager.saveCache(getActivity(), getColumnName(), contents);
+		public abstract Status[] getSelectedStatuses();
+		public abstract User[] getSelectedUsers();
+		public abstract Tweet[] getSelectedTweets();
+		public abstract DMConversation[] getSelectedMessages();
+		public abstract void setupAdapter();
+		// Fetches data from network; DO NOT THREAD!!!!!!! max_id may be -1
+		public abstract T[] fetch( long maxId );
+		
+		// Overriden by profile screens/not as frequently used parts
+		public boolean cacheContents(){ return true; }
+		
+		@SuppressWarnings("unchecked")
+		public void saveCachedContents(List<T> contents){
+			ColumnCacheManager.saveCache(getActivity(), getColumnName(), (List<Serializable>) contents);
+		}
+		
+		@Override
+		public void onStart() {
+			if(getActivity() == null) return;
+			
+			new Thread(new Runnable(){
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public void run() {
+					setupAdapter();
+					
+					// Try and load a cached result if we have one
+					final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
+					if(contents != null){
+						adapter.addAll((Collection<? extends T>) contents);
+						adapter.notifyDataSetChanged();
+					} else{
+						setLoading(true);
+						T[] t = fetch(-1);
+						if(t != null){
+							adapter.addAll(t);
+							setLoading(false);
+							adapter.notifyDataSetChanged();
+							
+							if(cacheContents()){
+								ArrayList<T> y = new ArrayList<T>();
+								for(T x : t){
+									y.add(x);
+								}
+								saveCachedContents(y);
+							}
+						}
+					}
+				}
+			}).start();
+		}
+		
+		public boolean isLoading;
+		
+		public void setLoading(boolean loading){
+			isLoading = loading;
+			getActivity().invalidateOptionsMenu();
+		}
+
+		@Override
+		public boolean isRefreshing() {
+			return isLoading;
+		}
+		
+		public void onDisplay() {
+			// todo - when swished to
 		}
 		
 		public void showError(final String message){
@@ -180,6 +266,54 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			});
 		}
 		
+		public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+			return inflater.inflate(R.layout.list_content, container, false); 
+		}
+
+		@Override
+		public void setEmptyText(CharSequence text) {
+			if (getView() != null)
+				((TextView)getView().findViewById(android.R.id.empty)).setText(text);
+		}
+		
+		@Override
+		public void setListShown(boolean shown) {
+			View mProgressContainer = getView().findViewById(R.id.progressContainer);
+			View mListContainer = getView().findViewById(R.id.listContainer);
+			if (shown) {
+				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+				mProgressContainer.setVisibility(View.GONE);
+				mListContainer.setVisibility(View.VISIBLE);
+			} else {
+				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+				mProgressContainer.setVisibility(View.VISIBLE);
+				mListContainer.setVisibility(View.GONE);
+			}
+		}
+		
+		public void performRefresh(){
+			setLoading(true);
+			new Thread(new Runnable(){
+				public void run(){
+					T[] t = fetch(-1);
+					if(t != null){
+						adapter.clear();
+						adapter.addAll(t);
+					}
+				}
+			}).start();
+		}
+		
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+	}
+		/*
 		public List<Serializable> statusToSerializableArray(
 				ArrayList<Status> data) {
 			List<Serializable> ret = new ArrayList<Serializable>();
@@ -224,12 +358,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		};
 		public void onReadyToLoad() {};
 
-		public boolean isLoading;
-
-		@Override
-		public boolean isRefreshing() {
-			return isLoading;
-		}
+		
 
 		public abstract void performRefresh(boolean paginate);
 
@@ -251,40 +380,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 		public abstract DMConversation[] getSelectedMessages();
 
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setRetainInstance(true);
-		}
 		
-		public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-			return inflater.inflate(R.layout.list_content, container, false); 
-		}
-
-		@Override
-		public void setEmptyText(CharSequence text) {
-			if (getView() != null)
-				((TextView)getView().findViewById(android.R.id.empty)).setText(text);
-		}
 		
-		@Override
-		public void setListShown(boolean shown) {
-			View mProgressContainer = getView().findViewById(R.id.progressContainer);
-			View mListContainer = getView().findViewById(R.id.listContainer);
-			if (shown) {
-				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-				mProgressContainer.setVisibility(View.GONE);
-				mListContainer.setVisibility(View.VISIBLE);
-			} else {
-				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-				mProgressContainer.setVisibility(View.VISIBLE);
-				mListContainer.setVisibility(View.GONE);
-			}
-		}
+		
 	}
-
+*/
 	public static abstract class BaseSpinnerFragment extends ListFragment
 			implements IBoidFragment {
 		public void onDisplay() {

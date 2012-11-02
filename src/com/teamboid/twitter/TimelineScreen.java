@@ -921,7 +921,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				((TrendsFragment) frag).places = null;
 			}
 			if (frag instanceof BaseListFragment)
-				((BaseListFragment) frag).performRefresh(false);
+				((BaseListFragment) frag).performRefresh();
 			else if (frag instanceof BaseGridFragment)
 				((BaseGridFragment) frag).performRefresh(false);
 			else if (frag instanceof BaseSpinnerFragment)
