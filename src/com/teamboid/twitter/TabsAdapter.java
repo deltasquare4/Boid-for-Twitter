@@ -199,21 +199,23 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					public void run() {
 						final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
 						
-						getActivity().runOnUiThread(new Runnable(){
-
-							@Override
-							public void run() {
-								reloadAdapter(true);
+						if(getActivity() != null){
+							getActivity().runOnUiThread(new Runnable(){
+	
+								@Override
+								public void run() {
+									reloadAdapter(true);
+									
+									if(contents != null){
+										showCachedContents(contents);
+										Log.d("boid", getColumnName() + " loaded from cache :)");
+									} else{ performRefresh(false); }
+									
+									onReadyToLoad();
+								}
 								
-								if(contents != null){
-									showCachedContents(contents);
-									Log.d("boid", getColumnName() + " loaded from cache :)");
-								} else{ performRefresh(false); }
-								
-								onReadyToLoad();
-							}
-							
-						});
+							});
+						}
 					}
 					
 				}).start();

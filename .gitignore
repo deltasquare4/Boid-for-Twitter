@@ -15,3 +15,9 @@ gen/
 
 # Local configuration file (sdk path, etc)
 local.properties
+
+# DO NOT REMOVE THIS LINE. I DON'T CARE ABOUT WINDOWS PATHS
+project.properties
+.idea
+.settings
+out

@@ -583,5 +583,6 @@
 	    <item>browser</item>
 	    <item>readability</item>
 	</string-array>
+	<string name="full">Full</string>
 	
 </resources>
