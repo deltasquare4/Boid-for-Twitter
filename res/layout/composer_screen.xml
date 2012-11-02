@@ -2,29 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent"
 	android:orientation="vertical">
-
 	<ScrollView android:id="@+id/scroll" android:layout_width="match_parent"
 		android:layout_height="0dp" android:layout_weight="100">
-
 		<LinearLayout android:layout_width="match_parent"
 			android:layout_height="wrap_content" android:orientation="vertical"
 			android:paddingBottom="34dp" android:paddingLeft="15dp"
 			android:paddingRight="15dp" android:paddingTop="15dp">
-
 			<ViewStub android:id="@+id/replyTo" android:layout_width="match_parent"
 				android:layout_height="wrap_content" android:layout="@layout/feed_item" />
-
 			<TextView android:id="@+id/replyToText" style="?android:listSeparatorTextViewStyle"
 				android:layout_width="match_parent" android:layout_height="wrap_content"
 				android:text="@string/in_reply_to" android:textAllCaps="true"
 				android:textSize="10sp" android:visibility="gone" />
-
 			<TextView android:id="@+id/twitlongerUsed"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_marginBottom="5dp" android:text="@string/will_use_twitlonger"
 				android:textColor="@color/dark" android:textStyle="italic"
 				android:visibility="gone" />
-
 			<EditText android:id="@+id/tweetContent"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:gravity="top" android:hint="@string/what_you_wanna_say"
@@ -35,7 +29,6 @@
 
 			<!-- Upload Service Config. TODO: Probably could be better UI, deffo on 
 				Tablet at least -->
-
 			<TextView android:id="@+id/upload_with_label" style="?android:listSeparatorTextViewStyle"
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:layout_marginTop="5dp" android:layout_width="fill_parent"
@@ -54,12 +47,10 @@
 			<LinearLayout android:id="@+id/draftsArea"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:orientation="vertical" android:visibility="gone" />
-
 		</LinearLayout>
 	</ScrollView>
 
 	<!-- Auto-completion -->
-
 	<HorizontalScrollView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_gravity="end|bottom"
 		android:background="?sideNavColor">

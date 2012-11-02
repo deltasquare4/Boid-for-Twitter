@@ -3,7 +3,7 @@
     xmlns:awesome="http://schemas.android.com/apk/awesomeprefs"
     xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <CheckBoxPreference 
+    <SwitchPreference 
         android:key="notifications_global"
         android:defaultValue="true"
         android:persistent="true" android:title="@string/notifications" android:summary="@string/notifications_global"/>

@@ -49,6 +49,5 @@
 			android:hint="@string/bio_str" android:maxLength="160"
 			android:gravity="top" android:layout_below="@+id/bioLabel" />
 
-
 	</RelativeLayout>
 </ScrollView>

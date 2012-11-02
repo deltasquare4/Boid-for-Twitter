@@ -54,7 +54,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,7 +88,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			if (intent.getAction().equals(AccountService.END_LOAD)) {
 				// lets see what we can do
 				return;
-			} else if(intent.getAction().equals(SendTweetService.NETWORK_AVAIL)){
+			} else if (intent.getAction()
+					.equals(SendTweetService.NETWORK_AVAIL)) {
 				TimelineScreen.this.invalidateOptionsMenu();
 				return;
 			}
@@ -297,7 +297,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				AccountService.selectedAccount = lastSel;
 			}
 		}
-		
+
 		TimelineSidebarBox.setup(this);
 		if (mTabsAdapter == null) {
 			mTabsAdapter = new TabsAdapter(this);
@@ -481,26 +481,27 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOffscreenPageLimit(4);
 		mViewPager.setAdapter(mTabsAdapter);
-		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(final int position) {
-				getActionBar().getTabAt(position).select();
-				runOnUiThread(new Runnable(){
-
+		mViewPager
+				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
-					public void run() {
-						try {
-							((TabsAdapter.IBoidFragment) mTabsAdapter
-									.getLiveItem(position)).onDisplay();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+					public void onPageSelected(final int position) {
+						getActionBar().getTabAt(position).select();
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								try {
+									((TabsAdapter.IBoidFragment) mTabsAdapter
+											.getLiveItem(position)).onDisplay();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+
+						});
+
 					}
-					
 				});
-				
-			}
-		});
 
 		if (newColumn) {
 			newColumn = false;
@@ -521,7 +522,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			ViewPager pager = (ViewPager) findViewById(R.id.pager);
 			pager.setAdapter(mTabsAdapter);
 			pager.setCurrentItem(defaultColumn);
-			((TabsAdapter.IBoidFragment)mTabsAdapter.getLiveItem(defaultColumn)).onDisplay();
+			((TabsAdapter.IBoidFragment) mTabsAdapter
+					.getLiveItem(defaultColumn)).onDisplay();
 		}
 		filterDefaultColumnSelection = false;
 		notificationSwitch(intent);
@@ -566,7 +568,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		for (int i = 0; i < getActionBar().getTabCount(); i++) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
-			if (IBoidFragment.class.isInstance(frag)){
+			if (IBoidFragment.class.isInstance(frag)) {
 				((IBoidFragment) frag).reloadAdapter(false);
 			}
 		}
@@ -575,7 +577,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
 			if (getIntent().getData().getPath().contains("/status/")) {
 				startActivity(getIntent().setClass(this, TweetViewer.class));
@@ -588,24 +590,22 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				return;
 			}
 		}
-		
+
 		boid = new BoidActivity(this);
 		boid.AccountsReady = new BoidActivity.OnAction() {
-			
+
 			@Override
 			public void done() {
-				loadColumns(
-						boid.firstLoad,
-						null);
+				loadColumns(boid.firstLoad, null);
 				accountsLoaded();
 				invalidateOptionsMenu();
 			}
 		};
 		boid.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.main);
 		initialize(savedInstanceState);
-		
+
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey("lastTheme")
 					|| savedInstanceState.containsKey("lastDisplayReal")) {
@@ -646,23 +646,24 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					getApplicationContext()).getBoolean("show_real_names",
 					false);
 		}
-		
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(SendTweetService.NETWORK_AVAIL);
 		filter.addAction(SendTweetService.UPDATE_STATUS);
 		filter.addAction(AccountService.END_LOAD);
 		registerReceiver(receiver, filter);
-		
+
 		// ActionBar Fix
 		// http://stackoverflow.com/questions/8465258/how-can-i-force-the-action-bar-to-be-at-the-bottom-in-ics
 		// based on how Google did it
 		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayOptions(actionBar.getDisplayOptions() | ActionBar.DISPLAY_SHOW_CUSTOM);
-		/*View v = new View(this);
-		actionBar.setCustomView(v,
-	            new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
-	                    0,
-	                    Gravity.CENTER_VERTICAL | Gravity.RIGHT));*/
+		actionBar.setDisplayOptions(actionBar.getDisplayOptions()
+				| ActionBar.DISPLAY_SHOW_CUSTOM);
+		/*
+		 * View v = new View(this); actionBar.setCustomView(v, new
+		 * ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, 0,
+		 * Gravity.CENTER_VERTICAL | Gravity.RIGHT));
+		 */
 	}
 
 	public void accountsLoaded() {
@@ -885,7 +886,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			myProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		} else {
 			for (int i = 0; i < accs.size(); i++) {
-				switcher.getSubMenu().add("@" + accs.get(i).getUser().getScreenName());
+				switcher.getSubMenu().add(
+						"@" + accs.get(i).getUser().getScreenName());
 			}
 		}
 		if (AccountService.getCurrentAccount() != null) {
@@ -897,10 +899,10 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						+ AccountService.getCurrentAccount().getUser()
 								.getScreenName());
 		}
-		
-		if(!NetworkUtils.haveNetworkConnection(this))
+
+		if (!NetworkUtils.haveNetworkConnection(this))
 			menu.findItem(R.id.refreshAction).setVisible(false);
-		
+
 		return true;
 	}
 

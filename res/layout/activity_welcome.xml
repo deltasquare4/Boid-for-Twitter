@@ -1,43 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
-    <ImageView
-        android:paddingTop="40dip"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:src="@drawable/launcher_icon" />
-    
-    <TextView 
-        android:id="@+id/error"
-        android:background="#FF0000"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:layout_marginTop="10dip"
-        android:padding="10dip"
-        android:textColor="#FFF"
-        android:visibility="gone"
-        android:text="@string/sign_in_failure"
-        />
-    
-    <TextView 
-        android:gravity="center"
-        android:paddingTop="20dip"
-        android:paddingBottom="20dip"
-        android:textSize="30sp"
-        android:layout_width="match_parent"
-        android:text="@string/welcome_str"
-        android:layout_height="wrap_content" />
-    
-    <Button 
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:id="@+id/login" />
-
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical">
+	<ImageView android:paddingTop="40dip" android:layout_gravity="center"
+		android:layout_height="wrap_content" android:layout_width="wrap_content"
+		android:src="@drawable/launcher_icon" />
+	<TextView android:id="@+id/error" android:background="#FF0000"
+		android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:layout_marginBottom="10dip" android:layout_marginTop="10dip"
+		android:padding="10dip" android:textColor="#FFF" android:visibility="gone"
+		android:text="@string/sign_in_failure" />
+	<TextView android:gravity="center" android:paddingTop="20dip"
+		android:paddingBottom="20dip" android:textSize="30sp"
+		android:layout_width="match_parent" android:text="@string/welcome_str"
+		android:layout_height="wrap_content" />
+	<Button android:layout_gravity="center" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text="@string/login"
+		android:id="@+id/login" />
 </LinearLayout>
