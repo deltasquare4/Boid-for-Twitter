@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -12,8 +11,6 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;

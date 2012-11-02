@@ -2,12 +2,9 @@ package com.teamboid.twitter;
 
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.services.AccountService.VerifyAccountResult;
-import com.teamboid.twitter.utilities.BoidActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebView;

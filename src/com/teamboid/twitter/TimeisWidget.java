@@ -1,7 +1,5 @@
 package com.teamboid.twitter;
 
-import java.util.regex.Pattern;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;

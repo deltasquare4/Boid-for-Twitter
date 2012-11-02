@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetListActivity;

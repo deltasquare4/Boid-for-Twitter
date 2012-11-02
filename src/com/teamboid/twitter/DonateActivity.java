@@ -1,7 +1,5 @@
 package com.teamboid.twitter;
 
-import java.net.ResponseCache;
-
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.helper.AbstractBillingObserver;

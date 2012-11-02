@@ -568,7 +568,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		for (int i = 0; i < getActionBar().getTabCount(); i++) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
-			if (IBoidFragment.class.isInstance(frag)) {
+			if (frag instanceof IBoidFragment) {
 				((IBoidFragment) frag).reloadAdapter(false);
 			}
 		}

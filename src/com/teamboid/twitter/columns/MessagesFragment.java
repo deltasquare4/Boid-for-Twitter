@@ -10,8 +10,6 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ConversationScreen;
 import com.teamboid.twitter.R;

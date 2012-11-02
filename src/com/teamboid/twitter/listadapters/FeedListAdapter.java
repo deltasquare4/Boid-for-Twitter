@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;

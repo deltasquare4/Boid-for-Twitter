@@ -1,7 +1,6 @@
 package com.teamboid.twitter.listadapters;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.BaseGridFragment;
