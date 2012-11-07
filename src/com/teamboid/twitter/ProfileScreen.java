@@ -13,7 +13,6 @@ import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
 import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.MediaTimelineFragment;
-import com.teamboid.twitter.columns.PaddedProfileTimelineFragment;
 import com.teamboid.twitter.columns.ProfileAboutFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
@@ -193,7 +192,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 									getTheme().obtainStyledAttributes(
 											new int[] { R.attr.timelineTab })
 											.getDrawable(0)),
-					PaddedProfileTimelineFragment.class, 0, screenName);
+					ProfileTimelineFragment.class, 0, screenName);
 			
 			int i = 2;
 			if(boid.isTablet()){
@@ -221,7 +220,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 			mTabsAdapter.addTab(
 					bar.newTab().setTabListener(this)
 							.setText(R.string.tweets_str),
-					PaddedProfileTimelineFragment.class, 0, screenName);
+					ProfileTimelineFragment.class, 0, screenName);
 			int i = 2;
 			if(boid.isTablet()){
 				i = 1;

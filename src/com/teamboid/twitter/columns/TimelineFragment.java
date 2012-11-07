@@ -14,15 +14,18 @@ public class TimelineFragment extends BaseTimelineFragment {
 
 	@Override
 	public String getColumnName() {
-		return AccountService.getCurrentAccount().getId() + ".mentions";
+		return AccountService.getCurrentAccount().getId() + ".timeline";
 	}
 
 	@Override
-	public Status[] fetch(long maxId) {
+	public Status[] fetch(long maxId, long sinceId) {
 		try{
 			Paging paging = new Paging(50);
 			if(maxId != -1){
 				paging.setMaxId(maxId);
+			}
+			if(sinceId != -1){
+				paging.setSinceId(sinceId);
 			}
 			return AccountService.getCurrentAccount().getClient().getHomeTimeline(paging);
 		} catch(Exception e){

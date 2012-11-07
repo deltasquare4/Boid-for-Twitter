@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import me.kennydude.awesomeprefs.NullView;
+
 import com.handlerexploit.prime.ImageManager.LowPriorityThreadFactory;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.ColumnCacheManager;
@@ -90,12 +92,17 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		mActionBar.addTab(tab);
 		notifyDataSetChanged();
 	}
+	
+	boolean isHome = false;
+	public void setIsHome(boolean b){ isHome = b; }
 
 	public void addTab(ActionBar.Tab tab, Class<?> clss, int index, String query) {
 		Bundle args = new Bundle();
 		args.putInt("tab_index", index);
 		if (query != null)
 			args.putString("query", query);
+		if(isHome == true)
+			args.putBoolean("home", true);
 		TabInfo info = new TabInfo(clss, args);
 		tab.setTag(info);
 		mTabs.add(info);
@@ -200,7 +207,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public abstract DMConversation[] getSelectedMessages();
 		public abstract void setupAdapter();
 		// Fetches data from network; DO NOT THREAD!!!!!!! max_id may be -1
-		public abstract T[] fetch( long maxId );
+		public abstract T[] fetch( long maxId, long sinceId );
 		
 		// Overriden by profile screens/not as frequently used parts
 		public boolean cacheContents(){ return true; }
@@ -214,10 +221,24 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			return getAdapter().getItemId( getListView().getFirstVisiblePosition() );
 		}
 		
+		public int getPaddingTop(){
+			return 0;
+		}
+		
+		public View getTopView(){
+			return null;
+		}
+		
 		@Override
 		public void onStart() {
 			super.onStart();
 			if(getActivity() == null) return;
+			
+			getView().findViewById(R.id.container).setPadding(0, getPaddingTop(), 0, 0);
+			View v = getTopView();
+			if(v != null){
+				((NullView)getView().findViewById(R.id.headerControl)).replace(v);
+			}
 			
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
@@ -344,7 +365,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 				@Override
 				public void run() {
-					T[] t = fetch( getAdapter().getItemId( getAdapter().getCount() - 1 ) );
+					T[] t = fetch( getAdapter().getItemId( getAdapter().getCount() - 1 ), -1 );
 					setLoading(false);
 					if(t != null){
 						getAdapter().addAll(t);
@@ -361,7 +382,9 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			setLoading(true);
 			execService.execute(new Runnable(){
 				public void run(){
-					T[] t = fetch(-1);
+					long s = -1;
+					if(getAdapter().getCount() > 0) s = getAdapter().getItemId(0);
+					T[] t = fetch(-1, s);
 					setLoading(false);
 					if(t != null){
 						long id = getCurrentTop();
@@ -484,44 +507,13 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 	}
 	
-	public static abstract class BaseSpinnerFragment extends ListFragment
+	public static abstract class BaseSpinnerFragment<T extends Serializable> extends BaseListFragment<T>
 			implements IBoidFragment {
-		// TODO: Should inherit BaseListFragment
-		
-		public void onDisplay() {
-		};
 
-		public boolean isLoading;
-		private boolean isShown;
-
-		@Override
-		public boolean isRefreshing() {
-			return isLoading;
-		}
-
-		public abstract void performRefresh(boolean paginate);
-
-		public abstract void reloadAdapter(boolean firstInitialize);
-
-		public abstract void savePosition();
-
-		public abstract void restorePosition();
-
-		public abstract void jumpTop();
-
-		public abstract void filter();
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setRetainInstance(true);
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.spinner_list_fragment, container,
-					false);
+		public View getTopView(){
+			Spinner spin = new Spinner(getActivity());
+			spin.setId(R.id.fragSpinner);
+			return spin;
 		}
 
 		public Spinner getSpinner() {
@@ -529,29 +521,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				return null;
 			return (Spinner) getView().findViewById(R.id.fragSpinner);
 		}
-
-		@Override
-		public void setEmptyText(CharSequence text) {
-			if (getView() == null)
-				return;
-			((TextView) getView().findViewById(android.R.id.empty))
-					.setText(text);
-		}
-
-		@Override
-		public void setListShown(boolean visible) {
-			if (getView() == null)
-				return;
-			isShown = visible;
-			getView().findViewById(android.R.id.progress).setVisibility(
-					(visible == false) ? View.VISIBLE : View.GONE);
-			getListView().setVisibility(
-					(visible == true) ? View.VISIBLE : View.GONE);
-			boolean condition = (getListAdapter() == null || getListAdapter()
-					.isEmpty()) && isShown;
-			getView().findViewById(android.R.id.empty).setVisibility(
-					condition ? View.VISIBLE : View.GONE);
-		}
+		
 	}
 
 	public static abstract class BaseGridFragment extends Fragment implements

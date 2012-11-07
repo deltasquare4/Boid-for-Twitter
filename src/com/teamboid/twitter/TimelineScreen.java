@@ -306,6 +306,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			filterDefaultColumnSelection = true;
 			mTabsAdapter.clear();
 		}
+		mTabsAdapter.setIsHome(true);
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(

@@ -19,11 +19,14 @@ public class MentionsFragment extends BaseTimelineFragment {
 	}
 
 	@Override
-	public Status[] fetch(long maxId) {
+	public Status[] fetch(long maxId, long sinceId) {
 		try{
 			Paging paging = new Paging(50);
 			if(maxId != -1){
 				paging.setMaxId(maxId);
+			}
+			if(sinceId != -1){
+				paging.setSinceId(sinceId);
 			}
 			return AccountService.getCurrentAccount().getClient().getMentions(paging);
 		} catch(Exception e){

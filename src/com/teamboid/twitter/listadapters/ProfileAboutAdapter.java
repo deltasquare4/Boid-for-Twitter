@@ -33,6 +33,7 @@ import android.widget.Toast;
  * 
  * @author Aidan Follestad
  */
+@Deprecated
 public class ProfileAboutAdapter extends BaseAdapter {
 
 	public ProfileAboutAdapter(Activity context) {

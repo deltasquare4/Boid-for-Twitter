@@ -31,6 +31,9 @@ import com.teamboid.twitter.utilities.Utilities;
  * @author Aidan Follestad
  */
 public class ProfileAboutFragment extends ProfilePaddedFragment {
+	
+	// TODO: This needs sorting into something NOT an adapter
+	// because it is not changing all of the time or growing/shrinking
 
 	private Activity context;
 	private ProfileAboutAdapter adapt;
