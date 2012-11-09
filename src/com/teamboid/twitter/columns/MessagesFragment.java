@@ -31,7 +31,7 @@ import com.teamboid.twitterapi.user.User;
  *
  * @author Aidan Follestad
  */
-public class MessagesFragment extends BaseListFragment {
+public class MessagesFragment extends BaseListFragment<DMConversation> {
 
     private MessageConvoAdapter adapt;
     private Activity context;

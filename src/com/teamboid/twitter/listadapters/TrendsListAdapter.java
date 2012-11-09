@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.trend.Trend;
 import com.teamboid.twitterapi.trend.Trends;
 
@@ -19,9 +22,10 @@ import com.teamboid.twitterapi.trend.Trends;
  * The list adapter used for the trends column.
  * @author Aidan Follestad
  */
-public class TrendsListAdapter extends BaseAdapter {
+public class TrendsListAdapter extends BoidAdapter<Trend> {
 
 	public TrendsListAdapter(Context timeline) {
+		super(timeline);
 		mActivity = timeline;
 		trends = new ArrayList<Trend>();
 	}
@@ -69,14 +73,17 @@ public class TrendsListAdapter extends BaseAdapter {
 	
 	@Override
 	public int getCount() { return trends.size(); }
+	
 	@Override
-	public Object getItem(int position) {
-		try { return URLDecoder.decode(trends.get(position).getQuery(), "UTF-8"); }
+	public Trend getItem(int position) {
+		return trends.get(position);
+		/*try { return URLDecoder.decode(trends.get(position).getQuery(), "UTF-8"); }
 		catch (UnsupportedEncodingException e) { 
 			e.printStackTrace();
 			return null;
-		}
+		}*/
 	}
+	
 	@Override
 	public long getItemId(int position) { return position; }
 	@Override
@@ -88,6 +95,11 @@ public class TrendsListAdapter extends BaseAdapter {
 		Trend curItem = trends.get(position);
 		toReturn.setText(curItem.getName());
 		return toReturn;
+	}
+	
+	@Override
+	public int getPosition(long id) {
+		return (int)id;
 	}
 }
 

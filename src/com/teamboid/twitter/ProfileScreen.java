@@ -248,64 +248,6 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		invalidateOptionsMenu();
 	}
 
-	public void loadFollowingInfo() {
-		new Thread(new Runnable() {
-			public void run() {
-				final Account acc = AccountService.getCurrentAccount();
-				try {
-					Relationship x = acc.getClient().getRelationship(
-							AccountService.getCurrentAccount().getId(),
-							user.getId());
-					getAboutFragment().getAdapter().updateIsBlocked(
-							x.isSourceBlockingTarget());
-
-					if (getAboutFragment().getAdapter().isBlocked()) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								getActionBar().setSelectedNavigationItem(1);
-								getAboutFragment().getAdapter()
-										.notifyDataSetChanged();
-								invalidateOptionsMenu();
-							}
-						});
-						return;
-					}
-
-					getAboutFragment().getAdapter().updateIsFollowedBy(
-							x.isSourceFollowedByTarget());
-					getAboutFragment().getAdapter().updateIsFollowing(
-							x.isSourceFollowingTarget());
-
-				} catch (final Exception e) {
-					e.printStackTrace();
-					runOnUiThread(new Runnable() {
-						public void run() {
-							Toast.makeText(
-									getApplicationContext(),
-									getString(
-											R.string.failed_check_relationship)
-											.replace("{user}",
-													user.getScreenName()),
-									Toast.LENGTH_SHORT).show();
-							getAboutFragment().getAdapter().setIsError(true);
-						}
-					});
-					return;
-				}
-				if (user.getFollowingType() == FollowingType.REQUEST_SENT) {
-					getAboutFragment().getAdapter().updateRequestSent(true);
-					return;
-				}
-				runOnUiThread(new Runnable() {
-					public void run() {
-						getAboutFragment().getAdapter().notifyDataSetChanged();
-					}
-				});
-
-			}
-		}).start();
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -329,7 +271,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 		} else {
 			inflater.inflate(R.menu.profile_actionbar, menu);
 			if (user != null) {
-				if (!getAboutFragment().getAdapter().isBlocked())
+				if (!getAboutFragment().isBlocked())
 					menu.findItem(R.id.blockAction).setEnabled(true);
 				else
 					menu.findItem(R.id.blockAction).setVisible(false);
@@ -744,7 +686,7 @@ public class ProfileScreen extends Activity implements ActionBar.TabListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
-			getAboutFragment().performRefresh(false);
+			getAboutFragment().performRefresh();
 		}
 	}
 

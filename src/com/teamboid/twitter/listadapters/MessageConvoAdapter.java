@@ -1,5 +1,6 @@
 package com.teamboid.twitter.listadapters;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.RemoteImageView;
@@ -30,7 +31,8 @@ import com.teamboid.twitterapi.dm.DirectMessage;
  */
 public class MessageConvoAdapter extends BaseAdapter {
 
-	public static class DMConversation {
+	public static class DMConversation implements Serializable {
+		private static final long serialVersionUID = -8519031809073902285L;
 
 		public DMConversation(Long toId, String toName, String toScreenName,
 				DirectMessage initMsg) {

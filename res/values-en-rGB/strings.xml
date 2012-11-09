@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- favOURites. british power! -->
+    <string name="no_favorites">No favourites</string>
+    <string name="failed_favorite">Something happened while favouriting @{user}\'s
+		Tweet!
+	</string>
+	<string name="failed_unfavorite">Something happened while unfavouriting @{user}\'s
+		Tweet!
+	</string>
+	<string name="favorite_str">Favourite</string>
+	<string name="unfavorite_str">Unfavourite</string>
+	<string name="favorites_str">Favourites</string>
+	<string name="user_favorites">{user}\'s Favourites</string>
+	
+	<!-- colOUR -->
+	<string name="theme_description">Boid\'s theme, modifies text and UI colours.
+	</string>
+    
+</resources>
