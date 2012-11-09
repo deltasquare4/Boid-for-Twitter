@@ -37,7 +37,7 @@ import com.teamboid.twitterapi.status.GeoLocation;
  * 
  * @author Aidan Follestad
  */
-public class NearbyFragment extends BaseSpinnerFragment {
+public class NearbyFragment extends BaseSpinnerFragment<Tweet> {
 
 	private SearchFeedListAdapter adapt;
 	private TimelineScreen context;

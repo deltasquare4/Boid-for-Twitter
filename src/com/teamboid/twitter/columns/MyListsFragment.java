@@ -1,17 +1,9 @@
 package com.teamboid.twitter.columns;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TweetListActivity;
 import com.teamboid.twitter.TabsAdapter.BaseListFragment;
@@ -28,27 +20,18 @@ import com.teamboid.twitterapi.user.User;
  * Represents the column that lists the user lists of the current user, these user lists are created/subscribed to on Twitter's website. 
  * @author Aidan Follestad
  */
-public class MyListsFragment extends BaseListFragment {
-
-	private UserListDisplayAdapter adapt;
-	private Activity context;
+public class MyListsFragment extends BaseListFragment<UserList> {
 	public static final String ID = "COLUMNTYPE:MYLISTS";
-
-	@Override
-	public void onAttach(Activity act) {
-		super.onAttach(act);
-		context = act;
-	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		final UserList curList = (UserList)adapt.getItem(position);
-		Intent intent = new Intent(context, TweetListActivity.class)
-		.putExtra("mode", TweetListActivity.USER_LIST)
-		.putExtra("list_name", curList.getName())
-		.putExtra("list_ID", curList.getId());
-		context.startActivity(intent);
+		final UserList curList = (UserList)getListAdapter().getItem(position);
+		Intent intent = new Intent(getActivity(), TweetListActivity.class)
+						.putExtra("mode", TweetListActivity.USER_LIST)
+						.putExtra("list_name", curList.getName())
+						.putExtra("list_ID", curList.getId());
+		getActivity().startActivity(intent);
 	}
 
 	@Override
@@ -58,97 +41,14 @@ public class MyListsFragment extends BaseListFragment {
 		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int index, long id) {
-				adapt.destroyOrUnsubscribe(index);
+				// Note: the Adapter has an AlertDialog
+				((UserListDisplayAdapter)getListAdapter()).destroyOrUnsubscribe(index);
 				return false;
 			}
 		});
 		setRetainInstance(true);
 		setEmptyText(getString(R.string.no_tweets));
-		reloadAdapter(true);
 	}
-
-	@Override
-	public void performRefresh(final boolean paginate) {
-		if (context == null || isLoading || adapt == null)
-			return;
-		isLoading = true;
-		if (adapt.getCount() == 0 && getView() != null)
-			setListShown(false);
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Paging paging = new Paging(50);
-				if (paginate)
-					paging.setMaxId(adapt.getItemId(adapt.getCount() - 1));
-				final Account acc = AccountService.getCurrentAccount();
-				if (acc != null) {
-					try {
-						final UserList[] lists = acc.getClient().getLists();
-						
-						List<Serializable> data = new ArrayList<Serializable>();
-						for(UserList ul : lists){
-							data.add(ul);
-						}
-						saveCachedContents(data);
-						
-						context.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								setEmptyText(context.getString(R.string.no_lists));
-								adapt.add(lists);
-							}
-						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						context.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								setEmptyText(context.getString(R.string.error_str));
-								showError(e.getMessage());
-							}
-						});
-					}
-				}
-				context.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						if (getView() != null)
-							setListShown(true);
-						isLoading = false;
-					}
-				});
-			}
-		}).start();
-	}
-
-	@Override
-	public void reloadAdapter(boolean firstInitialize) {
-		if (context == null && getActivity() != null)
-			context = getActivity();
-		if (AccountService.getCurrentAccount() != null) {
-			adapt = AccountService.getMyListsAdapter(context);
-			setListAdapter(adapt);
-			if (adapt.getCount() == 0)
-				performRefresh(false);
-		}
-	}
-
-	@Override
-	public void savePosition() {
-	}
-
-	@Override
-	public void restorePosition() {
-	}
-
-	@Override
-	public void jumpTop() {
-		if (getView() != null)
-			getListView().setSelectionFromTop(0, 0);
-	}
-
-	@Override
-	public void filter() { }
 
 	@Override
 	public Status[] getSelectedStatuses() { return null; }
@@ -168,9 +68,27 @@ public class MyListsFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void showCachedContents(List<Serializable> contents) {
-		for(Serializable obj : contents){
-			adapt.add((UserList) obj);
+	public void setupAdapter() {
+		if (AccountService.getCurrentAccount() != null) {
+			setListAdapter( AccountService.getMyListsAdapter(getActivity()) );
+		}
+	}
+
+	@Override
+	public UserList[] fetch(long maxId, long sinceId) {
+		try{
+			Paging paging = new Paging(50);
+			if(maxId != -1){
+				paging.setMaxId(maxId);
+			} if(sinceId != -1){
+				paging.setSinceId(sinceId);
+			}
+			
+			return AccountService.getCurrentAccount().getClient().getLists();
+		} catch(Exception e){
+			e.printStackTrace();
+			showError(e.getMessage());
+			return null;
 		}
 	}
 }

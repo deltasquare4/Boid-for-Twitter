@@ -32,22 +32,13 @@ import com.teamboid.twitterapi.user.User;
  * @author Aidan Follestad
  */
 public class MessagesFragment extends BaseListFragment<DMConversation> {
-
-    private MessageConvoAdapter adapt;
-    private Activity context;
     public static final String ID = "COLUMNTYPE:MESSAGES";
-
-    @Override
-    public void onAttach(Activity act) {
-        super.onAttach(act);
-        context = act;
-    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        startActivity(new Intent(context, ConversationScreen.class)
-                .putExtra("screen_name", ((DMConversation) adapt.getItem(position)).getToScreenName())
+        startActivity(new Intent(getActivity(), ConversationScreen.class)
+                .putExtra("screen_name", ((DMConversation) getAdapter().getItem(position)).getToScreenName())
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 
@@ -58,7 +49,6 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
         getListView().setMultiChoiceModeListener(MessageConvoCAB.choiceListener);
         setRetainInstance(true);
         setEmptyText(getString(R.string.no_messages));
-        reloadAdapter(true);
     }
 
     @Override
@@ -114,37 +104,6 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
     }
 
     @Override
-    public void reloadAdapter(boolean firstInitialize) {
-        if (context == null && getActivity() != null)
-            context = getActivity();
-        if (AccountService.getCurrentAccount() != null) {
-            adapt = AccountService.getMessageConvoAdapter(context,
-                    AccountService.getCurrentAccount().getId());
-            if (getView() != null)
-                adapt.list = getListView();
-            setListAdapter(adapt);
-            if (adapt.getCount() == 0)
-                performRefresh(false);
-        }
-    }
-
-    @Override
-    public void restorePosition() {
-    }
-
-    @Override
-    public void savePosition() {
-    }
-
-    @Override
-    public void jumpTop() {
-        if (getView() != null) getListView().setSelectionFromTop(0, 0);
-    }
-
-    @Override
-    public void filter() { }
-
-    @Override
     public Status[] getSelectedStatuses() { return null; }
 
     @Override
@@ -155,28 +114,35 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
 
     @Override
     public DMConversation[] getSelectedMessages() {
-        if (adapt == null) return null;
+        if (getAdapter() == null) return null;
         ArrayList<DMConversation> toReturn = new ArrayList<DMConversation>();
         SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
         if (checkedItems != null) {
             for (int i = 0; i < checkedItems.size(); i++) {
                 if (checkedItems.valueAt(i)) {
-                    toReturn.add((DMConversation) adapt.getItem(checkedItems.keyAt(i)));
+                    toReturn.add((DMConversation) getAdapter().getItem(checkedItems.keyAt(i)));
                 }
             }
         }
         return toReturn.toArray(new DMConversation[0]);
     }
-    
-    @Override
-	public void showCachedContents(List<Serializable> contents) {
-		for(Serializable obj : contents){
-			adapt.add(new DMConversation[]{ (DMConversation) obj });
-		}
-	}
 
 	@Override
 	public String getColumnName() {
 		return AccountService.getCurrentAccount().getId() + ".dm_list";
+	}
+
+	@Override
+	public void setupAdapter() {
+		MessageConvoAdapter adapt = AccountService.getMessageConvoAdapter(getActivity(),
+                AccountService.getCurrentAccount().getId());
+		adapt.list = getListView();
+		setListAdapter(adapt);
+	}
+
+	@Override
+	public DMConversation[] fetch(long maxId, long sinceId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
