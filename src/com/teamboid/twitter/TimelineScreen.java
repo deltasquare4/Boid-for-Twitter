@@ -21,7 +21,7 @@ import com.teamboid.twitter.columns.MessagesFragment;
 import com.teamboid.twitter.columns.MyListsFragment;
 import com.teamboid.twitter.columns.NearbyFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
-import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
@@ -373,8 +373,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				} else
 					toAdd.setText(R.string.favorites_str);
 				mTabsAdapter.addTab(toAdd, FavoritesFragment.class, index);
-			} else if (c.startsWith(SavedSearchFragment.ID + "@")) {
-				String fromQuery = SavedSearchFragment.ID + "@from:";
+			} else if (c.startsWith(SearchTweetsFragment.ID + "@")) {
+				String fromQuery = SearchTweetsFragment.ID + "@from:";
 				if (c.toLowerCase().startsWith(fromQuery.toLowerCase())) {
 					// Convert the from:screenname saved search column to a user
 					// feed column
@@ -391,7 +391,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 									Utilities.arrayToJson(cols)).commit();
 				} else {
 					String query = c.substring(
-							SavedSearchFragment.ID.length() + 1).replace("%40",
+							SearchTweetsFragment.ID.length() + 1).replace("%40",
 							"@");
 					Tab toAdd = getActionBar().newTab().setTabListener(this);
 					if (iconic) {
@@ -404,9 +404,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						}
 					} else
 						toAdd.setText(query);
-					mTabsAdapter.addTab(toAdd, SavedSearchFragment.class,
+					mTabsAdapter.addTab(toAdd, SearchTweetsFragment.class,
 							index,
-							c.substring(SavedSearchFragment.ID.length() + 1));
+							c.substring(SearchTweetsFragment.ID.length() + 1));
 				}
 			} else if (c.startsWith(UserListFragment.ID + "@")) {
 				String name = c.substring(UserListFragment.ID.length() + 1);
@@ -927,7 +927,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			else if (frag instanceof BaseGridFragment)
 				((BaseGridFragment) frag).performRefresh(false);
 			else if (frag instanceof BaseSpinnerFragment)
-				((BaseSpinnerFragment) frag).performRefresh(false);
+				((BaseSpinnerFragment) frag).performRefresh();
 		}
 		return true;
 	}
@@ -980,7 +980,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					continue;
 					//((BaseListFragment) frag).savePosition();
 				else if (frag instanceof BaseSpinnerFragment)
-					((BaseSpinnerFragment) frag).savePosition();
+					continue;
+					//((BaseSpinnerFragment) frag).savePosition();
 			}
 			for (Account acc : AccountService.getAccounts()) {
 				if (acc.getUser().getScreenName()

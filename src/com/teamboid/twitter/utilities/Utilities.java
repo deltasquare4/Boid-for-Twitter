@@ -67,15 +67,15 @@ public class Utilities {
 
 	public static void recreateFeedAdapter(Activity context,
 			FeedListAdapter adapt) {
-		Status[] before = null;
+		/*Status[] before = null;
 		if (adapt.getCount() > 0)
 			before = adapt.toArray();
-		adapt = new FeedListAdapter(context, adapt.ID, adapt.account);
+		adapt = new FeedListAdapter(context, adapt.ID, adapt.getAccount());
 		if (before != null)
-			adapt.add(before);
+			adapt.add(before);*/
 		int index = 0;
 		for (FeedListAdapter a : AccountService.feedAdapters) {
-			if (a.ID.equals(adapt.ID) && a.account == adapt.account) {
+			if (a.ID.equals(adapt.ID) && a.getAccount().getId() == adapt.getAccount().getId()) {
 				AccountService.feedAdapters.set(index, adapt);
 			}
 			index++;

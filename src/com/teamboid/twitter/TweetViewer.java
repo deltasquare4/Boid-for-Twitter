@@ -120,7 +120,7 @@ public class TweetViewer extends MapActivity {
 					.edit().putLong("last_sel_account", (long) accId).commit();
 		}
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this);
+		binder = new FeedListAdapter(this, null, null);
 		ListView list = ((ListView) findViewById(android.R.id.list));
 		list.setAdapter(binder);
 		list.setOnItemClickListener(new OnItemClickListener() {

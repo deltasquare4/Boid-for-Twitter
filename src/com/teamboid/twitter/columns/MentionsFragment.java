@@ -1,6 +1,7 @@
 package com.teamboid.twitter.columns;
 
 import com.teamboid.twitter.TabsAdapter.BaseTimelineFragment;
+import com.teamboid.twitter.notifications.NotificationService;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.status.Status;
@@ -28,6 +29,9 @@ public class MentionsFragment extends BaseTimelineFragment {
 			if(sinceId != -1){
 				paging.setSinceId(sinceId);
 			}
+			
+			NotificationService.setReadMentions(AccountService.getCurrentAccount().getId(), getActivity());
+			
 			return AccountService.getCurrentAccount().getClient().getMentions(paging);
 		} catch(Exception e){
 			e.printStackTrace();

@@ -64,7 +64,7 @@ public class TweetListActivity extends ListActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this);
+		binder = new FeedListAdapter(this, null, null);
 		setListAdapter(binder);
 		refresh();
 		getListView().setOnItemClickListener(new OnItemClickListener(){

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.content.Context;
@@ -23,9 +24,10 @@ import com.teamboid.twitterapi.user.User;
  * The list adapter used for activities that search for users.
  * @author Aidan Follestad
  */
-public class SearchUsersListAdapter extends BaseAdapter {
+public class SearchUsersListAdapter extends BoidAdapter<User> {
 
 	public SearchUsersListAdapter(Context context) {
+		super(context, null, null);
 		mContext = context;
 		users = new ArrayList<User>();
 	}
@@ -36,20 +38,21 @@ public class SearchUsersListAdapter extends BaseAdapter {
 	public int savedIndex;
 	public int savedIndexTop;
 	
-	public boolean add(User tweet) {
+	public void add(User tweet) {
 		boolean added = false;
 		if(!update(tweet)) {
 			users.add(tweet);
 			added = true;
 		}
 		notifyDataSetChanged();
-		return added;
+		return;
 	}
 	public int add(User[] toAdd) {
 		int before = users.size();
 		int added = 0;
 		for(User user : toAdd) {
-			if(add(user)) added++;
+			add(user);
+			added++;
 		}
 		if(before == 0) return added;
 		else if(added == before) return 0;
@@ -82,7 +85,7 @@ public class SearchUsersListAdapter extends BaseAdapter {
 	@Override
 	public int getCount() { return users.size(); }
 	@Override
-	public Object getItem(int position) {
+	public User getItem(int position) {
 		return users.get(position);
 	}
 	@Override
@@ -114,5 +117,14 @@ public class SearchUsersListAdapter extends BaseAdapter {
 		if(user.isVerified()) ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.VISIBLE);
 		else ((ImageView)toReturn.findViewById(R.id.userItemVerified)).setVisibility(View.GONE);
 		return toReturn;
+	}
+	@Override
+	public int getPosition(long id) {
+		for(int i = 0; i <= this.getCount(); i++){
+			if(getItem(i).getId() == id){
+				return i;
+			}
+		}
+		return -1;
 	}
 }

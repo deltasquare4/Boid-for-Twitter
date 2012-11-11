@@ -1,44 +1,27 @@
 package com.teamboid.twitter.columns;
 
-import java.io.Serializable;
-
 import com.teamboid.twitterapi.search.Tweet;
-import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Status;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
-
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.SearchScreen;
-import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
+import com.teamboid.twitter.TabsAdapter.BaseLocationSpinnerFragment;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
-import com.teamboid.twitter.listadapters.TrendsListAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.trend.Trend;
 import com.teamboid.twitterapi.trend.TrendLocation;
-import com.teamboid.twitterapi.trend.Trends;
 import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays current trends. 
  * @author Aidan Follestad
  */
-public class TrendsFragment extends BaseSpinnerFragment<Trend> {
+public class TrendsFragment extends BaseLocationSpinnerFragment<Trend> {
 	public static String ID = "COLUMNTYPE:TRENDS";
-	public GeoLocation location;
 	public TrendLocation[] places;
 	public boolean filterSelected;
 

@@ -1,10 +1,8 @@
 package com.teamboid.twitter.listadapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +12,10 @@ import android.widget.ImageView.ScaleType;
 
 import java.util.ArrayList;
 
-import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
+import com.teamboid.twitter.Account;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.TabsAdapter;
 import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
@@ -35,11 +32,12 @@ import com.teamboid.twitterapi.status.Status;
  * @author Aidan Follestad
  */
 public class FeedListAdapter extends BoidAdapter<Status> implements Filterable {
-	public String ID;
-
-	public FeedListAdapter(Context context) {
-		super(context);
+	public FeedListAdapter(Context context, String id, Account acc) {
+		super(context, id, acc);
+		this.ID = id;
 	}
+
+	public String ID;
 
 	@Override
 	public long getItemId(int position) {

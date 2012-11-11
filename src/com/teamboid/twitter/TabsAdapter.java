@@ -16,6 +16,7 @@ import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.GeoLocation;
 import com.teamboid.twitterapi.status.Status;
 import com.teamboid.twitterapi.user.User;
 import com.teamboid.twitterapi.utilities.Utils;
@@ -28,6 +29,9 @@ import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -155,6 +159,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	public int getCount() {
 		return mTabs.size();
 	}
+	
+	@Override
+    public float getPageWidth(int position){
+    	return mContext.getResources().getInteger(R.integer.column_width); // TODO: Option
+    }
 
 	@Override
 	public Fragment getItem(int position) {
@@ -168,8 +177,10 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public void performRefresh();
 	}
 	public static abstract class BoidAdapter<T> extends ArrayAdapter<T>{
-		public BoidAdapter(Context context) {
+		Account xAcc;
+		public BoidAdapter(Context context, String id, Account acc) {
 			super(context, 0);
+			xAcc = acc;
 		}
 		public abstract long getItemId(int position);
 		/**
@@ -178,6 +189,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		 * @return
 		 */
 		public abstract int getPosition(long id);
+		public Account getAccount(){ return xAcc; }
 	}
 
 	/**
@@ -196,7 +208,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		@SuppressWarnings("unchecked")
 		public BoidAdapter<T> getAdapter(){
-			return (BoidAdapter<T>) getListView().getAdapter();
+			return (BoidAdapter<T>) getListAdapter();
 		}
 		
 		// Abstracts
@@ -232,13 +244,13 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		@Override
 		public void onStart() {
 			super.onStart();
-			if(getActivity() == null) return;
+			if(getActivity() == null || getView() == null) return;
 			
 			getView().findViewById(R.id.container).setPadding(0, getPaddingTop(), 0, 0);
-			View v = getTopView();
+			/*View v = getTopView();
 			if(v != null){
 				((NullView)getView().findViewById(R.id.headerControl)).replace(v);
-			}
+			}*/
 			
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
@@ -274,15 +286,27 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				@SuppressWarnings("unchecked")
 				@Override
 				public void run() {
+					if(getActivity() == null || getView() == null) return;
 					setupAdapter();
+					
+					if(getAdapter() == null){
+						Log.d("boid", "column " + getColumnName() + " is not working");
+					}
 					
 					// Try and load a cached result if we have one
 					final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
 					if(contents != null){
-						getAdapter().addAll((Collection<? extends T>) contents);
-						if(getAdapter().getFilter() != null)
-							getAdapter().getFilter().filter("");
-						getAdapter().notifyDataSetChanged();
+						getActivity().runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								getAdapter().addAll((Collection<? extends T>) contents);
+								if(getAdapter().getFilter() != null)
+									getAdapter().getFilter().filter("");
+								
+								getAdapter().notifyDataSetChanged();
+							}
+						});
 					} else{
 						performRefresh();
 					}
@@ -294,7 +318,17 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		public void setLoading(boolean loading){
 			isLoading = loading;
-			getActivity().invalidateOptionsMenu();
+			if(getActivity() != null){
+				getActivity().runOnUiThread(new Runnable(){
+	
+					@Override
+					public void run() {
+						try{ getActivity().invalidateOptionsMenu(); }
+						catch(Exception e) { }
+					}
+					
+				});
+			}
 		}
 
 		@Override
@@ -379,6 +413,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 		
 		public void performRefresh(){
+			if(getView() == null) return;
+			
 			setLoading(true);
 			execService.execute(new Runnable(){
 				public void run(){
@@ -387,7 +423,10 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					T[] t = fetch(-1, s);
 					setLoading(false);
 					if(t != null){
-						long id = getCurrentTop();
+						long id = -1;
+						try{
+							id = getCurrentTop();
+						} catch(Exception e){}
 						
 						getAdapter().clear();
 						getAdapter().addAll(t);
@@ -395,7 +434,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 							getAdapter().getFilter().filter("");
 						getAdapter().notifyDataSetChanged();
 						
-						getListView().setSelection( getAdapter().getPosition(id) );
+						if(id != -1)
+							getListView().setSelection( getAdapter().getPosition(id) );
 						
 						if(cacheContents()){
 							ArrayList<T> y = new ArrayList<T>();
@@ -414,6 +454,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 												getArguments().getInt(
 														"tab_index"))
 										.setText(
+												// TODO
 												getActivity().getString(R.string.mentions_str)
 														+ " ("
 														+ Integer
@@ -443,6 +484,55 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public void jumpTop() {
 			if (getView() != null)
 				getListView().setSelectionFromTop(0, 0);
+		}
+		
+	}
+	
+	public static abstract class BaseLocationSpinnerFragment<T extends Serializable> extends BaseSpinnerFragment<T>{
+		boolean isGettingLocation = false;
+		public GeoLocation location = null;
+		
+		public GeoLocation getGeoLocation(){
+			return location;
+		}
+		
+		@Override
+		public void onStart(){
+			super.onStart();
+			getLocation();
+		}
+		
+		public void getLocation() {
+			if (isGettingLocation)
+				return;
+			isGettingLocation = true;
+			final LocationManager locationManager = (LocationManager) getActivity()
+					.getSystemService(Context.LOCATION_SERVICE);
+			LocationListener locationListener = new LocationListener() {
+				@Override
+				public void onLocationChanged(Location loc) {
+					locationManager.removeUpdates(this);
+					isGettingLocation = false;
+					location = new GeoLocation(loc.getLatitude(),
+							loc.getLongitude());
+					performRefresh();
+				}
+
+				@Override
+				public void onStatusChanged(String provider, int status,
+						Bundle extras) {
+				}
+
+				@Override
+				public void onProviderEnabled(String provider) {
+				}
+
+				@Override
+				public void onProviderDisabled(String provider) {
+				}
+			};
+			locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 		}
 		
 	}

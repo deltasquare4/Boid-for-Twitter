@@ -25,7 +25,7 @@ import com.teamboid.twitterapi.trend.Trends;
 public class TrendsListAdapter extends BoidAdapter<Trend> {
 
 	public TrendsListAdapter(Context timeline) {
-		super(timeline);
+		super(timeline, null, null);
 		mActivity = timeline;
 		trends = new ArrayList<Trend>();
 	}
