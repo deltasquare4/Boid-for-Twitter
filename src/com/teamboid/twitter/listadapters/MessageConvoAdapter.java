@@ -323,7 +323,7 @@ public class MessageConvoAdapter  extends BoidAdapter<MessageConvoAdapter.DMConv
 
 	@Override
 	public int getPosition(long id) {
-		for(int i = 0; i <= this.getCount(); i++){
+		for(int i = 0; i <= this.getCount()-1; i++){
 			if(getItem(i).getToId() == id){
 				return i;
 			}

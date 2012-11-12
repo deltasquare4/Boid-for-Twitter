@@ -383,7 +383,7 @@ public class SearchFeedListAdapter extends BoidAdapter<Tweet> {
 
 	@Override
 	public int getPosition(long id) {
-		for(int i = 0; i <= this.getCount(); i++){
+		for(int i = 0; i <= this.getCount()-1; i++){
 			if(getItem(i).getId() == id){
 				return i;
 			}

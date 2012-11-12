@@ -20,7 +20,7 @@ public class TimelineFragment extends BaseTimelineFragment {
 	@Override
 	public Status[] fetch(long maxId, long sinceId) {
 		try{
-			Paging paging = new Paging(50);
+			Paging paging = new Paging(getMaxPerLoad());
 			if(maxId != -1){
 				paging.setMaxId(maxId);
 			}

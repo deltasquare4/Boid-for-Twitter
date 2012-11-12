@@ -207,6 +207,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
 		
 		Activity mContext;
+		String origTitle;
 		
 		@Override
 		public void onAttach(Activity a){
@@ -291,13 +292,14 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				}
 			});
 			
+			setupAdapter();
+			
 			execService.execute(new Runnable(){
 
 				@SuppressWarnings("unchecked")
 				@Override
 				public void run() {
 					if(getContext() == null || getView() == null) return;
-					setupAdapter();
 					
 					if(getAdapter() == null){
 						Log.d("boid", "column " + getColumnName() + " is not working");
@@ -305,6 +307,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					
 					// Try and load a cached result if we have one
 					final List<Serializable> contents = ColumnCacheManager.getCache(getContext(), getColumnName());
+					
+					origTitle = getContext().getActionBar()
+							.getTabAt(
+									getArguments().getInt(
+											"tab_index")).getText().toString();
 					if(contents != null){
 						getContext().runOnUiThread(new Runnable(){
 
@@ -351,7 +358,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 		
 		public void showError(final String message){
-			if(getActivity() == null) return; 
+			if(getActivity() == null || getView() == null) return; 
 			getActivity().runOnUiThread(new Runnable(){
 
 				@Override
@@ -422,6 +429,10 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			});
 		}
 		
+		public int getMaxPerLoad(){
+			return 50;
+		}
+		
 		public void performRefresh(){
 			if(getView() == null) return;
 			
@@ -442,14 +453,33 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 									id = getCurrentTop();
 								} catch(Exception e){}
 								
-								getAdapter().clear();
-								getAdapter().addAll(t);
+								if(t.length >= getMaxPerLoad()){
+									getAdapter().clear();
+								}
+								for(T item : t){
+									getAdapter().insert(item, 0);
+								}
+								//getAdapter().addAll(t);
 								if(getAdapter().getFilter() != null)
 									getAdapter().getFilter().filter("");
 								getAdapter().notifyDataSetChanged();
 								
 								if(id != -1)
 									getListView().setSelection( getAdapter().getPosition(id) );
+								
+								if(t.length > 0){
+									// Set the tab unread count
+								
+									getActivity().getActionBar()
+											.getTabAt(
+													getArguments().getInt(
+															"tab_index"))
+											.setText(
+													origTitle + (origTitle.isEmpty() ? "" : " ") + "("
+															+ Integer
+																	.toString(t.length)
+															+ ")");
+								}
 							}
 							
 						});
@@ -460,31 +490,6 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								y.add(x);
 							}
 							saveCachedContents(y);
-						}
-						if(t.length > 0){
-							// Set the tab unread count
-							if (!PreferenceManager
-									.getDefaultSharedPreferences(getActivity()).getBoolean(
-											"enable_iconic_tabs", true)) {
-								getActivity().getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-										.setText(
-												// TODO
-												getActivity().getString(R.string.mentions_str)
-														+ " ("
-														+ Integer
-																.toString(t.length)
-														+ ")");
-							} else {
-								getActivity().getActionBar()
-										.getTabAt(
-												getArguments().getInt(
-														"tab_index"))
-										.setText(
-												Integer.toString(t.length));
-							}
 						}
 					}
 				}
