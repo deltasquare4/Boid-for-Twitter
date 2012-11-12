@@ -206,6 +206,16 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			implements IBoidFragment {
 		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
 		
+		Activity mContext;
+		
+		@Override
+		public void onAttach(Activity a){
+			super.onAttach(a);
+			mContext = a;
+		}
+		
+		public Activity getContext(){ return mContext; }
+		
 		@SuppressWarnings("unchecked")
 		public BoidAdapter<T> getAdapter(){
 			return (BoidAdapter<T>) getListAdapter();
@@ -286,7 +296,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				@SuppressWarnings("unchecked")
 				@Override
 				public void run() {
-					if(getActivity() == null || getView() == null) return;
+					if(getContext() == null || getView() == null) return;
 					setupAdapter();
 					
 					if(getAdapter() == null){
@@ -294,9 +304,9 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					}
 					
 					// Try and load a cached result if we have one
-					final List<Serializable> contents = ColumnCacheManager.getCache(getActivity(), getColumnName());
+					final List<Serializable> contents = ColumnCacheManager.getCache(getContext(), getColumnName());
 					if(contents != null){
-						getActivity().runOnUiThread(new Runnable(){
+						getContext().runOnUiThread(new Runnable(){
 
 							@Override
 							public void run() {
@@ -420,22 +430,29 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				public void run(){
 					long s = -1;
 					if(getAdapter().getCount() > 0) s = getAdapter().getItemId(0);
-					T[] t = fetch(-1, s);
+					final T[] t = fetch(-1, s);
 					setLoading(false);
 					if(t != null){
-						long id = -1;
-						try{
-							id = getCurrentTop();
-						} catch(Exception e){}
-						
-						getAdapter().clear();
-						getAdapter().addAll(t);
-						if(getAdapter().getFilter() != null)
-							getAdapter().getFilter().filter("");
-						getAdapter().notifyDataSetChanged();
-						
-						if(id != -1)
-							getListView().setSelection( getAdapter().getPosition(id) );
+						getContext().runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								long id = -1;
+								try{
+									id = getCurrentTop();
+								} catch(Exception e){}
+								
+								getAdapter().clear();
+								getAdapter().addAll(t);
+								if(getAdapter().getFilter() != null)
+									getAdapter().getFilter().filter("");
+								getAdapter().notifyDataSetChanged();
+								
+								if(id != -1)
+									getListView().setSelection( getAdapter().getPosition(id) );
+							}
+							
+						});
 						
 						if(cacheContents()){
 							ArrayList<T> y = new ArrayList<T>();
