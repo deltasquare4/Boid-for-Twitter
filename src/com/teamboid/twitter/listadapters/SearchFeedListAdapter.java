@@ -6,6 +6,7 @@ import com.handlerexploit.prime.ImageManager;
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 import com.teamboid.twitter.utilities.Utilities;
 
 import android.content.Context;
@@ -32,9 +33,10 @@ import com.teamboid.twitterapi.status.Place;
  * 
  * @author Aidan Follestad
  */
-public class SearchFeedListAdapter extends BaseAdapter {
+public class SearchFeedListAdapter extends BoidAdapter<Tweet> {
 
 	public SearchFeedListAdapter(Context context, long _account, String query ) {
+		super(context, null, null);
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
 		account = _account;
@@ -42,6 +44,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	public SearchFeedListAdapter(Context context, String _id, long _account, String query) {
+		super(context, null, null);
 		mContext = context;
 		tweets = new ArrayList<Tweet>();
 		ID = _id;
@@ -137,9 +140,9 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		return false;
 	}
 
-	private boolean add(Tweet tweet) {
+	public void add(Tweet tweet) {
 		if (shouldFilter(mContext, tweet)) {
-			return false;
+			return;
 		}
 		boolean added = false;
 		if (!update(tweet)) {
@@ -147,15 +150,15 @@ public class SearchFeedListAdapter extends BaseAdapter {
 			added = true;
 		}
 		notifyDataSetChanged();
-		return added;
+		return;
 	}
 
 	public int add(Tweet[] toAdd) {
 		int before = tweets.size();
 		int added = 0;
 		for (Tweet tweet : toAdd) {
-			if (add(tweet))
-				added++;
+			add(tweet);
+			added++;
 		}
 		if (before == 0)
 			return added;
@@ -235,7 +238,7 @@ public class SearchFeedListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Tweet getItem(int position) {
 		return tweets.get(position);
 	}
 
@@ -376,5 +379,15 @@ public class SearchFeedListAdapter extends BaseAdapter {
 		mediaProg.setVisibility(View.GONE);
 		mediaPreview.setVisibility(View.GONE);
 		mediaPreview.setImageBitmap(null);
+	}
+
+	@Override
+	public int getPosition(long id) {
+		for(int i = 0; i <= this.getCount()-1; i++){
+			if(getItem(i).getId() == id){
+				return i;
+			}
+		}
+		return -1;
 	}
 }

@@ -7,7 +7,6 @@ import com.teamboid.twitter.TabsAdapter.BaseListFragment;
 import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
 import com.teamboid.twitter.TabsAdapter.TabInfo;
 import com.teamboid.twitter.cab.UserListCAB;
-import com.teamboid.twitter.columns.SavedSearchFragment;
 import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.SearchUsersFragment;
 import com.teamboid.twitter.listadapters.SearchFeedListAdapter;
@@ -157,7 +156,7 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 			ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
 					Long.toString(AccountService.getCurrentAccount().getId())
 							+ "_columns", ""));
-			cols.add(SavedSearchFragment.ID + "@"
+			cols.add(SearchTweetsFragment.ID + "@"
 					+ getIntent().getStringExtra("query"));
 			prefs.edit()
 					.putString(
@@ -172,7 +171,7 @@ public class SearchScreen extends Activity implements ActionBar.TabListener {
 				Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:" + Integer.toString(i));
 				if (frag != null)
-					((BaseListFragment) frag).performRefresh(false);
+					((BaseListFragment) frag).performRefresh();
 			}
 			return true;
 		default:

@@ -131,15 +131,15 @@ public class Api16 {
 			/**
 			 * Index 4 is equal to the 5th item.
 			 */
-			int m = 4;
-			if (ja.length() < 5) {
+			int m = 0;
+			if (ja.length() > 5) {
 				/**
 				 * If there's not 5 queued notifications, than settle with
 				 * what's there.
 				 */
-				m = ja.length() - 1;
+				m = ja.length() - 5;
 			}
-			for (int i = m; i > 0; i--) {
+			for (int i = m; i <= ja.length(); i++) {
 				JSONObject jo = ja.getJSONObject(i);
 				String user = jo.getString("user") + ": ";
 				SpannableStringBuilder sp = new SpannableStringBuilder(user

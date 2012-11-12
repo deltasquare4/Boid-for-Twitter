@@ -1,36 +1,131 @@
 package com.teamboid.twitter.columns;
 
-import com.teamboid.twitterapi.status.GeoLocation;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import com.teamboid.twitterapi.search.Tweet;
+import com.teamboid.twitterapi.status.Status;
 
+import android.content.Context;
+import android.location.LocationManager;
+import android.preference.PreferenceManager;
+import android.widget.ArrayAdapter;
 import com.teamboid.twitter.Account;
 import com.teamboid.twitter.R;
-import com.teamboid.twitter.SearchScreen;
-import com.teamboid.twitter.TabsAdapter.BaseSpinnerFragment;
-import com.teamboid.twitter.listadapters.TrendsListAdapter;
+import com.teamboid.twitter.TabsAdapter.BaseLocationSpinnerFragment;
+import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.trend.Trend;
 import com.teamboid.twitterapi.trend.TrendLocation;
-import com.teamboid.twitterapi.trend.Trends;
+import com.teamboid.twitterapi.user.User;
 
 /**
  * Represents the column that displays current trends. 
  * @author Aidan Follestad
  */
-public class TrendsFragment extends BaseSpinnerFragment {
+public class TrendsFragment extends BaseLocationSpinnerFragment<Trend> {
+	public static String ID = "COLUMNTYPE:TRENDS";
+	public TrendLocation[] places;
+	public boolean filterSelected;
 
+	@Override
+	public String getColumnName() {
+		return ID;
+	}
+	
+
+	@Override
+	public Trend[] fetch(long maxId, long sinceId) {
+		try{
+			Account acc = AccountService.getCurrentAccount();
+			
+			int selectedIndex = getSpinner().getSelectedItemPosition();
+			switch(selectedIndex){
+			case 0:
+				return acc.getClient().getTrendsGlobal();
+			case 1:
+				return acc.getClient().getTrendsDaily()[0].getTrends();
+			case 2:
+				return acc.getClient().getTrendsWeekly()[0].getTrends();
+			default:
+				if(getSpinner().getSelectedItem().toString().equals(
+						getActivity().getResources().getStringArray(R.array.trend_sources)[3]) || places == null) {
+					resetSpinner(true);
+					places = new TrendLocation[4];
+					TrendLocation[] temp = acc.getClient().getTrendsAvailable(location);
+					int count = 0;
+					for(int i = 0; i < temp.length; i++) {
+						if(count == 4) break;
+						places[i] = temp[i];
+						count++;
+					}
+					resetSpinner(false);
+				} else {
+					return acc.getClient().getLocationTrends(
+							places[selectedIndex - 3].getWoeId());
+				}
+			}
+		
+		} catch(Exception e){
+			e.printStackTrace();
+			showError(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override public Status[] getSelectedStatuses() {	return null; }
+	@Override public User[] getSelectedUsers() { return null; }
+	@Override public Tweet[] getSelectedTweets() { return null; }
+	@Override public DMConversation[] getSelectedMessages() { return null; }
+
+	@Override
+	public void setupAdapter() {
+		setListAdapter(AccountService.getTrendsAdapter(getActivity()));
+	}
+	
+	public boolean deviceHasLocation(){
+		try{
+			LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+			return locationManager.getProviders(true).size() > 0;
+		} catch(Exception e){
+			return false;
+		}
+	}
+	
+	private void resetSpinner(boolean loading) {
+		if(getSpinner() == null) return;
+		final ArrayAdapter<String> spinAdapt = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item);
+		spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		if(loading) {
+			filterSelected = true;
+			spinAdapt.add(getActivity().getString(R.string.loading_str));
+			getSpinner().setAdapter(spinAdapt);
+			return;
+		} else filterSelected = false;
+		
+		String[] toAdd = getActivity().getResources().getStringArray(R.array.trend_sources);
+		for (String t : toAdd) spinAdapt.add(t);
+		filterSelected = true;
+		
+		if(!deviceHasLocation()){ // probably won't happen in production, but it's to cover us
+			spinAdapt.remove(spinAdapt.getItem(3));
+		} else if(places != null) {
+			spinAdapt.remove(spinAdapt.getItem(3));
+			for(TrendLocation loc : places) {
+				try{
+					spinAdapt.add(getActivity().getString(R.string.local_trend_with_place).replace("{place}", loc.getName()));
+				} catch(Exception e){}
+			}
+			getSpinner().setAdapter(spinAdapt);
+			getSpinner().setSelection(3);
+		} else {
+			int sourceIndex = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("last_trend_source", 0);
+			getSpinner().setAdapter(spinAdapt);
+			getSpinner().setSelection(sourceIndex);
+		}
+		filterSelected = false;
+	}
+
+	
+};
+/*
 	private TrendsListAdapter adapt;
 	private Activity context;
 	public static final String ID = "COLUMNTYPE:TRENDS";
@@ -285,3 +380,4 @@ public class TrendsFragment extends BaseSpinnerFragment {
 				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 	}
 }
+*/

@@ -21,7 +21,7 @@ import com.teamboid.twitter.columns.MessagesFragment;
 import com.teamboid.twitter.columns.MyListsFragment;
 import com.teamboid.twitter.columns.NearbyFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
-import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
@@ -245,13 +245,13 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				if (intent.getIntExtra("switch", -1) == Api11.MENTIONS) {
 					if (frag instanceof MentionsFragment) {
 						switchIndex = i;
-						((BaseListFragment) frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh();
 						break;
 					}
 				} else {
 					if (frag instanceof MessagesFragment) {
 						switchIndex = i;
-						((BaseListFragment) frag).performRefresh(false);
+						((BaseListFragment) frag).performRefresh();
 						break;
 					}
 				}
@@ -306,6 +306,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 			filterDefaultColumnSelection = true;
 			mTabsAdapter.clear();
 		}
+		mTabsAdapter.setIsHome(true);
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		ArrayList<String> cols = Utilities.jsonToArray(prefs.getString(
@@ -372,8 +373,8 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				} else
 					toAdd.setText(R.string.favorites_str);
 				mTabsAdapter.addTab(toAdd, FavoritesFragment.class, index);
-			} else if (c.startsWith(SavedSearchFragment.ID + "@")) {
-				String fromQuery = SavedSearchFragment.ID + "@from:";
+			} else if (c.startsWith(SearchTweetsFragment.ID + "@")) {
+				String fromQuery = SearchTweetsFragment.ID + "@from:";
 				if (c.toLowerCase().startsWith(fromQuery.toLowerCase())) {
 					// Convert the from:screenname saved search column to a user
 					// feed column
@@ -390,7 +391,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 									Utilities.arrayToJson(cols)).commit();
 				} else {
 					String query = c.substring(
-							SavedSearchFragment.ID.length() + 1).replace("%40",
+							SearchTweetsFragment.ID.length() + 1).replace("%40",
 							"@");
 					Tab toAdd = getActionBar().newTab().setTabListener(this);
 					if (iconic) {
@@ -403,9 +404,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 						}
 					} else
 						toAdd.setText(query);
-					mTabsAdapter.addTab(toAdd, SavedSearchFragment.class,
+					mTabsAdapter.addTab(toAdd, SearchTweetsFragment.class,
 							index,
-							c.substring(SavedSearchFragment.ID.length() + 1));
+							c.substring(SearchTweetsFragment.ID.length() + 1));
 				}
 			} else if (c.startsWith(UserListFragment.ID + "@")) {
 				String name = c.substring(UserListFragment.ID.length() + 1);
@@ -568,8 +569,9 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 		for (int i = 0; i < getActionBar().getTabCount(); i++) {
 			Fragment frag = getFragmentManager().findFragmentByTag(
 					"page:" + Integer.toString(i));
-			if (frag instanceof IBoidFragment) {
-				((IBoidFragment) frag).reloadAdapter(false);
+			if (IBoidFragment.class.isInstance(frag)) {
+				// TODO: Solve
+				//((IBoidFragment) frag).reloadAdapter();
 			}
 		}
 	}
@@ -822,7 +824,7 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 					Fragment frag = getFragmentManager().findFragmentByTag(
 							"page:" + i);
 					if (frag != null && frag instanceof BaseListFragment) {
-						((BaseListFragment) frag).filter();
+						// wut? ((BaseListFragment) frag).filter();
 					}
 				}
 			}
@@ -921,11 +923,11 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				((TrendsFragment) frag).places = null;
 			}
 			if (frag instanceof BaseListFragment)
-				((BaseListFragment) frag).performRefresh(false);
+				((BaseListFragment) frag).performRefresh();
 			else if (frag instanceof BaseGridFragment)
 				((BaseGridFragment) frag).performRefresh(false);
 			else if (frag instanceof BaseSpinnerFragment)
-				((BaseSpinnerFragment) frag).performRefresh(false);
+				((BaseSpinnerFragment) frag).performRefresh();
 		}
 		return true;
 	}
@@ -975,9 +977,11 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				Fragment frag = getFragmentManager().findFragmentByTag(
 						"page:" + Integer.toString(i));
 				if (frag instanceof BaseListFragment)
-					((BaseListFragment) frag).savePosition();
+					continue;
+					//((BaseListFragment) frag).savePosition();
 				else if (frag instanceof BaseSpinnerFragment)
-					((BaseSpinnerFragment) frag).savePosition();
+					continue;
+					//((BaseSpinnerFragment) frag).savePosition();
 			}
 			for (Account acc : AccountService.getAccounts()) {
 				if (acc.getUser().getScreenName()

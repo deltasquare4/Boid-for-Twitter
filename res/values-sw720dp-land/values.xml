@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<item type="bool" name="is_tablet">true</item>
+    <item type="integer" name="column_width">0.2</item>
 </resources>

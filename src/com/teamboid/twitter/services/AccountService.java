@@ -342,7 +342,7 @@ public class AccountService extends Service {
 		if(feedAdapters == null) return null;
 		FeedListAdapter toReturn = null;
 		for (FeedListAdapter adapt : feedAdapters) {
-			if (TimelineFragment.ID.equals(adapt.ID) && account == adapt.account) {
+			if (TimelineFragment.ID.equals(adapt.ID) && account == adapt.getAccount().getId()) {
 				toReturn = adapt;
 				break;
 			}
@@ -358,13 +358,13 @@ public class AccountService extends Service {
 		if (feedAdapters == null) feedAdapters = new ArrayList<FeedListAdapter>();
 		FeedListAdapter toReturn = null;
 		for (FeedListAdapter adapt : feedAdapters) {
-			if (id.equals(adapt.ID) && account == adapt.account) {
+			if (id.equals(adapt.ID) && account == adapt.getAccount().getId()) {
 				toReturn = adapt;
 				break;
 			}
 		}
 		if (toReturn == null && createIfNull) {
-			toReturn = new FeedListAdapter(activity, id, account);
+			toReturn = new FeedListAdapter(activity, id, getAccount(account));
 			feedAdapters.add(toReturn);
 		}
 		return toReturn;
@@ -374,7 +374,7 @@ public class AccountService extends Service {
 		if (feedAdapters == null) return;
 		for (int i = 0; i < feedAdapters.size(); i++) {
 			FeedListAdapter curAdapt = feedAdapters.get(i);
-			if (curAdapt.ID.equals(id) && curAdapt.account == account) {
+			if (curAdapt.ID.equals(id) && curAdapt.getAccount().getId() == account) {
 				curAdapt.clear();
 				feedAdapters.set(i, curAdapt);
 				break;

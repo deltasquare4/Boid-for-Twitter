@@ -1,10 +1,12 @@
 package com.teamboid.twitter.listadapters;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.handlerexploit.prime.RemoteImageView;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.TabsAdapter.BoidAdapter;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.utilities.Utilities;
 
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.teamboid.twitterapi.dm.DirectMessage;
+import com.teamboid.twitterapi.status.Status;
 
 /**
  * The list adapter used for the messages tab, displays a list of conversations
@@ -27,9 +30,10 @@ import com.teamboid.twitterapi.dm.DirectMessage;
  * 
  * @author Aidan Follestad
  */
-public class MessageConvoAdapter extends BaseAdapter {
+public class MessageConvoAdapter  extends BoidAdapter<MessageConvoAdapter.DMConversation> {
 
-	public static class DMConversation {
+	public static class DMConversation implements Serializable {
+		private static final long serialVersionUID = -8519031809073902285L;
 
 		public DMConversation(Long toId, String toName, String toScreenName,
 				DirectMessage initMsg) {
@@ -118,6 +122,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 	}
 
 	public MessageConvoAdapter(Activity _context, long _account) {
+		super(_context, null, null);
 		context = _context;
 		items = new ArrayList<DMConversation>();
 		account = _account;
@@ -233,7 +238,7 @@ public class MessageConvoAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public DMConversation getItem(int position) {
 		return items.get(position);
 	}
 
@@ -313,5 +318,15 @@ public class MessageConvoAdapter extends BaseAdapter {
 				.getLastMessage().getText().replace("\n", " ").trim(), null,
 				null, true, null));
 		return toReturn;
+	}
+
+	@Override
+	public int getPosition(long id) {
+		for(int i = 0; i <= this.getCount()-1; i++){
+			if(getItem(i).getToId() == id){
+				return i;
+			}
+		}
+		return -1;
 	}
 }

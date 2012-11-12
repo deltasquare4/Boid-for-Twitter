@@ -59,7 +59,7 @@ public class SendTweetService extends Service {
 												AccountService
 														.getCurrentAccount()
 														.getId())
-										.add(new com.teamboid.twitterapi.status.Status[] { stt.tweet });
+										.add( stt.tweet );
 							}
 						});
 					} catch (Exception e) {

@@ -32,6 +32,7 @@ import com.teamboid.twitter.ComposerScreen;
 import com.teamboid.twitter.InAppBrowser;
 import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
+import com.teamboid.twitter.ReadabilityActivity;
 import com.teamboid.twitter.SearchScreen;
 import com.teamboid.twitter.listadapters.FeedListAdapter;
 import com.teamboid.twitter.listadapters.MediaFeedListAdapter;
@@ -66,15 +67,15 @@ public class Utilities {
 
 	public static void recreateFeedAdapter(Activity context,
 			FeedListAdapter adapt) {
-		Status[] before = null;
+		/*Status[] before = null;
 		if (adapt.getCount() > 0)
 			before = adapt.toArray();
-		adapt = new FeedListAdapter(context, adapt.ID, adapt.account);
+		adapt = new FeedListAdapter(context, adapt.ID, adapt.getAccount());
 		if (before != null)
-			adapt.add(before);
+			adapt.add(before);*/
 		int index = 0;
 		for (FeedListAdapter a : AccountService.feedAdapters) {
-			if (a.ID.equals(adapt.ID) && a.account == adapt.account) {
+			if (a.ID.equals(adapt.ID) && a.getAccount().getId() == adapt.getAccount().getId()) {
 				AccountService.feedAdapters.set(index, adapt);
 			}
 			index++;
@@ -375,10 +376,17 @@ public class Utilities {
 						if (!url.startsWith("http://")
 								&& !url.startsWith("https://"))
 							url = ("http://" + url);
-						context.startActivity(new Intent(Intent.ACTION_VIEW)
-								.setData(Uri.parse(url))
-								.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-								.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						
+						String action = PreferenceManager.getDefaultSharedPreferences( widget.getContext() ).getString("link_action", "browser");
+						
+						if(action.equals("browser")){
+							context.startActivity(new Intent(Intent.ACTION_VIEW)
+									.setData(Uri.parse(url))
+									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						} else if(action.equals("readability")){
+							context.startActivity(new Intent(widget.getContext(), ReadabilityActivity.class).setData(Uri.parse(url)));
+						}
 					}
 				}, e.getStart(), e.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			} else if (e.getType() == Extractor.Entity.Type.SEARCH) {

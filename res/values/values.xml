@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="profilePadding">93dp</dimen>
     <dimen name="sidebarWidth">300dp</dimen>
     <item type="bool" name="is_tablet">false</item>
+    <item type="integer" name="column_width">1</item>
     
 </resources>

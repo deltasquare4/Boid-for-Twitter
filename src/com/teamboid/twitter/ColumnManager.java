@@ -15,7 +15,7 @@ import com.teamboid.twitter.columns.MessagesFragment;
 import com.teamboid.twitter.columns.MyListsFragment;
 import com.teamboid.twitter.columns.NearbyFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
-import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
@@ -257,7 +257,7 @@ public class ColumnManager extends Activity {
 						});
 					}
 				}).start();
-				adapt.addColumn(SavedSearchFragment.ID + "@" + query.replace("@", "%40"), -1);
+				adapt.addColumn(SearchTweetsFragment.ID + "@" + query.replace("@", "%40"), -1);
 				diag.dismiss();
 			}
 		});

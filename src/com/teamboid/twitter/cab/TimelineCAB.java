@@ -101,7 +101,7 @@ public class TimelineCAB {
 		if (context instanceof TweetListActivity) {
 			ListAdapter adapter = ((TweetListActivity) context).getListView()
 					.getAdapter();
-			((FeedListAdapter) adapter).remove(status.getId());
+			((FeedListAdapter) adapter).remove(status);
 		} else {
 			for (int i = 0; i < context.getActionBar().getTabCount(); i++) {
 				Fragment frag = context.getFragmentManager().findFragmentByTag(
@@ -110,7 +110,7 @@ public class TimelineCAB {
 					ListAdapter adapter = ((BaseListFragment) frag)
 							.getListView().getAdapter();
 					if (adapter instanceof FeedListAdapter) {
-						((FeedListAdapter) adapter).remove(status.getId());
+						((FeedListAdapter) adapter).remove(status);
 					}
 				}
 			}
@@ -363,7 +363,7 @@ public class TimelineCAB {
 																AccountService
 																		.getCurrentAccount()
 																		.getId())
-														.add(new Status[] { result });
+														.add(result);
 											}
 										});
 							} catch (Exception e) {

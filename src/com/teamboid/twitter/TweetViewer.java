@@ -118,8 +118,7 @@ public class TweetViewer extends MapActivity {
 					.edit().putLong("last_sel_account", (long) accId).commit();
 		}
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		binder = new FeedListAdapter(this, null, AccountService
-				.getCurrentAccount().getId());
+		binder = new FeedListAdapter(this, null, null);
 		ListView list = ((ListView) findViewById(android.R.id.list));
 		list.setAdapter(binder);
 		list.setOnItemClickListener(new OnItemClickListener() {
@@ -316,7 +315,7 @@ public class TweetViewer extends MapActivity {
 								public void run() {
 									hasConvo = true;
 									invalidateOptionsMenu();
-									binder.add(toAdd.toArray(new Status[0]));
+									binder.addAll(toAdd);
 									binder.notifyDataSetChanged();
 									if(findViewById(R.id.glowstone) != null){
 										((GlowableRelativeLayout) findViewById(R.id.glowstone))
@@ -361,7 +360,8 @@ public class TweetViewer extends MapActivity {
 		RemoteImageView profilePic = (RemoteImageView) findViewById(R.id.tweetProfilePic);
 		profilePic.setImageResource(R.drawable.sillouette);
 		profilePic.setImageURL(Utilities.getUserImage(status.getUser()
-				.getScreenName(), this));
+				.getScreenName(), this, status.getUser()));
+		
 		View.OnClickListener profileOpen = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -507,7 +507,7 @@ public class TweetViewer extends MapActivity {
 							AccountService.getFeedAdapter(TweetViewer.this,
 									TimelineFragment.ID,
 									AccountService.getCurrentAccount().getId())
-									.add(new Status[] { result });
+									.add(result);
 						}
 					});
 				} catch (Exception e) {

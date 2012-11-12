@@ -10,7 +10,7 @@ import com.teamboid.twitter.columns.MessagesFragment;
 import com.teamboid.twitter.columns.MyListsFragment;
 import com.teamboid.twitter.columns.NearbyFragment;
 import com.teamboid.twitter.columns.ProfileTimelineFragment;
-import com.teamboid.twitter.columns.SavedSearchFragment;
+import com.teamboid.twitter.columns.SearchTweetsFragment;
 import com.teamboid.twitter.columns.TimelineFragment;
 import com.teamboid.twitter.columns.TrendsFragment;
 import com.teamboid.twitter.columns.UserListFragment;
@@ -117,8 +117,8 @@ public class ColumnManagerAdapter extends BaseAdapter {
 		} else if(c.equals(FavoritesFragment.ID)) {
 			c = _context.getString(R.string.favorites_str);
 			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerFavorites }).getDrawable(0);
-		} else if(c.startsWith(SavedSearchFragment.ID + "@")) {
-			c = c.substring(SavedSearchFragment.ID.length() + 1).replace("%40", "@");
+		} else if(c.startsWith(SearchTweetsFragment.ID + "@")) {
+			c = c.substring(SearchTweetsFragment.ID.length() + 1).replace("%40", "@");
 			image = _context.getTheme().obtainStyledAttributes(new int[] { R.attr.colManagerSavedSearch }).getDrawable(0);
 		} else if(c.startsWith(UserListFragment.ID + "@")) {
 			c = c.substring(UserListFragment.ID.length() + 1);

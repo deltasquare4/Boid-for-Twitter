@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent">
-	<Button android:id="@+id/profileFollowBtn" android:layout_width="fill_parent"
-		android:layout_height="50dp" android:background="@drawable/follow_button"
-		android:shadowColor="#000000" android:shadowDx="0" android:shadowDy="0"
-		android:shadowRadius="1" android:textColor="#FFFFFF" />
-</RelativeLayout>
+	<LinearLayout
+	    android:orientation="vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content">
+	    
+	    <!-- Nice and effecient :) -->
+	    
+	    <Button android:id="@+id/profileFollowBtn" android:layout_width="fill_parent"
+			android:layout_height="50dp" android:background="@drawable/follow_button"
+			android:text="@string/loading_str" android:enabled="false"
+			android:shadowColor="#000000" android:shadowDx="0" android:shadowDy="0"
+			android:shadowRadius="1" android:textColor="#FFFFFF" />
+	    
+	    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+					android:id="@+id/verified" android:layout_width="match_parent"
+					android:text="@string/verified_str" android:padding="5dp"
+					android:gravity="center_vertical" android:tag="verified"
+					android:layout_height="wrap_content" android:visibility="gone"
+					android:drawablePadding="5dp" android:drawableLeft="@drawable/verified" />
+	    
+	    <include android:id="@+id/bio" layout="@layout/info_list_item" />
+	    <include android:id="@+id/tweetNo" layout="@layout/info_list_item" />
+	    <include android:id="@+id/tweetsPerDay" layout="@layout/info_list_item" />
+	    <include android:id="@+id/website" layout="@layout/info_list_item" />
+	    <include android:id="@+id/location" layout="@layout/info_list_item" />
+	    <include android:id="@+id/favorites" layout="@layout/info_list_item" />
+	    <include android:id="@+id/friends" layout="@layout/info_list_item" />
+	    <include android:id="@+id/followers" layout="@layout/info_list_item" />
+	    
+	</LinearLayout>
+</ScrollView>

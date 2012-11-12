@@ -9,13 +9,16 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 public class InAppBrowser extends Activity {
-
-	private WebView view;
+	public WebView view;
 	
-	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		showUrl(getIntent().getStringExtra("url"));
+	}
+	
+	@SuppressLint("SetJavaScriptEnabled")
+	public void setupView(){
 		view = new WebView(this);
 		setContentView(view);
 		view.getSettings().setJavaScriptEnabled(true);
@@ -28,7 +31,11 @@ public class InAppBrowser extends Activity {
 				Toast.makeText(InAppBrowser.this, "Oh no! " + description, Toast.LENGTH_SHORT).show();
 			}
 		});
-		view.loadUrl(getIntent().getStringExtra("url"));
+	}
+	
+	public void showUrl(String url){
+		setupView();
+		view.loadUrl(url);
 	}
 	
 	@Override

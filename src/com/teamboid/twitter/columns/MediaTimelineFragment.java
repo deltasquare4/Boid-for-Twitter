@@ -262,4 +262,9 @@ public class MediaTimelineFragment extends BaseGridFragment {
 			firstSync = true;
 		}
 	}
+
+	@Override
+	public void performRefresh() {
+		performRefresh(false);
+	}
 }

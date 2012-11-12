@@ -88,6 +88,8 @@
 			android:description="@string/account_service_desc" android:icon="@drawable/launcher_icon"
 			android:label="@string/account_service_name" />
 
+		<activity android:name="com.teamboid.twitter.ReadabilityActivity" />
+		
 		<activity android:name="com.teamboid.twitter.SettingsScreen"
 			android:configChanges="screenSize" android:label="@string/settings_str" />
 		<activity android:name="com.teamboid.twitter.ComposerScreen"

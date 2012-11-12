@@ -2,14 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent"
 	android:orientation="horizontal">
-	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:orientation="vertical"
 		android:layout_width="@dimen/sidebarWidth" android:layout_height="match_parent">
-
+		
+	    <include layout="@layout/profile_header" />
+	    
 		<fragment android:id="@+id/aboutFragment"
 			android:layout_height="match_parent" android:layout_width="match_parent"
 			class="com.teamboid.twitter.columns.ProfileAboutFragment" />
-		<include layout="@layout/profile_header" />
-	</RelativeLayout>
+	</LinearLayout>
 	<android.support.v4.view.ViewPager
 		android:layout_weight="1" android:layout_width="0dp"
 		android:layout_height="match_parent" android:id="@+id/pager" />
