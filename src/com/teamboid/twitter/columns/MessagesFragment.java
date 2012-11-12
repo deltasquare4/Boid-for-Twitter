@@ -76,10 +76,12 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
 
 	@Override
 	public void setupAdapter() {
-		MessageConvoAdapter adapt = AccountService.getMessageConvoAdapter(getActivity(),
-                AccountService.getCurrentAccount().getId());
-		adapt.list = getListView();
-		setListAdapter(adapt);
+		if(AccountService.getCurrentAccount() != null){
+			MessageConvoAdapter adapt = AccountService.getMessageConvoAdapter(getActivity(),
+	                AccountService.getCurrentAccount().getId());
+			adapt.list = getListView();
+			setListAdapter(adapt);
+		}
 	}
 
 	@Override

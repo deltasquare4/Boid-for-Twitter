@@ -486,8 +486,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 						
 						if(cacheContents()){
 							ArrayList<T> y = new ArrayList<T>();
-							for(T x : t){
-								y.add(x);
+							for(int i = 0; i <= getAdapter().getCount() - 1; i++){
+								y.add(getAdapter().getItem(i));
 							}
 							saveCachedContents(y);
 						}
