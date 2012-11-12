@@ -25,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -420,6 +419,7 @@ public class SelectMediaScreen extends PreferenceActivity {
 			// m.setPersistent(false);
 			m.checked = pref.equals(entry.getKey());
 			m.callback = new OnPreferenceClickListener() {
+				@SuppressWarnings("rawtypes")
 				@Override
 				public boolean onPreferenceClick(Preference pref) {
 					setResult(RESULT_OK, new Intent().putExtra("service", entry.getKey()));

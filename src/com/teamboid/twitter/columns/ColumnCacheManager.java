@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.os.Parcel;
 import android.util.Log;
 
 /**
