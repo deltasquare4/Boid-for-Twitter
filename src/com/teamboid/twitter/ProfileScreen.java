@@ -57,8 +57,6 @@ import android.widget.Toast;
 import android.app.LoaderManager;
 
 import com.teamboid.twitterapi.list.UserList;
-import com.teamboid.twitterapi.relationship.Relationship;
-import com.teamboid.twitterapi.user.FollowingType;
 import com.teamboid.twitterapi.user.User;
 
 /**
