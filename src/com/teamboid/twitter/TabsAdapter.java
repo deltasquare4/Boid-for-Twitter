@@ -38,6 +38,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
@@ -207,6 +208,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
 		
 		Activity mContext;
+		View headerView;
 		String origTitle;
 		
 		@Override
@@ -263,6 +265,17 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 				((NullView)getView().findViewById(R.id.headerControl)).replace(v);
 			}*/
 			
+			headerView = LayoutInflater.from(getContext()).inflate(R.layout.list_footer, null);
+			headerView.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View arg0) {
+					if(!isLoading){
+						loadMore();
+					}
+				}
+			});
+			getListView().addFooterView(headerView);
+			
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -282,7 +295,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								.getBoolean("enable_iconic_tabs", true)) {
 							getActivity().getActionBar()
 									.getTabAt(getArguments().getInt("tab_index"))
-									.setText(R.string.mentions_str);
+									.setText(origTitle);
 						} else {
 							getActivity().getActionBar()
 									.getTabAt(getArguments().getInt("tab_index"))
@@ -294,6 +307,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			
 			setupAdapter();
 			
+			setListShown(false);
 			execService.execute(new Runnable(){
 
 				@SuppressWarnings("unchecked")
@@ -312,6 +326,15 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 							.getTabAt(
 									getArguments().getInt(
 											"tab_index")).getText().toString();
+					getContext().runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							setListShown(true);
+						}
+						
+					});
+					
 					if(contents != null){
 						getContext().runOnUiThread(new Runnable(){
 
@@ -333,14 +356,18 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		public boolean isLoading;
 		
-		public void setLoading(boolean loading){
+		public void setLoading(final boolean loading){
 			isLoading = loading;
 			if(getActivity() != null){
 				getActivity().runOnUiThread(new Runnable(){
 	
 					@Override
 					public void run() {
-						try{ getActivity().invalidateOptionsMenu(); }
+						try{
+							getActivity().invalidateOptionsMenu();
+							headerView.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
+							((TextView)headerView.findViewById(R.id.text)).setText(loading ? R.string.please_wait : R.string.load_more);
+						}
 						catch(Exception e) { }
 					}
 					
@@ -363,20 +390,23 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 				@Override
 				public void run() {
-					final TextView tv = (TextView) (getView().findViewById(R.id.error));
-					tv.setText(message);
-					tv.setAlpha(1);
-					tv.setVisibility(View.VISIBLE);
-					tv.animate().setStartDelay(3000).setListener(new AnimatorListener(){
-						@Override public void onAnimationCancel(Animator arg0) {}
-						@Override public void onAnimationRepeat(Animator arg0) {}
-						@Override public void onAnimationStart(Animator arg0) {}
-						
-						@Override public void onAnimationEnd(Animator arg0) {
-							tv.setVisibility(View.GONE);
-						}
-						
-					}).alpha(0);
+					setLoading(false);
+					try{
+						final TextView tv = (TextView) (getView().findViewById(R.id.error));
+						tv.setText(message);
+						tv.setAlpha(1);
+						tv.setVisibility(View.VISIBLE);
+						tv.animate().setStartDelay(3000).setListener(new AnimatorListener(){
+							@Override public void onAnimationCancel(Animator arg0) {}
+							@Override public void onAnimationRepeat(Animator arg0) {}
+							@Override public void onAnimationStart(Animator arg0) {}
+							
+							@Override public void onAnimationEnd(Animator arg0) {
+								tv.setVisibility(View.GONE);
+							}
+							
+						}).alpha(0);
+					} catch(Exception e){}
 				}
 				
 			});
@@ -394,6 +424,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		@Override
 		public void setListShown(boolean shown) {
+			if(getView() == null) return;
+			
 			View mProgressContainer = getView().findViewById(R.id.progressContainer);
 			View mListContainer = getView().findViewById(R.id.listContainer);
 			if (shown) {

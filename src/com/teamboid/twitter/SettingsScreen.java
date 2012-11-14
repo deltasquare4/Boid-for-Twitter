@@ -242,8 +242,11 @@ public class SettingsScreen extends PreferenceActivity  {
 				
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					android.accounts.Account ac = AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId));
+					
+					ContentResolver.removePeriodicSync(ac, NotificationService.AUTHORITY, new Bundle());
 					ContentResolver.addPeriodicSync(
-							AndroidAccountHelper.getAccount(getActivity(), AccountService.getAccount(accountId)), 
+							ac, 
 							NotificationService.AUTHORITY,
 							new Bundle(),
 							Integer.parseInt((String)newValue) * 60);

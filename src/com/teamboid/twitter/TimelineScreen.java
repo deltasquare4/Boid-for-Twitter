@@ -902,9 +902,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 								.getScreenName());
 		}
 
-		if (!NetworkUtils.haveNetworkConnection(this))
-			menu.findItem(R.id.refreshAction).setVisible(false);
-
 		return true;
 	}
 

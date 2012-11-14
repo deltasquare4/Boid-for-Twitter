@@ -3,7 +3,7 @@
 	package="com.teamboid.twitter" android:versionCode="87"
 	android:versionName="0.8.9 Beta">
 
-	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" />
+	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="17" />
 
 	<uses-feature android:name="android.hardware.camera"
 		android:required="false" />
