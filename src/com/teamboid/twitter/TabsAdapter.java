@@ -322,10 +322,12 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					// Try and load a cached result if we have one
 					final List<Serializable> contents = ColumnCacheManager.getCache(getContext(), getColumnName());
 					
-					origTitle = getContext().getActionBar()
-							.getTabAt(
-									getArguments().getInt(
-											"tab_index")).getText().toString();
+					if(getArguments() != null && getArguments().containsKey("tab_index")){
+						origTitle = getContext().getActionBar()
+								.getTabAt(
+										getArguments().getInt(
+												"tab_index")).getText().toString();
+					}
 					getContext().runOnUiThread(new Runnable(){
 
 						@Override
@@ -499,7 +501,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								if(id != -1)
 									getListView().setSelection( getAdapter().getPosition(id) );
 								
-								if(t.length > 0){
+								if(t.length > 0 && getArguments() != null && getArguments().containsKey("tab_index")){
 									// Set the tab unread count
 								
 									getActivity().getActionBar()
@@ -517,11 +519,15 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 						});
 						
 						if(cacheContents()){
-							ArrayList<T> y = new ArrayList<T>();
-							for(int i = 0; i <= getAdapter().getCount() - 1; i++){
-								y.add(getAdapter().getItem(i));
+							try{
+								ArrayList<T> y = new ArrayList<T>();
+								for(int i = 0; i <= getAdapter().getCount() - 1; i++){
+									y.add(getAdapter().getItem(i));
+								}
+								saveCachedContents(y);
+							} catch(Exception e){
+								e.printStackTrace();
 							}
-							saveCachedContents(y);
 						}
 					}
 				}
@@ -559,34 +565,39 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public void getLocation() {
 			if (isGettingLocation)
 				return;
-			isGettingLocation = true;
-			final LocationManager locationManager = (LocationManager) getActivity()
-					.getSystemService(Context.LOCATION_SERVICE);
-			LocationListener locationListener = new LocationListener() {
-				@Override
-				public void onLocationChanged(Location loc) {
-					locationManager.removeUpdates(this);
-					isGettingLocation = false;
-					location = new GeoLocation(loc.getLatitude(),
-							loc.getLongitude());
-					performRefresh();
-				}
-
-				@Override
-				public void onStatusChanged(String provider, int status,
-						Bundle extras) {
-				}
-
-				@Override
-				public void onProviderEnabled(String provider) {
-				}
-
-				@Override
-				public void onProviderDisabled(String provider) {
-				}
-			};
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+			try{
+				isGettingLocation = true;
+				final LocationManager locationManager = (LocationManager) getActivity()
+						.getSystemService(Context.LOCATION_SERVICE);
+				LocationListener locationListener = new LocationListener() {
+					@Override
+					public void onLocationChanged(Location loc) {
+						locationManager.removeUpdates(this);
+						isGettingLocation = false;
+						location = new GeoLocation(loc.getLatitude(),
+								loc.getLongitude());
+						performRefresh();
+					}
+	
+					@Override
+					public void onStatusChanged(String provider, int status,
+							Bundle extras) {
+					}
+	
+					@Override
+					public void onProviderEnabled(String provider) {
+					}
+	
+					@Override
+					public void onProviderDisabled(String provider) {
+					}
+				};
+				locationManager.requestLocationUpdates(
+						LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+			} catch(Exception e){
+				e.printStackTrace();
+				showError(e.getMessage());
+			}
 		}
 		
 	}
