@@ -105,7 +105,15 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
                 for (DirectMessage msg : sent) messages.add(msg);
             }
             
-            ((MessageConvoAdapter)getListAdapter()).add(messages.toArray(new DirectMessage[]{}));
+            // REALLY BAD!
+            getActivity().runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+					((MessageConvoAdapter)getListAdapter()).add(messages.toArray(new DirectMessage[]{}));
+				}
+            	
+            });
             
             NotificationService.setReadDMs(acc.getId(), getActivity());
             

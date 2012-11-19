@@ -29,6 +29,7 @@ import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -205,7 +206,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	 */
 	public static abstract class BaseListFragment<T extends Serializable> extends ListFragment
 			implements IBoidFragment {
-		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
+		private static ExecutorService execService = Executors.newCachedThreadPool(Executors.defaultThreadFactory());
 		
 		Activity mContext;
 		View headerView;
@@ -255,15 +256,42 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 		
 		@Override
-		public void onStart() {
-			super.onStart();
+		public void onPause() {
+			super.onPause();
+			try{
+				if(getAdapter().getCount() > 0){
+					SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+					sp.edit().putLong("column-last-pos-" + getColumnName(), getAdapter().getItemId( getListView().getFirstVisiblePosition() )).commit();
+				}
+			} catch(Exception e){ e.printStackTrace(); }
+		}
+		
+		void restoreLastPosition(){
+			try{
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+				getListView().setSelection( getAdapter().getPosition( sp.getLong("column-last-pos-" + getColumnName(), -1) ) );
+			} catch(Exception e){ e.printStackTrace(); }
+		}
+		
+		@Override
+		public void onResume() {
+			super.onResume();
 			if(getActivity() == null || getView() == null) return;
 			
+			if(getAdapter() != null){
+				if(getAdapter().getCount() > 0){
+					// Apply last position
+					restoreLastPosition();
+					return;
+				}
+			}
+			
 			getView().findViewById(R.id.container).setPadding(0, getPaddingTop(), 0, 0);
-			/*View v = getTopView();
+			View v = getTopView();
 			if(v != null){
-				((NullView)getView().findViewById(R.id.headerControl)).replace(v);
-			}*/
+				v.setId(R.id.headerControl);
+				((NullView)getView().findViewById(R.id.headerControlWrapper)).replace(v);
+			}
 			
 			headerView = LayoutInflater.from(getContext()).inflate(R.layout.list_footer, null);
 			headerView.setOnClickListener(new OnClickListener(){
@@ -345,6 +373,9 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								getAdapter().addAll((Collection<? extends T>) contents);
 								if(getAdapter().getFilter() != null)
 									getAdapter().getFilter().filter("");
+								
+								// We have resumed from sleepyness
+								restoreLastPosition();
 								
 								getAdapter().notifyDataSetChanged();
 							}
