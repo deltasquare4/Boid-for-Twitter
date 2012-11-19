@@ -29,6 +29,7 @@ import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,6 +39,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
@@ -162,7 +164,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	
 	@Override
     public float getPageWidth(int position){
-    	return mContext.getResources().getInteger(R.integer.column_width); // TODO: Option
+    	return mContext.getResources().getInteger(R.integer.column_width);
     }
 
 	@Override
@@ -204,9 +206,10 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	 */
 	public static abstract class BaseListFragment<T extends Serializable> extends ListFragment
 			implements IBoidFragment {
-		private static ExecutorService execService = Executors.newCachedThreadPool(new LowPriorityThreadFactory());
+		private static ExecutorService execService = Executors.newCachedThreadPool(Executors.defaultThreadFactory());
 		
 		Activity mContext;
+		View headerView;
 		String origTitle;
 		
 		@Override
@@ -253,15 +256,53 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		}
 		
 		@Override
-		public void onStart() {
-			super.onStart();
+		public void onPause() {
+			super.onPause();
+			try{
+				if(getAdapter().getCount() > 0){
+					SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+					sp.edit().putLong("column-last-pos-" + getColumnName(), getAdapter().getItemId( getListView().getFirstVisiblePosition() )).commit();
+				}
+			} catch(Exception e){ e.printStackTrace(); }
+		}
+		
+		void restoreLastPosition(){
+			try{
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+				getListView().setSelection( getAdapter().getPosition( sp.getLong("column-last-pos-" + getColumnName(), -1) ) );
+			} catch(Exception e){ e.printStackTrace(); }
+		}
+		
+		@Override
+		public void onResume() {
+			super.onResume();
 			if(getActivity() == null || getView() == null) return;
 			
+			if(getAdapter() != null){
+				if(getAdapter().getCount() > 0){
+					// Apply last position
+					restoreLastPosition();
+					return;
+				}
+			}
+			
 			getView().findViewById(R.id.container).setPadding(0, getPaddingTop(), 0, 0);
-			/*View v = getTopView();
+			View v = getTopView();
 			if(v != null){
-				((NullView)getView().findViewById(R.id.headerControl)).replace(v);
-			}*/
+				v.setId(R.id.headerControl);
+				((NullView)getView().findViewById(R.id.headerControlWrapper)).replace(v);
+			}
+			
+			headerView = LayoutInflater.from(getContext()).inflate(R.layout.list_footer, null);
+			headerView.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View arg0) {
+					if(!isLoading){
+						loadMore();
+					}
+				}
+			});
+			getListView().addFooterView(headerView);
 			
 			getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 				@Override
@@ -282,7 +323,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								.getBoolean("enable_iconic_tabs", true)) {
 							getActivity().getActionBar()
 									.getTabAt(getArguments().getInt("tab_index"))
-									.setText(R.string.mentions_str);
+									.setText(origTitle);
 						} else {
 							getActivity().getActionBar()
 									.getTabAt(getArguments().getInt("tab_index"))
@@ -294,6 +335,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			
 			setupAdapter();
 			
+			setListShown(false);
 			execService.execute(new Runnable(){
 
 				@SuppressWarnings("unchecked")
@@ -308,10 +350,21 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					// Try and load a cached result if we have one
 					final List<Serializable> contents = ColumnCacheManager.getCache(getContext(), getColumnName());
 					
-					origTitle = getContext().getActionBar()
-							.getTabAt(
-									getArguments().getInt(
-											"tab_index")).getText().toString();
+					if(getArguments() != null && getArguments().containsKey("tab_index")){
+						origTitle = getContext().getActionBar()
+								.getTabAt(
+										getArguments().getInt(
+												"tab_index")).getText().toString();
+					}
+					getContext().runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							setListShown(true);
+						}
+						
+					});
+					
 					if(contents != null){
 						getContext().runOnUiThread(new Runnable(){
 
@@ -320,6 +373,9 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								getAdapter().addAll((Collection<? extends T>) contents);
 								if(getAdapter().getFilter() != null)
 									getAdapter().getFilter().filter("");
+								
+								// We have resumed from sleepyness
+								restoreLastPosition();
 								
 								getAdapter().notifyDataSetChanged();
 							}
@@ -333,15 +389,19 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		public boolean isLoading;
 		
-		public void setLoading(boolean loading){
+		public void setLoading(final boolean loading){
 			isLoading = loading;
 			if(getActivity() != null){
 				getActivity().runOnUiThread(new Runnable(){
 	
 					@Override
 					public void run() {
-						try{ getActivity().invalidateOptionsMenu(); }
-						catch(Exception e) { }
+						try{
+							getContext().invalidateOptionsMenu();
+							headerView.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
+							((TextView)headerView.findViewById(R.id.text)).setText(loading ? R.string.please_wait : R.string.load_more);
+						}
+						catch(Exception e) { e.printStackTrace(); }
 					}
 					
 				});
@@ -363,20 +423,23 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 
 				@Override
 				public void run() {
-					final TextView tv = (TextView) (getView().findViewById(R.id.error));
-					tv.setText(message);
-					tv.setAlpha(1);
-					tv.setVisibility(View.VISIBLE);
-					tv.animate().setStartDelay(3000).setListener(new AnimatorListener(){
-						@Override public void onAnimationCancel(Animator arg0) {}
-						@Override public void onAnimationRepeat(Animator arg0) {}
-						@Override public void onAnimationStart(Animator arg0) {}
-						
-						@Override public void onAnimationEnd(Animator arg0) {
-							tv.setVisibility(View.GONE);
-						}
-						
-					}).alpha(0);
+					setLoading(false);
+					try{
+						final TextView tv = (TextView) (getView().findViewById(R.id.error));
+						tv.setText(message);
+						tv.setAlpha(1);
+						tv.setVisibility(View.VISIBLE);
+						tv.animate().setStartDelay(3000).setListener(new AnimatorListener(){
+							@Override public void onAnimationCancel(Animator arg0) {}
+							@Override public void onAnimationRepeat(Animator arg0) {}
+							@Override public void onAnimationStart(Animator arg0) {}
+							
+							@Override public void onAnimationEnd(Animator arg0) {
+								tv.setVisibility(View.GONE);
+							}
+							
+						}).alpha(0);
+					} catch(Exception e){ e.printStackTrace(); }
 				}
 				
 			});
@@ -394,9 +457,13 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		
 		@Override
 		public void setListShown(boolean shown) {
+			if(getView() == null) return;
+			
 			View mProgressContainer = getView().findViewById(R.id.progressContainer);
 			View mListContainer = getView().findViewById(R.id.listContainer);
 			if (shown) {
+				getView().findViewById(android.R.id.empty).setVisibility(getAdapter().getCount() == 0 ? View.VISIBLE : View.GONE);
+				
 				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
 				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
 				mProgressContainer.setVisibility(View.GONE);
@@ -442,6 +509,14 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					long s = -1;
 					if(getAdapter().getCount() > 0) s = getAdapter().getItemId(0);
 					final T[] t = fetch(-1, s);
+					
+					if(t != null && t.length == 0){
+						showError("nothing");
+						if(getAdapter().getCount() == 0){
+							setListShown(false);
+						}
+					}
+					
 					setLoading(false);
 					if(t != null){
 						getContext().runOnUiThread(new Runnable(){
@@ -456,9 +531,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								if(t.length >= getMaxPerLoad()){
 									getAdapter().clear();
 								}
+								
 								for(T item : t){
 									getAdapter().insert(item, 0);
 								}
+								
 								//getAdapter().addAll(t);
 								if(getAdapter().getFilter() != null)
 									getAdapter().getFilter().filter("");
@@ -467,7 +544,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								if(id != -1)
 									getListView().setSelection( getAdapter().getPosition(id) );
 								
-								if(t.length > 0){
+								if(t.length > 0 && getArguments() != null && getArguments().containsKey("tab_index")){
 									// Set the tab unread count
 								
 									getActivity().getActionBar()
@@ -485,11 +562,15 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 						});
 						
 						if(cacheContents()){
-							ArrayList<T> y = new ArrayList<T>();
-							for(T x : t){
-								y.add(x);
+							try{
+								ArrayList<T> y = new ArrayList<T>();
+								for(int i = 0; i <= getAdapter().getCount() - 1; i++){
+									y.add(getAdapter().getItem(i));
+								}
+								saveCachedContents(y);
+							} catch(Exception e){
+								e.printStackTrace();
 							}
-							saveCachedContents(y);
 						}
 					}
 				}
@@ -527,34 +608,39 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 		public void getLocation() {
 			if (isGettingLocation)
 				return;
-			isGettingLocation = true;
-			final LocationManager locationManager = (LocationManager) getActivity()
-					.getSystemService(Context.LOCATION_SERVICE);
-			LocationListener locationListener = new LocationListener() {
-				@Override
-				public void onLocationChanged(Location loc) {
-					locationManager.removeUpdates(this);
-					isGettingLocation = false;
-					location = new GeoLocation(loc.getLatitude(),
-							loc.getLongitude());
-					performRefresh();
-				}
-
-				@Override
-				public void onStatusChanged(String provider, int status,
-						Bundle extras) {
-				}
-
-				@Override
-				public void onProviderEnabled(String provider) {
-				}
-
-				@Override
-				public void onProviderDisabled(String provider) {
-				}
-			};
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+			try{
+				isGettingLocation = true;
+				final LocationManager locationManager = (LocationManager) getActivity()
+						.getSystemService(Context.LOCATION_SERVICE);
+				LocationListener locationListener = new LocationListener() {
+					@Override
+					public void onLocationChanged(Location loc) {
+						locationManager.removeUpdates(this);
+						isGettingLocation = false;
+						location = new GeoLocation(loc.getLatitude(),
+								loc.getLongitude());
+						performRefresh();
+					}
+	
+					@Override
+					public void onStatusChanged(String provider, int status,
+							Bundle extras) {
+					}
+	
+					@Override
+					public void onProviderEnabled(String provider) {
+					}
+	
+					@Override
+					public void onProviderDisabled(String provider) {
+					}
+				};
+				locationManager.requestLocationUpdates(
+						LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+			} catch(Exception e){
+				e.printStackTrace();
+				showError(e.getMessage());
+			}
 		}
 		
 	}

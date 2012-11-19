@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.teamboid.twitter.Account;
+import com.teamboid.twitter.ProfileScreen;
 import com.teamboid.twitter.R;
 import com.teamboid.twitter.TabsAdapter.IBoidFragment;
 import com.teamboid.twitter.TweetListActivity;
@@ -39,9 +40,17 @@ public class ProfileAboutFragment extends Fragment implements IBoidFragment {
 	User currentUser;
 	Relationship ourRelationship;
 	
+	public int getPaddingTop(){
+		if(getArguments().containsKey("home"))
+			return 0;
+		return getActivity().getResources().getDimensionPixelSize(R.dimen.profilePadding);
+	}
+	
 	@Override
 	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		return inflater.inflate(R.layout.profile_info_tab, container, false);
+		View r = inflater.inflate(R.layout.profile_info_tab, container, false);
+		r.setPadding(0, getPaddingTop(), 0, 0);
+		return r;
 	}
 	
 	public void setScreenName(String name){
@@ -64,15 +73,29 @@ public class ProfileAboutFragment extends Fragment implements IBoidFragment {
 	@Override
 	public void onDisplay() { /* ignore */ }
 	
-	void setItem(int id, String title, String body){
-		View c = getView().findViewById(id);
-		c.setVisibility(View.VISIBLE);
-		((TextView)c.findViewById(R.id.infoListItemTitle)).setText(title);
-		((TextView)c.findViewById(R.id.infoListItemBody)).setText(body);
+	void setItem(final int id, final String title, final String body){
+		getActivity().runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				View c = getView().findViewById(id);
+				c.setVisibility(View.VISIBLE);
+				((TextView)c.findViewById(R.id.infoListItemTitle)).setText(title);
+				((TextView)c.findViewById(R.id.infoListItemBody)).setText(body);
+			}
+			
+		});
 	}
 	
-	void hideItem(int id){
-		getView().findViewById(id).setVisibility(View.GONE);
+	void hideItem(final int id){
+		getActivity().runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				getView().findViewById(id).setVisibility(View.GONE);
+			}
+			
+		});
 	}
 	
 	public static double round(double unrounded, int precision, int roundingMode) {
@@ -134,7 +157,19 @@ public class ProfileAboutFragment extends Fragment implements IBoidFragment {
 					setItem(R.id.friends, getString(R.string.friends_str), currentUser.getFriendsCount() + "");
 					setItem(R.id.followers, getString(R.string.followers_str), currentUser.getFollowersCount()  +"");
 					
-					getView().findViewById(R.id.verified).setVisibility( currentUser.isVerified() ? View.VISIBLE : View.GONE );
+					getActivity().runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							getView().findViewById(R.id.verified).setVisibility( currentUser.isVerified() ? View.VISIBLE : View.GONE );
+							try{
+								((ProfileScreen)getActivity()).user = currentUser;
+								((ProfileScreen)getActivity()).setupViews();
+							} catch(Exception e){}
+						}
+						
+					});
+					
 					
 					// Follow button logic
 					updateFollowButton();
@@ -155,31 +190,39 @@ public class ProfileAboutFragment extends Fragment implements IBoidFragment {
 					currentUser.getId());
 		} catch(Exception e){ e.printStackTrace(); }
 		
-		Button button = ((Button)getView().findViewById(R.id.profileFollowBtn));
-		
-		if(ourRelationship == null){
-			button.setText(R.string.error_str);
-			button.setEnabled(false);
-		} else{
-			button.setEnabled(true);
-			if(ourRelationship.isSourceBlockingTarget()){
-				button.setText(R.string.unblock_str);
-			} else if(currentUser.getFollowingType().equals(FollowingType.REQUEST_SENT)){
-				button.setText(R.string.request_sent_str);
-			} else{
-				if (!ourRelationship.isSourceFollowingTarget()) {
-					if (ourRelationship.isTargetFollowingSource())
-						button.setText(R.string.follow_back_str);
-					else
-						button.setText(R.string.follow_str);
-				} else {
-					if (ourRelationship.isTargetFollowingSource())
-						button.setText(R.string.follows_you_unfollow_str);
-					else
-						button.setText(R.string.unfollow_str);
+		getActivity().runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				Button button = ((Button)getView().findViewById(R.id.profileFollowBtn));
+				
+				if(ourRelationship == null){
+					button.setText(R.string.error_str);
+					button.setEnabled(false);
+				} else{
+					button.setEnabled(true);
+					if(ourRelationship.isSourceBlockingTarget()){
+						button.setText(R.string.unblock_str);
+					} else if(currentUser.getFollowingType().equals(FollowingType.REQUEST_SENT)){
+						button.setText(R.string.request_sent_str);
+					} else{
+						if (!ourRelationship.isSourceFollowingTarget()) {
+							if (ourRelationship.isTargetFollowingSource())
+								button.setText(R.string.follow_back_str);
+							else
+								button.setText(R.string.follow_str);
+						} else {
+							if (ourRelationship.isTargetFollowingSource())
+								button.setText(R.string.follows_you_unfollow_str);
+							else
+								button.setText(R.string.unfollow_str);
+						}
+					}
 				}
 			}
-		}
+			
+		});
+		
 	}
 	
 	@Override

@@ -15,6 +15,7 @@ import com.teamboid.twitter.listadapters.MessageConvoAdapter;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitter.notifications.NotificationService;
+import com.teamboid.twitterapi.client.Paging;
 import com.teamboid.twitterapi.dm.DirectMessage;
 import com.teamboid.twitterapi.search.Tweet;
 import com.teamboid.twitterapi.status.Status;
@@ -76,30 +77,47 @@ public class MessagesFragment extends BaseListFragment<DMConversation> {
 
 	@Override
 	public void setupAdapter() {
-		MessageConvoAdapter adapt = AccountService.getMessageConvoAdapter(getActivity(),
-                AccountService.getCurrentAccount().getId());
-		adapt.list = getListView();
-		setListAdapter(adapt);
+		if(AccountService.getCurrentAccount() != null){
+			MessageConvoAdapter adapt = AccountService.getMessageConvoAdapter(getActivity(),
+	                AccountService.getCurrentAccount().getId());
+			adapt.list = getListView();
+			setListAdapter(adapt);
+		}
 	}
 
 	@Override
 	public DMConversation[] fetch(long maxId, long sinceId) {
 		try{
+			Paging paging = new Paging(20);
+			if(maxId != -1){
+				paging.setMaxId(maxId);
+			}
+			
 			Account acc = AccountService.getCurrentAccount();
 			
 			final ArrayList<DirectMessage> messages = new ArrayList<DirectMessage>();
-            DirectMessage[] recv = acc.getClient().getDirectMessages(null);
+            DirectMessage[] recv = acc.getClient().getDirectMessages(paging);
             if (recv != null && recv.length > 0) {
                 for (DirectMessage msg : recv) messages.add(msg);
             }
-            DirectMessage[] sent = acc.getClient().getSentDirectMessages(null);
+            DirectMessage[] sent = acc.getClient().getSentDirectMessages(paging);
             if (sent != null && sent.length > 0) {
                 for (DirectMessage msg : sent) messages.add(msg);
             }
             
+            // REALLY BAD!
+            getActivity().runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+					((MessageConvoAdapter)getListAdapter()).add(messages.toArray(new DirectMessage[]{}));
+				}
+            	
+            });
+            
             NotificationService.setReadDMs(acc.getId(), getActivity());
             
-            return messages.toArray(new DMConversation[]{});
+            return null;
 		} catch(Exception e){
 			e.printStackTrace();
 			showError(e.getMessage());

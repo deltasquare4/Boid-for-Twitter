@@ -60,6 +60,8 @@ public class ColumnCacheManager {
 			List<Serializable> contents = new ArrayList<Serializable>();
 			Log.d("cache", "reading from " + getCacheFile(c, column).getAbsolutePath());
 			FileInputStream fis = new FileInputStream(getCacheFile(c, column));
+			if(fis.available() == 0){ fis.close(); return null; }
+			
 			ObjectInputStream ooi = new ObjectInputStream(fis);
 			while(true){
 				try{

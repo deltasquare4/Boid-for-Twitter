@@ -4,5 +4,6 @@
     <dimen name="sidebarWidth">300dp</dimen>
     <item type="bool" name="is_tablet">false</item>
     <item type="integer" name="column_width">1</item>
+    <item type="id" name="headerControl"/>
     
 </resources>

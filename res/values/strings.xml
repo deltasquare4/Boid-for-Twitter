@@ -584,5 +584,6 @@
 	    <item>readability</item>
 	</string-array>
 	<string name="full">Full</string>
+	<string name="load_more">Load More</string>
 	
 </resources>

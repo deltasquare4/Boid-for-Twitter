@@ -902,9 +902,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 								.getScreenName());
 		}
 
-		if (!NetworkUtils.haveNetworkConnection(this))
-			menu.findItem(R.id.refreshAction).setVisible(false);
-
 		return true;
 	}
 
@@ -926,8 +923,6 @@ public class TimelineScreen extends Activity implements ActionBar.TabListener {
 				((BaseListFragment) frag).performRefresh();
 			else if (frag instanceof BaseGridFragment)
 				((BaseGridFragment) frag).performRefresh(false);
-			else if (frag instanceof BaseSpinnerFragment)
-				((BaseSpinnerFragment) frag).performRefresh();
 		}
 		return true;
 	}
