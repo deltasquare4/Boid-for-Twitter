@@ -31,6 +31,7 @@
 			<ListView android:id="@android:id/list" android:layout_width="match_parent"
 				android:layout_height="match_parent" android:drawSelectorOnTop="false" />
 			<TextView android:id="@android:id/empty"
+			    android:text="@string/no_tweets"
 				android:layout_width="match_parent" android:layout_height="match_parent"
 				android:gravity="center" android:textAppearance="?android:attr/textAppearanceLarge" />
 		</FrameLayout>

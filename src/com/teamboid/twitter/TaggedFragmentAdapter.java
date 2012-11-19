@@ -18,9 +18,12 @@ package com.teamboid.twitter;
 
 import java.util.ArrayList;
 
+import com.teamboid.twitter.compat.Api15;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
@@ -67,6 +70,13 @@ public abstract class TaggedFragmentAdapter extends PagerAdapter {
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
+        
+        Fragment liveFragment = mFragmentManager.findFragmentByTag("page:" + Integer.toString(position));
+        if(liveFragment != null){
+        	mCurTransaction.attach(liveFragment);
+        	
+        	return liveFragment;
+        }
 
         Fragment fragment = getItem(position);
         if (DEBUG) Log.v(TAG, "Adding item #" + position + ": f=" + fragment);
@@ -79,7 +89,14 @@ public abstract class TaggedFragmentAdapter extends PagerAdapter {
         while (mFragments.size() <= position) {
             mFragments.add(null);
         }
-        fragment.setMenuVisibility(false);
+        
+        if (fragment != mCurrentPrimaryItem) {
+            fragment.setMenuVisibility(false);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1){
+            	Api15.setUserVisibleHint(fragment, false);
+            }
+        }
+        
         mFragments.set(position, fragment);
         mCurTransaction.add(container.getId(), fragment, "page:" + Integer.toString(position));
 

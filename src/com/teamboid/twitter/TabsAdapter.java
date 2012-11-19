@@ -163,7 +163,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 	
 	@Override
     public float getPageWidth(int position){
-    	return mContext.getResources().getInteger(R.integer.column_width); // TODO: Option
+    	return mContext.getResources().getInteger(R.integer.column_width);
     }
 
 	@Override
@@ -366,11 +366,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					@Override
 					public void run() {
 						try{
-							getActivity().invalidateOptionsMenu();
+							getContext().invalidateOptionsMenu();
 							headerView.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
 							((TextView)headerView.findViewById(R.id.text)).setText(loading ? R.string.please_wait : R.string.load_more);
 						}
-						catch(Exception e) { }
+						catch(Exception e) { e.printStackTrace(); }
 					}
 					
 				});
@@ -408,7 +408,7 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 							}
 							
 						}).alpha(0);
-					} catch(Exception e){}
+					} catch(Exception e){ e.printStackTrace(); }
 				}
 				
 			});
@@ -431,6 +431,8 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 			View mProgressContainer = getView().findViewById(R.id.progressContainer);
 			View mListContainer = getView().findViewById(R.id.listContainer);
 			if (shown) {
+				getView().findViewById(android.R.id.empty).setVisibility(getAdapter().getCount() == 0 ? View.VISIBLE : View.GONE);
+				
 				mProgressContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
 				mListContainer.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
 				mProgressContainer.setVisibility(View.GONE);
@@ -476,6 +478,14 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 					long s = -1;
 					if(getAdapter().getCount() > 0) s = getAdapter().getItemId(0);
 					final T[] t = fetch(-1, s);
+					
+					if(t != null && t.length == 0){
+						showError("nothing");
+						if(getAdapter().getCount() == 0){
+							setListShown(false);
+						}
+					}
+					
 					setLoading(false);
 					if(t != null){
 						getContext().runOnUiThread(new Runnable(){
@@ -490,9 +500,11 @@ public class TabsAdapter extends TaggedFragmentAdapter {
 								if(t.length >= getMaxPerLoad()){
 									getAdapter().clear();
 								}
+								
 								for(T item : t){
 									getAdapter().insert(item, 0);
 								}
+								
 								//getAdapter().addAll(t);
 								if(getAdapter().getFilter() != null)
 									getAdapter().getFilter().filter("");
