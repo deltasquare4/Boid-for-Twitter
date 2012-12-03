@@ -9,10 +9,8 @@ import java.util.concurrent.Executors;
 
 import me.kennydude.awesomeprefs.NullView;
 
-import com.handlerexploit.prime.ImageManager.LowPriorityThreadFactory;
 import com.teamboid.twitter.cab.TimelineCAB;
 import com.teamboid.twitter.columns.ColumnCacheManager;
-import com.teamboid.twitter.columns.MentionsFragment;
 import com.teamboid.twitter.listadapters.MessageConvoAdapter.DMConversation;
 import com.teamboid.twitter.services.AccountService;
 import com.teamboid.twitterapi.search.Tweet;
